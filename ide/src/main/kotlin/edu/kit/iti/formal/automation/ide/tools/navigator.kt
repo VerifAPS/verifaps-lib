@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
+import kotlin.Comparator
 
 interface NavigatorService {
     //fun setRootFile(root: File)
@@ -203,11 +204,16 @@ fun JComponent.registerKeyboardAction(vararg actions: IdeAction, modifier: Int =
 data class FolderTreeNode(val file: File, val filter: (File) -> Boolean) : TreeNode {
     var children: List<FolderTreeNode> = arrayListOf()
         get() {
+            val cmpFile = compareBy<File> { it.name }
+            val cmpDirectory = compareBy<File> { it.isDirectory }.reversed()
+            val cmp = cmpDirectory.thenComparing(cmpDirectory)
+
             if (field.isEmpty())
                 field = file.listFiles()
                         ?.filter(filter)
+                        ?.sortedWith(cmp)
                         ?.map { FolderTreeNode(it, filter) }
-                        ?: listOf<FolderTreeNode>()
+                        ?: listOf()
             return field
         }
 

@@ -35,7 +35,7 @@ abstract class BaseLanguageSupport : LanguageSupport {
 class DefaultSyntaxScheme : SyntaxScheme(false) {
     override fun getStyle(index: Int): Style {
         val style = Style()
-        style.foreground = Color.WHITE
+        style.foreground = Color.BLACK
         return style
     }
 }

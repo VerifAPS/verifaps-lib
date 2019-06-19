@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.automation.ide.editors
 
 import edu.kit.iti.formal.automation.ide.*
-import edu.kit.iti.formal.automation.ide.tools.OutlineService
-import edu.kit.iti.formal.automation.ide.tools.OverviewStructureNode
-import edu.kit.iti.formal.automation.ide.tools.StructureData
-import edu.kit.iti.formal.automation.ide.tools.StructureTypeIcon
+import edu.kit.iti.formal.automation.ide.tools.*
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.ast.Position
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -181,6 +178,8 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
     //val timer = Timer(500) { _ -> EVENT_BUS.post(EventGetetaUpdate(textArea.text)) }
     val problemList by lookup.with<ProblemList>()
     val outlineService by lookup.with<OutlineService>()
+    val previewService by lookup.with<GetetaPreviewService>()
+
 
     override fun parse(doc: RSyntaxDocument?, style: String?): ParseResult {
         val res = DefaultParseResult(this)
@@ -188,8 +187,10 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
         //parser.errorReporter.isPrint = true
         try {
             val ctx = parser.file()
+            val gtt =  GetetaFacade.parseTableDSL(ctx)
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
+            previewService.render(gtt)
             outlineService.show(node)
             problemList.set(textArea, listOf())
         } catch (e: SyntaxErrorReporter.ParserException) {

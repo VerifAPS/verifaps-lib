@@ -208,18 +208,13 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
-    fun translateToSt(name: String, scope: Scope, sfc: SFCImplementation): StatementList {
+    fun translateToSt(scope: Scope, sfc: SFCImplementation, name: String = ""): StatementList {
         val st = StatementList()
-        sfc.networks.forEachIndexed { index, network ->
-            st.add(TranslationSfcToSt(index, name, network, scope).call()) }
+        sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToSt(network, name, index, scope).call()) }
         return st
     }
 
-    fun translateSfc(elements: PouElements) {
-        elements.forEach {
-            it.accept(TranslateSfcToSt)
-        }
-    }
+    fun translateSfc(elements: PouElements) { elements.forEach { it.accept(TranslateSfcToSt) } }
 
     object InstructionList {
         /*

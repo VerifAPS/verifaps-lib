@@ -305,7 +305,7 @@ reference_value
 
 identifier_list
 :
-	names+=name	(COMMA names+=name )*
+	names+=variable_names (COMMA names+=variable_names)*
 ;
 
 function_declaration
@@ -725,9 +725,22 @@ variable
 	| symbolic_variable
 ;
 
+variable_names:
+      IDENTIFIER
+    | SUPER
+    | THIS
+    | STEP
+    | END_STEP
+    | INITIAL_STEP
+    | END_ACTION
+    | FROM
+    | END_TRANSITION
+    | TRANSITION
+    ;
+
 symbolic_variable :
     //x^[a,252]
-	a=(IDENTIFIER|SUPER|THIS)
+	a=variable_names
 	(
         (deref += CARET)+
 	)?

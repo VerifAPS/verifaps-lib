@@ -1,0 +1,4079 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://www.plcopen.org/xml/tc6_0200">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP8 Patch 1" creationDateTime="2016-02-29T20:15:04.9897142" />
+  <contentHeader name="Scenario3v1_CASE16_I_Final.project" modificationDateTime="2016-02-29T20:12:30.8137167">
+    <coordinateInfo>
+      <fbd>
+        <scaling x="1" y="1" />
+      </fbd>
+      <ld>
+        <scaling x="1" y="1" />
+      </ld>
+      <sfc>
+        <scaling x="1" y="1" />
+      </sfc>
+    </coordinateInfo>
+    <addData>
+      <data name="http://www.3s-software.com/plcopenxml/projectinformation" handleUnknown="implementation">
+        <ProjectInformation />
+      </data>
+    </addData>
+  </contentHeader>
+  <types>
+    <dataTypes />
+    <pous>
+      <pou name="Stamp" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="StampSliderSensorMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampSliderSensorMovedIn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampSliderFilled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampLowered">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneDown">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneSucked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CranePositionStamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneOnConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampStartButton">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartVar">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="StampSliderMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampSliderMovedIn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampWhiteLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampPusher">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampGreenLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampPressure">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartCommandStamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="interconnect">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Timer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="Duration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#500ms" />
+              </initialValue>
+            </variable>
+            <variable name="interconnectStampStartCommand">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCInit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="Stamp_Init_3_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampPusher := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>cb46770b-ba84-458e-9115-6787842739f4</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="StampSliderBack_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampSliderMovedIn := TRUE;
+StampSliderMovedOut := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>e096b084-767d-4408-b5b6-2cdb59d54eaf</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Stamp_Init_2_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampSliderMovedIn := FALSE;
+StampSliderMovedOut := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>74cbd679-acc5-4a91-827a-fd1485ed5513</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Stamp_Init_1_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampSliderMovedIn := TRUE;
+StampSliderMovedOut := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>3302a3d7-f075-4c7e-bf8f-15eaafcce031</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Interstep_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StartCommandStamp := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>df091dca-aa30-4384-ba9b-1c1dfb9bfc70</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="StampSliderForward_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampPusher := FALSE;
+StampSliderMovedOut := TRUE;
+
+IF((StampLowered=FALSE)AND(StampUp=TRUE))THEN
+	interconnect := FALSE;
+END_IF
+
+Timer(IN:=FALSE, PT:=T#1ms);</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>3d489705-b64e-49cd-9c6f-e2b8e01929f7</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Step1_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timer(IN:=StampLowered, PT:=T#500MS);
+interconnect := Timer.Q;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>6e62e457-7b31-4105-837b-4c8b56d637c4</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Start_Stamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampSliderMovedOut := FALSE;
+StampSliderMovedIn := FALSE;
+StampPusher := FALSE;
+StampGreenLamp := FALSE;
+StampPressure := FALSE;
+StartCommandStamp := FALSE;
+
+
+IF(StampStartButton = TRUE) THEN
+	interconnectStampStartCommand := TRUE;
+END_IF</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>1469b084-5c17-431b-9619-97a5a3603e65</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="StampProcess_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampSliderMovedIn := FALSE;
+StampPusher := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>faa9e622-5d58-414e-bdd0-6a00e49616c1</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Green_Lamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampGreenLamp := TRUE;
+interconnectStampStartCommand := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>a16bb630-09c3-4782-b3ba-bd7ebb4ab880</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Stamp_Init_4_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StampPusher := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>8c629ef1-378c-4b9e-bd38-5591a5864f62</ObjectId>
+              </data>
+            </addData>
+          </action>
+        </actions>
+        <body>
+          <SFC>
+            <step localId="0" initialStep="true" name="Init">
+              <position x="0" y="0" />
+              <connectionPointIn />
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Init</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">TRUE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="1">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="1" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="3" name="Start_Stamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="2" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Start_Stamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Start_Stamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="4">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>interconnectStampStartCommand</expression>
+            </inVariable>
+            <transition localId="5">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="3" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="4" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">interconnectStampStartCommand</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="6" name="Green_Lamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="5" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Green_Lamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Green_Lamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="7">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="8">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="6" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="7" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="9" name="Stamp_Init_1">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="8" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Stamp_Init_1</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Stamp_Init_1_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="10">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampSliderSensorMovedIn</expression>
+            </inVariable>
+            <transition localId="11">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="9" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="10" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderSensorMovedIn</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="12" name="Stamp_Init_2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="11" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Stamp_Init_2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Stamp_Init_2_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="13">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampSliderSensorMovedOut</expression>
+            </inVariable>
+            <transition localId="14">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="12" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="13" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderSensorMovedOut</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="15" name="Stamp_Init_3">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="14" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Stamp_Init_3</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Stamp_Init_3_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="16">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampLowered</expression>
+            </inVariable>
+            <transition localId="17">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="15" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="16" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampLowered</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="18" name="Stamp_Init_4">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="17" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Stamp_Init_4</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Stamp_Init_4_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="19">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampUp</expression>
+            </inVariable>
+            <transition localId="20">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="18" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="19" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampUp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="21" name="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="20" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Interstep_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="22">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StartVar</expression>
+            </inVariable>
+            <transition localId="23">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="21" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="22" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StartVar</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="24" name="Interstep_2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="23" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep_2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="25">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampSliderFilled</expression>
+            </inVariable>
+            <transition localId="26">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="24" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="25" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderFilled</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="27" name="Step0">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="26" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step0</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="28">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp</expression>
+            </inVariable>
+            <transition localId="29">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="27" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="28" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="30" name="StampSliderBack">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="29" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderBack</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">StampSliderBack_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="31">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampSliderSensorMovedIn</expression>
+            </inVariable>
+            <transition localId="32">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="30" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="31" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderSensorMovedIn</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="33" name="StampProcess">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="32" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampProcess</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">StampProcess_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="34">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampLowered</expression>
+            </inVariable>
+            <transition localId="35">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="33" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="34" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampLowered</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="36" name="Step1">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="35" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step1</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Step1_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="37">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>interconnect</expression>
+            </inVariable>
+            <transition localId="38">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="36" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="37" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">interconnect</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="39" name="StampSliderForward">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="38" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderForward</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">StampSliderForward_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="40">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StampSliderMovedOut</expression>
+            </inVariable>
+            <transition localId="41">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="39" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="40" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StampSliderMovedOut</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="42" name="Step2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="41" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="43">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnConveyor</expression>
+            </inVariable>
+            <transition localId="44">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="42" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="43" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <jumpStep localId="45" targetName="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="44" />
+              </connectionPointIn>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </jumpStep>
+          </SFC>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/sfcsettings" handleUnknown="implementation">
+            <SFCSettings>
+              <LibTitle>IecSfc</LibTitle>
+              <LibCompany>System</LibCompany>
+              <LibVersion>3.4.2.0</LibVersion>
+              <LibNamespace />
+              <CalcActiveTransOnly>false</CalcActiveTransOnly>
+              <UseDefaults>false</UseDefaults>
+              <Flags>
+                <EnableLimit Declare="true" Use="false" />
+                <Init Declare="true" Use="true" />
+                <Reset Declare="true" Use="true" />
+                <QuitError Declare="true" Use="false" />
+                <Pause Declare="true" Use="false" />
+                <Error Declare="true" Use="false" />
+                <Trans Declare="true" Use="false" />
+                <ErrorStep Declare="true" Use="false" />
+                <ErrorPOU Declare="true" Use="false" />
+                <CurrentStep Declare="true" Use="false" />
+                <Tip Declare="true" Use="false" />
+                <TipMode Declare="true" Use="false" />
+                <MaxFlags Declare="false" Use="false" />
+                <SFCErrorAnalyzation Declare="false" Use="false" />
+                <SFCErrorAnalyzationTable Declare="false" Use="false" />
+              </Flags>
+            </SFCSettings>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>cb00ee46-c16d-43a7-b0e4-06d7f70e272f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="Magazin" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="SliderNotMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SliderMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WorkpieceReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneDown">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneOnConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneOnMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneSucked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartButtonMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartVar">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CraneLower">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinVacuumOff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinVacuumOn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneTurnCounterclockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneTurnClockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinSlider">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinGreenLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinWhiteLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartCommandMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="interconnectMagazinStartCommand">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCInit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="Green_Lamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinGreenLamp := TRUE;
+interconnectMagazinStartCommand := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>bbc65ddb-8a10-4397-b03b-7d2d7129d058</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Magazin_Init_2_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinSlider := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>2a51b5cb-018f-4d53-9644-e535e14ac7b2</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="SliderMoveBack_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IF((SliderMovedOut = TRUE)AND(SliderNotMovedOut = FALSE))THEN
+	MagazinSlider := FALSE;
+END_IF</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>1d7df787-4e33-43c0-b218-e302e1bd216e</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="convey_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">IF(SliderNotMovedOut)THEN
+	MagazinSlider := TRUE;
+END_IF</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>990af4ea-0f12-4c94-bc18-3f13f3904f57</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Interstep_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StartCommandMagazin := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>c7111b17-840e-4f1d-a451-61c466d1447b</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Magazin_Init_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinSlider := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>86b8a1be-1ef7-4669-b6f0-807d6b1137bd</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Start_Magazin_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinSlider := FALSE;
+MagazinGreenLamp := FALSE;
+StartVar := FALSE;
+StartCommandMagazin := FALSE;
+
+
+IF(StartButtonMagazin = TRUE) THEN
+	interconnectMagazinStartCommand := TRUE;
+END_IF</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>112ba872-acd8-4676-8472-9197173a5aa3</ObjectId>
+              </data>
+            </addData>
+          </action>
+        </actions>
+        <body>
+          <SFC>
+            <step localId="0" initialStep="true" name="Init">
+              <position x="0" y="0" />
+              <connectionPointIn />
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Init</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">TRUE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="1">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="1" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="3" name="Start_Magazin">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="2" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Start_Magazin</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Start_Magazin_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="4">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>interconnectMagazinStartCommand</expression>
+            </inVariable>
+            <transition localId="5">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="3" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="4" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">interconnectMagazinStartCommand</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="6" name="Green_Lamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="5" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Green_Lamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Green_Lamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="7">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="8">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="6" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="7" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="9" name="Magazin_Init">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="8" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Magazin_Init</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Magazin_Init_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="10">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="11">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="9" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="10" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="12" name="Magazin_Init_2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="11" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Magazin_Init_2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Magazin_Init_2_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="13">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="14">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="12" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="13" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="15" name="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="14" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Interstep_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="16">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StartVar</expression>
+            </inVariable>
+            <transition localId="17">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="15" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="16" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StartVar</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="18" name="convey">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="17" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">convey</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">convey_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="19">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnMagazin</expression>
+            </inVariable>
+            <transition localId="20">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="18" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="19" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnMagazin</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="21" name="Step0">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="20" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step0</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="22">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="23">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="21" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="22" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="24" name="Slider_Move_Back">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="23" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Slider_Move_Back</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">SliderMoveBack_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="25">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp</expression>
+            </inVariable>
+            <transition localId="26">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="24" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="25" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="27" name="Step1">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="26" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step1</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="28">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnConveyor</expression>
+            </inVariable>
+            <transition localId="29">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="27" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="28" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <jumpStep localId="30" targetName="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="29" />
+              </connectionPointIn>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </jumpStep>
+          </SFC>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/sfcsettings" handleUnknown="implementation">
+            <SFCSettings>
+              <LibTitle>IecSfc</LibTitle>
+              <LibCompany>System</LibCompany>
+              <LibVersion>3.4.2.0</LibVersion>
+              <LibNamespace />
+              <CalcActiveTransOnly>false</CalcActiveTransOnly>
+              <UseDefaults>false</UseDefaults>
+              <Flags>
+                <EnableLimit Declare="true" Use="false" />
+                <Init Declare="true" Use="true" />
+                <Reset Declare="true" Use="true" />
+                <QuitError Declare="true" Use="false" />
+                <Pause Declare="true" Use="false" />
+                <Error Declare="true" Use="false" />
+                <Trans Declare="true" Use="false" />
+                <ErrorStep Declare="true" Use="false" />
+                <ErrorPOU Declare="true" Use="false" />
+                <CurrentStep Declare="true" Use="false" />
+                <Tip Declare="true" Use="false" />
+                <TipMode Declare="true" Use="false" />
+                <MaxFlags Declare="false" Use="false" />
+                <SFCErrorAnalyzation Declare="false" Use="false" />
+                <SFCErrorAnalyzationTable Declare="false" Use="false" />
+              </Flags>
+            </SFCSettings>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>739fd667-fdea-4bcd-9cab-3ec07466104f</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="Crane" pouType="functionBlock">
+        <interface>
+          <inputVars>
+            <variable name="SliderNotMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SliderMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinCapacitiveSensor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WorkpieceReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneDown">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneOnConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneOnMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneSucked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampLowered">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CranePositionStamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartButtonMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCReset">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartVar">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StampSliderFilled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="WorkpieceOccupiesConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </inputVars>
+          <outputVars>
+            <variable name="CraneLower">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinVacuumOff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="MagazinVacuumOn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneTurnCounterclockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="CraneTurnClockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="StartCommandCrane">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </outputVars>
+          <localVars>
+            <variable name="Timer1">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="Duration1">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#1s500ms" />
+              </initialValue>
+            </variable>
+            <variable name="actualtime1">
+              <type>
+                <TIME />
+              </type>
+            </variable>
+            <variable name="interconnect">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="interconnectCraneStartCommand">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="TimeDelay_Timer">
+              <type>
+                <derived name="TON" />
+              </type>
+            </variable>
+            <variable name="TimeDelay_Timer_Duration">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#50ms" />
+              </initialValue>
+            </variable>
+            <variable name="TimeDelay_Timer_interconnect">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="SFCInit">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <actions>
+          <action name="CraneLiftConveyor_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>439f263f-d474-4b03-a994-b310bfe3efde</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="TimeDelay_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TimeDelay_Timer(IN:=TRUE, PT:=TimeDelay_Timer_Duration);
+TimeDelay_Timer_interconnect := TimeDelay_Timer.Q;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>0df0ed7f-b489-4e96-8724-742a71f0bf1d</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Start_Crane_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;
+MagazinVacuumOff := TRUE;
+MagazinVacuumOn := FALSE;
+CraneTurnCounterclockwise := FALSE;
+CraneTurnClockwise := FALSE;
+StartVar := FALSE;
+StartCommandCrane := FALSE;
+
+
+IF(StartButtonMagazin = TRUE) THEN
+	interconnectCraneStartCommand := TRUE;
+END_IF</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>f30710bc-cef2-4422-941e-76d0f58cf081</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Suck_At_Stamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinVacuumOn := TRUE;
+MagazinVacuumOff := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>3e5fb950-bc0f-4478-b0f3-b5b438064e1e</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Lift_At_Stamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>a7984073-f504-4f7c-acc1-2e44324a32c4</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="CraneLiftMagazin_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>abb137ed-a967-48cd-9401-16874cdc350c</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Step0_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := TRUE;
+CraneTurnCounterclockwise := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>b2e2ea53-e65e-4cb2-a15b-8ea6f2991dce</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Interstep_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">StartCommandCrane := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>70ee7dba-339f-4a63-aa70-845e8974c435</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="pause_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Timer1(IN:=CraneUP, PT:=Duration1);
+interconnect := Timer1.Q;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>7640d99d-73ec-44d6-ac94-6505283e193a</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Init_2_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>f4d2a592-8a98-4c96-8107-3fd523fb7009</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Turn_Left_From_Stamp_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := TRUE;
+CraneTurnCounterclockwise := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>d5a10451-12bc-4540-b265-e2ceff0a3d47</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="CraneOnConveyor_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnCounterclockwise := FALSE;
+CraneTurnClockwise := FALSE;
+CraneLower := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>2f83da71-9cff-4486-92d2-d652f7b61927</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="release_Workpiece_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinVacuumOff := TRUE;
+MagazinVacuumOn := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>52d7436d-4236-4ce0-8344-5e49dbe55a77</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Reset_interconnect_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">interconnect := FALSE;
+Timer1(IN:=FALSE,PT:=T#1ms);</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>58c7a43e-d77a-4be5-bc19-de279523fa18</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_On_Conveyor_Metallic_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnCounterclockwise := FALSE;
+CraneTurnClockwise := FALSE;
+CraneLower := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>e288fc28-c983-4b2a-8d40-4ca161fd0ac6</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Turn_Left_Metallic_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnCounterclockwise := TRUE;
+CraneTurnClockwise := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>ced71d65-eb2a-4513-842e-dfb1d83f344d</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="release_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinVacuumOff := TRUE;
+MagazinVacuumOn := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>ae278ab7-573f-4d16-a645-7dc8db625627</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Init_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := TRUE;
+interconnectCraneStartCommand := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>79963d9b-dbbb-4737-8d43-72e52e1ca10a</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_On_Conveyor_Metallic_active_0">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnCounterclockwise := FALSE;
+CraneTurnClockwise := FALSE;
+CraneLower := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>fce1bfa5-84f0-4472-b61e-0ef0655dbeea</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Lift_Magazin_Metallic_active_0">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>d33ea368-ea13-40cb-aa6f-130bc32e7630</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Lower_Crane_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>1c7457be-e0a3-4cde-b7d1-4c96b4832b5c</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="MagazinStop_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">MagazinVacuumOn := TRUE;
+MagazinVacuumOff := FALSE;
+CraneLower := TRUE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>0318e7e9-96a0-47e7-98b1-d92cb1680ee6</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Crane_Go_Up_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneLower := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>eb09ec52-2384-4621-90ac-0ec6e3afbab5</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="CraneTurnLeft_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnCounterclockwise := TRUE;
+CraneTurnClockwise := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>eae3fd4b-d1d0-4029-9a75-ac61aeb92b5b</ObjectId>
+              </data>
+            </addData>
+          </action>
+          <action name="Interstep_Check_Workpiece_active">
+            <body>
+              <ST>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := FALSE;
+CraneTurnCounterClockwise := FALSE;</xhtml>
+              </ST>
+            </body>
+            <addData>
+              <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+                <ObjectId>1d42e782-4044-4ace-afea-cb3412d89231</ObjectId>
+              </data>
+            </addData>
+          </action>
+        </actions>
+        <body>
+          <SFC>
+            <step localId="0" initialStep="true" name="Init">
+              <position x="0" y="0" />
+              <connectionPointIn />
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Init</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">TRUE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="1">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="0" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="1" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="3" name="Start_Crane">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="2" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Start_Crane</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Start_Crane_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="4">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>interconnectCraneStartCommand</expression>
+            </inVariable>
+            <transition localId="5">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="3" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="4" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">interconnectCraneStartCommand</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="6" name="Crane_Init">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="5" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Init</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Init_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="7">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="8">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="6" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="7" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="9" name="Crane_Init_2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="8" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Init_2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Init_2_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="10">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp</expression>
+            </inVariable>
+            <transition localId="11">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="9" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="10" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="12" name="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="11" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Interstep_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="13">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>StartVar</expression>
+            </inVariable>
+            <transition localId="14">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="12" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="13" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">StartVar</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="15" name="Interstep_2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="14" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep_2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="16">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>SliderMovedOut</expression>
+            </inVariable>
+            <transition localId="17">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="15" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="16" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">SliderMovedOut</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="18" name="TimeDelay">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="17" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TimeDelay</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">TimeDelay_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="19">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TimeDelay_Timer_interconnect</expression>
+            </inVariable>
+            <transition localId="20">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="18" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="19" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TimeDelay_Timer_interconnect</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="21" name="Turn_Right">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="20" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Turn_Right</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Step0_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="22">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnMagazin</expression>
+            </inVariable>
+            <transition localId="23">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="21" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="22" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnMagazin</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="24" name="Interstep_Check_Workpiece">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="23" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep_Check_Workpiece</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Interstep_Check_Workpiece_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <selectionDivergence localId="25">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="24" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <connectionPointOut formalParameter="sfc" />
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Branch1</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="23bdaa98-72ec-41f7-817b-9dede5697086">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </selectionDivergence>
+            <inVariable localId="26">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>WorkpieceReady</expression>
+            </inVariable>
+            <transition localId="27">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="25" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="26" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">WorkpieceReady</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="28" name="Crane_Lower">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="27" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Lower</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">MagazinStop_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="29">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneSucked</expression>
+            </inVariable>
+            <transition localId="30">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="28" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="29" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneSucked</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="31" name="Step0">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="30" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step0</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <selectionDivergence localId="32">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="31" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Branch0</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="23bdaa98-72ec-41f7-817b-9dede5697086">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </selectionDivergence>
+            <inVariable localId="33">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>NOT MagazinCapacitiveSensor</expression>
+            </inVariable>
+            <transition localId="34">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="32" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="33" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">NOT MagazinCapacitiveSensor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="35" name="Crane_Lift_Magazin">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="34" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Lift_Magazin</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">CraneLiftMagazin_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="36">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp and NOT WorkpieceOccupiesConveyor</expression>
+            </inVariable>
+            <transition localId="37">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="35" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="36" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp and NOT WorkpieceOccupiesConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="38" name="Crane_Turn_Left_NOT_Metallic">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="37" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Turn_Left_NOT_Metallic</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">CraneTurnLeft_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="39">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnConveyor</expression>
+            </inVariable>
+            <transition localId="40">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="38" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="39" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="41" name="Crane_On_Conveyor">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="40" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_On_Conveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">CraneOnConveyor_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="42">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="43">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="41" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="42" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <inVariable localId="44">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>MagazinCapacitiveSensor</expression>
+            </inVariable>
+            <transition localId="45">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="32" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="44" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">MagazinCapacitiveSensor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="46" name="Crane_Lift_Magazin_Metallic">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="45" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Lift_Magazin_Metallic</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Lift_Magazin_Metallic_active_0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="47">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp and NOT WorkpieceOccupiesConveyor</expression>
+            </inVariable>
+            <transition localId="48">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="46" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="47" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp and NOT WorkpieceOccupiesConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="49" name="Crane_Turn_Left_Metallic">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="48" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Turn_Left_Metallic</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Turn_Left_Metallic_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="50">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CranePositionStamp</expression>
+            </inVariable>
+            <transition localId="51">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="49" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="50" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CranePositionStamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="52" name="Crane_On_Stamp_Metallic">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="51" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_On_Stamp_Metallic</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_On_Conveyor_Metallic_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="53">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="54">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="52" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="53" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="55" name="release_Workpiece">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="54" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">release_Workpiece</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">release_Workpiece_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="56">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="57">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="55" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="56" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="58" name="Crane_Go_Up">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="57" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Go_Up</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Go_Up_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="59">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp</expression>
+            </inVariable>
+            <transition localId="60">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="58" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="59" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="61" name="pause">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="60" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">pause</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">pause_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="62">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>interconnect</expression>
+            </inVariable>
+            <transition localId="63">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="61" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="62" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">interconnect</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="64" name="Reset_interconnect">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="63" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Reset_interconnect</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Reset_interconnect_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="65">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>SliderMovedOut</expression>
+            </inVariable>
+            <transition localId="66">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="64" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="65" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">SliderMovedOut</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="67" name="Lower_Crane">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="66" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Lower_Crane</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Lower_Crane_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="68">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="69">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="67" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="68" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="70" name="Suck_At_Stamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="69" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Suck_At_Stamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Suck_At_Stamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="71">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneSucked</expression>
+            </inVariable>
+            <transition localId="72">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="70" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="71" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneSucked</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="73" name="Crane_Lift_At_Stamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="72" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Lift_At_Stamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Lift_At_Stamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="74">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneUp AND NOT WorkpieceOccupiesConveyor </expression>
+            </inVariable>
+            <transition localId="75">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="73" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="74" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneUp AND NOT WorkpieceOccupiesConveyor </attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="76" name="Crane_Turn_Left_From_Stamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="75" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Turn_Left_From_Stamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_Turn_Left_From_Stamp_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="77">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneOnConveyor</expression>
+            </inVariable>
+            <transition localId="78">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="76" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="77" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneOnConveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="79" name="Crane_On_Conveyor_Metallic">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="78" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_On_Conveyor_Metallic</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">Crane_On_Conveyor_Metallic_active_0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="80">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>CraneDown</expression>
+            </inVariable>
+            <transition localId="81">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="79" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="80" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">CraneDown</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <selectionConvergence localId="82">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="43" formalParameter="sfc" />
+              </connectionPointIn>
+              <connectionPointIn>
+                <connection refLocalId="81" formalParameter="sfc" />
+              </connectionPointIn>
+              <connectionPointOut />
+            </selectionConvergence>
+            <step localId="83" name="release">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="82" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">release</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">release_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="84">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="85">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="83" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="84" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="86" name="Crane_Lift_Conveyor">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="85" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Crane_Lift_Conveyor</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                    <attribute guid="700a583f-b4d4-43e4-8c14-629c7cd3bec8">CraneLiftConveyor_active</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="87">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="88">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="86" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="87" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <inVariable localId="89">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>(NOT WorkpieceReady) AND (StampSliderFilled)</expression>
+            </inVariable>
+            <transition localId="90">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="25" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="89" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">(NOT WorkpieceReady) AND (StampSliderFilled)</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="91" name="Wait_At_Stamp">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="90" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Wait_At_Stamp</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="92">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="93">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="91" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="92" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <jumpStep localId="94" targetName="pause">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="93" />
+              </connectionPointIn>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">pause</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </jumpStep>
+            <inVariable localId="95">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>(NOT WorkpieceReady) AND (NOT StampSliderFilled)</expression>
+            </inVariable>
+            <transition localId="96">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="25" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="95" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">(NOT WorkpieceReady) AND (NOT StampSliderFilled)</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <step localId="97" name="Step2">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="96" />
+              </connectionPointIn>
+              <connectionPointOut formalParameter="sfc" />
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Step2</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                    <attribute guid="6844a48e-46c2-4cc8-a185-a478f3b99cc0">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </step>
+            <inVariable localId="98">
+              <position x="0" y="0" />
+              <connectionPointOut />
+              <expression>TRUE</expression>
+            </inVariable>
+            <transition localId="99">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="97" formalParameter="sfc" />
+              </connectionPointIn>
+              <condition>
+                <connectionPointIn>
+                  <connection refLocalId="98" />
+                </connectionPointIn>
+              </condition>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">TRUE</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                    <attribute guid="bc882c11-1e91-4dd8-a6b8-2075724ed18b">0</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </transition>
+            <jumpStep localId="100" targetName="Start_Crane">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="99" />
+              </connectionPointIn>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Start_Crane</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </jumpStep>
+            <selectionConvergence localId="101">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="88" formalParameter="sfc" />
+              </connectionPointIn>
+              <connectionPointIn>
+                <connection refLocalId="94" formalParameter="sfc" />
+              </connectionPointIn>
+              <connectionPointIn>
+                <connection refLocalId="100" formalParameter="sfc" />
+              </connectionPointIn>
+              <connectionPointOut />
+            </selectionConvergence>
+            <jumpStep localId="102" targetName="Interstep">
+              <position x="0" y="0" />
+              <connectionPointIn>
+                <connection refLocalId="101" />
+              </connectionPointIn>
+              <addData>
+                <data name="http://www.3s-software.com/plcopenxml/sfc/element" handleUnknown="implementation">
+                  <attributes xmlns="">
+                    <attribute guid="38391c6d-6d4a-42f8-8ee7-9f45e5adafa8">Interstep</attribute>
+                    <attribute guid="01580b27-6378-448b-8ecb-0e4b795b58d6">FALSE</attribute>
+                  </attributes>
+                </data>
+              </addData>
+            </jumpStep>
+          </SFC>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/sfcsettings" handleUnknown="implementation">
+            <SFCSettings>
+              <LibTitle>IecSfc</LibTitle>
+              <LibCompany>System</LibCompany>
+              <LibVersion>3.4.2.0</LibVersion>
+              <LibNamespace />
+              <CalcActiveTransOnly>false</CalcActiveTransOnly>
+              <UseDefaults>false</UseDefaults>
+              <Flags>
+                <EnableLimit Declare="true" Use="false" />
+                <Init Declare="true" Use="true" />
+                <Reset Declare="true" Use="true" />
+                <QuitError Declare="true" Use="false" />
+                <Pause Declare="true" Use="false" />
+                <Error Declare="true" Use="false" />
+                <Trans Declare="true" Use="false" />
+                <ErrorStep Declare="true" Use="false" />
+                <ErrorPOU Declare="true" Use="false" />
+                <CurrentStep Declare="true" Use="false" />
+                <Tip Declare="true" Use="false" />
+                <TipMode Declare="true" Use="false" />
+                <MaxFlags Declare="false" Use="false" />
+                <SFCErrorAnalyzation Declare="false" Use="false" />
+                <SFCErrorAnalyzationTable Declare="false" Use="false" />
+              </Flags>
+            </SFCSettings>
+          </data>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>376eb4a3-fca0-4976-aa45-ae0bc8929402</ObjectId>
+          </data>
+        </addData>
+      </pou>
+      <pou name="Main" pouType="program">
+        <interface>
+          <localVars>
+            <variable name="Sensor_WorkpieceOccupiesConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StartButtonMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_MagazinEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_MagazinSwitchManuellAutomatic">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CraneSucked">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CraneDown">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CraneUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_SliderNotMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_SliderMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_MagazinCapacitiveSensor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_MagazinOpticalSensor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CranePositionStamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CraneOnConveyor">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CraneOnMagazin">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_WorkpieceReady">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_CranePosition">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampSliderSensorMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampSliderSensorMovedIn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampSliderFilled">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampUp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampLowered">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampSwitchManuellAutomatic">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampEmergencyStop">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Sensor_StampStartButton">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_SomeActuator">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_MagazinSlider">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_CraneLower">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_MagazinVacuumOn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_MagazinVacuumOff">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_MagazinGreenLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_MagazinWhiteLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_CraneTurnCounterclockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_CraneTurnClockwise">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_StampSliderMovedOut">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_StampSliderMovedIn">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_StampWhiteLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_StampGreenLamp">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_StampPusher">
+              <type>
+                <BOOL />
+              </type>
+            </variable>
+            <variable name="Actuator_AnalogCranePressure">
+              <type>
+                <INT />
+              </type>
+            </variable>
+            <variable name="Mag">
+              <type>
+                <derived name="Magazin" />
+              </type>
+            </variable>
+            <variable name="Crane">
+              <type>
+                <derived name="Crane" />
+              </type>
+            </variable>
+            <variable name="Stamp">
+              <type>
+                <derived name="Stamp" />
+              </type>
+            </variable>
+          </localVars>
+        </interface>
+        <body>
+          <ST>
+            <xhtml xmlns="http://www.w3.org/1999/xhtml">Mag.SliderNotMovedOut := Sensor_SliderNotMovedOut;
+Mag.SliderMovedOut := Sensor_SliderMovedOut;
+Mag.CraneOnMagazin := Sensor_CraneOnMagazin;
+Mag.CraneDown := Sensor_CraneDown;
+Mag.CraneUp := Sensor_CraneUp;
+Mag.CraneOnConveyor := Sensor_CraneOnConveyor;
+Mag.WorkpieceReady := Sensor_WorkpieceReady;
+Mag.StartButtonMagazin := Sensor_StartButtonMagazin;
+
+Actuator_MagazinSlider := Mag.MagazinSlider;
+Actuator_MagazinGreenLamp := Mag.MagazinGreenLamp;
+
+Crane.CraneUp := Sensor_CraneUp;
+Crane.CraneOnConveyor := Sensor_CraneOnConveyor;
+Crane.CraneDown := Sensor_CraneDown;
+Crane.CraneSucked := Sensor_CraneSucked;
+Crane.CraneOnMagazin := Sensor_CraneOnMagazin;
+Crane.MagazinCapacitiveSensor := Sensor_MagazinCapacitiveSensor;
+Crane.CranePositionStamp := Sensor_CranePositionStamp;
+Crane.SliderMovedOut := Sensor_SliderMovedOut;
+Crane.WorkpieceReady := Sensor_WorkpieceReady;
+Crane.StampSliderFilled := Sensor_StampSliderFilled;
+Crane.SliderMovedOut := Sensor_SliderMovedOut;
+Crane.StartButtonMagazin := Sensor_StartButtonMagazin;
+Crane.WorkpieceOccupiesConveyor := Sensor_WorkpieceOccupiesConveyor;
+
+Actuator_CraneTurnCounterclockwise := Crane.CraneTurnCounterclockwise;
+Actuator_CraneTurnClockwise := Crane.CraneTurnClockwise;
+Actuator_CraneLower := Crane.CraneLower;
+Actuator_MagazinVacuumOff := Crane.MagazinVacuumOff;
+Actuator_MagazinVacuumOn := Crane.MagazinVacuumOn;
+
+
+Stamp.StampSliderSensorMovedOut := Sensor_StampSliderSensorMovedOut;
+Stamp.StampSliderSensorMovedIn := Sensor_StampSliderSensorMovedIn;
+Stamp.StampSliderFilled := Sensor_StampSliderFilled;
+Stamp.StampUp := Sensor_StampUp;
+Stamp.StampLowered := Sensor_StampLowered;
+Stamp.CraneDown := Sensor_CraneDown;
+Stamp.CraneUp := Sensor_CraneUp;
+Stamp.CraneSucked := Sensor_CraneSucked;
+Stamp.CranePositionStamp := Sensor_CranePositionStamp;
+Stamp.CraneOnConveyor := Sensor_CraneOnConveyor;
+Stamp.StampStartButton := Sensor_StampStartButton;
+
+Actuator_StampSliderMovedOut := Stamp.StampSliderMovedOut;
+Actuator_StampSliderMovedIn := Stamp.StampSliderMovedIn;
+Actuator_StampWhiteLamp := Stamp.StampWhiteLamp;
+Actuator_StampPusher := Stamp.StampPusher;
+Actuator_StampGreenLamp := Stamp.StampGreenLamp;
+
+Actuator_AnalogCranePressure := 6000;
+
+
+IF((Sensor_StampEmergencyStop) AND (Sensor_MagazinEmergencyStop))THEN
+	Mag();
+	Crane();
+	Stamp();
+	IF((Actuator_MagazinGreenLamp) AND (Actuator_StampGreenLamp))THEN
+		IF((Stamp.StartCommandStamp) AND (Crane.StartCommandCrane) AND (Mag.StartCommandMagazin))THEN
+			Crane.StartVar := TRUE;
+			Mag.StartVar := TRUE;
+			Stamp.StartVar := TRUE;
+		END_IF
+	END_IF
+	Crane.SFCReset := FALSE;
+	Mag.SFCReset := FALSE;
+	Stamp.SFCReset := FALSE;
+ELSIF ((NOT Sensor_StampEmergencyStop) OR (NOT Sensor_MagazinEmergencyStop))THEN
+	Actuator_MagazinSlider := FALSE;
+	Actuator_CraneLower := FALSE;
+	Actuator_MagazinVacuumOn := FALSE;
+	Actuator_MagazinVacuumOff := TRUE;
+	Actuator_MagazinGreenLamp := FALSE;
+	Actuator_CraneTurnCounterclockwise := FALSE;
+	Actuator_CraneTurnClockwise := FALSE;
+	Actuator_StampSliderMovedOut := TRUE;
+	Actuator_StampSliderMovedIn := FALSE;
+	Actuator_StampGreenLamp := FALSE;
+	Actuator_StampPusher := FALSE;
+	
+	Actuator_AnalogCranePressure := 0;
+	
+	Crane.SFCReset := TRUE;
+	Mag.SFCReset := TRUE;
+	Stamp.SFCReset := TRUE;
+	
+	Crane.StartVar := FALSE;
+	Mag.StartVar := FALSE;
+	Stamp.StartVar := FALSE;
+END_IF
+</xhtml>
+          </ST>
+        </body>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>3859d352-37c2-4c30-8b35-8d3250bc476c</ObjectId>
+          </data>
+        </addData>
+      </pou>
+    </pous>
+  </types>
+  <instances>
+    <configurations />
+  </instances>
+  <addData>
+    <data name="http://www.3s-software.com/plcopenxml/projectstructure" handleUnknown="discard">
+      <ProjectStructure>
+        <Object Name="Stamp" ObjectId="cb00ee46-c16d-43a7-b0e4-06d7f70e272f">
+          <Object Name="Stamp_Init_3_active" ObjectId="cb46770b-ba84-458e-9115-6787842739f4" />
+          <Object Name="StampSliderBack_active" ObjectId="e096b084-767d-4408-b5b6-2cdb59d54eaf" />
+          <Object Name="Stamp_Init_2_active" ObjectId="74cbd679-acc5-4a91-827a-fd1485ed5513" />
+          <Object Name="Stamp_Init_1_active" ObjectId="3302a3d7-f075-4c7e-bf8f-15eaafcce031" />
+          <Object Name="Interstep_active" ObjectId="df091dca-aa30-4384-ba9b-1c1dfb9bfc70" />
+          <Object Name="StampSliderForward_active" ObjectId="3d489705-b64e-49cd-9c6f-e2b8e01929f7" />
+          <Object Name="Step1_active" ObjectId="6e62e457-7b31-4105-837b-4c8b56d637c4" />
+          <Object Name="Start_Stamp_active" ObjectId="1469b084-5c17-431b-9619-97a5a3603e65" />
+          <Object Name="StampProcess_active" ObjectId="faa9e622-5d58-414e-bdd0-6a00e49616c1" />
+          <Object Name="Green_Lamp_active" ObjectId="a16bb630-09c3-4782-b3ba-bd7ebb4ab880" />
+          <Object Name="Stamp_Init_4_active" ObjectId="8c629ef1-378c-4b9e-bd38-5591a5864f62" />
+        </Object>
+        <Object Name="Magazin" ObjectId="739fd667-fdea-4bcd-9cab-3ec07466104f">
+          <Object Name="Green_Lamp_active" ObjectId="bbc65ddb-8a10-4397-b03b-7d2d7129d058" />
+          <Object Name="Magazin_Init_2_active" ObjectId="2a51b5cb-018f-4d53-9644-e535e14ac7b2" />
+          <Object Name="SliderMoveBack_active" ObjectId="1d7df787-4e33-43c0-b218-e302e1bd216e" />
+          <Object Name="convey_active" ObjectId="990af4ea-0f12-4c94-bc18-3f13f3904f57" />
+          <Object Name="Interstep_active" ObjectId="c7111b17-840e-4f1d-a451-61c466d1447b" />
+          <Object Name="Magazin_Init_active" ObjectId="86b8a1be-1ef7-4669-b6f0-807d6b1137bd" />
+          <Object Name="Start_Magazin_active" ObjectId="112ba872-acd8-4676-8472-9197173a5aa3" />
+        </Object>
+        <Object Name="Crane" ObjectId="376eb4a3-fca0-4976-aa45-ae0bc8929402">
+          <Object Name="CraneLiftConveyor_active" ObjectId="439f263f-d474-4b03-a994-b310bfe3efde" />
+          <Object Name="TimeDelay_active" ObjectId="0df0ed7f-b489-4e96-8724-742a71f0bf1d" />
+          <Object Name="Start_Crane_active" ObjectId="f30710bc-cef2-4422-941e-76d0f58cf081" />
+          <Object Name="Suck_At_Stamp_active" ObjectId="3e5fb950-bc0f-4478-b0f3-b5b438064e1e" />
+          <Object Name="Crane_Lift_At_Stamp_active" ObjectId="a7984073-f504-4f7c-acc1-2e44324a32c4" />
+          <Object Name="CraneLiftMagazin_active" ObjectId="abb137ed-a967-48cd-9401-16874cdc350c" />
+          <Object Name="Step0_active" ObjectId="b2e2ea53-e65e-4cb2-a15b-8ea6f2991dce" />
+          <Object Name="Interstep_active" ObjectId="70ee7dba-339f-4a63-aa70-845e8974c435" />
+          <Object Name="pause_active" ObjectId="7640d99d-73ec-44d6-ac94-6505283e193a" />
+          <Object Name="Crane_Init_2_active" ObjectId="f4d2a592-8a98-4c96-8107-3fd523fb7009" />
+          <Object Name="Crane_Turn_Left_From_Stamp_active" ObjectId="d5a10451-12bc-4540-b265-e2ceff0a3d47" />
+          <Object Name="CraneOnConveyor_active" ObjectId="2f83da71-9cff-4486-92d2-d652f7b61927" />
+          <Object Name="release_Workpiece_active" ObjectId="52d7436d-4236-4ce0-8344-5e49dbe55a77" />
+          <Object Name="Reset_interconnect_active" ObjectId="58c7a43e-d77a-4be5-bc19-de279523fa18" />
+          <Object Name="Crane_On_Conveyor_Metallic_active" ObjectId="e288fc28-c983-4b2a-8d40-4ca161fd0ac6" />
+          <Object Name="Crane_Turn_Left_Metallic_active" ObjectId="ced71d65-eb2a-4513-842e-dfb1d83f344d" />
+          <Object Name="release_active" ObjectId="ae278ab7-573f-4d16-a645-7dc8db625627" />
+          <Object Name="Crane_Init_active" ObjectId="79963d9b-dbbb-4737-8d43-72e52e1ca10a" />
+          <Object Name="Crane_On_Conveyor_Metallic_active_0" ObjectId="fce1bfa5-84f0-4472-b61e-0ef0655dbeea" />
+          <Object Name="Crane_Lift_Magazin_Metallic_active_0" ObjectId="d33ea368-ea13-40cb-aa6f-130bc32e7630" />
+          <Object Name="Lower_Crane_active" ObjectId="1c7457be-e0a3-4cde-b7d1-4c96b4832b5c" />
+          <Object Name="MagazinStop_active" ObjectId="0318e7e9-96a0-47e7-98b1-d92cb1680ee6" />
+          <Object Name="Crane_Go_Up_active" ObjectId="eb09ec52-2384-4621-90ac-0ec6e3afbab5" />
+          <Object Name="CraneTurnLeft_active" ObjectId="eae3fd4b-d1d0-4029-9a75-ac61aeb92b5b" />
+          <Object Name="Interstep_Check_Workpiece_active" ObjectId="1d42e782-4044-4ace-afea-cb3412d89231" />
+        </Object>
+        <Object Name="Main" ObjectId="3859d352-37c2-4c30-8b35-8d3250bc476c" />
+      </ProjectStructure>
+    </data>
+  </addData>
+</project>
