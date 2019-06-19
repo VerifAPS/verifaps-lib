@@ -1,8 +1,8 @@
-// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_22.xml on Thu Apr 25 18:33:13 CEST 2019
+// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_22.xml on Wed Jun 19 20:01:52 CEST 2019
 
 TYPE
     RFID_ByteArray : STRUCT
-        RFID_Data : array;
+        RFID_Data : ARRAY[0..127] OF BYTE;
     END_STRUCT;
 END_TYPE
 
@@ -2215,13 +2215,13 @@ FUNCTION_BLOCK Potentiometer
     
     VAR
         AI_Position : INT;
-        delta : INT:= 150;
-        iPosStack : INT:= 24310;
-        iPosStackRFID : INT:= 23290;
-        iPosConveyor : INT:= 15930;
-        iPosConveyorRFID : INT:= 14890;
-        iPosStamp : INT:= 7845;
-        iPosStampRFID : INT:= 6810;
+        delta : INT := 150;
+        iPosStack : INT := 24310;
+        iPosStackRFID : INT := 23290;
+        iPosConveyor : INT := 15930;
+        iPosConveyorRFID : INT := 14890;
+        iPosStamp : INT := 7845;
+        iPosStampRFID : INT := 6810;
     END_VAR
     
     IF((iPosStack-delta) < AI_Position AND AI_Position < (iPosStack+delta)) THEN //AT STACK
@@ -2383,11 +2383,11 @@ FUNCTION_BLOCK RFID
         StatusByte_RFID_Present : BOOL;
         StatusByte_ErrorOccured : BOOL;
         StatusByte_Command_executed : BOOL;
-        CMD_Write : BYTE:= 2#1;
-        CMD_Read : BYTE:= 2#10;
-        CMD_Antenna_Off : BYTE:= 2#10000;
-        CMD_Antenna_On : BYTE:= 2#0;
-        `Step` : INT:= 10;
+        CMD_Write : BYTE := 2#1;
+        CMD_Read : BYTE := 2#10;
+        CMD_Antenna_Off : BYTE := 2#10000;
+        CMD_Antenna_On : BYTE := 2#0;
+        `Step` : INT := 10;
         Counter : UINT;
         TagData : RFID_ByteArray;
         DataToWriteCounter : INT;
@@ -2517,17 +2517,17 @@ FUNCTION_BLOCK RFID
     END_ACTION
     ACTION ACT_ReadFromRFIDTag
         
-        CASE Step OF 
+        CASE `Step` OF 
         	100:// copy complete Data to internal Array // Set Loop-Counter to 0
         		Counter := 0;
-        		Step := 110;	        
+        		`Step` := 110;	        
         	        
         	110:// Read 4 Byte  // Wait until read done
         		AO_Adr_L := INT_TO_BYTE(Counter); 
         		AO_CMD := CMD_Read;
          
         		IF(StatusByte_Command_executed AND StausByte_CommandCode_1)  THEN 		
-        			Step := 120;			
+        			`Step` := 120;			
         		END_IF;	        
         
         	120: //copy data and reset command   
@@ -2536,24 +2536,24 @@ FUNCTION_BLOCK RFID
         		Data_Last_RFID.RFID_Data[Counter+2] := AI_Data_5;
         		Data_Last_RFID.RFID_Data[Counter+3] := AI_Data_MSB;
         		AO_CMD := CMD_Antenna_On;
-        		Step := 130;
+        		`Step` := 130;
         
         	130: // Wait until Last command1 is false
         		IF (NOT StausByte_CommandCode_1) THEN 
-        			Step := 140;
+        			`Step` := 140;
         		END_IF;	        
         	        
             140: // increment counter // compare, if last dword copied
                 Counter := Counter + 4;
         	    IF(Counter >= 100) THEN
-        			Step := 150;
+        			`Step` := 150;
                 ELSE
-                    Step := 110;
+                    `Step` := 110;
         		END_IF;
         	        
             150: // copy complete array back to data // set done = true
                 Done_Reading := TRUE;
-                Step := 10;
+                `Step` := 10;
         END_CASE
     END_ACTION
     ACTION ACT_ResetRFID
@@ -2576,10 +2576,10 @@ FUNCTION_BLOCK RFID
     END_ACTION
     ACTION ACT_WriteOnRFIDTag
         
-        CASE Step OF 
+        CASE `Step` OF 
         	200:// copy complete Data to internal Array // Set Loop-Counter to 0
         		Counter := 0;
-        		Step := 210;	        
+        		`Step` := 210;	        
         	        
         	210:// Write 4 Byte  // Wait until write done
         		AO_Adr_L := INT_TO_BYTE(Counter); 
@@ -2590,38 +2590,38 @@ FUNCTION_BLOCK RFID
         		AO_CMD := CMD_Write;
          
         		IF(StatusByte_Command_executed AND StausByte_CommandCode_0)  THEN 		
-        			Step := 220;			
+        			`Step` := 220;			
         		END_IF;	        
         
         	220: // reset command    
         		AO_CMD := CMD_Antenna_On;
-        		Step := 230;
+        		`Step` := 230;
         
         	230: // Wait until Last command0 is false
         		IF (NOT StausByte_CommandCode_0) THEN 
-        			Step := 240;
+        			`Step` := 240;
         		END_IF;	        
         	        
             240: // increment counter // compare, if last dword copied
                 Counter := Counter + 4;
         	    IF(Counter >= 100) THEN
-        			Step := 250;
+        			`Step` := 250;
                 ELSE
-                    Step := 210;
+                    `Step` := 210;
         		END_IF;
         	        
             250: // copy complete array back to data // set done = true
                 Done_Writing := TRUE;
-                Step := 10;
+                `Step` := 10;
         END_CASE
     END_ACTION
     ACTION Read_entry
         
-        Step := 100;
+        `Step` := 100;
     END_ACTION
     ACTION Write_entry
         
-        Step := 200;
+        `Step` := 200;
     END_ACTION
     
     ACT_ConvertStatusByteToBits();

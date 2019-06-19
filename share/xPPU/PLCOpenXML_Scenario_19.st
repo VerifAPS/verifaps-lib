@@ -1,4 +1,4 @@
-// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_19.xml on Thu Apr 25 18:33:14 CEST 2019
+// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_19.xml on Wed Jun 19 20:01:53 CEST 2019
 
 FUNCTION_BLOCK BistableCylinder
     
@@ -3332,7 +3332,7 @@ FUNCTION_BLOCK xPPU
     
     VAR
         Timer : TON;
-        t : TIME:= TIME#1s500ms;
+        t : TIME := TIME#1s500ms;
         SFCInit : BOOL;
     END_VAR
     ACTION ACT_CheckEmergency

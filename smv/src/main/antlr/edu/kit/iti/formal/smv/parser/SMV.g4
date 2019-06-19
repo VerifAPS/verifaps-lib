@@ -251,7 +251,7 @@ stateExpr:
 
 terminalAtom
     : LPAREN stateExpr RPAREN                                                   # paren
-    | func=(ID|NEXT|INIT) LPAREN stateExpr ( COMMA  stateExpr)* RPAREN          # functionExpr
+    | func=(ID|NEXT|INIT|SIGNED|UNSIGNED) LPAREN stateExpr ( COMMA  stateExpr)* RPAREN # functionExpr
     | casesExpr                                                                 # casesExprAtom
     | var=ID                                                                    # variableAccess
     | var=ID (LBRACKET NUMBER RBRACKET)*                                        # arrayAccess

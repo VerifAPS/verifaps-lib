@@ -1,4 +1,4 @@
-// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_21.xml on Thu Apr 25 18:33:03 CEST 2019
+// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_21.xml on Wed Jun 19 20:01:31 CEST 2019
 
 FUNCTION_BLOCK A_to_V_Transducer
     
@@ -2044,10 +2044,10 @@ FUNCTION_BLOCK Potentiometer
     
     VAR
         AI_Position : INT;
-        delta : INT:= 100;
-        iPosStack : INT:= 24310;
-        iPosConveyor : INT:= 15930;
-        iPosStamp : INT:= 7845;
+        delta : INT := 100;
+        iPosStack : INT := 24310;
+        iPosConveyor : INT := 15930;
+        iPosStamp : INT := 7845;
     END_VAR
     
     IF((iPosStack-delta) < AI_Position AND AI_Position < (iPosStack+delta)) THEN

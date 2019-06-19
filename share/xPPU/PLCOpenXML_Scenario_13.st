@@ -1,4 +1,4 @@
-// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_13.xml on Thu Apr 25 18:33:17 CEST 2019
+// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_13.xml on Wed Jun 19 20:01:54 CEST 2019
 
 FUNCTION_BLOCK BistableCylinder
     
@@ -1381,10 +1381,10 @@ FUNCTION_BLOCK Potentiometer
     
     VAR
         AI_Position : INT;
-        delta : INT:= 100;
-        iPosStack : INT:= 24310;
-        iPosConveyor : INT:= 15930;
-        iPosStamp : INT:= 7845;
+        delta : INT := 100;
+        iPosStack : INT := 24310;
+        iPosConveyor : INT := 15930;
+        iPosStamp : INT := 7845;
     END_VAR
     
     IF((iPosStack-delta) < AI_Position AND AI_Position < (iPosStack+delta)) THEN

@@ -27,5 +27,4 @@ G F (a & b)
 a U b
 a U b U c
 ( (a) U (b) ) U (c)
-
 ( a U b ) U c
