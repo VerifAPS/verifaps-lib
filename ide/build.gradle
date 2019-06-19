@@ -1,4 +1,8 @@
-apply plugin: 'application'
+plugins {
+    id("application")
+    id 'com.github.johnrengelman.shadow' version "5.0.0"
+}
+
 mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 
 description = 'Case Studies and Executables of VerifAPS'
