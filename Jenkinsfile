@@ -1,27 +1,51 @@
 pipeline {
   agent {
-    docker {
-      image 'wadoon/verifaps-test:latest'
+    node {
+      label 'Gentzen'
     }
 
   }
   stages {
     stage('Build') {
+      agent {
+        docker {
+          image 'wadoon/verifaps-test:latest'
+        }
+
+      }
       steps {
         sh 'gradle classes'
       }
     }
     stage('Build-Test') {
+      agent {
+        docker {
+          image 'wadoon/verifaps-test:latest'
+        }
+
+      }
       steps {
         sh 'gradle testClasses'
       }
     }
     stage('Check') {
+      agent {
+        docker {
+          image 'wadoon/verifaps-test:latest'
+        }
+
+      }
       steps {
         sh 'gradle --continue -parallel --build-cache check'
       }
     }
     stage('Sonarqube') {
+      agent {
+        docker {
+          image 'wadoon/verifaps-test:latest'
+        }
+
+      }
       steps {
         sh '''gradle sonarqube \\                                                                                                           130 / git:develop / 18:40:25
   -Dsonar.projectKey=VerifAPS_verifaps-lib \\
