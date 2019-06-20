@@ -619,7 +619,7 @@ data class GuardedStatement(
 
     override fun clone(): GuardedStatement {
         val gs = GuardedStatement(condition.clone(), statements.clone())
-        gs.ruleContext = gs.ruleContext
+        gs.ruleContext = ruleContext
         return gs
     }
 }

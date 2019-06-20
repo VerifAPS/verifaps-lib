@@ -238,11 +238,8 @@ class TblExprToSExpr(columnVar: String,
                      val programVar: Set<String>,
                      val access: String? = null)
     : TestTableLanguageBaseVisitor<SExpr>() {
-    val translation: (String) -> String = {
-        when (it) {
-            else -> it
-        }
-    }
+
+    val translation: (String) -> String = { it }
 
     private val variable: SExpr = if (access == null) SSymbol(columnVar) else sexpr(columnVar, access)
 
