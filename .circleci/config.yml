@@ -61,7 +61,14 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: gradle --continue --build-cache check
+#      - run: gradle --continue --build-cache check
+      - run: |
+          gradle --continue --build-cache --parallel check sonarqube \
+                 -Dsonar.projectKey=VerifAPS_verifaps-lib
+                 -Dsonar.branch.name=${CIRCLE_BRANCH}
+                 -Dsonar.organization=verifaps \
+                 -Dsonar.host.url=https://sonarcloud.io \
+                 -Dsonar.login=$SONAR_TOKEN
 
       - run:
           name: Save test results
@@ -73,13 +80,6 @@ jobs:
       - store_test_results:
           path: ~/junit
 
-      - run: |
-          gradle --continue --build-cache --parallel sonarqube \
-                 -Dsonar.projectKey=VerifAPS_verifaps-lib
-                 -Dsonar.branch.name=${CIRCLE_BRANCH}
-                 -Dsonar.organization=verifaps \
-                 -Dsonar.host.url=https://sonarcloud.io \
-                 -Dsonar.login=$SONAR_TOKEN
 
   integration-tests:
     docker:
