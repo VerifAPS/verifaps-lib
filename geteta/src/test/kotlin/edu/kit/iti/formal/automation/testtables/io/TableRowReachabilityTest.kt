@@ -89,7 +89,7 @@ class TableRowReachabilityTest {
                 "s04#(END)", out)
     }
 
-    @Test
+    //@Test
     @Throws(JAXBException::class)
     fun testReachability4() {
         val gtt = GetetaFacade.parseTableXML("src/test/resources/reachability/reachability4.xml")
