@@ -35,6 +35,10 @@ class StructuredTextPrinter
         throw IllegalArgumentException("not implemented: " + visitable!!::class.java)
     }
 
+    override fun visit(empty: EMPTY_EXPRESSION) {
+        sb.print("(* empty expression *)")
+    }
+
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {
         sb.printf("ARRAY[")
         arrayTypeDeclaration.ranges.forEachIndexed { i, it ->

@@ -6,6 +6,11 @@ import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 
+/**
+ * This analysis sets an `stBody` generated from an `sfcBody`.
+ * @author weigl
+ * @author gorenflo
+ */
 object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
     override fun defaultVisit(obj: Any) {}
 

@@ -1381,7 +1381,7 @@ class DirectVariable(s: String) : Reference() {
 
 sealed class Invoked {
     fun getCalleeScope(): Scope? {
-        return when(this){
+        return when (this) {
             is Program -> program.scope
             is FunctionBlock -> fb.scope
             is Function -> function.scope
@@ -1425,6 +1425,7 @@ data class StringLit(var dataType: RefTo<IECString> = RefTo(), var value: String
 }
 
 data class RealLit(var dataType: RefTo<AnyReal> = RefTo(), var value: BigDecimal) : Literal() {
+    constructor(dt: AnyReal, v: BigDecimal) : this(RefTo(dt), v)
     constructor(dt: String?, v: BigDecimal) : this(RefTo(dt), v)
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, AnyReal.REAL)
@@ -1441,6 +1442,7 @@ private fun <T : AnyDt> RefTo<T>.checkAndresolveDt(localScope: Scope, default: T
 }
 
 data class EnumLit(var dataType: RefTo<EnumerateType> = RefTo(), var value: String) : Literal() {
+    constructor(dataType: EnumerateType, value: String) : this(RefTo(dataType), value)
     constructor(dataType: String?, value: String) : this(RefTo(dataType), value)
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope)
@@ -1466,7 +1468,7 @@ class NullLit() : Literal() {
 
 data class ToDLit(var value: TimeofDayData) : Literal() {
     override fun dataType(localScope: Scope) = AnyDate.TIME_OF_DAY
-    override fun asValue(scope: Scope) = VToD(AnyDate.TIME_OF_DAY, value)
+    override fun asValue(scope: Scope) = VTimeOfDay(AnyDate.TIME_OF_DAY, value)
     override fun clone() = copy()
 }
 
@@ -1500,6 +1502,7 @@ data class BooleanLit(var value: Boolean) : Literal() {
 }
 
 data class BitLit(var dataType: RefTo<AnyBit> = RefTo(), var value: Long) : Literal() {
+    constructor(dt: AnyBit, v: Long) : this(RefTo(dt), v)
     constructor(dt: String?, v: Long) : this(RefTo(dt), v)
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope)
@@ -1706,7 +1709,7 @@ class Location : Expression {
 
 
 //region Helpers
-class StatementList(private var list: MutableList<Statement> = arrayListOf())
+class StatementList(private val list: MutableList<Statement> = arrayListOf())
     : Statement(), MutableList<Statement> by list {
 
     constructor(vararg then: Statement) : this(list = ArrayList(Arrays.asList(*then)))
@@ -1716,7 +1719,7 @@ class StatementList(private var list: MutableList<Statement> = arrayListOf())
     }
 
     constructor(ts: Collection<Statement>) : this() {
-        this.list = ArrayList(ts)
+        this.list.addAll(ts)
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -1767,7 +1770,7 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
 data class Position(
         val lineNumber: Int = -1,
         val charInLine: Int = -1,
-        val offset: Int = -1) : edu.kit.iti.formal.automation.st.Cloneable {
+        val offset: Int = -1) : Cloneable {
 
     companion object {
         fun start(token: Token?) =
@@ -1778,9 +1781,9 @@ data class Position(
         fun end(token: Token?): Position {
             return if (token == null) Position()
             else {
-                val text = token.text?:""
+                val text = token.text ?: ""
                 val newlines = text.count { it == '\n' }
-                Position(token.line+ newlines,
+                Position(token.line + newlines,
                         text.length - Math.max(0, text.lastIndexOf('\n')),
                         token.stopIndex)
             }
@@ -2059,6 +2062,8 @@ data class VariableDeclaration(
         fun get(): Int {
             val p = peek()
             internal = internal shl 1
+            if (internal <= 0)
+                throw IllegalStateException("Not enough flag bits left for variable declaration.")
             return p
         }
     }

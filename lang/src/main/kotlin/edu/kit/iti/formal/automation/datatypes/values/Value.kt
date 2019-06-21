@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.datatypes.values
  */
 
 import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.st.ast.*
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -57,34 +58,98 @@ sealed class Value<T : AnyDt, S : Any>(
     override fun toString(): String {
         return "Value{$dataType}($value)"
     }
+
+    open fun assignTo(ref: SymbolicReference): StatementList? = null
 }
 
 
 class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
     constructor(dt: AnyInt, v: Long) : this(dt, BigInteger.valueOf(v))
 
+    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo IntegerLit(dataType, value as BigInteger))
 }
 
 class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>)
-    : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v)
+    : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v) {
+}
 
-class VAnyReal(dt: AnyReal, v: BigDecimal) : Value<AnyReal, BigDecimal>(dt, v)
-class VAnyBit(dt: AnyBit, v: Bits) : Value<AnyBit, Bits>(dt, v)
+class VAnyReal(dt: AnyReal, v: BigDecimal) : Value<AnyReal, BigDecimal>(dt, v) {
+    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo RealLit(dataType, value))
+}
 
-class VBool(dt: AnyBit.BOOL, v: Boolean) : Value<AnyBit.BOOL, Boolean>(dt, v)
+class VAnyBit(dt: AnyBit, v: Bits) : Value<AnyBit, Bits>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) =
+            StatementList(ref assignTo BitLit(dataType, value.register))
+}
+
+class VBool(dt: AnyBit.BOOL, v: Boolean) : Value<AnyBit.BOOL, Boolean>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo if (value) BooleanLit.LTRUE else BooleanLit.LFALSE)
+}
 
 val TRUE = VBool(AnyBit.BOOL, true)
 val FALSE = VBool(AnyBit.BOOL, false)
 
-class VIECString(dt: IECString, v: String) : Value<IECString, String>(dt, v)
-class VDate(dt: AnyDate.DATE, v: DateData) : Value<AnyDate.DATE, DateData>(dt, v)
-class VTime(dt: TimeType, v: TimeData) : Value<TimeType, TimeData>(dt, v)
-class VDateAndTime(dt: AnyDate.DATE_AND_TIME, v: DateAndTimeData) : Value<AnyDate.DATE_AND_TIME, DateAndTimeData>(dt, v)
-class VTimeOfDay(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v)
-class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v.toUpperCase())
-class VToD(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v)
-class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(dt, v)
-class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v)
+class VIECString(dt: IECString, v: String) : Value<IECString, String>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) =
+            StatementList(ref assignTo StringLit(dataType, value))
+}
+
+class VDate(dt: AnyDate.DATE, v: DateData) : Value<AnyDate.DATE, DateData>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo DateLit(value))
+}
+
+class VTime(dt: TimeType, v: TimeData) : Value<TimeType, TimeData>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo TimeLit(value))
+}
+
+class VDateAndTime(dt: AnyDate.DATE_AND_TIME, v: DateAndTimeData) : Value<AnyDate.DATE_AND_TIME, DateAndTimeData>(dt, v) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo DateAndTimeLit(value))
+
+}
+
+class VTimeOfDay(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v) {
+    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo ToDLit(value))
+}
+
+class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v.toUpperCase()) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo EnumLit(dataType, value))
+}
+
+class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(dt, v) {
+    val fieldValues: List<Pair<String, Value<*, *>>>
+        get() {
+            return dataType.fields.map {
+                val specificValue = value.fieldValues[it.name]
+                it.name to (specificValue ?: it.initValue
+                ?: throw IllegalStateException("value it not determined for record value: field '${it.name}'"))
+            }
+        }
+
+    override fun assignTo(ref: SymbolicReference): StatementList? {
+        val seq = StatementList()
+        fieldValues.forEach { (n, dt) ->
+            dt.assignTo(ref[n])?.also {
+                seq.addAll(it)
+            }
+        }
+        return seq
+    }
+}
+
+
+class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v) {
+    override fun assignTo(ref: SymbolicReference): StatementList? {
+        val seq = StatementList()
+        val avalue = value as MultiDimArrayValue
+        dataType.allIndices().forEach {
+            val svalue = avalue.get(it)
+            svalue.assignTo(ref[it])?.also { seq.addAll(it) }
+        }
+        return seq
+    }
+}
 
 object VVOID : Value<VOID, Unit>(VOID, Unit)
-object VNULL : Value<ClassDataType.AnyClassDt, Unit>(ClassDataType.AnyClassDt, Unit)
+object VNULL : Value<ClassDataType.AnyClassDt, Unit>(ClassDataType.AnyClassDt, Unit) {
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo NullLit())
+}

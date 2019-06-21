@@ -167,4 +167,7 @@ class MaintainInitialValues : AstVisitor<Unit>() {
         }
     }
 
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
+        super.visit(structureTypeDeclaration)
+    }
 }

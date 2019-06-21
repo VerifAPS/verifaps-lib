@@ -832,7 +832,7 @@ exit_statement
  sfc:  sfc_network+;
  sfc_network : init_step (step | transition /*| action */)*;
  init_step : INITIAL_STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
- step : STEP step_name=IDENTIFIER COLON ( action_association SEMICOLON )* END_STEP;
+ step : STEP step_name=IDENTIFIER COLON? ( action_association SEMICOLON )* END_STEP;
  action_association : actionName=symbolic_variable '(' actionQualifier ? ( ',' indicatorName=IDENTIFIER )* ')';
  actionQualifier : IDENTIFIER (COMMA expression )?;
  //actionTime: TIME_LITERAL | IDENTIFIER;

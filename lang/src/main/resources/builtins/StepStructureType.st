@@ -1,4 +1,4 @@
-TYPE xt:
+TYPE SFC_STEPS:
   STRUCT
     X: BOOL;
     _X: BOOL;

@@ -9,7 +9,7 @@ import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.TranslationSfcToSt
+import edu.kit.iti.formal.automation.st.TranslationSfcToStPipeline
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -210,7 +210,7 @@ object IEC61131Facade {
 
     fun translateToSt(scope: Scope, sfc: SFCImplementation, name: String = ""): StatementList {
         val st = StatementList()
-        sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToSt(network, name, index, scope).call()) }
+        sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToStPipeline(network, name, index, scope).call()) }
         return st
     }
 

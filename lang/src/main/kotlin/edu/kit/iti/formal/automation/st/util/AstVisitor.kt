@@ -337,7 +337,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     override fun traverse(returnStatement: ReturnStatement) {}
 
     override fun traverse(structureTypeDeclaration: StructureTypeDeclaration) {
-        structureTypeDeclaration.fields.forEach { it.init?.accept(visitor) }
+        structureTypeDeclaration.fields.forEach { it.accept(visitor) }
     }
 
     override fun traverse(subRangeTypeDeclaration: SubRangeTypeDeclaration) {}
@@ -917,9 +917,13 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
 
     override fun visit(referenceValue: ReferenceValue): T {
         traversalPolicy.traverse(referenceValue)
-        return super<DefaultVisitorNN>.visit(referenceValue)
+        return super.visit(referenceValue)
     }
 
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): T {
+        traversalPolicy.traverse(structureTypeDeclaration)
+        return super.visit(structureTypeDeclaration)
+    }
 }
 
 open abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
