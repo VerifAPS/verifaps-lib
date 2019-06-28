@@ -5,8 +5,9 @@ description = 'Library for creation and parsing of SMV files.'
 dependencies {
     compile group: 'org.antlr', name: 'antlr4-runtime', version:'4.7.2'
     antlr group: 'org.antlr', name: 'antlr4', version:'4.7.2'
-    compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.5.3'
+    compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.6.26'
     compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+    compile project(":util")
 }
 
 generateGrammarSource {
