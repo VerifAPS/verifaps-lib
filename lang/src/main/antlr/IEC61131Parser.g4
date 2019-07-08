@@ -687,12 +687,12 @@ statement_list
 
 statement
 :
-	    assignment_statement SEMICOLON
+  	  label_statement
+	| assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
   	| return_statement SEMICOLON
   	| jump_statement SEMICOLON
-  	| label_statement SEMICOLON
-	  | if_statement
+	| if_statement
     | case_statement
     | for_statement
     | while_statement
