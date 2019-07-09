@@ -637,13 +637,16 @@ class StructuredTextPrinter
                         sb.nl()
                         sb.printf(vd.name).printf(" : ")
                         variableDataType(vd)
-                        if (vd.init != null) {
-                            sb.printf(" := ")
-                            vd.init!!.accept(this)
-                        } else if (vd.initValue != null) {
-                            sb.printf(" := ")
-                            val (dt, v) = vd.initValue as Value<*, *>
-                            sb.printf(dt.repr(v))
+                        when {
+                            vd.initValue != null -> {
+                                sb.printf(" := ")
+                                val (dt, v) = vd.initValue as Value<*, *>
+                                sb.printf(dt.repr(v))
+                            }
+                            vd.init != null -> {
+                                sb.printf(" := ")
+                                vd.init!!.accept(this)
+                            }
                         }
                         sb.printf(";")
                     }

@@ -1,12 +1,11 @@
 package me.tomassetti.kanvas
 
-import me.tomassetti.kolasu.model.Node
-import org.fife.ui.autocomplete.*
+import org.fife.ui.autocomplete.Completion
+import org.fife.ui.autocomplete.CompletionProviderBase
+import org.fife.ui.autocomplete.ParameterizedCompletion
 import java.awt.Color
 import java.awt.Point
-import java.util.*
 import javax.swing.text.BadLocationException
-import javax.swing.text.Document
 import javax.swing.text.JTextComponent
 import javax.swing.text.Segment
 

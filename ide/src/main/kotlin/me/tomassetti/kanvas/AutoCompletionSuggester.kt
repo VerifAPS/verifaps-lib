@@ -3,7 +3,7 @@ package me.tomassetti.kanvas
 import me.tomassetti.antlr4c3.ParserStack
 import me.tomassetti.antlr4c3.api.completionsWithContextIgnoringSemanticPredicates
 import me.tomassetti.kanvas.Debugging.NONE
-import me.tomassetti.kolasu.model.Node
+import com.strumenta.kolasu.model.Node
 import org.antlr.v4.runtime.CommonToken
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
