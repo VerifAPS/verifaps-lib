@@ -17,6 +17,8 @@ import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
+import edu.kit.iti.formal.util.HasMetadata
+import edu.kit.iti.formal.util.HasMetadataImpl
 import edu.kit.iti.formal.util.times
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
@@ -26,12 +28,12 @@ import java.math.BigInteger
 import java.util.*
 import java.util.function.Consumer
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.reflect.full.memberProperties
 
-sealed class Top : Visitable, Cloneable,
+sealed class Top : Visitable, Cloneable, HasMetadata by HasMetadataImpl(),
         HasRuleContext, Serializable {
     override var ruleContext: ParserRuleContext? = null
-
 
     val nodeName: String
         get() = this::class.simpleName!!
@@ -54,8 +56,8 @@ interface HasScope {
 //region Declaration and Toplevel
 abstract class PouElement : Top(), Identifiable, Comparable<PouElement> {
     var comment: String = ""
-    override fun compareTo(pouElement: PouElement): Int {
-        return name.compareTo(pouElement.name)
+    override fun compareTo(other: PouElement): Int {
+        return name.compareTo(other.name)
     }
 }
 
@@ -73,17 +75,32 @@ data class PouElements(val elements: MutableList<PouElement> = arrayListOf())
     }
 }
 
+data class Namespace(var fqName: String) {
+    val name : String
+        get() = nameParts.last()
+
+    val nameParts : Sequence<String>
+        get() = fqName.splitToSequence('.')
+
+    infix fun isSubSpaceOf(n : Namespace) : Boolean {
+        if(this == n || fqName == n.fqName)
+            return false
+        return n.fqName.startsWith(fqName)
+    }
+
+}
+
+val GLOBAL_NAMESPACE = Namespace("")
+
 data class NamespaceDeclaration(
-        var fqName: Array<String> = arrayOf(),
+        var fqName: Namespace = GLOBAL_NAMESPACE,
         val pous: PouElements = PouElements(),
         override var scope: Scope = Scope()) : HasScope, Top() {
     override fun clone(): NamespaceDeclaration {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
 data class ConfigurationDeclaration(override var scope: Scope) : HasScope, PouElement() {
@@ -598,11 +615,11 @@ data class CommentStatement(var comment: String) : Statement() {
 
     companion object {
         fun box(s: String, vararg args: Any): Statement {
-            var s = String.format(s, *args)
-            val rest = "*" * (79 - 2 - s.length)
+            val q = String.format(s, *args)
+            val rest = "*" * (79 - 2 - q.length)
             val line = "*" * 79
             return CommentStatement(
-                    "$line\n * $s $rest\n $line")
+                    "$line\n * $q $rest\n $line")
         }
 
         fun single(fmt: String, vararg args: Any): Statement {
@@ -839,15 +856,6 @@ data class SymbolicReference @JvmOverloads constructor(
     }*/
 }
 
-//Helpers
-fun <T : Expression> Iterable<T>.disjunction() = reduce { a: Expression, b: Expression -> a or b }
-
-fun <T : Expression> Iterable<T>.conjunction() = reduce { a: Expression, b: Expression -> a and b }
-fun <T : Expression> Iterable<T>.sum() = reduce { a: Expression, b: Expression -> a plus b }
-fun <T : Expression> Iterable<T>.substract() = reduce { a: Expression, b: Expression -> a minus b }
-fun <T : Expression> Iterable<T>.product() = reduce { a: Expression, b: Expression -> a times b }
-fun <T : Expression> Iterable<T>.division() = reduce { a: Expression, b: Expression -> a div b }
-//endregion
 
 data class Invocation(
         var callee: SymbolicReference = SymbolicReference(),
@@ -967,11 +975,11 @@ data class InvocationParameter(
 
 //region Type
 interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
-    abstract override var name: String
+    override var name: String
     //var dataType: AnyDt
     @property:Deprecated("should be an type DECLARATION")
-    abstract var baseType: RefTo<AnyDt>
-    abstract val initialization: Initialization?
+    var baseType: RefTo<AnyDt>
+    val initialization: Initialization?
     override fun clone(): TypeDeclaration
 
     @Throws(IECException::class)
@@ -992,7 +1000,7 @@ data class SimpleTypeDeclaration(
     constructor(dt: AnyDt, init: Initialization?) : this(baseType = RefTo(dt), initialization = init)
 
     override fun setInit(init: Initialization?) {
-        initialization = init
+        this.initialization = init
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -1043,12 +1051,12 @@ data class StructureTypeDeclaration(
 data class SubRangeTypeDeclaration(
         override var name: String = ANONYM,
         override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type DECLARATION
-        override var initialization: Literal? = null,//TODO Refine to integer literal
+        override var initialization: IntegerLit? = null,
         var range: Range? = null)
     : TypeDeclaration, Top() {
 
     override fun setInit(init: Initialization?) {
-        initialization = init as Literal?
+        initialization = init as? IntegerLit
     }
 
     /*override fun getDataType(scope: Scope): RangeType? {
@@ -1350,7 +1358,7 @@ abstract class CaseCondition() : Top() {
     }
 }
 
-class Deref(private val reference: Reference) : Reference() {
+class Deref(val reference: Reference) : Reference() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun dataType(localScope: Scope): AnyDt {
         return reference.dataType(localScope)//TODO
@@ -1751,14 +1759,9 @@ class StatementList(private val list: MutableList<Statement> = arrayListOf())
 }
 
 data class ExpressionList(private val expressions: MutableList<Expression> = arrayListOf())
-//TODO check for expression
-    : Expression(), MutableList<Expression> by expressions {
+    : Top(), MutableList<Expression> by expressions {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-
-    override fun dataType(localScope: Scope): AnyDt {
-        throw IllegalStateException("not implemented")
-    }
 
     override fun clone(): ExpressionList {
         val el = ExpressionList()
@@ -2281,9 +2284,10 @@ class SFCTransition : Top() {
 
     override fun clone(): SFCTransition {
         val t = SFCTransition()
+        t.guard = this.guard.clone()
         t.name = this.name
-        t.from = this.from //TODO deep clone
-        t.to = this.to // TODO deep clone
+        t.from = this.from.toMutableSet()
+        t.to = this.to.toMutableSet()
         return t
     }
 
@@ -2293,7 +2297,7 @@ class SFCTransition : Top() {
 
     class PriorityComparison : Comparator<SFCTransition> {
         override fun compare(o1: SFCTransition, o2: SFCTransition): Int {
-            return Integer.compare(o1.priority ?: 0, o2.priority)
+            return Integer.compare(o1.priority, o2.priority)
         }
     }
 }

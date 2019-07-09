@@ -22,15 +22,40 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.automation.rvt.translators.*
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.rvt.translators.DefaultValueTranslator
+import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
-import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.Literal
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.meta
 import java.util.*
+
+public val SVariable.info: SmvVariableInfo
+    get() {
+        return meta<SmvVariableInfo>()
+                ?: SmvVariableInfo().also { setMetadata(SmvVariableInfo::class.java, it) }
+    }
+
+public var SVariable.isInput: Boolean
+    get() = info.isInput
+    set(value) {
+        info.isInput = value
+    }
+
+public var SVariable.isOutput: Boolean
+    get() = info.isOutput
+    set(value) {
+        info.isOutput = value
+    }
+
+data class SmvVariableInfo(var isInput: Boolean = false, var isOutput: Boolean = false)
 
 /**
  * @author Alexander Weigl
@@ -62,12 +87,13 @@ class ModuleBuilder(val program: PouExecutable,
         // Using this workaround instead
         val stateVariables = finalState.keys
                 .filter { (name) ->
-                    inputVars.stream().noneMatch { v2 -> v2.name == name } }
+                    inputVars.stream().noneMatch { v2 -> v2.name == name }
+                }
 
         val outputVarNames = outputVars.map(VariableDeclaration::name)
         for (`var` in stateVariables) {
             if (outputVarNames.contains(`var`.name)) {
-                `var`.addMetadata(OUTPUT_VARIABLE)
+                `var`.isOutput = true
             }
         }
 
@@ -77,8 +103,10 @@ class ModuleBuilder(val program: PouExecutable,
 
     private fun insertInputVariables(decls: List<VariableDeclaration>) {
         decls.map { this.typeTranslator.translate(it) }
-                .map { it.addMetadata(INPUT_VARIABLE) }
-                .forEach { module.moduleParameters.add(it) }
+                .forEach { v ->
+                    v.isInput = true
+                    module.moduleParameters.add(v)
+                }
     }
 
     private fun insertVariables(variables: Collection<SVariable>) {
@@ -111,10 +139,5 @@ class ModuleBuilder(val program: PouExecutable,
         val e = finalState[s]
         val a = SAssignment(s, e!!)
         module.nextAssignments.add(a)
-    }
-
-    companion object {
-        val INPUT_VARIABLE = 1
-        val OUTPUT_VARIABLE = 2
     }
 }

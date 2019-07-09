@@ -40,8 +40,8 @@ class RefTo<T : Identifiable>(private var name: String?,
     var obj: T?
         get() = identified
         set(value) {
-            // TODO: assertion should be changed
-            //assert name == null || obj == null || obj.getName().equals(name);
+ //           if(value!=null || name == null || value?.name != name )
+ //               throw IllegalStateException("Name does match the object name.")
             identified = value
         }
 

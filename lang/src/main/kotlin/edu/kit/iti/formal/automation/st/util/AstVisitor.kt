@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.st.util
 
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 import edu.kit.iti.formal.automation.visitors.Visitable
@@ -113,6 +114,7 @@ interface ITraversal<T> {
     fun traverse(transition: SFCTransition)
     fun traverse(elements: PouElements)
     fun traverse(empty: EMPTY_EXPRESSION)
+    fun traverse(namespace: NamespaceDeclaration)
 }
 
 /**
@@ -126,6 +128,10 @@ interface ITraversal<T> {
  *
  */
 open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
+    override fun traverse(namespace: NamespaceDeclaration) {
+        namespace.pous.forEach { it.accept(visitor) }
+    }
+
     override fun traverse(assignmentStatement: AssignmentStatement) {
         assignmentStatement.expression.accept(visitor)
         assignmentStatement.location.accept(visitor)
@@ -302,14 +308,13 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     }
 
     override fun traverse(interfaceDeclaration: InterfaceDeclaration) {
-        //TODO inferface? interfaceDeclaration.scope.accept(visitor)
         for (m in interfaceDeclaration.methods)
             m.accept(visitor)
     }
 
     override fun traverse(method: MethodDeclaration) {
         method.scope.accept(visitor)
-        method.stBody?.accept(visitor)
+        method.stBody.accept(visitor)
     }
 
     override fun traverse(globalVariableListDeclaration: GlobalVariableListDeclaration) {
@@ -321,7 +326,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     }
 
     override fun traverse(location: Location) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        location.path.forEach { it.accept(visitor) }
     }
 
     override fun traverse(arrayTypeDeclaration: ArrayTypeDeclaration) {}
@@ -346,36 +351,28 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
         simpleTypeDeclaration.initialization?.accept(visitor)
     }
 
-    override fun traverse(commentStatement: CommentStatement) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun traverse(commentStatement: CommentStatement) {}
 
     override fun traverse(deref: Deref) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        deref.reference.accept(visitor)
     }
 
-    override fun traverse(symbolicReference: SymbolicReference) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun traverse(symbolicReference: SymbolicReference) {}
 
     override fun traverse(ptd: PointerTypeDeclaration) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        ptd.initialization?.accept(visitor)
     }
 
-    override fun traverse(init: IdentifierInitializer) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun traverse(init: IdentifierInitializer) {}
 
-    override fun traverse(literal: Literal) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun traverse(literal: Literal) {}
 
     override fun traverse(referenceSpecification: ReferenceTypeDeclaration) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        referenceSpecification.refTo.accept(visitor)
     }
 
     override fun traverse(sfcStep: SFCStep) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun traverse(actionDeclaration: ActionDeclaration) {
@@ -393,7 +390,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     }
 
     override fun traverse(transition: SFCTransition) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        transition.guard.accept(visitor)
     }
 
     override fun traverse(elements: PouElements) {
@@ -415,6 +412,12 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
  * @author Alexander Weigl (26.06.2014)
  */
 class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
+    override fun traverse(namespace: NamespaceDeclaration) {
+        val newElements = visitList(namespace.pous)
+        namespace.pous.clear()
+        namespace.pous.addAll(newElements)
+    }
+
     override fun traverse(elements: PouElements) {
         val newElements = visitList(elements)
         elements.clear()
@@ -546,9 +549,9 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     }
 
 
-    override fun traverse(fbc: InvocationStatement) {
-        fbc.callee = fbc.callee.accept(visitor) as SymbolicReference
-        fbc.parameters = fbc.parameters
+    override fun traverse(invocation: InvocationStatement) {
+        invocation.callee = invocation.callee.accept(visitor) as SymbolicReference
+        invocation.parameters = invocation.parameters
                 .map { it.accept(visitor) as InvocationParameter }
                 .toMutableList()
     }
@@ -587,7 +590,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
         val variables = ArrayList(localScope.variables)
         for (variable in variables) {
             //assert variable.getParent() != null;
-            val newVariable = variable.accept(visitor) as VariableDeclaration
+            val newVariable = variable.accept(visitor) as? VariableDeclaration
             if (newVariable == null)
                 localScope.variables.remove(variable.name)
             else
@@ -633,14 +636,15 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     }
 
 
-    override fun traverse(fbd: FunctionBlockDeclaration) {
+    override fun traverse(functionBlockDeclaration: FunctionBlockDeclaration) {
+        val fbd = functionBlockDeclaration
         if (fbd.stBody != null)
             fbd.stBody = fbd.stBody!!.accept(visitor) as StatementList
         if (fbd.sfcBody != null)
             fbd.sfcBody = fbd.sfcBody!!.accept(visitor) as SFCImplementation
 
         val a = visitList(fbd.actions)
-
+        fbd.actions = ArrayLookupList(a)
     }
 
 
@@ -694,8 +698,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
         val methods = ArrayList<MethodDeclaration>(clazz.methods.size)
         for (method in clazz.methods) {
             val newMethod = method.accept(visitor) as MethodDeclaration
-            if (newMethod != null)
-                methods.add(newMethod)
+            methods.add(newMethod)
         }
         //clazz.setMethods(methods)
     }
@@ -709,14 +712,13 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
         val methods = ArrayList<MethodDeclaration>(interfaceDeclaration.methods.size)
         for (method in interfaceDeclaration.methods) {
             val newMethod = method.accept(visitor) as MethodDeclaration
-            if (newMethod != null)
-                methods.add(method)
+            methods.add(newMethod)
         }
         interfaceDeclaration.methods = methods
     }
 
-    override fun traverse(gvlDecl: GlobalVariableListDeclaration) {
-        gvlDecl.scope = (gvlDecl.scope.accept(visitor) as Scope?)!!
+    override fun traverse(globalVariableListDeclaration: GlobalVariableListDeclaration) {
+        globalVariableListDeclaration.scope = (globalVariableListDeclaration.scope.accept(visitor) as Scope?)!!
     }
 
     override fun traverse(literal: Literal) {}
@@ -759,12 +761,17 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
 
     override fun visit(range: CaseCondition.Range): T {
         traversalPolicy.traverse(range)
-        return super<DefaultVisitorNN>.visit(range)
+        return super.visit(range)
+    }
+
+    override fun visit(namespace: NamespaceDeclaration): T {
+        traversalPolicy.traverse(namespace)
+        return super.visit(namespace)
     }
 
     override fun visit(integerCondition: CaseCondition.IntegerCondition): T {
         traversalPolicy.traverse(integerCondition)
-        return super<DefaultVisitorNN>.visit(integerCondition)
+        return super.visit(integerCondition)
     }
 
     override fun visit(enumeration: CaseCondition.Enumeration): T {
@@ -805,7 +812,7 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
 
     override fun visit(statements: StatementList): T {
         traversalPolicy.traverse(statements)
-        return super<DefaultVisitorNN>.visit(statements)
+        return super.visit(statements)
     }
 
     override fun visit(programDeclaration: ProgramDeclaration): T {

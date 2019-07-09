@@ -228,7 +228,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             return t
         } else if (ctx.subrange_spec_init() != null) {
             val t = visitSubrange_spec_init(ctx.subrange_spec_init())
-            t.initialization = init as Literal?
+            t.initialization = init as? IntegerLit
             return t
         } else if (ctx.structure_declaration() != null) {
             val t = visitStructure_declaration(ctx.structure_declaration())

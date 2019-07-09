@@ -8,6 +8,9 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.LinkedHashMap
+import kotlin.math.ceil
+import kotlin.math.ln
 
 
 sealed class AnyDt(override var name: String = "ANY") : Identifiable {
@@ -358,11 +361,11 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
  * @author weigl
  */
 class EnumerateType(name: String = "ENUM",
-                    var allowedValues: MutableMap<String, Int> = hashMapOf()) : AnyDt(name) {
+                    var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap()) : AnyDt(name) {
 
     val bitlength: Int
         get() {
-            return Math.ceil(Math.log(allowedValues.size.toDouble())).toInt()
+            return ceil(ln(allowedValues.size.toDouble())).toInt()
         }
 
     lateinit var defValue: String
@@ -381,22 +384,16 @@ class EnumerateType(name: String = "ENUM",
         defValue = etd.allowedValues[0].text.toUpperCase()
     }
 
-    /** {@inheritDoc}  */
     override fun repr(obj: Any): String {
-        return if (name == null)
-            obj.toString()
-        else
-            "$name#$obj"
+        return "$name#$obj"
     }
 
-    /** {@inheritDoc}  */
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 
     fun isAllowedValue(value: String) = this.allowedValues.contains(value)
     operator fun contains(textValue: String) = textValue.toUpperCase() in allowedValues
 
     override fun toString(): String = "ENUM $name"
-
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -413,6 +410,21 @@ class EnumerateType(name: String = "ENUM",
         result = 31 * result + defValue.hashCode()
         return result
     }
+
+    operator fun get(value: String) = allowedValues[value]
+    operator fun get(value: Int) = allowedValues.entries.find { (a, b) -> b == value }?.key
+
+    fun range(start: String, end: String): List<String> {
+        val keys = allowedValues.keys.toList()
+        val s = keys.indexOf(start)
+        val e = keys.indexOf(end)
+
+        if (s < 0) throw IllegalStateException()
+        if (e < 0) throw IllegalStateException()
+
+        return keys.subList(s, e + 1)
+    }
+
 }
 
 open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) : AnyNum() {
@@ -590,6 +602,7 @@ object DINT : AnyInt(32) {
 data class RangeType(
         var bottom: BigInteger = BigInteger.ZERO,
         var top: BigInteger = BigInteger.ZERO,
+        var default: BigInteger = bottom,
         var base: AnyInt = INT) : AnyInt(base.bitLength, base.isSigned) {
 
     override val upperBound: BigInteger
@@ -690,7 +703,7 @@ data class RecordType(override var name: String = ANONYM_DATATYPE, val fields: V
  * @author weigl
  * @version $Id: $Id
  */
-class PointerType(internal var of: AnyDt) : AnyDt() {
+class PointerType(var of: AnyDt) : AnyDt() {
 
     /** {@inheritDoc}  */
     override fun toString(): String {

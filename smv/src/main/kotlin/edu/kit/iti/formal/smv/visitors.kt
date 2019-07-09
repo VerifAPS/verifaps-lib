@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
+import java.lang.IllegalStateException
 
 /**
  *
@@ -111,7 +112,7 @@ open class SMVAstScanner : SMVAstVisitor<Unit> {
  */
 abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
     override fun visit(top: SMVAst) = top
-    override fun visit(v: SVariable) = v
+    override fun visit(v: SVariable): SMVExpr = v
 
     override fun visit(be: SBinaryExpression): SMVExpr {
         be.left = be.left.accept(this) as SMVExpr
@@ -151,5 +152,15 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
                 .map({ it.accept(this) as SMVExpr })
                 .toMutableList()
         return quantified
+    }
+}
+
+class VariableReplacer(val map : Map<SVariable, SMVExpr>) : SMVAstMutableVisitor() {
+    override fun visit(v: SVariable): SMVExpr {
+        return map.getOrDefault(v, v)
+    }
+
+    override fun visit(ce: SCaseExpression): SMVExpr {
+        return super.visit(ce)
     }
 }

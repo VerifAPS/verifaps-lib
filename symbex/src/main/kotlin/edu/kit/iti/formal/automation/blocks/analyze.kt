@@ -41,7 +41,8 @@ fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
     append("digraph G {\n")
 
     blocks.blocks.forEach {
-        val ssa = it.mutationMap.toList().joinToString("\\n") { (v,e)->
+        val map = if (it.ssa.isNotEmpty()) it.ssa else it.localMutationMap
+        val ssa = map.toList().joinToString("\\n") { (v, e) ->
             "$v = $e"
         }
         val label = listOf(

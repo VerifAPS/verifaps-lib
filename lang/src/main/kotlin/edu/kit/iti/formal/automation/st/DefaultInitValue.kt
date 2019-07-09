@@ -67,8 +67,7 @@ object DefaultInitValue : InitValueTranslator {
         }
 
         override fun visit(rangeType: RangeType): Value<*, *> {
-            // TODO use type's initialization value, if it exists
-            return visit(rangeType.base)
+            return VAnyInt(rangeType.base, rangeType.default)
         }
 
         override fun visit(timeType: TimeType): Value<*, *> {
@@ -133,7 +132,9 @@ object DefaultInitValue : InitValueTranslator {
 }
 
 object EvaluateInitialization : AstVisitor<Value<*, *>>() {
-    override fun defaultVisit(obj: Any) = TODO()
+    override fun defaultVisit(obj: Any) : Value<*,*> {
+        throw java.lang.IllegalArgumentException("${javaClass.name} not implemented for ${obj.javaClass.name}.")
+    }
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
         val type = ArrayType(v[0].dataType, listOf())

@@ -124,17 +124,6 @@ object SmtFacade {
 
 }
 
-/**
- * TODO No idea to make this nice and efficient.
- */
-class PrettyPrint(val writer: PrintWriter) {
-    fun prettyPrint(seq: Collection<SExpr>) {
-        seq.forEach { prettyPrint(it) }
-    }
-
-    fun prettyPrint(sexpr: SExpr) {}
-}
-
 class SexprParseTreeTransformer : SexprBaseVisitor<SExpr>() {
     override fun visitFile(ctx: SexprParser.FileContext): SExpr {
         val expressions = ctx.sexpr().map { it.accept(this) }

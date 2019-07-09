@@ -38,7 +38,7 @@ object KastelDemonstrator {
 
         val (pous, errors) = IEC61131Facade.fileResolve(INPUT_FILE)
         errors.forEach {
-            println("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
+            Console.info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
         }
 
         val program = Utils.findProgram(pous)!!
@@ -80,10 +80,11 @@ object KastelDemonstrator {
         val isHigh = { v: String ->
             val b = v in listOf(
                     //unused: "ReadStatusAxis1\$ConstantVelocity"
+                    //ReadActVelAxis1.Velocity
                     "ActStep\$rVelocity"
                     //,"MoveVelAxis1\$InVelocity"
                     //,"ReadActVelAxis1\$Velocity"
-                    )// v.endsWith("Velocity")
+            )// v.endsWith("Velocity")
             Console.info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b
         }
@@ -144,6 +145,8 @@ class PrivacyModelBuilder(private val code: SMVModule,
         instantiateCode(FIRST_RUN)
         instantiateCode(SECOND_RUN)
 
+        //Console.info("State: ${code.stateVars.map { it.name }}")
+
         //equal starting state
         main.initExpr.add(
                 code.stateVars
@@ -155,6 +158,10 @@ class PrivacyModelBuilder(private val code: SMVModule,
 
         // high variables
         val highVar = code.inputVars.filter { isHigh(it.name) }
+
+        //Console.info("lowVar: ${lowVar.map { it.name }}")
+        //Console.info("highVar: ${highVar.map { it.name }}")
+
 
         fun conjunction(v: List<SVariable>) =
                 if (v.isEmpty()) SLiteral.TRUE
@@ -272,12 +279,6 @@ class IFModelBuilder(private val code: SMVModule,
     }
 }
 
-
-fun <T> nonNullSeq(seq: Collection<T?>): List<T> {
-    val al = ArrayList<T>()
-    seq.forEach { it?.let { al += it } }
-    return al
-}
 
 /**
  * Find and tag the variables with the given [flag]

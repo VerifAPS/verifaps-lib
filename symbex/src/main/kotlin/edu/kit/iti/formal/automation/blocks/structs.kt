@@ -22,6 +22,30 @@ data class BlockProgram(
 
     fun findBlockByLabel(lbl: String) = blocks.find { it.label == lbl }
 
+    fun topsorted(): List<Block> {
+        val e = ArrayList(edges)
+        val sorted = ArrayList<Block>(blocks.size)
+        val unsorted = ArrayList(blocks)
+        for (i in 0..blocks.size) {
+            if(unsorted.isEmpty()) break
+            val blocksWOIncoming = unsorted.filter {
+                ! e.any { (_, to) -> to == it }
+            }
+
+            unsorted.removeAll(blocksWOIncoming)
+            sorted.addAll(blocksWOIncoming)
+
+            val outgoingEdges = e.filter { (from, _) ->
+                from in blocksWOIncoming
+            }
+            e.removeAll(outgoingEdges)
+        }
+
+        if (blocks.size != sorted.size) {
+            throw IllegalStateException("Something went wrong")
+        }
+        return sorted
+    }
 
     fun removeBlock(it: Block) {
         blocks.remove(it)
@@ -48,9 +72,11 @@ data class BlockProgram(
 
 data class Block(var label: String = getRandomLabel(),
                  var executionCondition: Expression = BooleanLit.LTRUE,
-                 val statements: StatementList = StatementList()) {
+                 var statements: StatementList = StatementList()) {
 
-    var mutationMap: Map<SVariable, SMVExpr> = hashMapOf()
+    lateinit var executionConditionSSA: SMVExpr
+    var ssa: Map<SVariable, SMVExpr> = hashMapOf()
+    var localMutationMap: Map<SVariable, SMVExpr> = hashMapOf()
 
     var cumulatedExecutionCondition = executionCondition
 
