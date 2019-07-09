@@ -59,14 +59,14 @@ fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclarati
     when (sv.dataType) {
         is RecordType -> { // recursion for struct, => list of variables + prefix
             val rt = sv.dataType as RecordType
-            val (_, rv) = (sv.initValue ?: DefaultInitValue.getInit(sv.dataType!!)) as VStruct
+            val (_, rv) =
+                    (sv.initValue ?: DefaultInitValue.getInit(sv.dataType!!)) as VStruct
 
             return rt.fields.flatMap {
                 createStructVariables(it)
             }.map {
                 val v = rv.fieldValues[it.name]
-                if (v != null && it.initValue == null)
-                    it.initValue = v
+                if (v != null) it.initValue = v
                 it.name = "${sv.name}$${it.name}"
                 it.type = sv.type
                 it

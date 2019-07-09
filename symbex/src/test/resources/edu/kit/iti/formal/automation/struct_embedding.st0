@@ -14,14 +14,14 @@ END_FUNCTION
 
 FUNCTION A_f : INT
 
+    VAR_OUTPUT  
+        A_f : INT := INT#0;
+    END_VAR
+
     VAR_INPUT
         _SELF$x : INT := INT#0;
         _SELF$y : INT := INT#0;
         z : INT := INT#0;
-    END_VAR
-
-    VAR_OUTPUT
-        A_f : INT := INT#0;
     END_VAR
 
     IF (_SELF$x > z) THEN
@@ -37,12 +37,12 @@ PROGRAM MY_PROGRAM
         a$y : INT := INT#333;
     END_VAR
 
-    VAR_INPUT
-        z : INT := INT#0;
-    END_VAR
-
     VAR_OUTPUT
         new_z : INT := INT#0;
+    END_VAR
+
+    VAR_INPUT
+        z : INT := INT#0;
     END_VAR
 
 
