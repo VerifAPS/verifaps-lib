@@ -6,6 +6,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.Invocation
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference
+import edu.kit.iti.formal.automation.st.ast.Top
 import java.util.*
 
 
@@ -58,7 +59,9 @@ class VariableNotDefinedException(message: String) : IECException(message) {
     }
 }
 
-class DataTypeNotResolvedException(message: String) : IECException(message)
+class DataTypeNotResolvedException(message: String) : IECException(message) {
+    val expr: Top? = null
+}
 
 class FunctionInvocationArgumentNumberException : IECException()
 

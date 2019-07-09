@@ -17,8 +17,7 @@ import java.util.*
  * Created by weigl on 26.11.16.
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
-    override fun defaultVisit(obj: Any)
-            = throw IllegalStateException("Symbolic Executioner does not handle $obj")
+    override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
     var scope: Scope = Scope.defaultScope()
     private val varCache = HashMap<String, SVariable>()
@@ -66,8 +65,16 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     fun lift(vd: SymbolicReference): SVariable {
         return if (varCache.containsKey(vd.identifier))
             varCache[vd.identifier]!!
-        else
-            throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
+        else {
+            val v = peek().keys.find { name->
+                vd.identifier == name.name
+            }
+            if (v != null) {
+                varCache[vd.identifier] = v
+                return v
+            } else
+                throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
+        }
     }
 
     //region rewriting of expressions using the current state

@@ -164,7 +164,7 @@ private fun commonOutputVariables(oldVersion: SMVModule, newVersion: SMVModule, 
     return commonVariables(oldVersion.outputVars, newVersion.outputVars, pred)
 }
 
-val filterOutput = { k: SVariable -> k.hasMetadata(ModuleBuilder.OUTPUT_VARIABLE) }
+val filterOutput = { k: SVariable -> k.isOutput }
 private val SMVModule.outputVars: Collection<SVariable>
     get() {
         return this.stateVars.filter(filterOutput)

@@ -22,6 +22,9 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import edu.kit.iti.formal.automation.cpp.TranslateToCpp
+import edu.kit.iti.formal.automation.cpp.generateHeader
+import edu.kit.iti.formal.automation.cpp.generateRunnableStub
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
@@ -30,9 +33,12 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.smv.VariableReplacer
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.CodeWriter
+import java.io.StringWriter
 import java.util.*
 
 /**
@@ -57,7 +63,7 @@ object SymbExFacade {
             state[se.lift(vd)] = ts[i++]
         }
         se.push(state)
-        se.scope!!.topLevel.registerFunction(decl)
+        se.scope.topLevel.registerFunction(decl)
         return fc.accept(se) as SMVExpr
     }
 
@@ -153,4 +159,38 @@ object SymbExFacade {
         program.accept(symbex)
         return symbex.peek()
     }
+
+    fun evaluateExpression(sstate: SymbolicState, exc: Expression, scope: Scope): SMVExpr {
+        val symbex = SymbolicExecutioner(scope)
+        symbex.push(sstate)
+        return exc.accept(symbex) as SMVExpr
+    }
+
+    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, exc: Expression, scope: Scope) = evaluateExpression(SymbolicState(ssa), exc, scope)
+
+
+    fun evaluateExpression(expr: Expression, scope: Scope): SMVExpr {
+        val symbex = SymbolicExecutioner(scope)
+        return expr.accept(symbex) as SMVExpr
+    }
+
+    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, expr: SMVExpr): SMVExpr {
+        val vr = VariableReplacer(ssa)
+        println(expr)
+        return expr.clone().accept(vr) as SMVExpr
+    }
+
+    fun toCpp(pous: PouElements, complete: Boolean): String {
+        val out = StringWriter()
+        val cout = CodeWriter(out)
+        val cppVisitor = TranslateToCpp(cout)
+        if (complete) generateHeader(cout)
+        pous.accept(cppVisitor)
+        if (complete) {
+            cout.nl().nl()
+            generateRunnableStub(cout, pous)
+        }
+        return out.toString()
+    }
 }
+

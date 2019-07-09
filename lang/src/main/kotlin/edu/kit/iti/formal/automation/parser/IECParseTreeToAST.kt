@@ -228,7 +228,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             return t
         } else if (ctx.subrange_spec_init() != null) {
             val t = visitSubrange_spec_init(ctx.subrange_spec_init())
-            t.initialization = init as Literal?
+            t.initialization = init as? IntegerLit
             return t
         } else if (ctx.structure_declaration() != null) {
             val t = visitStructure_declaration(ctx.structure_declaration())
@@ -715,8 +715,17 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
                 ctx.case_statement(), ctx.invocation_statement(),
+                ctx.jump_statement(), ctx.label_statement(),
                 ctx.for_statement())
     }
+
+
+    override fun visitJump_statement(ctx: IEC61131Parser.Jump_statementContext) =
+            JumpStatement(ctx.id.text)
+
+    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext)  =
+            LabelStatement(ctx.id.text)
+
 
     override fun visitSymbolic_variable(ctx: IEC61131Parser.Symbolic_variableContext): Any {
         //TODO REWORK

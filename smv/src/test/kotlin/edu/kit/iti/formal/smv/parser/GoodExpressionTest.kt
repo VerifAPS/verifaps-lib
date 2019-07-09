@@ -11,12 +11,9 @@ object GoodExpressionTest {
     @MethodSource("getGoodExpressions")
     fun testParser(testExpression: String) {
         val slp = TestHelper.getParser(testExpression)
-        val e = slp.expr()
+        slp.expr()
         Assertions.assertEquals(0, slp.numberOfSyntaxErrors.toLong())
-        val expr = e.accept(SMVTransformToAST()) as SMVExpr
-        // TODO
-        //String out = expr.accept(new StringPrinter());
-        //System.out.println(">>> " + out);
+        //e.accept(SMVTransformToAST()) as SMVExpr
     }
 
     @ParameterizedTest

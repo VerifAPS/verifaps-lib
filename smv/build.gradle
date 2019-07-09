@@ -3,6 +3,7 @@ apply plugin: 'antlr'
 description = 'Library for creation and parsing of SMV files.'
 
 dependencies {
+    compile project(":util")
     compile group: 'org.antlr', name: 'antlr4-runtime', version:'4.7.2'
     antlr group: 'org.antlr', name: 'antlr4', version:'4.7.2'
     compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.6.26'

@@ -242,22 +242,19 @@ array_specification
 	  RBRACKET OF (string_type_declaration|non_generic_type_name)
 
 ;
-//TODO need to clarify https://infosys.beckhoff.com/english.php?content=../content/1033/tcplccontrol/html/tcplcctrl_array.htm&id=
+//After https://infosys.beckhoff.com/english.php?content=../content/1033/tcplccontrol/html/tcplcctrl_array.htm&id=
+//the brackets would be optional.
 array_initialization
 :
 	LBRACKET array_initial_elements
-	(
-		COMMA array_initial_elements
-	)* COMMA? RBRACKET
+	(COMMA array_initial_elements)*
+	COMMA? RBRACKET
 ;
 
 array_initial_elements
 :
-	array_initial_element
-	| integer LPAREN
-	(
-		array_initial_element
-	)? RPAREN
+	  array_initial_element
+	| integer LPAREN (array_initial_element)? RPAREN
 ;
 
 array_initial_element
@@ -687,12 +684,12 @@ statement_list
 
 statement
 :
-	    assignment_statement SEMICOLON
+  	  label_statement
+	| assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
   	| return_statement SEMICOLON
   	| jump_statement SEMICOLON
-  	| label_statement SEMICOLON
-	  | if_statement
+	| if_statement
     | case_statement
     | for_statement
     | while_statement

@@ -34,7 +34,6 @@ val PREAMBLE = listOf(
 
 /**
  * This array is a list of commands we need to set for every nuXmv instance.
- * Currently, it sets the TRACE plugin to XML output.
  */
 val POSTAMBLE = listOf(
         "quit"

@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.visitors
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
+import java.lang.IllegalStateException
 
 interface Visitor<T> {
     fun visit(location: Location): T
@@ -64,10 +65,9 @@ interface Visitor<T> {
     fun visit(transition: SFCTransition): T
     fun visit(invocation: InvocationStatement): T
     fun visit(elements: PouElements): T
-    fun visit(empty: EMPTY_EXPRESSION): T {
-        TODO("not implemented")
-    }
+    fun visit(empty: EMPTY_EXPRESSION): T { throw IllegalStateException() }
 
     fun visit(jump: JumpStatement): T
     fun visit(label: LabelStatement): T
+    fun visit(namespace: NamespaceDeclaration): T
 }

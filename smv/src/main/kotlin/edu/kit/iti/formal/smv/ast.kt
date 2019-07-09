@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.smv.ast
 
 import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.util.HasMetadata
+import edu.kit.iti.formal.util.HasMetadataImpl
 import org.antlr.v4.runtime.Token
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -24,9 +26,10 @@ interface SOperator {
  * @author Alexander Weigl
  * @version 1 (09.04.18)
  */
-sealed class SMVAst {
+sealed class SMVAst : HasMetadata by HasMetadataImpl() {
     fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
+    abstract fun clone(): SMVAst
 }
 
 data class SAssignment(
@@ -41,6 +44,8 @@ data class SAssignment(
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
+
+    override fun clone() = copy()
 }
 
 data class SBinaryExpression(var left: SMVExpr,
@@ -59,6 +64,8 @@ data class SBinaryExpression(var left: SMVExpr,
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
+
+    override fun clone() = SBinaryExpression(left.clone(), operator, right.clone())
 }
 
 
@@ -138,7 +145,12 @@ data class SCaseExpression(var cases: MutableList<Case> = arrayListOf()) : SMVEx
         override fun toString(): String {
             return ":: $condition->$then"
         }
+
+        fun clone(): Case = Case(condition.clone(), then.clone())
     }
+
+    override fun clone() = SCaseExpression(cases.map { it.clone() }.toMutableList())
+
 }
 
 
@@ -157,6 +169,8 @@ data class SFunction(
     constructor(funcName: String, vararg expr: SMVExpr) :
             this(funcName, Arrays.asList(*expr))
 
+    override fun clone() = SFunction(name, arguments.map { it.clone() })
+
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
@@ -169,6 +183,8 @@ data class SFunction(
 
 sealed class SLiteral(open val value: Any, override val dataType: SMVType) : SMVExpr() {
     override fun <T> accept(visitor: SMVAstVisitor<T>): T = visitor.visit(this)
+
+    abstract override fun clone(): SLiteral
 
     companion object {
         @JvmStatic
@@ -211,35 +227,42 @@ sealed class SLiteral(open val value: Any, override val dataType: SMVType) : SMV
 data class SIntegerLiteral(override var value: BigInteger)
     : SLiteral(value, SMVTypes.INT) {
     override fun inModule(module: String): SMVExpr = SIntegerLiteral(value)
+
+    override fun clone() = copy()
 }
 
 data class SFloatLiteral(override var value: BigDecimal)
     : SLiteral(value, SMVTypes.FLOAT) {
     override fun inModule(module: String): SMVExpr = SFloatLiteral(value)
+    override fun clone() = copy()
 }
 
 data class SWordLiteral(override var value: BigInteger,
                         override var dataType: SMVWordType)
     : SLiteral(value, dataType) {
     override fun inModule(module: String): SMVExpr = SWordLiteral(value, dataType)
+    override fun clone() = copy()
 }
 
 data class SBooleanLiteral(override var value: Boolean)
     : SLiteral(value, SMVTypes.BOOLEAN) {
     override fun inModule(module: String): SMVExpr = SBooleanLiteral(value)
+    override fun clone() = copy()
 }
 
 data class SEnumLiteral(override var value: String,
                         override var dataType: EnumType = SMVTypes.GENERIC_ENUM)
     : SLiteral(value, dataType) {
     override fun inModule(module: String): SMVExpr = SEnumLiteral(value)
+    override fun clone() = copy()
 }
 
 // Use with caution!
 data class SGenericLiteral(override var value: Any,
-                    override var dataType: SMVType)
+                           override var dataType: SMVType)
     : SLiteral(value, dataType) {
-    override fun inModule(module: String): SMVExpr = SGenericLiteral(value,dataType)
+    override fun inModule(module: String): SMVExpr = SGenericLiteral(value, dataType)
+    override fun clone() = copy()
 }
 
 
@@ -323,6 +346,8 @@ abstract class SMVExpr : SMVAst() {
     fun inNext(): SFunction =
             SFunction("next", this)
     //endregion
+
+    abstract override fun clone(): SMVExpr
 }
 
 
@@ -364,6 +389,8 @@ data class SMVModule
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
     }
+
+    override fun clone() = copy()
 }
 
 
@@ -372,7 +399,6 @@ data class SMVModule
  */
 data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
     override var dataType: SMVType? = null
-    var metadata: Int = 0
 
     constructor(n: String, dt: SMVType) : this(n) {
         dataType = dt
@@ -383,21 +409,14 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
     }
 
     override fun compareTo(o: SVariable): Int {
-        return name!!.compareTo(o.name!!)
+        return name.compareTo(o.name)
     }
 
     /*override fun toString(): String {
         return name
     }*/
 
-    fun addMetadata(metadata: Int): SVariable {
-        this.metadata = this.metadata or metadata
-        return this
-    }
-
-    fun hasMetadata(metadata: Int): Boolean {
-        return 0 != this.metadata and metadata
-    }
+    override fun clone() = copy()
 
     override fun inModule(module: String): SVariable {
         return SVariable.create("$module.$name").with(dataType)
@@ -409,7 +428,7 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
         internal var v = SVariable(name)
 
         fun with(type: SMVType?): SVariable {
-            v.dataType = type as SMVType?
+            v.dataType = type
             return v
         }
 
@@ -571,8 +590,8 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
  * @author Alexander Weigl
  * @version 1 (11.06.17)
  */
-class SQuantified(var operator: STemporalOperator,
-                  var quantified: MutableList<SMVExpr> = ArrayList(2))
+data class SQuantified(var operator: STemporalOperator,
+                       var quantified: MutableList<SMVExpr> = ArrayList(2))
     : SMVExpr() {
 
     override val dataType: SMVTypes.BOOLEAN
@@ -590,6 +609,9 @@ class SQuantified(var operator: STemporalOperator,
 
     operator fun set(i: Int, value: SMVExpr): SMVExpr = quantified.set(i, value)
     operator fun get(i: Int) = quantified[i]
+
+    override fun clone() = SQuantified(operator, quantified.map { it.clone() }.toMutableList())
+
 }
 
 
@@ -648,7 +670,7 @@ enum class STemporalOperator constructor(val language: TemporalLanguage,
 /**
  *
  */
-class SUnaryExpression(
+data class SUnaryExpression(
         /**
          *
          */
@@ -664,6 +686,8 @@ class SUnaryExpression(
     override fun inModule(module: String): SUnaryExpression {
         return SUnaryExpression(operator, expr.inModule(module))
     }
+
+    override fun clone() = SUnaryExpression(operator, expr.clone())
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)

@@ -224,8 +224,13 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                 try {
                     //val scope = invocation.invoked?.getCalleeScope()!!
                     it.expression.dataType(scope)
+                } catch (e: VariableNotDefinedException) {
+                    reporter.report(e.reference!!, "Variable ${e.reference.toHuman()} could not be found in scope.",
+                            VARIABLE_NOT_RESOLVED)
+                    null
                 } catch (e: DataTypeNotResolvedException) {
-                    e.printStackTrace()
+                    reporter.report(e.expr!!, "Datatype of ${e.expr.toHuman()} could not be derived.",
+                            TYPE_RESOLVE)
                     null
                 }
             }
