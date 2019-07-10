@@ -80,7 +80,7 @@ class PCLOpenXMLBuilder(private val stream: URL, private val writer: CodeWriter)
         /**
          * This handler ignores namespaces!
          */
-        private val FACTORY = SAXHandlerFactory {
+        val FACTORY = SAXHandlerFactory {
             object : SAXHandler() {
                 @Throws(SAXException::class)
                 override fun startElement(

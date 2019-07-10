@@ -28,6 +28,8 @@ import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
 import edu.kit.iti.formal.automation.datatypes.values.DateData
 import edu.kit.iti.formal.automation.datatypes.values.TimeData
 import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
+import edu.kit.iti.formal.automation.fbd.FbDiagram
+import edu.kit.iti.formal.automation.fbd.FbdBody
 import edu.kit.iti.formal.automation.il.*
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
@@ -495,6 +497,11 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ast.stBody = ctx.body().statement_list().accept(this) as StatementList
         if (ctx.body().sfc() != null)
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
+        if (ctx.body().ilBody() != null)
+            ast.ilBody = ctx.body().ilBody().accept(this) as IlBody
+        if (ctx.body().fbBody() != null)
+            ast.fbBody = ctx.body().fbBody().accept(this) as FbdBody
+
 
         return ast
     }
@@ -581,6 +588,10 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ast.stBody = ctx.body().statement_list().accept(this) as StatementList
         if (ctx.body().sfc() != null)
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
+        if (ctx.body().ilBody() != null)
+            ast.ilBody = ctx.body().ilBody().accept(this) as IlBody
+        if (ctx.body().fbBody() != null)
+            ast.fbBody = ctx.body().fbBody().accept(this) as FbdBody
 
         ctx.action().forEach { act -> ast.addAction(act.accept(this) as ActionDeclaration) }
 
@@ -723,7 +734,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitJump_statement(ctx: IEC61131Parser.Jump_statementContext) =
             JumpStatement(ctx.id.text)
 
-    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext)  =
+    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext) =
             LabelStatement(ctx.id.text)
 
 
@@ -905,13 +916,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitAction(ctx: IEC61131Parser.ActionContext): ActionDeclaration {
         val action = ActionDeclaration()
         action.name = ctx.IDENTIFIER().symbol.text
-        if (ctx.body().statement_list() != null) {
+        if (ctx.body().statement_list() != null)
             action.stBody = ctx.body().statement_list().accept(this) as StatementList
-        }
-
-        if (ctx.body().sfc() != null) {
+        if (ctx.body().sfc() != null)
             action.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
-        }
+        if (ctx.body().ilBody() != null)
+            action.ilBody = ctx.body().ilBody().accept(this) as IlBody
+        if (ctx.body().fbBody() != null)
+            action.fbBody = ctx.body().fbBody().accept(this) as FbdBody
         return action
     }
 
@@ -983,7 +995,6 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
                 .map { it.get() }
                 .toHashSet()
     }
-
 
     //region il
     override fun visitIlBody(ctx: IEC61131Parser.IlBodyContext): IlBody {
@@ -1084,4 +1095,9 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     }
     //endregion
+
+    override fun visitFbBody(ctx: IEC61131Parser.FbBodyContext): FbdBody {
+        val json =  ctx.FBD_CODE().text.removeSurrounding("(***FBD", "***)").trim()
+        return FbdBody.fromJson(json)
+    }
 }

@@ -17,14 +17,14 @@ object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
     override fun visit(programDeclaration: ProgramDeclaration) {
         super.visit(programDeclaration)
         programDeclaration.sfcBody?.also {
-            programDeclaration.stBody = programDeclaration.stBody ?: IEC61131Facade.translateToSt(
+            programDeclaration.stBody = programDeclaration.stBody ?: IEC61131Facade.translateSfcToSt(
                     programDeclaration.scope, it)
         }
     }
 
     override fun visit(actionDeclaration: ActionDeclaration) {
         actionDeclaration.sfcBody?.also {
-            actionDeclaration.stBody = actionDeclaration.stBody ?: IEC61131Facade.translateToSt(scope, it,
+            actionDeclaration.stBody = actionDeclaration.stBody ?: IEC61131Facade.translateSfcToSt(scope, it,
                     "${actionDeclaration.name}_")
         }
     }
@@ -32,7 +32,7 @@ object TranslateSfcToSt : AstVisitorWithScope<Unit>() {
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
         super.visit(functionBlockDeclaration)
         functionBlockDeclaration.sfcBody?.also {
-            functionBlockDeclaration.stBody = functionBlockDeclaration.stBody ?: IEC61131Facade.translateToSt(
+            functionBlockDeclaration.stBody = functionBlockDeclaration.stBody ?: IEC61131Facade.translateSfcToSt(
                     functionBlockDeclaration.scope, it)
         }
     }

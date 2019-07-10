@@ -175,7 +175,7 @@ object IEC61131Facade {
                                 selector: (PouElements) -> PouExecutable?)
             : List<PouExecutable?> {
         return programs.map {
-            val (elements, error) = IEC61131Facade.filefr(libraryElements + it)
+            val (elements, error) = filefr(libraryElements + it)
             error.forEach { Console.warn(it.toHuman()) }
             selector(elements)
         }
@@ -208,13 +208,20 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
-    fun translateToSt(scope: Scope, sfc: SFCImplementation, name: String = ""): StatementList {
+    //region translations
+    fun translateSfcToSt(scope: Scope, sfc: SFCImplementation, name: String = ""): StatementList {
         val st = StatementList()
         sfc.networks.forEachIndexed { index, network -> st.add(TranslationSfcToStPipeline(network, name, index, scope).call()) }
         return st
     }
 
     fun translateSfc(elements: PouElements) { elements.forEach { it.accept(TranslateSfcToSt) } }
+
+    fun translateFbd(elements: PouElements) {
+        elements.forEach { it.accept(TranslateFbdToSt) }
+    }
+    //endregion
+
 
     object InstructionList {
         /*

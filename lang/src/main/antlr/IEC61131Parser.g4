@@ -375,7 +375,11 @@ function_block_declaration
 body :
       sfc
     | IL_CODE ilBody /*| ladder_diagram | fb_diagram | instruction_list |*/
-    | statement_list;
+    | fbBody
+    | statement_list
+;
+
+fbBody: FBD_CODE;
 
 funcBody : /*ladder_diagram | fb_diagram | instruction_list |*/
             statement_list;

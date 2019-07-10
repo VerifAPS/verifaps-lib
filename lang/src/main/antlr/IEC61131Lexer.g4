@@ -28,6 +28,8 @@ fragment X:('x'|'X');
 fragment Y:('y'|'Y');
 fragment Z:('z'|'Z');
 
+FBD_CODE: '(***FBD' .*? '***)';
+
 IL_CODE: '//IL\n' -> pushMode(il);
 
 /******

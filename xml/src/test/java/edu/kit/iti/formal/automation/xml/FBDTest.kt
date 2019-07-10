@@ -5,7 +5,9 @@ import edu.kit.iti.formal.automation.plcopenxml.FBDTranslator
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.plcopenxml.PCLOpenXMLBuilder
 import edu.kit.iti.formal.util.CodeWriter
+import org.jdom2.filter.Filters
 import org.jdom2.input.SAXBuilder
+import org.jdom2.xpath.XPathFactory
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.io.StringWriter
@@ -18,7 +20,27 @@ import java.nio.file.Files
  */
 object FBDTest {
     @Test
-    fun read() {
+    fun fbdExampleDotFile() {
+        val path = LoadHelp.getResource("FBDExample.xml")
+        Assumptions.assumeTrue(path != null)
+        val saxBuilder = SAXBuilder()
+        saxBuilder.saxHandlerFactory = PCLOpenXMLBuilder.FACTORY
+        val doc = saxBuilder.build(path?.toUri()?.toURL())
+        val xpathFactory = XPathFactory.instance()
+        val pou = xpathFactory.compile("//pou[@name=\"FBD1\"]/body/FBD", Filters.element()).evaluateFirst(doc)
+        Assumptions.assumeTrue(pou != null)
+
+        val t = FBDTranslator(pou, CodeWriter())
+        val body = t.generateFbdBody()
+        val c = CodeWriter()
+        body.writeDot(c)
+        body.asStructuredText(c)
+        println(c.stream.toString())
+    }
+
+
+    @Test
+    fun fbdExample() {
         val path = LoadHelp.getResource("FBDExample.xml")
         Assumptions.assumeTrue(path != null)
         val out = IECXMLFacade.extractPLCOpenXml(path!!)

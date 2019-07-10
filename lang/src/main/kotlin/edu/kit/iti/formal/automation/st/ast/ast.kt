@@ -8,6 +8,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotResolvedException
 import edu.kit.iti.formal.automation.exceptions.IECException
 import edu.kit.iti.formal.automation.exceptions.TypeConformityException
 import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
+import edu.kit.iti.formal.automation.fbd.FbdBody
 import edu.kit.iti.formal.automation.il.IlBody
 import edu.kit.iti.formal.automation.operators.BinaryOperator
 import edu.kit.iti.formal.automation.operators.Operators
@@ -76,14 +77,14 @@ data class PouElements(val elements: MutableList<PouElement> = arrayListOf())
 }
 
 data class Namespace(var fqName: String) {
-    val name : String
+    val name: String
         get() = nameParts.last()
 
-    val nameParts : Sequence<String>
+    val nameParts: Sequence<String>
         get() = fqName.splitToSequence('.')
 
-    infix fun isSubSpaceOf(n : Namespace) : Boolean {
-        if(this == n || fqName == n.fqName)
+    infix fun isSubSpaceOf(n: Namespace): Boolean {
+        if (this == n || fqName == n.fqName)
             return false
         return n.fqName.startsWith(fqName)
     }
@@ -133,6 +134,7 @@ data class FunctionBlockDeclaration(
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
         override var ilBody: IlBody? = null,
+        override var fbBody: FbdBody? = null,
         var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
         override val interfaces: RefList<InterfaceDeclaration> = RefList(),
         override val methods: MutableList<MethodDeclaration> = arrayListOf()
@@ -302,7 +304,11 @@ interface HasIlBody {
     var ilBody: IlBody?
 }
 
-interface HasBody : HasSfcBody, HasStBody, HasIlBody
+interface HasFbBody {
+    var fbBody: FbdBody?
+}
+
+interface HasBody : HasSfcBody, HasStBody, HasIlBody, HasFbBody
 
 interface HasMethods : Identifiable {
     val methods: MutableList<MethodDeclaration>
@@ -319,6 +325,7 @@ data class ProgramDeclaration(
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
         override var ilBody: IlBody? = null,
+        override var fbBody: FbdBody? = null,
         var actions: LookupList<ActionDeclaration> = ArrayLookupList()
 ) : PouExecutable(), Identifiable {
     override fun clone() = copy()
@@ -370,7 +377,8 @@ data class FunctionDeclaration(
         override var scope: Scope = Scope(),
         var returnType: RefTo<AnyDt> = RefTo(),
         override var stBody: StatementList? = StatementList(),
-        override var ilBody: IlBody? = null)
+        override var ilBody: IlBody? = null,
+        override var fbBody: FbdBody? = null)
     : PouExecutable() {
 
     override var sfcBody: SFCImplementation?
@@ -2136,7 +2144,8 @@ data class ActionDeclaration(
         override var name: String = ANONYM,
         override var stBody: StatementList? = null,
         override var sfcBody: SFCImplementation? = null,
-        override var ilBody: IlBody? = null)
+        override var ilBody: IlBody? = null,
+        override var fbBody: FbdBody? = null)
     : Identifiable, HasBody, Top() {
     override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
