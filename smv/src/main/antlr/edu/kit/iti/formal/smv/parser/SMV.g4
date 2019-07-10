@@ -1,6 +1,12 @@
 grammar SMV;
 
-
+A:'A';
+E:'E';
+BU:'BU';
+EBF:'EBF';
+ABF:'ABF';
+EBG:'EBG';
+ABG:'ABG';
 NOT:'!';
 AF:'AF';
 AG:'AG';
@@ -219,11 +225,11 @@ moduleType :
 	| mod=ID (LPAREN stateExpr ( COMMA  stateExpr)* RPAREN)? #moduleTypeSimple
 	;
 
-
 expr
     : left=expr op=(AU|EU|U|V|S|T) right=expr #temporalBinExpr
-    | op=(EG | EX | EF | AG | AX | AF| X
-         | G | F | Y | Z | H | O) expr #temporalUnaryExpr
+    | op=(EG | EX | EF | AG | AX | AF| X  | G | F | Y | Z | H | O) expr #temporalUnaryExpr
+    | op=(EBF | ABF | EBG | ABG) NUMBER DOTDOT NUMBER right=expr #temporalUnaryRctlExpr
+    | op=(A|E) LBRACKET expr BU NUMBER DOTDOT NUMBER expr RBRACKET #temporalBinRctlExpr
     | LPAREN expr RPAREN #temporalParen
     | stateExpr #exprStateExpr
     ;
@@ -244,6 +250,7 @@ stateExpr:
     | stateExpr op=(EQ | NEQ | LT | GT | LTE | GTE) stateExpr
     | stateExpr op=AND stateExpr
     | stateExpr op=(OR | XOR | XNOR) stateExpr
+    | stateExpr '?' stateExpr ':' stateExpr
     | stateExpr op=EQUIV stateExpr
     | stateExpr op=IMP stateExpr
     | terminalAtom
@@ -255,6 +262,7 @@ terminalAtom
     | casesExpr                                                                 # casesExprAtom
     | var=ID                                                                    # variableAccess
     | var=ID (LBRACKET NUMBER RBRACKET)*                                        # arrayAccess
+    //| var=ID (LBRACKET expr : expr RBRACKET)*                                        # arrayAccess
     | value=ID (DOT dotted=terminalAtom | (LBRACKET array+=NUMBER RBRACKET)*)?  # variableDotted
     | value=NUMBER                                                              # integerLiteral
     | value=FLOAT                                                               # floatLiteral
