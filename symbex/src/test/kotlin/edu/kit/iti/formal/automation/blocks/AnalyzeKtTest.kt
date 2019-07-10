@@ -1,16 +1,13 @@
 package edu.kit.iti.formal.automation.blocks
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.expr
 import edu.kit.iti.formal.automation.IEC61131Facade.statements
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.smv.ast.SVariable
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.lang.StringBuilder
 
 internal class AnalyzeKtTest {
     @Test
@@ -30,6 +27,38 @@ internal class AnalyzeKtTest {
         val s = statements(prg)
         val block = splitUpByLabel(s)
         splitGotoBlocks(block)
+        println(writeDotFile(block))
+    }
+
+    @Test
+    fun smallestLoopWithJumpProgram() {
+        val prg = """
+             A: 
+                a:=1;
+             B:
+              JMP A;
+        """.trimIndent()
+
+        val s = statements(prg)
+        val block = splitUpByLabel(s)
+        splitGotoBlocks(block)
+        block.unrollLoop(block.blocks.subList(1, 3).toMutableList(), 1)
+        println(writeDotFile(block))
+    }
+
+    @Test
+    fun selfLoopWithJumpProgram() {
+        val prg = """
+             A: 
+              a:=1;
+              JMP A;
+        """.trimIndent()
+
+        val s = statements(prg)
+        val block = splitUpByLabel(s)
+        splitGotoBlocks(block)
+        println(writeDotFile(block))
+        block.unrollLoops()
         println(writeDotFile(block))
     }
 
@@ -88,7 +117,7 @@ internal class AnalyzeKtTest {
         scope.variables.add(VariableDeclaration("C", INT))
         scope.variables.add(VariableDeclaration("D", INT))
         scope.variables.add(VariableDeclaration("E", INT))
-        fillBlocksWithMutation(block, scope)
+        block.ssa()
         println(writeDotFile(block))
     }
 
@@ -110,22 +139,23 @@ internal class AnalyzeKtTest {
         bp.edges += b2 to b4
         bp.edges += b3 to b4
 
-        val scope = Scope()
-        scope.variables.add(VariableDeclaration("a", INT))
-        scope.variables.add(VariableDeclaration("b", INT))
-        scope.variables.add(VariableDeclaration("c", INT))
-        scope.variables.add(VariableDeclaration("d", INT))
-        scope.variables.add(VariableDeclaration("e", INT))
-        fillBlocksWithMutation(bp, scope)
-        ssaForm(bp, scope)
+        bp.scope.variables.add(VariableDeclaration("a", INT))
+        bp.scope.variables.add(VariableDeclaration("b", INT))
+        bp.scope.variables.add(VariableDeclaration("c", INT))
+        bp.scope.variables.add(VariableDeclaration("d", INT))
+        bp.scope.variables.add(VariableDeclaration("e", INT))
+        println(writeDotFile(bp))
+        bp.ssa()
         println(writeDotFile(bp))
 
         val actual = StringBuilder()
-        bp.endBlock.ssa.forEach { t, u ->
+        bp.endBlock.ssaMutation.forEach { t, u ->
             actual.append("${t.name} ==> ${u.repr()}\n\n")
         }
 
-        val expected = """a ==> 0sd16_5 + (case 
+        val expected = """__ERROR__ ==> __ERROR__
+            
+a ==> 0sd16_5 + (case 
 a = 0sd16_1 : a; !(a = 0sd16_1) : 0sd16_1; 
 esac)
 
@@ -143,6 +173,5 @@ e ==> 0sd16_7 + e
 """.trimIndent()
         Assertions.assertEquals(expected.trim(), actual.trim())
     }
-
 
 }

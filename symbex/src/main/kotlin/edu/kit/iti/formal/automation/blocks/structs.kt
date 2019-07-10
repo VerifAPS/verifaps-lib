@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.blocks
 
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.BooleanLit
 import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.JumpStatement
@@ -7,11 +8,16 @@ import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 data class BlockProgram(
         val blocks: MutableList<Block> = arrayListOf(),
-        val edges: MutableList<Pair<Block, Block>> = arrayListOf()) {
+        val edges: MutableList<Pair<Block, Block>> = arrayListOf(),
+        val scope: Scope = Scope()) {
     fun addAll(subbp: BlockProgram) {
         blocks.addAll(subbp.blocks)
         edges.addAll(subbp.edges)
@@ -27,9 +33,9 @@ data class BlockProgram(
         val sorted = ArrayList<Block>(blocks.size)
         val unsorted = ArrayList(blocks)
         for (i in 0..blocks.size) {
-            if(unsorted.isEmpty()) break
+            if (unsorted.isEmpty()) break
             val blocksWOIncoming = unsorted.filter {
-                ! e.any { (_, to) -> to == it }
+                !e.any { (_, to) -> to == it }
             }
 
             unsorted.removeAll(blocksWOIncoming)
@@ -55,6 +61,35 @@ data class BlockProgram(
         edges.removeAll(i)
     }
 
+    fun hasLoop(start: Block = startBlock): Boolean = findCycle(start) != null
+
+    fun findCycle(start: Block = startBlock): List<Block>? {
+        val marked = HashSet<Block>()
+        val onStack = Stack<Block>()
+
+        fun explore(v: Block): Boolean {
+            marked += v
+            onStack += v
+            for ((_, to) in outgoingEdges(v)) {
+                if (to !in marked) {
+                    if (explore(to)) return true
+                } else if (to in onStack) {
+                    onStack += to
+                    return true
+                }
+            }
+            onStack.pop()
+            return false
+        }
+
+        if (explore(start)) {
+            val loop = ArrayList(onStack)
+            val s = loop.indexOf(loop.last())
+            return loop.subList(s, loop.size - 1)
+        }
+        return null
+    }
+
     var startBlock
         get() = blocks.first()
         set(value) {
@@ -74,11 +109,9 @@ data class Block(var label: String = getRandomLabel(),
                  var executionCondition: Expression = BooleanLit.LTRUE,
                  var statements: StatementList = StatementList()) {
 
-    lateinit var executionConditionSSA: SMVExpr
-    var ssa: Map<SVariable, SMVExpr> = hashMapOf()
+    lateinit var ssaExecutionCondition: SMVExpr
+    var ssaMutation: Map<SVariable, SMVExpr> = hashMapOf()
     var localMutationMap: Map<SVariable, SMVExpr> = hashMapOf()
-
-    var cumulatedExecutionCondition = executionCondition
 
     val gotoLabel: String?
         get() = if (statements.isNotEmpty()) (statements.last() as? JumpStatement)?.target else null
@@ -96,6 +129,13 @@ data class Block(var label: String = getRandomLabel(),
         }
     }
 
+    fun clone(): Block {
+        val b = Block(label, executionCondition.clone(), statements.clone())
+        //b.ssaExecutionCondition = ssaExecutionCondition.clone()
+        //b.ssaMutation = HashMap(ssaMutation)
+        b.localMutationMap = HashMap(localMutationMap)
+        return b
+    }
 }
 
 val counter = AtomicInteger(10000)

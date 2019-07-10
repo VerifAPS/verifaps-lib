@@ -27,6 +27,54 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     fun expr(e: Expression): String = e.accept(translateToCppExpr)
     fun exprN(e: Expression?): String? = e?.let { expr(it) }
 
+    fun value(v: Value<*, *>?): String {
+        return when (v) {
+            null -> "/* null value */"
+            is VBool -> v.value.toString()
+            is VAnyBit -> "(${dataType(v.dataType)}) ${v.value}"
+            is VAnyEnum -> v.value
+            is VAnyInt -> "(${dataType(v.dataType)}) ${v.value}"
+            is VStruct -> {
+                "(struct ${v.dataType.name}_t)" +
+                        v.fieldValues.joinToString(", ", "{", "}") { (n, v) ->
+                            ".$n = ${value(v)}"
+                        }
+            }
+            else -> "/* value $v unsupported */"
+        }
+    }
+
+    fun dataType(any: AnyDt?): String {
+        return when (any) {
+            null -> "/* datatype is null */"
+            VOID -> "void"
+            is INT -> "int16_t"
+            is SINT -> "int8_t"
+            is LINT -> "int64_t"
+            is DINT -> "int32_t"
+
+            is UINT -> "uint16_t"
+            is USINT -> "uint8_t"
+            is ULINT -> "uint64_t"
+            is UDINT -> "uint32_t"
+
+            is AnyBit.BOOL -> "bool"
+            is AnyBit.BYTE -> "uint8_t"
+            is AnyBit.WORD -> "uint32_t"
+            is AnyBit.DWORD -> "uint64_t"
+
+            //TODO ranges * any.ranges.size)
+            is ArrayType -> dataType(any.fieldType) + "[]"
+
+            is IECString -> "const char*"
+            is FunctionBlockDataType -> "struct ${any.functionBlock.name}_t"
+            is EnumerateType -> any.name
+            is RecordType -> "struct " + any.name
+            is PointerType -> dataType(any.of) + "*"
+            else -> "/* datatype: $any is not supported */"
+        }
+    }
+
     override fun visit(assignmentStatement: AssignmentStatement) {
         val lhs = expr(assignmentStatement.location)
         val rhs = expr(assignmentStatement.expression)
@@ -65,7 +113,6 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
             }
         }
     }
-
     //endregion
 
     //region statements
@@ -119,7 +166,6 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
         }
 
     }
-
 
     override fun visit(aCase: Case) {
         aCase.conditions.forEach { it.accept(this) }
@@ -186,54 +232,6 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     lateinit var actionNamePrefix: String
     var currentStateVariable: String = "self"
     lateinit var currentStateType: String
-
-    fun value(v: Value<*, *>?): String {
-        return when (v) {
-            null -> "/* null value */"
-            is VBool -> v.value.toString()
-            is VAnyBit -> "(${dataType(v.dataType)}) ${v.value}"
-            is VAnyEnum -> v.value
-            is VAnyInt -> "(${dataType(v.dataType)}) ${v.value}"
-            is VStruct -> {
-                "(struct ${v.dataType.name}_t)" +
-                        v.fieldValues.joinToString(", ", "{", "}") { (n, v) ->
-                            ".$n = ${value(v)}"
-                        }
-            }
-            else -> "/* value $v unsupported */"
-        }
-    }
-
-    fun dataType(any: AnyDt?): String {
-        return when (any) {
-            null -> "/* datatype is null */"
-            VOID -> "void"
-            is INT -> "int16_t"
-            is SINT -> "int8_t"
-            is LINT -> "int64_t"
-            is DINT -> "int32_t"
-
-            is UINT -> "uint16_t"
-            is USINT -> "uint8_t"
-            is ULINT -> "uint64_t"
-            is UDINT -> "uint32_t"
-
-            is AnyBit.BOOL -> "bool"
-            is AnyBit.BYTE -> "uint8_t"
-            is AnyBit.WORD -> "uint32_t"
-            is AnyBit.DWORD -> "uint64_t"
-
-            //TODO ranges * any.ranges.size)
-            is ArrayType -> dataType(any.fieldType) + "[]"
-
-            is IECString -> "const char*"
-            is FunctionBlockDataType -> "struct ${any.functionBlock.name}_t"
-            is EnumerateType -> any.name
-            is RecordType -> "struct " + any.name
-            is PointerType -> dataType(any.of) + "*"
-            else -> "/* datatype: $any is not supported */"
-        }
-    }
 
     override fun visit(programDeclaration: ProgramDeclaration) {
         visit(programDeclaration as PouExecutable, programDeclaration.actions)
@@ -323,7 +321,6 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
 
     }
 //endregion
-
 
     override fun visit(empty: EMPTY_EXPRESSION) {
         out.print("/* empty */")

@@ -40,8 +40,10 @@ fun splitUpByLabel(list: StatementList): BlockProgram {
 fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
     append("digraph G {\n")
 
+    fun String.escape() = replace("#","_")
+
     blocks.blocks.forEach {
-        val map = if (it.ssa.isNotEmpty()) it.ssa else it.localMutationMap
+        val map = if (it.ssaMutation.isNotEmpty()) it.ssaMutation else it.localMutationMap
         val ssa = map.toList().joinToString("\\n") { (v, e) ->
             "$v = $e"
         }
@@ -51,11 +53,11 @@ fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
                 IEC61131Facade.print(it.statements).replace("\n", "\\n"),
                 ssa).joinToString(" | ")
 
-        append("${it.label} [label=\"{$label}\",shape=\"record\"];\n")
+        append("${it.label.escape()} [label=\"{$label}\",shape=\"record\"];\n")
     }
 
     blocks.edges.forEach { (a, b) ->
-        append("${a.label} -> ${b.label} [];\n")
+        append("${a.label.escape()} -> ${b.label.escape()} [];\n")
     }
 
     append("}")
