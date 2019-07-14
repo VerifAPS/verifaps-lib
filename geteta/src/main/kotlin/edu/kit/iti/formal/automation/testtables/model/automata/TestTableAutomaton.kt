@@ -124,4 +124,21 @@ data class TestTableAutomaton(
     fun getFirstState(s: TableRow) = getState(s, 0)
     fun getState(s: TableRow, cycle: Int) =
             rowStates[s]?.get(cycle)
+
+    fun getRowStates(): Sequence<RowState> {
+        return rowStates.asSequence().flatMap { it.value.asSequence() }
+    }
+
+    fun getStartStates(): List<RowState> {
+        return rowStates
+                .filter { (k, _) -> k.isInitialReachable }
+                .map { (_, v) -> v.get(0) }
+    }
+
+    fun getOutgoingTransition(from: AutomatonState) =
+            transitions.filter { it.from == from }
+
+    fun getIncomingTransition(to: AutomatonState) =
+            transitions.filter { it.to == to }
+
 }

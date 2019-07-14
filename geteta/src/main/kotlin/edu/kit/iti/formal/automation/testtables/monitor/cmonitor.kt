@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.monitor
 
+import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
@@ -338,7 +339,7 @@ $asciiTable
                 val defProgress = (tr.defProgress.name)
 
                 val progress = tr.outgoing.map { it.defInput.name }
-                        .reduce { acc: String , v: String -> "$acc || $v" }
+                        .reduce { acc: String, v: String -> "$acc || $v" }
 
                 writer.write("#define   $defInput  = (${tr.inputExpr.values.conjunction().toCExpression()});")
                         .nl()
@@ -354,7 +355,7 @@ $asciiTable
     }
 }
 
-private fun SMVAst.toCExpression(): String = accept(SmvToCTranslator)
+private fun SMVAst.toCExpression(): String = accept(SmvToCTranslator())
 
 private val Variable.cInitValue: String
     get() {
@@ -368,30 +369,34 @@ private val Variable.cInitValue: String
     }
 
 private val Variable.ctype: String
-    get() {
-        val dt = dataType
-        return when (dt) {
-            is AnyBit.BOOL -> "int8_t";
-            is AnyInt ->
-                if (dt.isSigned)
-                    "int${dt.bitLength}_t";
-                else
-                    "uint${dt.bitLength}_t";
-            is EnumerateType ->
-                "uint8_t";
-            else -> "$dt is unknown"
-        }
+    get() = TranslateToCppFacade.dataType(dataType)
+/*return when (dt) {
+    is AnyBit.BOOL -> "int8_t";
+    is AnyInt ->
+        if (dt.isSigned)
+            "int${dt.bitLength}_t";
+        else
+            "uint${dt.bitLength}_t";
+    is EnumerateType ->
+        "uint8_t";
+    else -> "$dt is unknown"
+}*/
+
+
+class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
+    override fun defaultVisit(top: SMVAst): String = "/*$top not supported*/"
+    val variableReplacement = HashMap<String, String>()
+    val rewritingFunction = { n: String -> n }
+    override fun visit(v: SVariable): String {
+        val n = variableReplacement[v.name] ?: v.name
+        return rewritingFunction(n)
     }
-
-
-object SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
-    override fun defaultVisit(top: SMVAst): String = ""
-    override fun visit(v: SVariable): String = v.name.replace("code$", "io->")
-    override fun visit(be: SBinaryExpression) =
-            "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
 
     override fun visit(ue: SUnaryExpression) =
             "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
+
+    override fun visit(be: SBinaryExpression) =
+            "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
 
     private fun opToC(operator: SBinaryOperator) = when (operator) {
         SBinaryOperator.PLUS -> "+"

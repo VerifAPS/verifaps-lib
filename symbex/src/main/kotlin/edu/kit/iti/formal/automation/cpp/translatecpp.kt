@@ -12,21 +12,7 @@ import edu.kit.iti.formal.util.joinInto
 import java.util.*
 import kotlin.collections.ArrayList
 
-/**
- *
- * @author Alexander Weigl
- * @version 1 (08.07.19)
- */
-class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
-    val translateToCppExpr = TranslateToCppExpr()
-
-    override fun defaultVisit(obj: Any) {
-        out.println("/* Unsupported $obj in $this */")
-    }
-
-    fun expr(e: Expression): String = e.accept(translateToCppExpr)
-    fun exprN(e: Expression?): String? = e?.let { expr(it) }
-
+object TranslateToCppFacade {
     fun value(v: Value<*, *>?): String {
         return when (v) {
             null -> "/* null value */"
@@ -74,6 +60,27 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
             else -> "/* datatype: $any is not supported */"
         }
     }
+}
+
+
+/**
+ *
+ * @author Alexander Weigl
+ * @version 1 (08.07.19)
+ */
+class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
+    val translateToCppExpr = TranslateToCppExpr()
+
+    override fun defaultVisit(obj: Any) {
+        out.println("/* Unsupported $obj in $this */")
+    }
+
+    fun expr(e: Expression): String = e.accept(translateToCppExpr)
+    fun exprN(e: Expression?): String? = e?.let { expr(it) }
+
+    fun value(v: Value<*, *>?): String = TranslateToCppFacade.value(v)
+
+    fun dataType(any: AnyDt?): String = TranslateToCppFacade.dataType(any)
 
     override fun visit(assignmentStatement: AssignmentStatement) {
         val lhs = expr(assignmentStatement.location)
