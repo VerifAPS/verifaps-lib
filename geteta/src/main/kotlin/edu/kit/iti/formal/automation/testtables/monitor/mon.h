@@ -85,6 +85,7 @@ class Monitor : public IMonitor<io_t> {
 template <typename io_t>
 class CombinedMonitor : IMonitor<io_t> {
   vector<IMonitor<io_t>> monitors;
+  vector<pair<predicate<io_t>,IMonitor<io_t>> monitors;
 
  public:
   CombinedMonitor() : monitors() {}

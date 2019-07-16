@@ -11,7 +11,7 @@ import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
 
 /**
- *
+ * TODO extrinsic reset
  * @author Alexander Weigl
  * @version 1 (14.07.19)
  */
