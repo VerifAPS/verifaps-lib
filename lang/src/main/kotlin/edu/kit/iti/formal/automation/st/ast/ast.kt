@@ -2187,7 +2187,8 @@ data class SFCActionQualifier(
         RAISING("P1", false),               //could be renamed to RISING
         FALLING("P0", false),
         PULSE("P", false),
-        MAIN_ACTION("A", false)
+        /** special case for code sys */
+        WHILE("A", false)
     }
 
     companion object {
