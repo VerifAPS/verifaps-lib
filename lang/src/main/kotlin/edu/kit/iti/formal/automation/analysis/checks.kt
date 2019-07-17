@@ -229,7 +229,7 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                             VARIABLE_NOT_RESOLVED)
                     null
                 } catch (e: DataTypeNotResolvedException) {
-                    reporter.report(e.expr!!, "Datatype of ${e.expr.toHuman()} could not be derived.",
+                    reporter.report(e.expr, "Datatype of ${e.expr.toHuman()} could not be derived.",
                             TYPE_RESOLVE)
                     null
                 }
@@ -447,7 +447,7 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
         return rm
     }
 
-    fun report(node: Top, msg: String, cat: ReportCategory = UNKNOWN,
+    fun report(node: Top?, msg: String, cat: ReportCategory = UNKNOWN,
                lvl: ReportLevel = ERROR, init: ReporterMessage.() -> Unit = {}) = report {
         position(node)
         message = msg

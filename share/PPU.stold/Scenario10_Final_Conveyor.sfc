@@ -1,0 +1,127 @@
+SFC Conveyor
+    VAR  Duration_Conveyor_Runtime : TIME := TIME#4.0s500.0ms; END_VAR 
+    VAR  Duration_Conveyor_Test : TIME := TIME#1.0s; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_OUTPUT  SorterConveyorTowardsCrane : BOOL; END_VAR 
+    VAR_OUTPUT  SorterConveyorTowardsStacker : BOOL; END_VAR 
+    VAR_OUTPUT  SorterGreenLampConveyor : BOOL; END_VAR 
+    VAR_INPUT  SorterLightbarrierCraneInterface : BOOL; END_VAR 
+    VAR_INPUT  SorterStartButton : BOOL; END_VAR 
+    VAR_INPUT  SorterSwitchManuellAutomatic : BOOL; END_VAR 
+    VAR_OUTPUT  SorterWhiteLampConveyor : BOOL; END_VAR 
+    VAR_OUTPUT  StartCommandConveyor : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR  Timer_Conveyor_Runtime : TON; END_VAR 
+    VAR  Timer_Conveyor_Test : TON; END_VAR 
+    VAR  interconnectConveyorStartCommand : BOOL; END_VAR 
+    VAR  interconnectConveyorTerminationCommand : BOOL; END_VAR 
+    VAR  interconnect_Conveyor_Runtime : BOOL; END_VAR 
+    VAR  interconnect_Conveyor_Test : BOOL; END_VAR 
+    
+    STEP Conveyor_Init
+        ON active ACTION
+            
+            SorterConveyorTowardsStacker := TRUE;
+            SorterConveyorTowardsCrane := FALSE;
+            Timer_Conveyor_Test(IN := TRUE, PT := Duration_Conveyor_Test);
+            interconnect_Conveyor_Test := Timer_Conveyor_Test.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP Conveyor_Stop_Empty_Magazin
+        ON active ACTION
+            
+            SorterConveyorTowardsStacker := FALSE;
+            SorterConveyorTowardsCrane := FALSE;
+            interconnectConveyorStartCommand := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Conveyor_Towards_Stacker
+        ON active ACTION
+            
+            SorterConveyorTowardsStacker := TRUE;
+            SorterConveyorTowardsCrane := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Conveyor_init_2
+        ON active ACTION
+            
+            SorterConveyorTowardsStacker := FALSE;
+            SorterConveyorTowardsCrane := FALSE;
+            interconnect_Conveyor_Test := FALSE;
+            Timer_Conveyor_Test(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Conveyor_pause
+        ON active ACTION
+            
+            SorterConveyorTowardsStacker := FALSE;
+            SorterConveyorTowardsCrane := FALSE;
+            interconnect_Conveyor_Runtime := FALSE;
+            Timer_Conveyor_Runtime(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Green_Lamp
+        ON active ACTION
+            
+            SorterGreenLampConveyor := TRUE;
+            interconnectConveyorStartCommand := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Init
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            StartCommandConveyor := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Runtime_Conveyor
+        ON active ACTION
+            
+            Timer_Conveyor_Runtime(IN := TRUE, PT := Duration_Conveyor_Runtime);
+            interconnect_Conveyor_Runtime := Timer_Conveyor_Runtime.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP Start_Conveyor
+        ON active ACTION
+            
+            interconnectConveyorTerminationCommand := FALSE;
+            SorterConveyorTowardsStacker := FALSE;
+            SorterConveyorTowardsCrane := FALSE;
+            SorterGreenLampConveyor := FALSE;
+            interconnect_Conveyor_Test := FALSE;
+            Timer_Conveyor_Test(IN := FALSE, PT := TIME#);
+            StartVar := FALSE;
+            StartCommandConveyor := FALSE;
+            IF (SorterStartButton = TRUE) THEN
+                interconnectConveyorStartCommand := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Step0
+    END_STEP
+    
+    GOTO interconnect_Conveyor_Test :: Conveyor_Init -> Conveyor_init_2;
+    GOTO TRUE :: Conveyor_Stop_Empty_Magazin -> Interstep;
+    GOTO TRUE :: Conveyor_Towards_Stacker -> Runtime_Conveyor;
+    GOTO TRUE :: Conveyor_init_2 -> Interstep;
+    GOTO TRUE :: Conveyor_pause -> Interstep;
+    GOTO TRUE :: Green_Lamp -> Conveyor_Init;
+    GOTO TRUE :: Init -> Start_Conveyor;
+    GOTO StartVar :: Interstep -> Step0;
+    GOTO interconnect_Conveyor_Runtime :: Runtime_Conveyor -> Conveyor_pause;
+    GOTO interconnectConveyorStartCommand :: Start_Conveyor -> Green_Lamp;
+    GOTO NOT SorterLightbarrierCraneInterface :: Step0 -> Conveyor_Stop_Empty_Magazin;
+    GOTO SorterLightbarrierCraneInterface :: Step0 -> Conveyor_Towards_Stacker;
+END_SFC

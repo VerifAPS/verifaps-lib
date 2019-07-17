@@ -1,18 +1,33 @@
 /**
- *
- *
- *
+ * Header file for monitors.
  *
  */
 
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-enum MonitorState { FINE = 1, UNKNOWN = 0, ERROR = -1 };
+/**
+ * A monitor is either
+ */
+enum MonitorState {
+  // FINE - no errors occured
+  FINE = 1,
 
+  // UNKOWN - unknown inputs occured
+  UNKNOWN = 0,
+
+  // ERROR - violated output
+  ERROR = -1,
+
+  // REMOVABLE -
+  REMOVABLE = -2
+};
+
+// Special states
 const int ERROR_STATE = -1;
 const int LIGHTNING_STATE = -2;
 const int FINAL_STATE = -3;
@@ -39,6 +54,7 @@ class Monitor : public IMonitor<io_t> {
     int state;
     gv_t globalVars;
   };
+
   vector<Token> tokens;
 
  public:
@@ -85,7 +101,10 @@ class Monitor : public IMonitor<io_t> {
 template <typename io_t>
 class CombinedMonitor : IMonitor<io_t> {
   vector<IMonitor<io_t>> monitors;
-  vector<pair<predicate<io_t>,IMonitor<io_t>> monitors;
+
+  typealias Trigger = function<bool(io_t)>;
+  typealias MonitorInit = function<Monitor<io_t>(void)>;
+  vector<pair<Trigger, MonitorInit>> tokens;
 
  public:
   CombinedMonitor() : monitors() {}

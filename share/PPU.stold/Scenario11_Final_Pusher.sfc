@@ -1,0 +1,195 @@
+SFC Pusher
+    VAR  Duration1 : TIME := TIME#320.0ms; END_VAR 
+    VAR  Duration2 : TIME := TIME#390.0ms; END_VAR 
+    VAR  Duration3 : TIME := TIME#200.0ms; END_VAR 
+    VAR_OUTPUT  PusherY1 : BOOL; END_VAR 
+    VAR_OUTPUT  PusherY2 : BOOL; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_INPUT  SorterCapacitiveSensorPusher1 : BOOL; END_VAR 
+    VAR_INPUT  SorterCapacitiveSensorPusher2 : BOOL; END_VAR 
+    VAR_INPUT  SorterLightbarrierCraneInterface : BOOL; END_VAR 
+    VAR_INPUT  SorterLightnessSensorPusher1 : BOOL; END_VAR 
+    VAR_INPUT  SorterLightnessSensorPusher2 : BOOL; END_VAR 
+    VAR_INPUT  SorterLightnessSensorPusher3 : BOOL; END_VAR 
+    VAR_INPUT  SorterLightnesssensorCraneInterfaceInverse : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher1MovedIn : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher1MovedOut : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher2MovedIn : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher2MovedOut : BOOL; END_VAR 
+    VAR_INPUT  SorterStartButton : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR  Timer1 : TON; END_VAR 
+    VAR  Timer2 : TON; END_VAR 
+    VAR  Timer3 : TON; END_VAR 
+    VAR  enum : INT := INT#0; END_VAR 
+    VAR  interconnect : BOOL; END_VAR 
+    VAR  interconnect2 : BOOL; END_VAR 
+    VAR  interconnect3 : BOOL; END_VAR 
+    
+    STEP Check_For_Black_By_Using_Inverse_Sensor
+    END_STEP
+    
+    STEP First_Slide_Timer
+        ON active ACTION
+            
+            Timer1(IN := TRUE, PT := Duration1);
+            interconnect := Timer1.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP First_Slide_only_white_workpieces
+    END_STEP
+    
+    STEP Init
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            PusherY1 := FALSE;
+            PusherY2 := FALSE;
+            interconnect := FALSE;
+            interconnect2 := FALSE;
+            interconnect3 := FALSE;
+            StartVar := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Interstep_2
+    END_STEP
+    
+    STEP PusherY1_Move_In
+        ON active ACTION
+            
+            IF ((SorterPusher1MovedOut = TRUE) AND (SorterPusher1MovedIn = FALSE)) THEN
+                PusherY1 := FALSE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY1_Move_Out
+        ON active ACTION
+            
+            IF ((SorterPusher1MovedOut = FALSE) AND (SorterPusher1MovedIn = TRUE)) THEN
+                PusherY1 := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY2_Move_In
+        ON active ACTION
+            
+            IF ((SorterPusher2MovedOut = TRUE) AND (SorterPusher2MovedIn = FALSE)) THEN
+                PusherY2 := FALSE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY2_Move_Out
+        ON active ACTION
+            
+            IF ((SorterPusher2MovedOut = FALSE) AND (SorterPusher2MovedIn = TRUE)) THEN
+                PusherY2 := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Reset_interconnect
+        ON active ACTION
+            
+            interconnect := FALSE;
+            interconnect3 := FALSE;
+            Timer1(IN := FALSE, PT := TIME#);
+            Timer3(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Reset_interconnect2
+        ON active ACTION
+            
+            interconnect2 := FALSE;
+            interconnect3 := FALSE;
+            Timer2(IN := FALSE, PT := TIME#);
+            Timer3(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Reset_interconnect3
+        ON active ACTION
+            
+            interconnect3 := FALSE;
+            Timer3(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Second_Slide_Timer
+        ON active ACTION
+            
+            Timer2(IN := TRUE, PT := Duration2);
+            interconnect2 := Timer2.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP Second_Slide_only_metal_workpieces
+    END_STEP
+    
+    STEP Second_Test_For_Metal
+    END_STEP
+    
+    STEP Third_Slide_only_black_workpieces
+    END_STEP
+    
+    STEP Wait_Black
+        ON active ACTION
+            
+            IF ((NOT SorterLightnessSensorPusher2 AND NOT SorterCapacitiveSensorPusher2) = TRUE) THEN
+                Timer3(IN := (NOT SorterLightnessSensorPusher2 AND NOT SorterCapacitiveSensorPusher2), PT := Duration3);
+                interconnect3 := Timer3.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Wait_Y1
+        ON active ACTION
+            
+            IF (PusherY1 = TRUE) THEN
+                Timer3(IN := PusherY1, PT := Duration3);
+                interconnect3 := Timer3.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Wait_Y2
+        ON active ACTION
+            
+            IF (PusherY2 = TRUE) THEN
+                Timer3(IN := PusherY2, PT := Duration3);
+                interconnect3 := Timer3.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    GOTO (NOT SorterLightnessSensorPusher1 AND NOT SorterCapacitiveSensorPusher1) :: Check_For_Black_By_Using_Inverse_Sensor -> Third_Slide_only_black_workpieces;
+    GOTO interconnect :: First_Slide_Timer -> PusherY1_Move_Out;
+    GOTO TRUE :: First_Slide_only_white_workpieces -> First_Slide_Timer;
+    GOTO StartVar :: Init -> Interstep;
+    GOTO TRUE :: Interstep -> Interstep_2;
+    GOTO (SorterLightnessSensorPusher1 AND NOT SorterCapacitiveSensorPusher1) :: Interstep_2 -> First_Slide_only_white_workpieces;
+    GOTO NOT SorterLightnesssensorCraneInterfaceInverse :: Interstep_2 -> Check_For_Black_By_Using_Inverse_Sensor;
+    GOTO (SorterLightnessSensorPusher1 AND SorterCapacitiveSensorPusher1) :: Interstep_2 -> Second_Slide_only_metal_workpieces;
+    GOTO SorterPusher1MovedIn :: PusherY1_Move_In -> Reset_interconnect;
+    GOTO TRUE :: PusherY1_Move_Out -> Wait_Y1;
+    GOTO SorterPusher2MovedIn :: PusherY2_Move_In -> Reset_interconnect2;
+    GOTO TRUE :: PusherY2_Move_Out -> Wait_Y2;
+    GOTO TRUE :: Reset_interconnect -> Interstep_2;
+    GOTO TRUE :: Reset_interconnect2 -> Interstep_2;
+    GOTO TRUE :: Reset_interconnect3 -> Interstep_2;
+    GOTO interconnect2 :: Second_Slide_Timer -> PusherY2_Move_Out;
+    GOTO (SorterLightnessSensorPusher2 AND SorterCapacitiveSensorPusher2) :: Second_Slide_only_metal_workpieces -> Second_Test_For_Metal;
+    GOTO TRUE :: Second_Test_For_Metal -> Second_Slide_Timer;
+    GOTO (NOT SorterLightnessSensorPusher2 AND NOT SorterCapacitiveSensorPusher2) :: Third_Slide_only_black_workpieces -> Wait_Black;
+    GOTO interconnect3 :: Wait_Black -> Reset_interconnect3;
+    GOTO interconnect3 :: Wait_Y1 -> PusherY1_Move_In;
+    GOTO interconnect3 :: Wait_Y2 -> PusherY2_Move_In;
+END_SFC

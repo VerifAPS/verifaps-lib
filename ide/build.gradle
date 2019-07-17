@@ -17,6 +17,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fifesoft/autocomplete
     compile group: 'com.fifesoft', name: 'autocomplete', version: '3.0.0'
 
+    implementation 'com.github.ajalt:clikt:2.1.0'
+
+
     compile 'me.tomassetti:kolasu:0.2.2'
     compile group: 'org.javassist', name: 'javassist', version: '3.25.0-GA'
     compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
@@ -34,7 +37,7 @@ dependencies {
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
     //compile 'dk.navicon:vldocking:3.0.4'
-    compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar", 
+    compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
 
@@ -42,7 +45,7 @@ dependencies {
     //implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
 }
 
-repositories{
+repositories {
     maven {
         url = "http://bits.netbeans.org/maven2/"
     }
@@ -63,6 +66,7 @@ def mainClasses = [
         , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
         , 'check'            : "edu.kit.iti.formal.automation.Check"
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
+        , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
 ]
 
 

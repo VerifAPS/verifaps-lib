@@ -1,0 +1,98 @@
+SFC Magazin
+    VAR_INPUT  CraneDown : BOOL; END_VAR 
+    VAR_INPUT  CraneOnConveyor : BOOL; END_VAR 
+    VAR_INPUT  CraneOnMagazin : BOOL; END_VAR 
+    VAR_INPUT  CraneSucked : BOOL; END_VAR 
+    VAR_INPUT  CraneUp : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinGreenLamp : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinSlider : BOOL; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_INPUT  SliderMovedOut : BOOL; END_VAR 
+    VAR_INPUT  SliderNotMovedOut : BOOL; END_VAR 
+    VAR_INPUT  StartButtonMagazin : BOOL; END_VAR 
+    VAR_OUTPUT  StartCommandMagazin : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR_INPUT  WorkpieceReady : BOOL; END_VAR 
+    VAR  interconnectMagazinStartCommand : BOOL; END_VAR 
+    
+    STEP Green_Lamp
+        ON active ACTION
+            
+            MagazinGreenLamp := TRUE;
+            interconnectMagazinStartCommand := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Init
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            StartCommandMagazin := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Magazin_Init
+        ON active ACTION
+            
+            MagazinSlider := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Magazin_Init_2
+        ON active ACTION
+            
+            MagazinSlider := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Slider_Move_Back
+        ON active ACTION
+            
+            IF ((SliderMovedOut = TRUE) AND (SliderNotMovedOut = FALSE)) THEN
+                MagazinSlider := FALSE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Start_Magazin
+        ON active ACTION
+            
+            MagazinSlider := FALSE;
+            MagazinGreenLamp := FALSE;
+            StartVar := FALSE;
+            StartCommandMagazin := FALSE;
+            IF (StartButtonMagazin = TRUE) THEN
+                interconnectMagazinStartCommand := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Step0
+    END_STEP
+    
+    STEP Step1
+    END_STEP
+    
+    STEP convey
+        ON active ACTION
+            
+            IF SliderNotMovedOut THEN
+                MagazinSlider := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    GOTO TRUE :: Green_Lamp -> Magazin_Init;
+    GOTO TRUE :: Init -> Start_Magazin;
+    GOTO StartVar :: Interstep -> convey;
+    GOTO TRUE :: Magazin_Init -> Magazin_Init_2;
+    GOTO TRUE :: Magazin_Init_2 -> Interstep;
+    GOTO CraneUp :: Slider_Move_Back -> Step1;
+    GOTO interconnectMagazinStartCommand :: Start_Magazin -> Green_Lamp;
+    GOTO CraneDown :: Step0 -> Slider_Move_Back;
+    GOTO CraneOnConveyor :: Step1 -> Interstep;
+    GOTO CraneOnMagazin :: convey -> Step0;
+END_SFC

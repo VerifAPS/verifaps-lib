@@ -9,6 +9,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
+import java.io.Writer
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -59,6 +60,11 @@ object TranslateToCppFacade {
             is PointerType -> dataType(any.of) + "*"
             else -> "/* datatype: $any is not supported */"
         }
+    }
+
+    fun translate(writer: Writer, pous: PouElements) {
+        val ttc = TranslateToCpp(CodeWriter(writer))
+        pous.accept(ttc)
     }
 }
 

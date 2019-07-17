@@ -1,0 +1,380 @@
+SFC Crane
+    VAR  CranTurnClockwise : BOOL; END_VAR 
+    VAR_INPUT  CraneDown : BOOL; END_VAR 
+    VAR_OUTPUT  CraneLower : BOOL; END_VAR 
+    VAR_INPUT  CraneOnConveyor : BOOL; END_VAR 
+    VAR_INPUT  CraneOnMagazin : BOOL; END_VAR 
+    VAR_INPUT  CranePositionStamp : BOOL; END_VAR 
+    VAR_INPUT  CraneSucked : BOOL; END_VAR 
+    VAR_OUTPUT  CraneTurnClockwise : BOOL; END_VAR 
+    VAR_OUTPUT  CraneTurnCounterclockwise : BOOL; END_VAR 
+    VAR_INPUT  CraneUp : BOOL; END_VAR 
+    VAR  Duration1 : TIME := TIME#1.0s500.0ms; END_VAR 
+    VAR_INPUT  MagazinCapacitiveSensor : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinSlider : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinVacuumOff : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinVacuumOn : BOOL; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_INPUT  SliderMovedOut : BOOL; END_VAR 
+    VAR_INPUT  SliderNotMovedOut : BOOL; END_VAR 
+    VAR_INPUT  StampLowered : BOOL; END_VAR 
+    VAR_INPUT  StampSliderFilled : BOOL; END_VAR 
+    VAR_INPUT  StartButtonMagazin : BOOL; END_VAR 
+    VAR_OUTPUT  StartCommandCrane : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR  TimeDelay_Timer : TON; END_VAR 
+    VAR  TimeDelay_Timer_Duration : TIME := TIME#50.0ms; END_VAR 
+    VAR  TimeDelay_Timer_interconnect : BOOL; END_VAR 
+    VAR  Timer1 : TON; END_VAR 
+    VAR_INPUT  WorkpieceReady : BOOL; END_VAR 
+    VAR  actualtime1 : TIME; END_VAR 
+    VAR  interconnect : BOOL; END_VAR 
+    VAR  interconnectCraneStartCommand : BOOL; END_VAR 
+    
+    STEP Crane_Go_Up
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Init
+        ON active ACTION
+            
+            CraneLower := TRUE;
+            interconnectCraneStartCommand := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Init_2
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_At_Stamp
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Conveyor
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Conveyor_Black
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Magazin
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Magazin_Metallic
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_NOT_Metallic_Black
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lower
+        ON active ACTION
+            
+            MagazinVacuumOn := TRUE;
+            MagazinVacuumOff := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Conveyor
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Conveyor_Metallic
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Conveyor_Not_Metallica_Black
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Stamp_Metallic
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Stamp_Stop_Black
+        ON active ACTION
+            
+            CraneTurnClockwise := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Turn_Left_Back_To_Stamp
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := TRUE;
+            CraneTurnClockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Turn_Left_From_Stamp
+        ON active ACTION
+            
+            CraneTurnClockwise := TRUE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Turn_Left_Metallic
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := TRUE;
+            CraneTurnClockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Turn_Left_NOT_Metallic
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := TRUE;
+            CraneTurnClockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Turn_Left_NOT_Metallic_Black
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := TRUE;
+            CraneTurnClockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Init
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            StartCommandCrane := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Interstep_2
+    END_STEP
+    
+    STEP Last_Workpiece_At_Stamp
+    END_STEP
+    
+    STEP Lower_Crane
+        ON active ACTION
+            
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Magazin_Stop
+        ON active ACTION
+            
+            CraneTurnClockwise := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Magazin_Stop_Black
+        ON active ACTION
+            
+            CraneTurnClockwise := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+            MagazinVacuumOn := TRUE;
+            MagazinVacuumOff := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP No_Workpiece_ready
+    END_STEP
+    
+    STEP Reset_interconnect
+        ON active ACTION
+            
+            interconnect := FALSE;
+            Timer1(IN := FALSE, PT := TIME#1.0ms);
+        END_ACTION
+    END_STEP
+    
+    STEP Start_Crane
+        ON active ACTION
+            
+            CraneLower := FALSE;
+            MagazinVacuumOff := TRUE;
+            MagazinVacuumOn := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            StartVar := FALSE;
+            StartCommandCrane := FALSE;
+            IF (StartButtonMagazin = TRUE) THEN
+                interconnectCraneStartCommand := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Step0
+    END_STEP
+    
+    STEP Step2
+    END_STEP
+    
+    STEP Step4
+    END_STEP
+    
+    STEP Suck_At_Stamp
+        ON active ACTION
+            
+            MagazinVacuumOn := TRUE;
+            MagazinVacuumOff := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP TimeDelay
+        ON active ACTION
+            
+            TimeDelay_Timer(IN := TRUE, PT := TimeDelay_Timer_Duration);
+            TimeDelay_Timer_interconnect := TimeDelay_Timer.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP Turn_Right
+        ON active ACTION
+            
+            CraneTurnClockwise := TRUE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Turn_Right_Black
+        ON active ACTION
+            
+            CraneTurnClockwise := TRUE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP pause
+        ON active ACTION
+            
+            Timer1(IN := CraneUp, PT := Duration1);
+            interconnect := Timer1.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP release
+        ON active ACTION
+            
+            MagazinVacuumOff := TRUE;
+            MagazinVacuumOn := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP release_Black
+        ON active ACTION
+            
+            MagazinVacuumOn := FALSE;
+            MagazinVacuumOff := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP release_Workpiece
+        ON active ACTION
+            
+            MagazinVacuumOff := TRUE;
+            MagazinVacuumOn := FALSE;
+        END_ACTION
+    END_STEP
+    
+    GOTO CraneUp :: Crane_Go_Up -> Step2;
+    GOTO CraneDown :: Crane_Init -> Crane_Init_2;
+    GOTO CraneUp :: Crane_Init_2 -> Interstep;
+    GOTO CraneUp :: Crane_Lift_At_Stamp -> Crane_Turn_Left_From_Stamp;
+    GOTO TRUE :: Crane_Lift_Conveyor -> Interstep;
+    GOTO CraneUp :: Crane_Lift_Conveyor_Black -> Crane_Turn_Left_Back_To_Stamp;
+    GOTO CraneUp :: Crane_Lift_Magazin -> Crane_Turn_Left_NOT_Metallic;
+    GOTO CraneUp :: Crane_Lift_Magazin_Metallic -> Crane_Turn_Left_Metallic;
+    GOTO CraneUp :: Crane_Lift_NOT_Metallic_Black -> Crane_Turn_Left_NOT_Metallic_Black;
+    GOTO CraneSucked :: Crane_Lower -> Step0;
+    GOTO CraneDown :: Crane_On_Conveyor -> release;
+    GOTO CraneDown :: Crane_On_Conveyor_Metallic -> release;
+    GOTO CraneDown :: Crane_On_Conveyor_Not_Metallica_Black -> release_Black;
+    GOTO CraneDown :: Crane_On_Stamp_Metallic -> release_Workpiece;
+    GOTO TRUE :: Crane_On_Stamp_Stop_Black -> Reset_interconnect;
+    GOTO CranePositionStamp :: Crane_Turn_Left_Back_To_Stamp -> Crane_On_Stamp_Stop_Black;
+    GOTO CraneOnConveyor :: Crane_Turn_Left_From_Stamp -> Crane_On_Conveyor_Metallic;
+    GOTO CranePositionStamp :: Crane_Turn_Left_Metallic -> Crane_On_Stamp_Metallic;
+    GOTO CraneOnConveyor :: Crane_Turn_Left_NOT_Metallic -> Crane_On_Conveyor;
+    GOTO CraneOnConveyor :: Crane_Turn_Left_NOT_Metallic_Black -> Crane_On_Conveyor_Not_Metallica_Black;
+    GOTO TRUE :: Init -> Start_Crane;
+    GOTO StartVar :: Interstep -> Interstep_2;
+    GOTO SliderMovedOut :: Interstep_2 -> TimeDelay;
+    GOTO TRUE :: Last_Workpiece_At_Stamp -> pause;
+    GOTO CraneDown :: Lower_Crane -> Suck_At_Stamp;
+    GOTO (NOT WorkpieceReady AND StampSliderFilled) :: Magazin_Stop -> Last_Workpiece_At_Stamp;
+    GOTO WorkpieceReady :: Magazin_Stop -> Crane_Lower;
+    GOTO (NOT WorkpieceReady AND NOT StampSliderFilled) :: Magazin_Stop -> No_Workpiece_ready;
+    GOTO CraneSucked :: Magazin_Stop_Black -> Crane_Lift_NOT_Metallic_Black;
+    GOTO TRUE :: No_Workpiece_ready -> Start_Crane;
+    GOTO SliderMovedOut :: Reset_interconnect -> Lower_Crane;
+    GOTO interconnectCraneStartCommand :: Start_Crane -> Crane_Init;
+    GOTO NOT MagazinCapacitiveSensor :: Step0 -> Crane_Lift_Magazin;
+    GOTO MagazinCapacitiveSensor :: Step0 -> Crane_Lift_Magazin_Metallic;
+    GOTO (NOT MagazinCapacitiveSensor AND NOT WorkpieceReady) :: Step2 -> Step4;
+    GOTO (NOT MagazinCapacitiveSensor AND WorkpieceReady) :: Step2 -> Turn_Right_Black;
+    GOTO MagazinCapacitiveSensor :: Step2 -> pause;
+    GOTO TRUE :: Step4 -> pause;
+    GOTO CraneSucked :: Suck_At_Stamp -> Crane_Lift_At_Stamp;
+    GOTO TimeDelay_Timer_interconnect :: TimeDelay -> Turn_Right;
+    GOTO CraneOnMagazin :: Turn_Right -> Magazin_Stop;
+    GOTO CraneOnMagazin :: Turn_Right_Black -> Magazin_Stop_Black;
+    GOTO interconnect :: pause -> Reset_interconnect;
+    GOTO TRUE :: release -> Crane_Lift_Conveyor;
+    GOTO TRUE :: release_Black -> Crane_Lift_Conveyor_Black;
+    GOTO TRUE :: release_Workpiece -> Crane_Go_Up;
+END_SFC

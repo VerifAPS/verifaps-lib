@@ -1,0 +1,158 @@
+SFC Crane
+    VAR_INPUT  CraneDown : BOOL; END_VAR 
+    VAR_OUTPUT  CraneLower : BOOL; END_VAR 
+    VAR_INPUT  CraneOnConveyor : BOOL; END_VAR 
+    VAR_INPUT  CraneOnMagazin : BOOL; END_VAR 
+    VAR_INPUT  CraneSucked : BOOL; END_VAR 
+    VAR_OUTPUT  CraneTurnClockwise : BOOL; END_VAR 
+    VAR_OUTPUT  CraneTurnCounterclockwise : BOOL; END_VAR 
+    VAR_INPUT  CraneUp : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinVacuumOff : BOOL; END_VAR 
+    VAR_OUTPUT  MagazinVacuumOn : BOOL; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_INPUT  SliderMovedOut : BOOL; END_VAR 
+    VAR_INPUT  SliderNotMovedOut : BOOL; END_VAR 
+    VAR_INPUT  StartButtonMagazin : BOOL; END_VAR 
+    VAR_OUTPUT  StartCommandCrane : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR  TimeDelay_Timer : TON; END_VAR 
+    VAR  TimeDelay_Timer_Duration : TIME := TIME#50.0ms; END_VAR 
+    VAR  TimeDelay_Timer_interconnect : BOOL; END_VAR 
+    VAR_INPUT  WorkpieceReady : BOOL; END_VAR 
+    VAR  interconnectCraneStartCommand : BOOL; END_VAR 
+    
+    STEP Crane_Init
+        ON active ACTION
+            
+            CraneLower := TRUE;
+            interconnectCraneStartCommand := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Init_2
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Conveyor
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Lift_Magazine
+        ON active ACTION
+            
+            CraneLower := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_On_Conveyor
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Crane_Stop
+    END_STEP
+    
+    STEP Crane_Turn_Left
+        ON active ACTION
+            
+            CraneTurnCounterclockwise := TRUE;
+            CraneTurnClockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Init
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            StartCommandCrane := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Interstep_2
+    END_STEP
+    
+    STEP Interstep_Check_Workpiece
+    END_STEP
+    
+    STEP Magazin_Stop
+        ON active ACTION
+            
+            CraneTurnClockwise := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+            MagazinVacuumOn := TRUE;
+            MagazinVacuumOff := FALSE;
+            CraneLower := TRUE;
+        END_ACTION
+    END_STEP
+    
+    STEP Start_Crane
+        ON active ACTION
+            
+            CraneLower := FALSE;
+            MagazinVacuumOff := TRUE;
+            MagazinVacuumOn := FALSE;
+            CraneTurnCounterclockwise := FALSE;
+            CraneTurnClockwise := FALSE;
+            StartVar := FALSE;
+            StartCommandCrane := FALSE;
+            IF (StartButtonMagazin = TRUE) THEN
+                interconnectCraneStartCommand := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP TimeDelay
+        ON active ACTION
+            
+            TimeDelay_Timer(IN := TRUE, PT := TimeDelay_Timer_Duration);
+            TimeDelay_Timer_interconnect := TimeDelay_Timer.Q;
+        END_ACTION
+    END_STEP
+    
+    STEP Turn_Right
+        ON active ACTION
+            
+            CraneTurnClockwise := TRUE;
+            CraneTurnCounterclockwise := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP release
+        ON active ACTION
+            
+            MagazinVacuumOff := TRUE;
+            MagazinVacuumOn := FALSE;
+        END_ACTION
+    END_STEP
+    
+    GOTO CraneDown :: Crane_Init -> Crane_Init_2;
+    GOTO CraneUp :: Crane_Init_2 -> Interstep;
+    GOTO TRUE :: Crane_Lift_Conveyor -> Interstep;
+    GOTO CraneUp :: Crane_Lift_Magazine -> Crane_Turn_Left;
+    GOTO CraneDown :: Crane_On_Conveyor -> release;
+    GOTO TRUE :: Crane_Stop -> Start_Crane;
+    GOTO CraneOnConveyor :: Crane_Turn_Left -> Crane_On_Conveyor;
+    GOTO TRUE :: Init -> Start_Crane;
+    GOTO StartVar :: Interstep -> Interstep_2;
+    GOTO SliderMovedOut :: Interstep_2 -> TimeDelay;
+    GOTO WorkpieceReady :: Interstep_Check_Workpiece -> Magazin_Stop;
+    GOTO NOT WorkpieceReady :: Interstep_Check_Workpiece -> Crane_Stop;
+    GOTO CraneSucked :: Magazin_Stop -> Crane_Lift_Magazine;
+    GOTO interconnectCraneStartCommand :: Start_Crane -> Crane_Init;
+    GOTO TimeDelay_Timer_interconnect :: TimeDelay -> Turn_Right;
+    GOTO CraneOnMagazin :: Turn_Right -> Interstep_Check_Workpiece;
+    GOTO TRUE :: release -> Crane_Lift_Conveyor;
+END_SFC
