@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class AnalyzeKtTest {
@@ -86,7 +87,7 @@ internal class AnalyzeKtTest {
     }
 
 
-    @Test
+    @Test @Disabled
     fun ifGotoProgram() {
         val prg = """
             LBL:
@@ -122,7 +123,7 @@ internal class AnalyzeKtTest {
     }
 
 
-    @Test
+    @Test @Disabled
     fun testSSA() {
         val bp = BlockProgram()
         val b1 = Block("b1", statements = statements("c:= (a=1); e := 7+e;"))
