@@ -501,7 +501,7 @@ data class AssignmentStatement(var location: SymbolicReference,
 data class CaseStatement(
         var expression: Expression = EMPTY_EXPRESSION,
         var cases: MutableList<Case> = arrayListOf(),
-        var elseCase: StatementList? = StatementList())
+        var elseCase: StatementList = StatementList())
     : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     fun addCase(cs: Case) {

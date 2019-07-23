@@ -2,6 +2,9 @@ package edu.kit.iti.formal.automation.cpp
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.*
+import edu.kit.iti.formal.automation.operators.BinaryOperator
+import edu.kit.iti.formal.automation.operators.Operators
+import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.LookupList
@@ -19,7 +22,7 @@ object TranslateToCppFacade {
             null -> "/* null value */"
             is VBool -> v.value.toString()
             is VAnyBit -> "(${dataType(v.dataType)}) ${v.value}"
-            is VAnyEnum -> v.value
+            is VAnyEnum -> "${v.dataType.name}_${v.value}"
             is VAnyInt -> "(${dataType(v.dataType)}) ${v.value}"
             is VStruct -> {
                 "(struct ${v.dataType.name}_t)" +
@@ -55,7 +58,7 @@ object TranslateToCppFacade {
 
             is IECString -> "const char*"
             is FunctionBlockDataType -> "struct ${any.functionBlock.name}_t"
-            is EnumerateType -> any.name
+            is EnumerateType -> "enum ${any.name}"
             is RecordType -> "struct " + any.name
             is PointerType -> dataType(any.of) + "*"
             else -> "/* datatype: $any is not supported */"
@@ -65,6 +68,20 @@ object TranslateToCppFacade {
     fun translate(writer: Writer, pous: PouElements) {
         val ttc = TranslateToCpp(CodeWriter(writer))
         pous.accept(ttc)
+    }
+
+    fun translate(op: UnaryOperator) = when (op) {
+        Operators.NOT -> "!"
+        else -> op.symbol
+    }
+
+    fun translate(op: BinaryOperator) = when (op) {
+        Operators.NOT_EQUALS -> "!="
+        Operators.AND -> "&&"
+        Operators.OR -> "||"
+        Operators.XOR -> "^"
+        Operators.MOD -> "%"
+        else -> op.symbol
     }
 }
 
@@ -116,13 +133,14 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     override fun visit(enumeration: CaseCondition.Enumeration) {
         val start = enumeration.start
         val stop = enumeration.stop
+        val name = start.dataType.identifier!!
 
         if (stop == null) {
             out.nl().append("case ${expr(start)}:")
         } else {
             val range = start.dataType.obj!!.range(start.value, stop.value)
             for (i in range) {
-                out.nl().append("case $i:")
+                out.nl().append("case ${name}_$i:")
             }
         }
     }
@@ -134,9 +152,11 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
             for (c in caseStatement.cases)
                 c.accept(this@TranslateToCpp)
 
-            caseStatement.elseCase?.also {
-                out.cblock("default:", "") {
-                    it.accept(this@TranslateToCpp)
+            if (caseStatement.elseCase.isNotEmpty()) {
+                caseStatement.elseCase.also {
+                    out.cblock("default:", "") {
+                        it.accept(this@TranslateToCpp)
+                    }
                 }
             }
         }
@@ -325,12 +345,12 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     }
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-        out.print("enum {")
+        out.print("enum ${enumerationTypeDeclaration.name} {")
         val et = EnumerateType(enumerationTypeDeclaration)
-        et.allowedValues.joinInto(out, ", ") { t, u ->
-            out.print("$t = $u")
+        et.allowedValues.joinInto(out, ",\n") { t, u ->
+            out.print("${enumerationTypeDeclaration.name}_$t = $u")
         }
-        out.println("}")
+        out.println("};")
 
     }
 //endregion
@@ -353,7 +373,7 @@ class TranslateToCppExpr : AstVisitor<String>() {
         is IntegerLit -> literal.value.toString()
         is StringLit -> '"' + literal.value + '"'
         is RealLit -> literal.value.toString()
-        is EnumLit -> literal.value
+        is EnumLit -> literal.dataType.identifier + '_' + literal.value
         is NullLit -> "NULL"
         is ToDLit -> TODO()
         is DateLit -> TODO()
@@ -367,13 +387,13 @@ class TranslateToCppExpr : AstVisitor<String>() {
     override fun visit(binaryExpression: BinaryExpression): String {
         val left = binaryExpression.leftExpr.accept(this)
         val right = binaryExpression.rightExpr.accept(this)
-        val op = binaryExpression.operator.symbol
+        val op = TranslateToCppFacade.translate(binaryExpression.operator)
         return "($left $op $right)"
     }
 
     override fun visit(unaryExpression: UnaryExpression): String {
         val right = unaryExpression.expression.accept(this)
-        val op = unaryExpression.operator.symbol
+        val op = TranslateToCppFacade.translate(unaryExpression.operator)
         return "($op $right)"
     }
 

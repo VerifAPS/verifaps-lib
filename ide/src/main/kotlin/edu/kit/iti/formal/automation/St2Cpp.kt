@@ -9,6 +9,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import java.io.File
+import java.util.*
 
 /**
  *
@@ -34,6 +35,12 @@ object St2Cpp : CliktCommand() {
         }
 
         output.bufferedWriter().use {
+            it.write("""
+            // Generated ${Date()}
+            #include <stdbool.h>                
+            #include <stdint.h>          
+                  
+            """.trimIndent())
             TranslateToCppFacade.translate(it, pous)
         }
     }
