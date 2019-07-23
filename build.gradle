@@ -7,7 +7,6 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4" apply false
     id "org.sonarqube" version "2.7.1"
     id "com.github.ben-manes.versions" version "0.21.0"
-
 }
 
 dokka {
@@ -80,6 +79,16 @@ allprojects {
             downloadSources = true
         }
     }
+
+    sonarqube {
+        properties {
+            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+            property "sonar.exclusions", "*/build/generated-src/antlr/**"
+            property "sonar.c.file.suffixes", "-"
+            property "sonar.cpp.file.suffixes", "-"
+            property "sonar.objc.file.suffixes", "-"
+        }
+    }
 }
 
 
@@ -119,12 +128,6 @@ subprojects {
         toolVersion = "0.8.4"
     }
 
-
-    sonarqube {
-        properties {
-            property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        }
-    }
 
     jacocoTestReport {
         reports {
