@@ -20,8 +20,6 @@ class MonitorTests {
         gtt.generateSmvExpression()
         val automaton = GetetaFacade.constructTable(gtt).automaton
         val mon = CppMonitorGenerator.generate(gtt, automaton)
-        println(CppMonitorGenerator.getPreamble)
         println(mon)
-        println(CppMonitorGenerator.getPostamble)
     }
 }

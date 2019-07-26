@@ -31,10 +31,12 @@ import java.math.BigInteger
  * @version 1 (04.09.18)
  */
 object MonitorGenerationST : MonitorGeneration {
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): String {
+    override val key: String = "st"
+
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor {
         val mg = MonitorGenerationSTImpl(gtt, automaton)
         val elements = mg.call()
-        return IEC61131Facade.print(elements, true)
+        return Monitor(body = IEC61131Facade.print(elements, true))
     }
 
     /**

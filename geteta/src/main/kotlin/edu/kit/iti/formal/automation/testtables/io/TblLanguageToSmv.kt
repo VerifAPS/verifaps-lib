@@ -50,8 +50,8 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
             if (columnVariable.dataType == SMVTypes.INT) {
                 return SIntegerLiteral(value)
             } else {
-                return SWordLiteral(value,
-                        (columnVariable.dataType as SMVWordType?) ?: SMVTypes.signed(16))
+                val dtWord = (columnVariable.dataType as? SMVWordType?)
+                return SWordLiteral(value, dtWord?: SMVTypes.signed(16))
             }
         }
     }

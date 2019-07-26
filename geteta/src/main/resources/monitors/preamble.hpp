@@ -41,14 +41,20 @@ struct gvar {
 
 template <typename io_t>
 class IMonitor {
+ private:
+  MonitorState _state;
+
  public:
   virtual ~IMonitor() {}
   virtual void reset() = 0;
-  virtual MonitorState next(const io_t &&input) = 0;
+  virtual void next(const io_t &&input) = 0;
+
+  MonitorState state() { return _state; }
+  void state(MonitorState s) { _state = s; }
 };
 
-template <typename gv_t, typename io_t>
-class Monitor : public IMonitor<io_t> {
+template <typename io_t>
+class BaseMonitor : public IMonitor<io_t> {
  protected:
   struct Token {
     int state;
@@ -57,18 +63,18 @@ class Monitor : public IMonitor<io_t> {
 
   vector<Token> tokens;
 
- public:
-  Monitor() : tokens(), numErrors(0) {}
-
   int numErrors;
 
+ public:
+  Monitor() : tokens(), numErrors(0), state(MonitorState::FINE) {}
+
   virtual void reset() {
-    std::cout << "reset monitor\n";
+    state(MonitorState::FINE);
     numErrors = 0;
     tokens.clear();
   }
 
-  MonitorState next(const io_t &&input) {
+  void next(const io_t &&input) override {
     vector<Token> newTokens;
     for (auto &&tok : tokens) evaluate(newTokens, tok, input);
 
@@ -89,9 +95,8 @@ class Monitor : public IMonitor<io_t> {
       }
     }
 
-    if (hitError) return MonitorState::ERROR;
-    if (hitState) return MonitorState::FINE;
-    return MonitorState::UNKNOWN;
+    state(hitError ? MonitorState::ERROR;
+                   : hitState ? MonitorState::FINE : MonitorState::UNKNOWN);
   }
 
   virtual void evaluate(vector<Token> &newTokens, Token &token,
@@ -100,12 +105,6 @@ class Monitor : public IMonitor<io_t> {
 
 template <typename io_t>
 class CombinedMonitor : IMonitor<io_t> {
-  vector<IMonitor<io_t>> monitors;
-
-  typealias Trigger = function<bool(io_t)>;
-  typealias MonitorInit = function<Monitor<io_t>(void)>;
-  vector<pair<Trigger, MonitorInit>> tokens;
-
  public:
   CombinedMonitor() : monitors() {}
   virtual ~CombinedMonitor() {}
@@ -113,15 +112,20 @@ class CombinedMonitor : IMonitor<io_t> {
     for (auto &&m : monitors) m.reset();
   }
 
+  virtual void before(const io_t &&input) {}
+  virtual void eval(const io_t &&input) {}
+  virtual void after() {}
+
+  void combine(MonitorState res) {
+      if (res == MonitorState::ERROR) state(MonitorState::ERROR);
+      else if (state() != MonitorState::ERROR && res == MonitorState::FINE)
+          state(MonitorState::FINE);
+  }
+
   MonitorState next(const io_t &&input) override {
-    MonitorState combined = MonitorState::UNKNOWN;
-    for (auto &&m : monitors) {
-      auto res = m.next(input);
-      if (res == MonitorState::ERROR)
-        combined = MonitorState::ERROR;
-      else if (combined != MonitorState::ERROR && res == MonitorState::FINE)
-        combined = MonitorState::FINE;
-    }
-    return combined;
+    before(input);
+    state(MonitorState::UNKNOWN);
+    eval();
+    after();
   }
 };

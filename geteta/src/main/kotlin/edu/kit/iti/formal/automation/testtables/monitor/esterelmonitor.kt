@@ -11,8 +11,10 @@ import java.io.StringWriter
  * @version 1 (04.09.18)
  */
 object MonitorGenerationEsterel : MonitorGeneration {
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): String =
-            Impl(gtt, automaton).call()
+    override val key = "esterel"
+
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor =
+            Monitor(body = Impl(gtt, automaton).call())
 
     internal class Impl(private val gtt: GeneralizedTestTable,
                         private val automaton: TestTableAutomaton) {

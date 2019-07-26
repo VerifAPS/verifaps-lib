@@ -21,7 +21,9 @@ import java.util.*
 import java.util.concurrent.Callable
 
 object CMonitorGenerator : MonitorGeneration {
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): String {
+    override val key = "c"
+
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor {
         val impl = CMonitorGeneratorImpl(gtt, automaton)
         return impl.call()
     }
@@ -29,7 +31,8 @@ object CMonitorGenerator : MonitorGeneration {
 
 private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton,
                                     val compressState: Boolean = false,
-                                    val useDefines: Boolean = false) : Callable<String> {
+                                    val useDefines: Boolean = false) : Callable<Monitor> {
+    val monitor = Monitor()
     val stream = StringWriter()
     val writer = CodeWriter(stream)
     val state_t = "state_${gtt.name.toLowerCase()}_t"
@@ -46,14 +49,14 @@ private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton
     val sResets = "state->RESETS"
 
 
-    override fun call(): String {
+    override fun call(): Monitor {
         header()
         declareStateType()
         declareInoutType()
         declareStateFunctions()
         declareInoutFunctions()
         declareFunUpdateMonitor()
-        return stream.toString()
+        return monitor
     }
 
 
