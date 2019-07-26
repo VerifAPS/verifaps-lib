@@ -1,0 +1,18 @@
+table MinMaxTbl {
+    var input mode : ENUM
+    var input learn : BOOL
+    var input I : INT
+    var output Q : INT
+    var output W : BOOL
+    
+    gvar min : INT with 0
+    gvar max : INT with 5
+
+    group {
+        row >=1 { mode: Active; learn: -; I: -; Q: 0; W: true }
+        group >=1 {
+            row >=1 { mode: Learn; learn: false; I: -;  Q: 0; W: false }
+            row >=1 { mode: Learn; learn: true;  I: [min,max]; Q: [min,max]; W: false }
+        }
+    }
+}

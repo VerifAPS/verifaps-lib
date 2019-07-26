@@ -1,0 +1,21 @@
+table Ta {
+    var input i : INT
+    var output o : INT
+    var output c : INT
+    
+    
+    
+    group 0 [1, 1] {
+        row 1 [10, 10]{
+            i: -
+            o: i
+            c: 42
+        }
+        row 2 >= 10{
+            i: -
+            o: i
+            c: 41
+        }
+    }
+    
+}

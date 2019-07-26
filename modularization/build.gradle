@@ -1,0 +1,11 @@
+description = ''
+
+repositories {
+    maven { url "https://dl.bintray.com/ajalt/maven" }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile project(':aps-rvt')
+    implementation 'com.github.ajalt:clikt:2.1.0'
+}

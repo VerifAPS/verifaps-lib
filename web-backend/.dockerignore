@@ -1,0 +1,11 @@
+build/classes/
+build/kotlin/
+build/libs/
+build/resources/
+build/distributions/
+build/tmp/
+build/scripts/
+build.gradle
+Dockerfile
+out
+src

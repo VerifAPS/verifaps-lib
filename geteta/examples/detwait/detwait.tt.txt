@@ -1,0 +1,16 @@
+table TTable {
+    var input i : INT
+    var output o : INT
+
+    group omega {
+        row >=0 _p {
+            i: -
+            o: -
+        }
+        row {
+            i: 1
+            o: 1
+        }
+    }
+
+}

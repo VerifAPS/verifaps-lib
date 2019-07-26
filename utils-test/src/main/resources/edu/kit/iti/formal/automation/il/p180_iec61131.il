@@ -1,0 +1,9 @@
+LD S8.X
+AND bvar1
+AND bvar2
+ST bOut1
+LD C
+LT D
+S1 FF28
+LD FF28.Q
+ST bOut2

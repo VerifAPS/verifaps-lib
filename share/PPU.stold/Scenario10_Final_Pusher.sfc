@@ -1,0 +1,186 @@
+SFC Pusher
+    VAR  Duration1 : TIME := TIME#880.0ms; END_VAR 
+    VAR  Duration2 : TIME := TIME#1.0s940.0ms; END_VAR 
+    VAR  Duration3 : TIME := TIME#200.0ms; END_VAR 
+    VAR_OUTPUT  PusherY1 : BOOL; END_VAR 
+    VAR_OUTPUT  PusherY2 : BOOL; END_VAR 
+    VAR  SFCInit : BOOL; END_VAR 
+    VAR_INPUT  SFCReset : BOOL; END_VAR 
+    VAR_INPUT  SorterLightbarrierCraneInterface : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher1MovedIn : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher1MovedOut : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher2MovedIn : BOOL; END_VAR 
+    VAR_INPUT  SorterPusher2MovedOut : BOOL; END_VAR 
+    VAR_INPUT  SorterStartButton : BOOL; END_VAR 
+    VAR_INPUT  StartVar : BOOL; END_VAR 
+    VAR  Timer1 : TON; END_VAR 
+    VAR  Timer2 : TON; END_VAR 
+    VAR  Timer3 : TON; END_VAR 
+    VAR  enum : INT := INT#0; END_VAR 
+    VAR  interconnect : BOOL; END_VAR 
+    VAR  interconnect2 : BOOL; END_VAR 
+    VAR  interconnect3 : BOOL; END_VAR 
+    
+    STEP Enumeration
+        ON active ACTION
+            
+            enum := (enum + INT#1);
+        END_ACTION
+    END_STEP
+    
+    STEP First_Slide_Filled_Timer
+    END_STEP
+    
+    STEP Init
+        ON active ACTION
+            
+            PusherY1 := FALSE;
+            PusherY2 := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP Interstep
+        ON active ACTION
+            
+            PusherY1 := FALSE;
+            PusherY2 := FALSE;
+            interconnect := FALSE;
+            interconnect2 := FALSE;
+            interconnect3 := FALSE;
+            StartVar := FALSE;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY1_Move_In
+        ON active ACTION
+            
+            IF ((SorterPusher1MovedOut = TRUE) AND (SorterPusher1MovedIn = FALSE)) THEN
+                PusherY1 := FALSE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY1_Move_Out
+        ON active ACTION
+            
+            IF ((SorterPusher1MovedOut = FALSE) AND (SorterPusher1MovedIn = TRUE)) THEN
+                PusherY1 := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY2_Move_In
+        ON active ACTION
+            
+            IF ((SorterPusher2MovedOut = TRUE) AND (SorterPusher2MovedIn = FALSE)) THEN
+                PusherY2 := FALSE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP PusherY2_Move_Out
+        ON active ACTION
+            
+            IF ((SorterPusher2MovedOut = FALSE) AND (SorterPusher2MovedIn = TRUE)) THEN
+                PusherY2 := TRUE;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Reset_interconnect
+        ON active ACTION
+            
+            interconnect := FALSE;
+            interconnect3 := FALSE;
+            Timer1(IN := FALSE, PT := TIME#);
+            Timer3(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Reset_interconnect2
+        ON active ACTION
+            
+            interconnect2 := FALSE;
+            interconnect3 := FALSE;
+            Timer2(IN := FALSE, PT := TIME#);
+            Timer3(IN := FALSE, PT := TIME#);
+        END_ACTION
+    END_STEP
+    
+    STEP Second_Slide_Filled_Timer
+        ON active ACTION
+            
+            IF (SorterLightbarrierCraneInterface = FALSE) THEN
+                Timer1(IN := NOT SorterLightbarrierCraneInterface, PT := Duration1);
+                interconnect := Timer1.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Step0
+    END_STEP
+    
+    STEP Step1
+    END_STEP
+    
+    STEP Step2
+    END_STEP
+    
+    STEP Step3
+    END_STEP
+    
+    STEP Step4
+    END_STEP
+    
+    STEP Third_Slide_Filled_Timer
+        ON active ACTION
+            
+            IF (SorterLightbarrierCraneInterface = FALSE) THEN
+                Timer2(IN := NOT SorterLightbarrierCraneInterface, PT := Duration2);
+                interconnect2 := Timer2.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Wait_Y1
+        ON active ACTION
+            
+            IF (PusherY1 = TRUE) THEN
+                Timer3(IN := PusherY1, PT := Duration3);
+                interconnect3 := Timer3.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    STEP Wait_Y2
+        ON active ACTION
+            
+            IF (PusherY2 = TRUE) THEN
+                Timer3(IN := PusherY2, PT := Duration3);
+                interconnect3 := Timer3.Q;
+            END_IF;
+        END_ACTION
+    END_STEP
+    
+    GOTO ((enum < INT#7) AND (enum > INT#3)) :: Enumeration -> Step3;
+    GOTO (enum > INT#6) :: Enumeration -> Step1;
+    GOTO (enum < INT#4) :: Enumeration -> First_Slide_Filled_Timer;
+    GOTO SorterLightbarrierCraneInterface :: First_Slide_Filled_Timer -> Step0;
+    GOTO StartVar :: Init -> Interstep;
+    GOTO TRUE :: Interstep -> Enumeration;
+    GOTO SorterPusher1MovedIn :: PusherY1_Move_In -> Reset_interconnect;
+    GOTO TRUE :: PusherY1_Move_Out -> Wait_Y1;
+    GOTO SorterPusher2MovedIn :: PusherY2_Move_In -> Reset_interconnect2;
+    GOTO TRUE :: PusherY2_Move_Out -> Wait_Y2;
+    GOTO TRUE :: Reset_interconnect -> Enumeration;
+    GOTO TRUE :: Reset_interconnect2 -> Enumeration;
+    GOTO interconnect :: Second_Slide_Filled_Timer -> PusherY1_Move_Out;
+    GOTO NOT SorterLightbarrierCraneInterface :: Step0 -> Enumeration;
+    GOTO SorterLightbarrierCraneInterface :: Step1 -> Step2;
+    GOTO NOT SorterLightbarrierCraneInterface :: Step2 -> Second_Slide_Filled_Timer;
+    GOTO SorterLightbarrierCraneInterface :: Step3 -> Step4;
+    GOTO NOT SorterLightbarrierCraneInterface :: Step4 -> Third_Slide_Filled_Timer;
+    GOTO interconnect2 :: Third_Slide_Filled_Timer -> PusherY2_Move_Out;
+    GOTO interconnect3 :: Wait_Y1 -> PusherY1_Move_In;
+    GOTO interconnect3 :: Wait_Y2 -> PusherY2_Move_In;
+END_SFC

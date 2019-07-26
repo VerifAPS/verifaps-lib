@@ -1,0 +1,50 @@
+FUNCTION g : INT
+
+    VAR_INPUT
+        a$x : INT := INT#0;
+        a$y : INT := INT#0;
+    END_VAR
+
+    VAR_OUTPUT
+        g : INT := INT#0;
+    END_VAR
+
+    g := (a$x + a$y);
+END_FUNCTION
+
+FUNCTION A_f : INT
+
+    VAR_OUTPUT  
+        A_f : INT := INT#0;
+    END_VAR
+
+    VAR_INPUT
+        _SELF$x : INT := INT#0;
+        _SELF$y : INT := INT#0;
+        z : INT := INT#0;
+    END_VAR
+
+    IF (_SELF$x > z) THEN
+        A_f := _SELF$y;
+    ELSE
+        A_f := z;
+    END_IF
+END_FUNCTION
+
+PROGRAM MY_PROGRAM
+    VAR
+        a$x : INT := INT#42;
+        a$y : INT := INT#333;
+    END_VAR
+
+    VAR_OUTPUT
+        new_z : INT := INT#0;
+    END_VAR
+
+    VAR_INPUT
+        z : INT := INT#0;
+    END_VAR
+
+
+    new_z := (A_f(_SELF$x := a$x, _SELF$y := a$y, z := z) + g(a$x, a$y));
+END_PROGRAM

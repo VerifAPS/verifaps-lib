@@ -1,0 +1,56 @@
+body {
+    width: 60em;
+    margin: auto;
+}
+
+table.gtt {
+
+}
+
+tr.categories {
+    text-transform: uppercase;
+}
+
+th.input {
+
+}
+
+
+th.output {
+
+}
+
+th.cycle {
+
+}
+
+th.varheader {
+
+}
+
+tr.variables {
+    border-bottom: 1px solid black;
+}
+
+tr.variables th {
+    padding: .5ex;
+}
+
+tr:nth-child(2n+1) {
+    background: #eee;
+}
+
+td.row-number {
+    font-family: monospace;
+    text-align: right;
+}
+
+td.cell {
+    font-family: monospace;
+    text-align: center;
+}
+
+td.duration {
+    font-family: monospace;
+    text-align: center;
+}

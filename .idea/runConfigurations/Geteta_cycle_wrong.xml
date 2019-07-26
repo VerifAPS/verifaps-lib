@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Geteta cycle_wrong" type="JetRunConfigurationType" factoryName="Kotlin">
+    <module name="geteta" />
+    <option name="VM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value="--row-map --ods test.ods -t cycles_wrong.tt.txt -c cycles.st " />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <option name="MAIN_CLASS_NAME" value="edu.kit.iti.formal.automation.testtables.apps.Geteta" />
+    <option name="WORKING_DIRECTORY" value="file://geteta/examples/cycles" />
+    <envs>
+      <env name="NUXMV" value="$USER_HOME$/share/nuXmv-1.1.1-Linux/bin/nuXmv" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

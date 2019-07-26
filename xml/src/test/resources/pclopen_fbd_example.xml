@@ -1,0 +1,91 @@
+<FBD>
+    <inVariable localId="1">
+        <connectionPointOut/>
+        <expression>Var4</expression>
+    </inVariable>
+
+    <inVariable localId="2">
+        <connectionPointOut/>
+        <expression>1</expression>
+    </inVariable>
+
+    <block localId="3" typeName="ADD" instanceName="ADD">
+        <inputVariables>
+            <variable formalParameter="IN1">
+                <connectionPointIn>
+                    <connection refLocalId="1"/>
+                </connectionPointIn>
+            </variable>
+            <variable formalParameter="IN2">
+                <connectionPointIn>
+                    <connection refLocalId="2"/>
+                </connectionPointIn>
+            </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+            <variable formalParameter="OUT1">
+                <connectionPointOut/>
+            </variable>
+        </outputVariables>
+    </block>
+
+    <inVariable localId="4">
+        <connectionPointOut/>
+        <expression>Var1</expression>
+    </inVariable>
+
+    <inVariable localId="5">
+        <connectionPointOut/>
+        <expression>Var2</expression>
+    </inVariable>
+
+    <inVariable localId="6">
+        <connectionPointOut/>
+        <expression>TRUE</expression>
+    </inVariable>
+
+    <block instanceName="MUX1" localId="7" typeName="MUX">
+        <inputVariables>
+            <variable formalParameter="K">
+                <connectionPointIn>
+                    <connection formalParameter="OUT1" refLocalId="3"/>
+                </connectionPointIn>
+            </variable>
+            <variable formalParameter="IN1">
+                <connectionPointIn>
+                    <connection refLocalId="4"/>
+                </connectionPointIn>
+            </variable>
+            <variable formalParameter="IN2" negated="true">
+                <connectionPointIn>
+                    <connection refLocalId="5"/>
+                </connectionPointIn>
+            </variable>
+            <variable formalParameter="IN3">
+                <connectionPointIn>
+                    <connection refLocalId="6"/>
+                </connectionPointIn>
+            </variable>
+            <variable formalParameter="IN4" negated="true">
+                <connectionPointIn/>
+            </variable>
+            <variable formalParameter="IN5">
+                <connectionPointIn/>
+            </variable>
+        </inputVariables>
+        <inOutVariables/>
+        <outputVariables>
+            <variable formalParameter="OUT1" negated="true">
+                <connectionPointOut/>
+            </variable>
+        </outputVariables>
+    </block>
+
+    <outVariable localId="8">
+        <connectionPointIn>
+            <connection formalParameter="OUT1" refLocalId="7"/>
+        </connectionPointIn>
+        <expression>Var3</expression>
+    </outVariable>
+</FBD>

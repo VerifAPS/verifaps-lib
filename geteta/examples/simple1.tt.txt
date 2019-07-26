@@ -1,0 +1,21 @@
+table TTable {
+    var input i : BOOL
+    var output o : BOOL
+    
+    
+    
+    group 0 [1, 1] {
+        row 1 >= 0{
+            i: TRUE
+            o: FALSE
+        }
+        row 2 [5, 5]{
+            i: -
+            o: !o[-1]
+        }
+        row 3 >= 0{
+            i: TRUE
+            o: FALSE
+        }
+    }  
+} 

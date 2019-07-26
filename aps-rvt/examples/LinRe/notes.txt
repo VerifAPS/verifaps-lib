@@ -1,0 +1,23 @@
+* Counter example
+169.35user 0.59system 2:52.50elapsed 98%CPU (0avgtext+0avgdata 300568maxresident)k
+0inputs+0outputs (0major+101361minor)pagefaults 0swaps
+
+
+
+
+* Fixing relation: SensorOutput = - SensorOutput'
+
+			<value variable="__new__.SensorOutput">-0sd16_6883</value>
+			<value variable="__new__.m">0sd16_1165</value>
+			<value variable="__new__.t">-0sd16_6889</value>
+			<value variable="__new__.x2">0sd16_3071</value>
+			<value variable="__new__.x1">0sd16_3043</value>
+			<value variable="__new__.y1">-0sd16_6883</value>
+			<value variable="__new__.y2">-0sd16_4360</value>
+			<value variable="__old__.SensorOutput">0sd16_6871</value>
+			<value variable="__old__.m">-0sd16_1165</value>
+			<value variable="__old__.t">0sd16_6877</value>
+			<value variable="__old__.x2">0sd16_3071</value>
+			<value variable="__old__.x1">0sd16_3043</value>
+			<value variable="__old__.y2">-0sd16_4360</value>
+			<value variable="__old__.y1">-0sd16_6883</value>

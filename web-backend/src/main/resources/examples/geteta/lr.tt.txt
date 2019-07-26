@@ -1,0 +1,66 @@
+table TTable {
+    var input var_TPSet : BOOL
+    var input var_SensorInput : INT
+    var input var_TPy : INT
+    var input var_OperationMode : ENUM ENUM
+    var output var_SensorOutput : INT
+    
+    gvar var_x1 : INT with >=-10,<=-5
+    gvar var_x2 : INT with >=10,<=15
+    gvar var_y1 : INT with >=10,<=25
+    gvar var_y2 : INT with >=0,<=5
+    
+    
+    group 0 [1, 1] {
+        row 1 >= 0{
+            var_TPSet: -
+            var_SensorInput: -
+            var_TPy: -
+            var_OperationMode: var_Op
+            var_SensorOutput: 0
+        }
+        row 2 [1, 10]{
+            var_TPSet: 0
+            var_SensorInput: -
+            var_TPy: -
+            var_OperationMode: var_Teach
+            var_SensorOutput: 0
+        }
+        row 3 [1, 1]{
+            var_TPSet: 1
+            var_SensorInput: var_x1
+            var_TPy: var_y1
+            var_OperationMode: var_Teach
+            var_SensorOutput: 0
+        }
+        row 4 [1, 10]{
+            var_TPSet: 0
+            var_SensorInput: -
+            var_TPy: -
+            var_OperationMode: var_Teach
+            var_SensorOutput: 0
+        }
+        row 5 [1, 1]{
+            var_TPSet: -
+            var_SensorInput: var_x2,<>var_x1
+            var_TPy: var_y2
+            var_OperationMode: var_Teach
+            var_SensorOutput: 0
+        }
+        row 6 [1, 1]{
+            var_TPSet: -
+            var_SensorInput: -
+            var_TPy: -
+            var_OperationMode: var_Teach
+            var_SensorOutput: 0
+        }
+        row 7 [10, 10]{
+            var_TPSet: -
+            var_SensorInput: -
+            var_TPy: -
+            var_OperationMode: var_Op
+            var_SensorOutput: =var_y1+(var_y2-var_y1)/(var_x2-var_x1)*(var_SensorInput-var_x1)
+        }
+    }
+    
+}

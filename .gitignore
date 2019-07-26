@@ -1,4 +1,8 @@
+version.property
 
+
+.idea/vcs.xml
+.idea/misc.xml
 # Created by https://www.gitignore.io/api/intellij,maven,java
 
 ### Intellij ###
@@ -131,4 +135,6 @@ gradle-app.setting
 
 
 # End of https://www.gitignore.io/api/gradle
+*.iml
 .idea/modules
+

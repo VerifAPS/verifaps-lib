@@ -1,22 +1,18 @@
-rootProject.name = 'verifaps-lib'
-include ':iec-symbex'
-include ':iec61131lang'
-include ':smv-model'
-include ':iec-xml'
-include ':iec-run'
-//include ':iec-modularization'
+rootProject.name = 'verifaps'
+include ':lang'
+include ':util'
+include 'utils-test'
+include ':xml'
+include ':symbex'
+include ':smv'
+include ':run'
+include ':modularization'
 include ':aps-rvt'
-include ':casestudies'
+include ':ide'
 include ':flycheck'
+include ':geteta'
+include ':smt'
+include 'absintsfc'
 
-project(':iec-symbex').projectDir = "$rootDir/iec-symbex" as File
-project(':iec61131lang').projectDir = "$rootDir/iec61131lang" as File
-project(':smv-model').projectDir = "$rootDir/smv-model" as File
-project(':iec-xml').projectDir = "$rootDir/iec-xml" as File
-project(':iec-run').projectDir = "$rootDir/iec-run" as File
-//project(':iec-modularization').projectDir = "$rootDir/iec-modularization" as File
-project(':aps-rvt').projectDir = "$rootDir/aps-rvt" as File
-project(':casestudies').projectDir = "$rootDir/casestudies" as File
-
+//include ':web-backend'
 //include 'asdl'
-

@@ -1,0 +1,44 @@
+\usepackage{booktabs,array,microtype,multirow,tikz,boldline,lmodern}
+\usepackage{amsmath,amssymb,amsfonts}
+\usetikzlibrary{calc,arrows,arrows.meta,positioning,automata}
+\newcommand\FALSE{FALSE}
+\newcommand\TRUE{TRUE}
+\newcommand\DONTCARE{---}
+\newcommand\singlecopy[1]{#1}
+\newcommand{\dwait}{\DONTCARE$\!_{\textrm{\tiny p}}$}
+\newcommand\rowgroupduration[2]{%\newcommand\rowgroupduration[2]{%
+  \multirow{#1}{*}{
+    \cellcolor{white}
+    \tikz{
+      \draw[Bracket-Bracket] (0,0.5ex) -- +($(0,-#1em) - (0,3em)$)
+      node[midway,fill=white]{\large #2};
+    }
+  }
+}
+\usepackage{wasysym}
+\newcommand{\coltime}{\clock}
+\newcommand{\drawrepetition}[2]{\draw[line width=.75pt,-{Bracket}] ([yshift=.75em] #1) -- (#2);}
+
+\newcommand\variableheader[1]{\bfseries#1}
+\newcommand\categoryheader[1]{\textbf{\uppercase{#1}}}%\textsc{\bfseries #1}}
+\newcommand\cell[1]{$#1$}
+\newcommand\tikzmark[1]{\tikz[remember picture,overlay] \coordinate (#1);}
+
+\newcommand\NEGATION[1]{$\neg\mbox{#1}$}
+\newcommand\PARENS[1]{(#1)}
+\newcommand\LAND[2]{#1 $\land$ #2}
+\newcommand\LOR[2]{#1 $\lor$ #2}
+\newcommand\PLUS[2]{#1 $+$ #2}
+\newcommand\MINUS[2]{#1 $\lor$ #2}
+
+%%%%%%
+% row colors
+\usepackage{colortbl}
+\usepackage{etoolbox}
+\newcounter{gttrowcnt}
+\newcommand\gttrow{%
+  \ifnumodd{\arabic{gttrowcnt}}{%
+    \rowcolor{black!0}}{\rowcolor{black!10}}%
+  \arabic{gttrowcnt}%
+  \addtocounter{gttrowcnt}{1}}
+%%
