@@ -6,7 +6,6 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
@@ -28,7 +27,8 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>) = internalVariable(programRunNames).inModule(BinaryModelGluer.TABLE_MODULE)
+    open fun externalVariable(programRunNames: List<String>, tableName: String)
+            = internalVariable(programRunNames).inModule(tableName)
 
     open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
 }
@@ -43,7 +43,7 @@ data class ProgramVariable(
     /**
      *
      */
-    override fun externalVariable(programRunNames: List<String>) =
+    override fun externalVariable(programRunNames: List<String>, tableName: String) =
             SVariable("${programRunNames[programRun]}.$realName", logicType)
 
     /**

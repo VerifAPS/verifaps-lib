@@ -19,38 +19,27 @@
  */
 package edu.kit.iti.formal.automation.testtables.algorithms
 
-import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import java.util.concurrent.Callable
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.12.16)
  */
-class BinaryModelGluer(private val options: TableOptions,
-                       private val tableModule: SMVModule,
-                       private val tableType: SMVType,
-                       private val code: List<SMVModule>,
-                       private val programRunNames: List<String>) : Runnable {
-    val product = SMVModule("main")
+class MultiModelGluer(moduleName: String = "main")  {
+    val product = SMVModule(moduleName)
 
-    override fun run() {
-        product.name = MAIN_MODULE
-        product.inputVars.addAll(code.flatMap { it.moduleParameters })
-
-        programRunNames.zip(code).forEach { (name, code) ->
-            product.stateVars.add(
-                    SVariable(name,
-                            ModuleType(code.name, code.moduleParameters)))
-        }
-
-        product.stateVars.add(SVariable(TABLE_MODULE,tableType))
+    fun addProgramRun(runName: String, module: SMVModule) {
+        product.inputVars.addAll(module.moduleParameters)
+        product.stateVars.add(
+                SVariable(runName,
+                        ModuleType(module.name, module.moduleParameters)))
     }
 
-    companion object {
-        val TABLE_MODULE = "tableModule"
-        val MAIN_MODULE = "main"
+    fun addTable(tableName : String, type : SMVType) {
+        product.stateVars.add(SVariable(tableName, type))
     }
 }

@@ -1,0 +1,193 @@
+table detwait1 {
+    var input i : INT
+    var output o : INT
+
+    group {
+        row [1,1]>> { i:1; o: 1 }
+        row [1,1] { i:2; o: 2 }
+    }
+}
+
+table detwait2 {
+    var input i : INT
+    var output o : INT
+
+    group {
+        row [1,1]>> { i:-; o: - }
+        row [0,1]>> { i:1; o: 1 }
+        row [1,1] { i:2; o: 2 }
+    }
+}
+
+table detwait3 {
+    var input i : INT
+    var output o : INT
+
+    group {
+        row [0,1]>> { i:-; o: - }
+        row [0,1]>> { i:1; o: 1 }
+        row [0,1] { i:2; o: 2 }
+        row [0,1] { i:3; o: 3 }
+        row [0,1] { i:4; o: 4 }
+        row [1,1] { i:5; o: 5 }
+    }
+}
+
+
+
+table simplify1 {
+  var input i : BOOLEAN
+  var output o : BOOLEAN
+
+  group {
+      row a [1,1] {  }
+      row b [1,1] {  }
+      row c [1,1] {  }
+      row d omega {  }
+      row e [1,1] {  }
+      row f [1,1] {  }
+      row g [1,1] {  }
+      row h [1,1] {  }
+  }
+}
+
+
+table simplify2 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+        row a [1,1] { }
+        row b [1,1] {}
+        group z {
+            row d [1,1] {}
+            row e omega {}
+            row f [1,1] {}
+            row g [1,1] {}
+        }
+        row h [1,1] {}
+        row i [1,1] {}
+    }
+}
+
+
+table simplify3 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+        row a [1,1] {}
+        row b [1,1] {}
+        row c [1,1] {}
+        row d [1,1] {}
+        row e [1,1] {}
+        row f [1,1] {}
+        row g [1,1] {}
+        row h [1,1] {}
+        row i [1,1] {}
+        row j [1,1] {}
+        row k [1,1] {}
+        row l [1,1] {}
+        row m [1,1] {}
+        group z [2,2] {
+            group y [2,2] {
+                group x [3,3] {
+                    group w omega {
+                        row n [1,1] {  }
+                        row o [1,1] {  }
+                        row p [1,1] {  }
+                        row q [1,1] {  }
+                    }
+                }
+            }
+        }
+        row r [1,1] {  }
+        row s [1,1] {  }
+        row t [1,1] {  }
+    }
+}
+
+
+
+table reachability1 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+    group {
+        row[1, 1] {}
+        row[1, -] {}
+        row[0, -] {}
+        row[10, 10] {}
+    }
+}
+
+table reachability2 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+      row[0, -] {   }
+      row[0, -] {   }
+      row[0, -] {   }
+      row[1, 1] {   }
+    }
+}
+table reachability3 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+      row a [1, 1] {   }
+      group {
+        group {
+          group {
+            group {
+              group [1,-] {
+                row b [1, 1] {   }
+              }
+            }
+          }
+        }
+      }
+      row c [1, -]   {}
+      row d [0, -]   {}
+      row e [10, 10] {}
+    }
+}
+
+table reachability4 {
+  var input i : BOOLEAN
+  var output o : BOOLEAN
+
+  group {
+    steps {}
+    group [0,-] {
+      steps {}
+      group[0,-] {
+        steps {}
+        group[0,-] {
+          steps {}
+          group[0,-] {
+            steps {}
+            group[0,-] {
+              steps {}
+            }
+          }
+        }
+      }
+    }
+    steps [1,-] {}
+    steps [0,-] {}
+    steps [10,10] {}
+  }
+}
+
+table reachability5 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+          row[1, -] {   }
+          group [1,-] { row{} }
+          row [10,10] {}
+    }
+}

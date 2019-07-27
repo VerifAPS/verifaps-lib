@@ -2,7 +2,6 @@ package edu.kit.iti.formal.automation.testtables.viz
 
 import com.github.jferard.fastods.*
 import com.github.jferard.fastods.datastyle.DataStyle
-import com.github.jferard.fastods.datastyle.DataStyles
 import com.github.jferard.fastods.datastyle.createFloatStyleBuilder
 import com.github.jferard.fastods.style.BorderAttribute
 import com.github.jferard.fastods.style.TableCellStyle
@@ -11,6 +10,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
+import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
@@ -22,6 +22,7 @@ import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import java.util.logging.Logger
+import kotlin.collections.ArrayList
 
 abstract class ODSWriter {
     protected val odsFactory = OdsFactory.create(Logger.getLogger(""), Locale.US)
@@ -36,131 +37,143 @@ abstract class ODSTestTableWriter(protected val gtt: GeneralizedTestTable) : ODS
 
 class ODSCounterExampleWriter constructor(
         private val counterExample: CounterExample,
-        gtt: GeneralizedTestTable,
-        private val mapping: Collection<Mapping>,
         var tableStyle: TableStyle = DefaultTableStyle)
-    : Runnable, ODSTestTableWriter(gtt) {
+    : Runnable, ODSWriter() {
     lateinit var currentTable: Table
+    private val mappings = ArrayList<Pair<GeneralizedTestTable, Mapping>>()
 
-    override fun run() = mapping.forEach { createTable(it) }
 
-    private fun createTable(m: Mapping) {
+    fun addTestTable(t: SMVConstructionModel, m: MutableList<Mapping>) {
+        m.forEach {
+            mappings.add(t.testTable to it)
+        }
+    }
+
+    override fun run() = mappings.forEach { (gtt, m) ->
         currentTable = document.addTable(getUniqueName())
-        writeHeader()
-        writeCounterExample(m)
+        val i = Impl(gtt, m)
+        i.writeHeader()
+        i.writeCounterExample()
     }
 
-    private fun writeHeader() {
-        writeCategories()
-        writeVariableColumns()
-    }
+    inner class Impl(val gtt: GeneralizedTestTable, val m: Mapping) {
+        protected val input = gtt.programVariables.filter { it.isInput }
+        protected val output = gtt.programVariables.filter { it.isOutput }
 
-    private fun writeCategories() {
-        val row = currentTable.nextRow()
-        val cell = row.walker
+        fun writeHeader() {
+            writeCategories()
+            writeVariableColumns()
+        }
 
-        cell.setStringValue("#")
-        cell.setStyle(tableStyle.styleRowIdHeader)
-        cell.next()
+        private fun writeCategories() {
+            val row = currentTable.nextRow()
+            val cell = row.walker
 
-        if (gtt.options.relational) {
-            //TODO
-            cell.setStringValue("PAUSE")
+            cell.setStringValue("#")
+            cell.setStyle(tableStyle.styleRowIdHeader)
+            cell.next()
+
+            if (gtt.options.relational) {
+                //TODO
+                cell.setStringValue("PAUSE")
+                cell.setStyle(tableStyle.styleCategoryHeader)
+                cell.setColumnsSpanned(gtt.maxProgramRun)
+                cell.next()
+            }
+
+            cell.setStringValue("INPUT")
             cell.setStyle(tableStyle.styleCategoryHeader)
-            cell.setColumnsSpanned(gtt.maxProgramRun)
+            cell.setColumnsSpanned(input.size)
+            cell.next()
+
+            cell.setStringValue("OUTPUT")
+            cell.setStyle(tableStyle.styleCategoryHeader)
+            cell.setColumnsSpanned(output.size)
             cell.next()
         }
 
-        cell.setStringValue("INPUT")
-        cell.setStyle(tableStyle.styleCategoryHeader)
-        cell.setColumnsSpanned(input.size)
-        cell.next()
+        private fun writeVariableColumns() {
+            val row = currentTable.nextRow()
+            val cell = row.walker
 
-        cell.setStringValue("OUTPUT")
-        cell.setStyle(tableStyle.styleCategoryHeader)
-        cell.setColumnsSpanned(output.size)
-        cell.next()
-    }
-
-    private fun writeVariableColumns() {
-        val row = currentTable.nextRow()
-        val cell = row.walker
-
-        cell.setStringValue("")
-        cell.next()
-
-        if (gtt.options.relational) {
-            gtt.programRuns.forEach {
-                cell.setStringValue(it)
-                cell.setStyle(tableStyle.stylePauseVariableHeader)
-                cell.next()
-            }
-        }
-
-
-        if (input.isEmpty()) {
             cell.setStringValue("")
             cell.next()
-        } else {
-            input.forEach {
+
+            if (gtt.options.relational) {
+                gtt.programRuns.forEach {
+                    cell.setStringValue(it)
+                    cell.setStyle(tableStyle.stylePauseVariableHeader)
+                    cell.next()
+                }
+            }
+
+
+            if (input.isEmpty()) {
+                cell.setStringValue("")
+                cell.next()
+            } else {
+                input.forEach {
+                    cell.setStringValue(it.name)
+                    cell.setStyle(tableStyle.styleInputVariableHeader)
+                    cell.next()
+                }
+            }
+            output.forEach {
                 cell.setStringValue(it.name)
-                cell.setStyle(tableStyle.styleInputVariableHeader)
-                cell.next()
-            }
-        }
-        output.forEach {
-            cell.setStringValue(it.name)
-            cell.setStyle(tableStyle.styleOutputVariableHeader)
-            cell.next()
-        }
-    }
-
-    fun writeCounterExample(map: Mapping) {
-        val rowIds = map.asRowList()
-        rowIds.forEachIndexed { index, rowId ->
-            writeLine(index, rowId)
-        }
-    }
-
-    private fun writeLine(index: Int, rowId: String) {
-        val row = currentTable.nextRow()
-        val cell = row.walker
-
-        val tableRow = gtt.getTableRow(rowId)
-
-        cell.setStringValue(tableRow?.id)
-        cell.setStyle(tableStyle.styleRowId)
-        cell.next()
-
-        if (gtt.options.relational) {
-            gtt.programRuns.forEach {
-                cell.setStringValue(it)
-                cell.setStyle(tableStyle.stylePauseVariableHeader)
+                cell.setStyle(tableStyle.styleOutputVariableHeader)
                 cell.next()
             }
         }
 
-        if (input.isEmpty()) {
-            cell.setStringValue("")
+        fun writeCounterExample() {
+            val rowIds = m.asRowList()
+            rowIds.forEachIndexed { index, rowId ->
+                writeLine(index, rowId)
+            }
+        }
+
+        private fun writeLine(index: Int, rowId: String) {
+            val row = currentTable.nextRow()
+            val cell = row.walker
+
+            val tableRow = gtt.getTableRow(rowId)
+
+            cell.setStringValue(tableRow?.id)
+            cell.setStyle(tableStyle.styleRowId)
             cell.next()
-        } else {
-            input.forEach {
-                //Fix input clashes
-                val v = counterExample[index, it.name]
-                cell.setStyle(tableStyle.styleInputValue)
-                cell.setStringValue(v)
+
+            if (gtt.options.relational) {
+                gtt.programRuns.forEach {
+                    cell.setStringValue(it)
+                    cell.setStyle(tableStyle.stylePauseVariableHeader)
+                    cell.next()
+                }
+            }
+
+            if (input.isEmpty()) {
+                cell.setStringValue("")
+                cell.next()
+            } else {
+                input.forEach {
+                    //Fix input clashes
+                    val v = counterExample[index, it.name]
+                    cell.setStyle(tableStyle.styleInputValue)
+                    cell.setStringValue(v)
+                    cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
+                    cell.next()
+                }
+            }
+            output.forEach {
+                val v = counterExample[index,
+                        it.externalVariable(gtt.programRuns,"_${gtt.name}").name]
+                cell.setStyle(tableStyle.styleOutputValue)
                 cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
+                cell.setStringValue(v)
                 cell.next()
             }
         }
-        output.forEach {
-            val v = counterExample[index, it.externalVariable(gtt.programRuns).name]
-            cell.setStyle(tableStyle.styleOutputValue)
-            cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
-            cell.setStringValue(v)
-            cell.next()
-        }
     }
+
 }
 
 open class TableUnwinder(private val gtt: GeneralizedTestTable,
@@ -174,7 +187,7 @@ open class TableUnwinder(private val gtt: GeneralizedTestTable,
 
     private fun unwind(tn: TableNode) =
             when (tn) {
-                is Region -> unwind(tn);
+                is Region -> unwind(tn)
                 is TableRow -> unwind(tn)
             }
 

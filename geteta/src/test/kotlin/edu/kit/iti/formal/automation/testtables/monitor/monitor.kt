@@ -10,12 +10,12 @@ import java.io.File
  * @author Alexander Weigl
  * @version 1 (14.07.19)
  */
-class MonitorTests {
+class MonitorTests  {
     @Test
     fun testSimple() {
         val file = File("examples/constantprogram/constantprogram.gtt")
         Assumptions.assumeTrue(file.exists())
-        val gtt = GetetaFacade.parseTableDSL(file)
+        val gtt = GetetaFacade.parseTableDSL(file).first()
         gtt.programRuns += ""
         gtt.generateSmvExpression()
         val automaton = GetetaFacade.constructTable(gtt).automaton

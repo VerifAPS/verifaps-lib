@@ -21,47 +21,33 @@
  * License along with this program.  If not, see
  * <http:></http:>//www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables.io
+package edu.kit.iti.formal.automation.testtables
 
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import org.junit.jupiter.api.Assertions
- import org.junit.jupiter.api.Test
-import javax.xml.bind.JAXBException
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 
 /**
  * @author Alexander Weigl
  * @version 1 (01.02.18)
  */
-class OmegaSimplifierTest {
-    @Test
-    @Throws(Exception::class)
-    fun run_omga_simplify1() {
-        val ignored = test("simplify1.xml")
-        Assertions.assertEquals("s05, s06, s07, s08", ignored)
+class OmegaSimplifierTest : TableTester() {
+    @ParameterizedTest(name = "{index} {0}")
+    @CsvSource("simplify1| e, f, g, h",
+            "simplify2 | f, g, h, i",
+            "simplify3 | r, s, t",
+            delimiter = '|')
+    fun run(tableName: String, exp: String) {
+        val ignored = test(tableName)
+        Assertions.assertEquals(exp, ignored)
     }
 
-
-    @Throws(JAXBException::class)
-    private fun test(filename: String): String {
-        val gtt = GetetaFacade.parseTableXML("src/test/resources/omega/$filename")
+    private fun test(tableName: String): String {
+        val gtt = getTable(tableName)
         val os = OmegaSimplifier(gtt)
         os.run()
         return os.ignored.joinToString { it.id }
     }
-
-    @Test
-    @Throws(Exception::class)
-    fun run_omga_simplify2() {
-        val ignored = test("simplify2.xml")
-        Assertions.assertEquals("s06, s07, s08, s09", ignored)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun run_omga_simplify3() {
-        val ignored = test("simplify3.xml")
-        Assertions.assertEquals("s22, s23, s24", ignored)
-    }
-
 }

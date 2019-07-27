@@ -28,7 +28,8 @@ import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
+import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
+import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
@@ -36,6 +37,7 @@ import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.util.findProgram
 import java.io.File
+import kotlin.system.exitProcess
 
 object Geteta {
     @JvmStatic
@@ -55,7 +57,7 @@ class GetetaApp : CliktCommand(
 
     val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
             .file(exists = true, readable = true)
-            .required()
+            .multiple(required = true)
 
     val outputFolder by option("-o", "--output", help = "Output directory")
 
@@ -84,26 +86,28 @@ class GetetaApp : CliktCommand(
 
     override fun run() {
         Console.configureLoggingConsole()
-        Console.info("Use table file ${table.absolutePath}")
-        var gtt = GetetaFacade.readTable(table.absoluteFile)
 
-        Console.info("Apply omega simplification")
-        val os = OmegaSimplifier(gtt); os.run()
-        if (!os.ignored.isEmpty()) {
-            gtt = os.product
-            Console.warn("I ignore following rows: %s, because they are behind an \\omega duration.%n", os.ignored)
-        } else Console.info("No rows unreachable!")
-
+        val gtts = table.flatMap {
+            Console.info("Use table file ${it.absolutePath}")
+            GetetaFacade.readTable(it)
+        }.map {
+            it.ensureProgramRuns()
+            it.generateSmvExpression()
+            it.simplify()
+        }
 
         //
         Console.info("Parse program ${program.absolutePath} with libraries ${library}")
         val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0]
                 ?: throw IllegalStateException("No program given in $program")
 
+        // override mode
         if (mode != null)
-            gtt.options.mode = mode!!
+            gtts.forEach { it.options.mode = mode!! }
 
-        Console.info("Mode is ${gtt.options.mode}")
+        gtts.forEach {
+            Console.info("Mode is ${it.options.mode} for table ${it.name}")
+        }
 
         val modCode = SymbExFacade.evaluateProgram(code, disableSimplify)
         Console.info("Program evaluation")
@@ -111,43 +115,52 @@ class GetetaApp : CliktCommand(
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
         Console.info("Super enum built")
 
-        val tt = GetetaFacade.constructSMV(gtt, superEnumType)
+        val tt = gtts.map { gtt -> GetetaFacade.constructSMV(gtt, superEnumType) }
         Console.info("SMV for table constructed")
 
         if (drawAutomaton) {
             Console.info("Automaton drawing requested. This may took a while.")
-            val ad = AutomatonDrawer(File(outputFolder, "${this.table.name}.dot"),
-                    gtt, tt.automaton)
-            ad.runDot = true
-            ad.show = showAutomaton
-            ad.run()
-            if (showAutomaton)
-                Console.info("Image viewer should open")
+            gtts.zip(tt).forEach { (gtt, tt) ->
+                val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
+                        gtt, tt.automaton)
+                ad.runDot = true
+                ad.show = showAutomaton
+                ad.run()
+                if (showAutomaton)
+                    Console.info("Image viewer should open now")
+            }
         } else {
             Console.info("For drawing the automaton use: `--draw-automaton'.")
         }
 
         Console.info("Constructing final SMV file.")
-        val modTable = tt.tableModule
-        val mainModule = GetetaFacade.glue(modTable,
-                tt.ttType!!, listOf(modCode), gtt.programRuns, gtt.options)
+        val modTable = tt.map { it.tableModule }
+        val mainModule = MultiModelGluer().apply {
+            val pn = gtts.first().programRuns.first() // only one run in geteta
+            addProgramRun(pn, modCode)
+            tt.forEach {
+                addTable("_" + it.testTable.name, it.ttType!!)
+            }
+        }
+        val modules = arrayListOf(mainModule.product, modCode)
+        modules.addAll(modTable)
+        tt.forEach { modules.addAll(it.helperModules) }
 
-        val modules = arrayListOf(mainModule, modTable, modCode)
-        modules.addAll(tt.helperModules)
-
-        val folder = File(this.table.parent, this.table.nameWithoutExtension).absolutePath
-        Console.info("Run nuXmv: $nuxmv in $folder using ${gtt.options.verificationTechnique}")
+        val folder = File(this.table.first().parent,
+                this.table.first().nameWithoutExtension).absolutePath
+        val verificationTechnique = gtts.first().options.verificationTechnique
+        Console.info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
         val nuxmv = findProgram(nuxmv)
         if (nuxmv == null) {
             Console.error("Could not find ${this.nuxmv}.")
-            System.exit(1)
+            exitProcess(1)
             return
         }
         val b = GetetaFacade.runNuXMV(
                 nuxmv.absolutePath,
                 folder,
                 modules,
-                gtt.options.verificationTechnique)
+                verificationTechnique)
 
         val status =
                 when (b) {
@@ -162,31 +175,44 @@ class GetetaApp : CliktCommand(
                     else -> 0
                 }
 
+        runCexAnalysation(b, tt)
+        Console.info("STATUS: $status")
+        exitProcess(errorLevel)
+    }
 
-
-        if (b is NuXMVOutput.NotVerified) {
+    private fun runCexAnalysation(result: NuXMVOutput, tt: List<SMVConstructionModel>) {
+        if (result is NuXMVOutput.NotVerified) {
             if (runAnalyzer) {
-                val mappings = GetetaFacade.analyzeCounterExample(
-                        tt.automaton, gtt, b.counterExample)
-                mappings.forEachIndexed { i, m ->
-                    Console.info("%3d: %s", 0, m.asRowList())
+                val mappings = tt.map {
+                    GetetaFacade.analyzeCounterExample(
+                            it.automaton, it.testTable, result.counterExample)
                 }
-                if (mappings.isEmpty()) {
-                    Console.warn("no row mapping found!")
-                } else if (odsExport != null) {
-                    val w = ODSCounterExampleWriter(b.counterExample, gtt, mappings)
-                    w.run()
-                    w.writer.saveAs(odsExport)
-                    FastOds.openFile(odsExport)
-                } else {
-                    Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
+
+                mappings.forEach { mapping ->
+                    Console.info("MAPPING: ==========")
+                    mapping.forEachIndexed { i, m ->
+                        Console.info("%3d: %s", i, m.asRowList())
+                    }
+                    Console.info("/End of MAPPING")
+                }
+
+                when {
+                    mappings.isEmpty() -> Console.warn("no row mapping found!")
+                    odsExport != null -> {
+                        val w = ODSCounterExampleWriter(result.counterExample)
+                        tt.zip(mappings).forEach { (t, m) ->
+                            w.addTestTable(t, m)
+                        }
+                        w.run()
+                        w.writer.saveAs(odsExport)
+                        FastOds.openFile(odsExport)
+                    }
+                    else -> Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
                 }
             } else {
                 Console.info("Use `----row-map' to print possible row mappings.")
             }
         }
-        Console.info("STATUS: $status")
-        System.exit(errorLevel)
     }
 }
 

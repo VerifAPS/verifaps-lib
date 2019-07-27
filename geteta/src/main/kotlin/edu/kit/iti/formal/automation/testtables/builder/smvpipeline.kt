@@ -204,12 +204,13 @@ class ModuleParameterTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.testTable.programVariables.forEach {
             model.tableModule.moduleParameters.add(
-                    model.variableContext.getSMVVariable(it))
+                    it.internalVariable(model.variableContext.programRuns))
         }
 
         model.ttType = ModuleType(model.tableModule.name,
                 model.testTable.programVariables.map {
-                    val a = it.externalVariable(model.variableContext.programRuns)
+                    val a = it.externalVariable(model.variableContext.programRuns,
+                            "_${model.testTable.name}")
                     if (it.isOutput) a.inNext() else a
                 }
         )

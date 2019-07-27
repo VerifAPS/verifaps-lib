@@ -41,7 +41,6 @@ package edu.kit.iti.formal.automation.testtables.viz
  * #L%
  */
 
-import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.builder.stateNameSentinel
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
@@ -57,8 +56,8 @@ data class Mapping(private val state2Row: MutableList<Pair<Int, String>> = array
 
     fun asRowList() = state2Row.sortedBy { it.first }.map { it.second }
     fun connect(state: Int, row: String) = state2Row.add(state to row)
-    fun row(state: Int) = state2Row.find { (s, r) -> state == s }?.second
-    fun state(row: String) = state2Row.find { (s, r) -> row == r }?.first
+    fun row(state: Int) = state2Row.find { (s, _) -> state == s }?.second
+    fun state(row: String) = state2Row.find { (_, r) -> row == r }?.first
 }
 
 
@@ -94,7 +93,8 @@ private data class SearchNode(
 class CounterExampleAnalyzer(
         val automaton: TestTableAutomaton,
         val testTable: GeneralizedTestTable,
-        val counterExample: CounterExample) {
+        val counterExample: CounterExample,
+        val tableModuleName: String) {
 
     private val tableRows = testTable.region.flat()
     val rowMapping: MutableList<Mapping> = arrayListOf()
@@ -108,7 +108,7 @@ class CounterExampleAnalyzer(
 
         while (!queue.isEmpty()) {
             val cur = queue.remove()
-            val (cycle, row, duration) = cur
+            val (cycle, row, _) = cur
 
             // only consider rows.
             if (row is SpecialState) {
@@ -153,7 +153,7 @@ class CounterExampleAnalyzer(
     }
 
     private fun getValue(time: Int, variable: String): String? {
-        val _var = BinaryModelGluer.TABLE_MODULE + "." + variable
-        return counterExample[time, _var]
+        val v = tableModuleName + "." + variable
+        return counterExample[time, v]
     }
 }

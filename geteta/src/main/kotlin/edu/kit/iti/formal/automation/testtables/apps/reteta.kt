@@ -10,7 +10,9 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
+import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
 import edu.kit.iti.formal.smv.ast.SMVModule
 import java.io.File
@@ -32,11 +34,11 @@ class Reteta : CliktCommand(
             .flag(default = false)
 
     val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
-            .convert { File(it) }
-            .required()
+            .file()
+            .multiple(required = true)
 
     val outputFolder by option("-o", "--output", help = "Output directory")
-            .defaultLazy { table.nameWithoutExtension }
+            .defaultLazy { table.first().nameWithoutExtension }
 
     val library by option("-L", "--lib", help = "program files")
             .convert { File(it) }
@@ -55,7 +57,7 @@ class Reteta : CliktCommand(
 
 
     override fun run() {
-        if (!table.exists() || programs.isEmpty()) {
+        if (table.isEmpty() || programs.isEmpty()) {
             Console.fatal("No code or table file given.")
             System.exit(1)
         }
@@ -66,46 +68,49 @@ class Reteta : CliktCommand(
         val superEnumType = GetetaFacade.createSuperEnum(programs.map { it.scope })
 
         val programRunNames = programs.mapIndexed { index, it ->
-            "${it!!.name.toLowerCase()}$$index"
+            "${it.name.toLowerCase()}$$index"
         }
 
         //read table
-        var table = GetetaFacade.parseTableDSL(table)
-        table.programRuns = programRunNames
-        val os = OmegaSimplifier(table)
-        os.run()
-        if (!os.ignored.isEmpty()) {
-            table = os.product
-            System.out.printf("I ignore following rows: %s, because they are behind an \\omega duration.%n",
-                    os.ignored)
+        val gtts = table.flatMap { GetetaFacade.readTable(it) }.map {
+            it.ensureProgramRuns()
+            it.generateSmvExpression()
+            it.simplify()
         }
 
+        gtts.forEach { table ->
+            table.programRuns = programRunNames
 
-        val rttPipeline = RTTCodeAugmentation()
-        val augmentedPrograms = programs.map {
-            val s = rttPipeline.transform(TransformationState(it))
-            SymbExFacade.evaluateProgram(ProgramDeclaration(scope = s.scope, stBody = s.stBody),
-                    disableSimplify)
+            val rttPipeline = RTTCodeAugmentation()
+            val augmentedPrograms = programs.map {
+                val s = rttPipeline.transform(TransformationState(it))
+                SymbExFacade.evaluateProgram(ProgramDeclaration(scope = s.scope, stBody = s.stBody),
+                        disableSimplify)
+            }
+
+            if (!table.options.relational) {
+                throw IllegalStateException()
+            }
+
+            val tt = GetetaFacade.constructSMV(table, superEnumType)
+            val modTable = tt.tableModule
+            val mainModule = MultiModelGluer().apply {
+                programRunNames.zip(augmentedPrograms).forEach { (n, p) ->
+                    addProgramRun(n, p)
+                }
+                addTable("_${table.name}", tt.ttType!!)
+            }
+
+            val modules = LinkedList<SMVModule>()
+            modules.add(mainModule.product)
+            modules.add(modTable)
+            modules.addAll(augmentedPrograms)
+            modules.addAll(tt.helperModules)
+            val b = GetetaFacade.runNuXMV(
+                    nuxmv.absolutePath,
+                    this.table.first().nameWithoutExtension, modules,
+                    table.options.verificationTechnique)
         }
-
-        if (!table.options.relational) {
-            throw IllegalStateException()
-        }
-
-        val tt = GetetaFacade.constructSMV(table, superEnumType)
-        val modTable = tt.tableModule
-        val mainModule = GetetaFacade.glue(modTable, tt.ttType!!,
-                augmentedPrograms, programRunNames, table.options)
-
-        val modules = LinkedList<SMVModule>()
-        modules.add(mainModule)
-        modules.add(modTable)
-        modules.addAll(augmentedPrograms)
-        modules.addAll(tt.helperModules)
-        val b = GetetaFacade.runNuXMV(
-                nuxmv.absolutePath,
-                this.table.nameWithoutExtension, modules,
-                table.options.verificationTechnique)
     }
 
     fun readPrograms(): List<PouExecutable> {
@@ -120,5 +125,17 @@ class Reteta : CliktCommand(
             a
         }
     }
+}
+
+internal fun GeneralizedTestTable.simplify(): GeneralizedTestTable {
+    Console.info("Apply omega simplification")
+    val os = OmegaSimplifier(this)
+    os.run()
+    if (!os.ignored.isEmpty()) {
+        Console.warn("I ignore following rows: %s, because they are behind an \\omega duration.%n", os.ignored)
+        return os.product
+    }
+    Console.info("No rows unreachable!")
+    return this
 }
 

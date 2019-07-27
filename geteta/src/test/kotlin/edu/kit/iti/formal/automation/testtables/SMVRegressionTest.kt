@@ -21,52 +21,31 @@
  * License along with this program.  If not, see
  * <http:></http:>//www.gnu.org/licenses/gpl-3.0.html>.
  */
-package edu.kit.iti.formal.automation.testtables.io
+package edu.kit.iti.formal.automation.testtables
 
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
 import org.junit.jupiter.api.Assertions
- import org.junit.jupiter.api.Test
-
-import javax.xml.bind.JAXBException
-import java.io.IOException
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.io.File
 
 /**
  * @author Alexander Weigl
  * @version 1 (02.02.18)
  */
-class SMVModuleBuilderTest {
-    @Test
-    @Throws(JAXBException::class, IOException::class)
-    fun testDetWait1() {
-        test("src/test/resources/detwait/detwait1.xml",
-                "src/test/resources/detwait/detwait1.smv")
+object SMVRegressionTest : TableTester() {
+    @JvmStatic
+    fun getSmvFile(): List<Arguments> {
+        return File("src/test/resources/smvregressiontest").listFiles().map {
+            Arguments.of(it.name.replace(".smv", ""), it.toString())
+        }
     }
 
-    @Test
-    @Throws(JAXBException::class, IOException::class)
-    fun testDetWait2() {
-        test("src/test/resources/detwait/detwait2.xml",
-                "src/test/resources/detwait/detwait2.smv")
-    }
-
-    @Test
-    fun testDetWait3() {
-        test("src/test/resources/detwait/detwait3.xml",
-                "src/test/resources/detwait/detwait3.smv")
-    }
-
-
-    @Test
-    fun testOmega1() {
-        test("src/test/resources/omega/simplify1.xml",
-                "src/test/resources/omega/simplify1.smv")
-    }
-
-
+    @ParameterizedTest
+    @MethodSource("getSmvFile")
     fun test(table: String, expectedSMVFile: String) {
-        val gtt = GetetaFacade.parseTableXML(table)
+        val gtt = getTable(table)
         val expected = java.io.File(expectedSMVFile).readText()
         val enumType = GetetaFacade.createSuperEnum(listOf(Scope()))
         val tt = GetetaFacade.constructSMV(gtt, enumType)

@@ -6,17 +6,17 @@ import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
-import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
 import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.io.*
+import edu.kit.iti.formal.automation.testtables.io.TblLanguageToSmv
+import edu.kit.iti.formal.automation.testtables.io.TestTableLanguageBuilder
+import edu.kit.iti.formal.automation.testtables.io.TimeParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import edu.kit.iti.formal.automation.testtables.viz.CounterExampleAnalyzer
 import edu.kit.iti.formal.automation.testtables.viz.Mapping
@@ -31,18 +31,8 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import javax.xml.bind.JAXBException
 
 object GetetaFacade {
-    @JvmStatic
-    @Throws(JAXBException::class)
-    fun parseTableXML(filename: String): GeneralizedTestTable {
-        val tr = TableReader(File(filename))
-        tr.run()
-        return tr.product
-    }
-
-
     fun createParser(input: CharStream): TestTableLanguageParser {
         val lexer = TestTableLanguageLexer(input)
         val parser = TestTableLanguageParser(CommonTokenStream(lexer))
@@ -59,7 +49,7 @@ object GetetaFacade {
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
     fun parseCell(cell: String, enableRelational: Boolean = true): TestTableLanguageParser.CellContext =
-            createParser(cell).also { it.relational = true }.cell()!!
+            createParser(cell).also { it.relational = enableRelational }.cell()!!
 
     fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational),
             column, programRun, vars)
@@ -81,7 +71,7 @@ object GetetaFacade {
     }
 
     @Deprecated("use external/internalVariable")
-    fun asSMVVariable(column: edu.kit.iti.formal.automation.testtables.model.Variable): SVariable {
+    fun asSMVVariable(column: Variable): SVariable {
         return SVariable(column.name, getSMVDataType(column.dataType))
     }
 
@@ -98,16 +88,16 @@ object GetetaFacade {
     fun parseTableDSL(input: File) = parseTableDSL(CharStreams.fromFileName(input.absolutePath))
 
     @JvmStatic
-    fun parseTableDSL(input: CharStream): GeneralizedTestTable {
+    fun parseTableDSL(input: CharStream): List<GeneralizedTestTable> {
         val parser = createParser(input)
         return parseTableDSL(parser.file())
     }
 
     @JvmStatic
-    fun parseTableDSL(ctx:TestTableLanguageParser.FileContext): GeneralizedTestTable {
+    fun parseTableDSL(ctx: TestTableLanguageParser.FileContext): List<GeneralizedTestTable> {
         val ttlb = TestTableLanguageBuilder()
         ctx.accept(ttlb)
-        return ttlb.testTables[0]
+        return ttlb.testTables
     }
 
     fun exprsToSMV(vc: ParseContext,
@@ -119,14 +109,6 @@ object GetetaFacade {
     fun delay(ref: SReference): DelayModuleBuilder {
         return DelayModuleBuilder(ref.variable,
                 ref.cycles)
-    }
-
-
-    fun glue(modTable: SMVModule, tableType: SMVType,
-             modCode: List<SMVModule>, programRunNames: List<String>, options: TableOptions): SMVModule {
-        val mg = BinaryModelGluer(options, modTable, tableType, modCode, programRunNames)
-        mg.run()
-        return mg.product
     }
 
     /*
@@ -197,27 +179,22 @@ object GetetaFacade {
         return s.toString()
     }
 
-    /**
-     * Read XML or DSL format.
-     */
-    fun readTable(file: File): GeneralizedTestTable {
-        return if (file.name.endsWith("xml"))
-            parseTableXML(file.absolutePath)
-        else
-            parseTableDSL(file)
+    fun readTable(file: File): List<GeneralizedTestTable> {
+        return parseTableDSL(file)
     }
 
     fun constructTable(table: GeneralizedTestTable) =
             AutomatonBuilderPipeline(table).transform()
 
     fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) =
-            SmvConstructionPipeline(constructTable(table), superEnum).transform()
+            constructSMV(constructTable(table), superEnum)
 
     fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
             SmvConstructionPipeline(automaton, superEnum).transform()
 
     fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
-        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample)
+        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample,
+                "_${testTable.name}")
         analyzer.run()
         return analyzer.rowMapping
     }

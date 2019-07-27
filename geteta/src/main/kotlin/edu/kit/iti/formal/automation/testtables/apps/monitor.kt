@@ -39,14 +39,13 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .default(CodeOutput.CPP)
 
     override fun run() {
-        val gtts = table.map {
-            GetetaFacade.readTable(it).also {
-                it.ensureProgramRuns()
-                it.generateSmvExpression()
-            }
+        val gtts = table.flatMap { GetetaFacade.readTable(it) }.map {
+            it.ensureProgramRuns()
+            it.generateSmvExpression()
+            it
         }
-        val pairs
-                = gtts.map { it to GetetaFacade.constructTable(it).automaton }
+
+        val pairs = gtts.map { it to GetetaFacade.constructTable(it).automaton }
 
         val output =
                 if (table.size == 1) {

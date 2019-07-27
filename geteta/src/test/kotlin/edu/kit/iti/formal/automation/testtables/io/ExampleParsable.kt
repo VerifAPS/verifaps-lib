@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -13,7 +14,8 @@ object ExampleParsable {
     @ParameterizedTest
     @MethodSource("findExamples")
     fun test(file : File): Unit {
-        GetetaFacade.parseTableDSL(file)
+        val p = GetetaFacade.createParser(CharStreams.fromFileName(file.absolutePath))
+        p.errorReporter.throwException()
     }
 
     @JvmStatic

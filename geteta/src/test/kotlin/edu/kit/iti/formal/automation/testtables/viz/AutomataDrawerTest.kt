@@ -19,7 +19,7 @@ class AutomataDrawerTest {
 
 
     private fun renderAndShow(file: String) {
-        val tt = GetetaFacade.readTable(File(file))
+        val tt = GetetaFacade.readTable(File(file)).first()
         val pip = AutomatonBuilderPipeline(tt)
         val auto = pip.transform()
         val ad = AutomatonDrawer(File("tmp.dot"), tt, auto.automaton)
