@@ -190,7 +190,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
             val gtt =  GetetaFacade.parseTableDSL(ctx)
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
-            previewService.render(gtt)
+            previewService.render(gtt.first())//TODO
             outlineService.show(node)
             problemList.set(textArea, listOf())
         } catch (e: SyntaxErrorReporter.ParserException) {

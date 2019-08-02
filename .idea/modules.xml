@@ -2,20 +2,23 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/absintsfc/absintsfc.iml" filepath="$PROJECT_DIR$/.idea/modules/absintsfc/absintsfc.iml" group="verifaps/absintsfc" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/aps-rvt.iml" group="verifaps/aps-rvt" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/absintsfc/edu.kit.iti.formal.automation.verifaps.absintsfc.iml" filepath="$PROJECT_DIR$/.idea/modules/absintsfc/edu.kit.iti.formal.automation.verifaps.absintsfc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/aps-rvt/edu.kit.iti.formal.automation.verifaps.aps-rvt.iml" filepath="$PROJECT_DIR$/.idea/modules/aps-rvt/edu.kit.iti.formal.automation.verifaps.aps-rvt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/edu.kit.iti.formal.automation.verifaps.flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/edu.kit.iti.formal.automation.verifaps.flycheck.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/edu.kit.iti.formal.automation.verifaps.geteta.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/edu.kit.iti.formal.automation.verifaps.geteta.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ide/edu.kit.iti.formal.automation.verifaps.ide.iml" filepath="$PROJECT_DIR$/.idea/modules/ide/edu.kit.iti.formal.automation.verifaps.ide.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lang/edu.kit.iti.formal.automation.verifaps.lang.iml" filepath="$PROJECT_DIR$/.idea/modules/lang/edu.kit.iti.formal.automation.verifaps.lang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/modularization/edu.kit.iti.formal.automation.verifaps.modularization.iml" filepath="$PROJECT_DIR$/.idea/modules/modularization/edu.kit.iti.formal.automation.verifaps.modularization.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/run/edu.kit.iti.formal.automation.verifaps.run.iml" filepath="$PROJECT_DIR$/.idea/modules/run/edu.kit.iti.formal.automation.verifaps.run.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smt/edu.kit.iti.formal.automation.verifaps.smt.iml" filepath="$PROJECT_DIR$/.idea/modules/smt/edu.kit.iti.formal.automation.verifaps.smt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv/edu.kit.iti.formal.automation.verifaps.smv.iml" filepath="$PROJECT_DIR$/.idea/modules/smv/edu.kit.iti.formal.automation.verifaps.smv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/symbex/edu.kit.iti.formal.automation.verifaps.symbex.iml" filepath="$PROJECT_DIR$/.idea/modules/symbex/edu.kit.iti.formal.automation.verifaps.symbex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/edu.kit.iti.formal.automation.verifaps.util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/edu.kit.iti.formal.automation.verifaps.util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/utils-test/edu.kit.iti.formal.automation.verifaps.utils-test.iml" filepath="$PROJECT_DIR$/.idea/modules/utils-test/edu.kit.iti.formal.automation.verifaps.utils-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xml/edu.kit.iti.formal.automation.verifaps.xml.iml" filepath="$PROJECT_DIR$/.idea/modules/xml/edu.kit.iti.formal.automation.verifaps.xml.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" filepath="$PROJECT_DIR$/.idea/modules/flycheck/flycheck.iml" group="verifaps/flycheck" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" filepath="$PROJECT_DIR$/.idea/modules/geteta/geteta.iml" group="verifaps/geteta" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ide/ide.iml" filepath="$PROJECT_DIR$/.idea/modules/ide/ide.iml" group="verifaps/ide" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lang/lang.iml" filepath="$PROJECT_DIR$/.idea/modules/lang/lang.iml" group="verifaps/lang" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/modularization/modularization.iml" filepath="$PROJECT_DIR$/.idea/modules/modularization/modularization.iml" group="verifaps/modularization" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/run/run.iml" filepath="$PROJECT_DIR$/.idea/modules/run/run.iml" group="verifaps/run" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smt/smt.iml" filepath="$PROJECT_DIR$/.idea/modules/smt/smt.iml" group="verifaps/smt" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/smv/smv.iml" filepath="$PROJECT_DIR$/.idea/modules/smv/smv.iml" group="verifaps/smv" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/symbex/symbex.iml" filepath="$PROJECT_DIR$/.idea/modules/symbex/symbex.iml" group="verifaps/symbex" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/util/util.iml" filepath="$PROJECT_DIR$/.idea/modules/util/util.iml" group="verifaps/util" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/utils-test/utils-test.iml" filepath="$PROJECT_DIR$/.idea/modules/utils-test/utils-test.iml" group="verifaps/utils-test" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/verifaps.iml" filepath="$PROJECT_DIR$/.idea/modules/verifaps.iml" group="verifaps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/verifaps.iml" filepath="$PROJECT_DIR$/.idea/modules/verifaps.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.iml" filepath="$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.main.iml" filepath="$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.test.iml" filepath="$PROJECT_DIR$/.idea/modules/absintsfc/verifaps.absintsfc.test.iml" />
@@ -58,7 +61,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.iml" filepath="$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.main.iml" filepath="$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.test.iml" filepath="$PROJECT_DIR$/.idea/modules/xml/verifaps.xml.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xml/xml.iml" filepath="$PROJECT_DIR$/.idea/modules/xml/xml.iml" group="verifaps/xml" />
     </modules>
   </component>
 </project>
