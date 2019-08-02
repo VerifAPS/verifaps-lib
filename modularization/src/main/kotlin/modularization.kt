@@ -111,7 +111,7 @@ class NuXmvTask(val smvFile: File, val logFile: File, name: String = "") : PredT
         return when (result) {
             NuXMVOutput.Verified -> true
             is NuXMVOutput.Error -> throw IllegalStateException("Error in SMV file: $smvFile")
-            is NuXMVOutput.NotVerified -> false
+            is NuXMVOutput.Cex -> false
         }
     }
 

@@ -176,7 +176,7 @@ data class CounterExample(
 sealed class NuXMVOutput {
     object Verified : NuXMVOutput()
     class Error(val errors: List<String> = arrayListOf()) : NuXMVOutput()
-    class NotVerified(val counterExample: CounterExample) : NuXMVOutput()
+    class Cex(val counterExample: CounterExample) : NuXMVOutput()
 }
 
 /**
@@ -205,7 +205,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
         val closing = lines.lastIndexOf("</counter-example>")
         val xml = lines.slice(idxCex..closing)
                 .joinToString("\n")
-        return NuXMVOutput.NotVerified(CounterExample.load(xml))
+        return NuXMVOutput.Cex(CounterExample.load(xml))
     }
     return NuXMVOutput.Verified
 }

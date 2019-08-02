@@ -185,7 +185,7 @@ class RvtApsPipeline(val oldModule: PouExecutable,
         when (nuxmvResult!!) {
             is NuXMVOutput.Verified ->
                 Console.info("verified")
-            is NuXMVOutput.NotVerified ->
+            is NuXMVOutput.Cex ->
                 Console.info("not verified, counterexample available in log file")
             is NuXMVOutput.Error ->
                 Console.error("Error occured in nuXmv. Please refer to log file for more information.")

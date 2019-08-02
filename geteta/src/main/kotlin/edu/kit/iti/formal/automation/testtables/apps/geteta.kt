@@ -166,7 +166,7 @@ class GetetaApp : CliktCommand(
                 when (b) {
                     NuXMVOutput.Verified -> "verified"
                     is NuXMVOutput.Error -> "error"
-                    is NuXMVOutput.NotVerified -> "not-verified"
+                    is NuXMVOutput.Cex -> "not-verified"
                 }
 
         val errorLevel =
@@ -181,7 +181,7 @@ class GetetaApp : CliktCommand(
     }
 
     private fun runCexAnalysation(result: NuXMVOutput, tt: List<SMVConstructionModel>) {
-        if (result is NuXMVOutput.NotVerified) {
+        if (result is NuXMVOutput.Cex) {
             if (runAnalyzer) {
                 val mappings = tt.map {
                     GetetaFacade.analyzeCounterExample(
@@ -191,7 +191,7 @@ class GetetaApp : CliktCommand(
                 mappings.forEach { mapping ->
                     Console.info("MAPPING: ==========")
                     mapping.forEachIndexed { i, m ->
-                        Console.info("%3d: %s", i, m.asRowList())
+                        Console.info("{}: {}", i, m.asRowList())
                     }
                     Console.info("/End of MAPPING")
                 }
@@ -210,7 +210,7 @@ class GetetaApp : CliktCommand(
                     else -> Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
                 }
             } else {
-                Console.info("Use `----row-map' to print possible row mappings.")
+                Console.info("Use `--row-map' to print possible row mappings.")
             }
         }
     }
