@@ -159,25 +159,25 @@ table reachability4 {
   var output o : BOOLEAN
 
   group {
-    steps {}
+    row { }
     group [0,-] {
-      steps {}
+      row {}
       group[0,-] {
-        steps {}
+        row {}
         group[0,-] {
-          steps {}
+          row {}
           group[0,-] {
-            steps {}
+            row {}
             group[0,-] {
-              steps {}
+              row {}
             }
           }
         }
       }
     }
-    steps [1,-] {}
-    steps [0,-] {}
-    steps [10,10] {}
+    row [1,-] {}
+    row [0,-] {}
+    row [10,10] {}
   }
 }
 
@@ -189,5 +189,17 @@ table reachability5 {
           row[1, -] {   }
           group [1,-] { row{} }
           row [10,10] {}
+    }
+}
+
+
+table reachability6 {
+    var input i : BOOLEAN
+    var output o : BOOLEAN
+
+    group {
+          row a >= 0 {   }
+          row b >= 0 {   }
+          row c [1, 1] { }
     }
 }

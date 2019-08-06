@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.ide.tools.OverviewStructureNode
 import edu.kit.iti.formal.automation.ide.tools.StructureData
 import edu.kit.iti.formal.automation.ide.tools.StructureTypeIcon
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
+import edu.kit.iti.formal.automation.parser.IEC61131Lexer.*
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
@@ -44,84 +45,95 @@ class IECLanguageSupport(lookup: Lookup) : BaseLanguageSupport() {
 class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
     val colors: Colors by lookup.with()
     private val STRUCTURAL_KEYWORDS = setOf(
-            IEC61131Lexer.PROGRAM,
-            IEC61131Lexer.INITIAL_STEP,
-            IEC61131Lexer.TRANSITION,
-            IEC61131Lexer.END_TRANSITION,
-            IEC61131Lexer.END_VAR,
-            IEC61131Lexer.VAR,
-            IEC61131Lexer.VAR_ACCESS,
-            IEC61131Lexer.VAR_CONFIG,
-            IEC61131Lexer.VAR_EXTERNAL,
-            IEC61131Lexer.VAR_GLOBAL,
-            IEC61131Lexer.VAR_INPUT,
-            IEC61131Lexer.VAR_IN_OUT,
-            IEC61131Lexer.VAR_OUTPUT,
-            IEC61131Lexer.VAR_TEMP,
-            IEC61131Lexer.END_PROGRAM,
-            IEC61131Lexer.END_ACTION,
-            IEC61131Lexer.END_CASE,
-            IEC61131Lexer.END_CLASS,
-            IEC61131Lexer.END_CONFIGURATION,
-            IEC61131Lexer.END_FUNCTION_BLOCK,
-            IEC61131Lexer.FUNCTION_BLOCK,
-            FUNCTION,
-            IEC61131Lexer.END_FUNCTION,
-            IEC61131Lexer.END_INTERFACE,
-            IEC61131Lexer.END_METHOD,
-            IEC61131Lexer.INTERFACE,
-            IEC61131Lexer.METHOD,
-            IEC61131Lexer.END_NAMESPACE,
-            IEC61131Lexer.NAMESPACE,
-            IEC61131Lexer.END_STEP,
-            IEC61131Lexer.STEP,
-            IEC61131Lexer.STRUCT, IEC61131Lexer.END_STRUCT,
-            IEC61131Lexer.CONFIGURATION, IEC61131Lexer.END_CONFIGURATION,
-            IEC61131Lexer.ACTION, IEC61131Lexer.END_ACTION)
+            PROGRAM,
+            INITIAL_STEP,
+            TRANSITION,
+            END_TRANSITION,
+            END_VAR,
+            VAR,
+            VAR_ACCESS,
+            VAR_CONFIG,
+            VAR_EXTERNAL,
+            VAR_GLOBAL,
+            VAR_INPUT,
+            VAR_IN_OUT,
+            VAR_OUTPUT,
+            VAR_TEMP,
+            END_PROGRAM,
+            END_ACTION,
+            END_CASE,
+            END_CLASS,
+            END_CONFIGURATION,
+            END_FUNCTION_BLOCK,
+            FUNCTION_BLOCK,
+            IEC61131Lexer.FUNCTION,
+            END_FUNCTION,
+            END_INTERFACE,
+            END_METHOD,
+            INTERFACE,
+            METHOD,
+            END_NAMESPACE,
+            NAMESPACE,
+            END_STEP,
+            STEP,
+            STRUCT, END_STRUCT,
+            CONFIGURATION, END_CONFIGURATION,
+            ACTION, END_ACTION)
 
     private val DATATYPE_KEYWORD = setOf(
-            IEC61131Lexer.ANY_BIT,
-            IEC61131Lexer.ARRAY,
-            IEC61131Lexer.STRING,
-            IEC61131Lexer.WSTRING,
-            IEC61131Lexer.ANY_DATE,
-            IEC61131Lexer.ANY_INT,
-            IEC61131Lexer.ANY_NUM,
-            IEC61131Lexer.ANY_REAL,
-            IEC61131Lexer.REAL,
-            IEC61131Lexer.LREAL,
-            IEC61131Lexer.INT,
-            IEC61131Lexer.DINT,
-            IEC61131Lexer.UDINT,
-            IEC61131Lexer.SINT,
-            IEC61131Lexer.USINT,
-            IEC61131Lexer.ULINT,
-            IEC61131Lexer.DINT,
-            IEC61131Lexer.LINT,
-            IEC61131Lexer.DATE,
-            IEC61131Lexer.DATE_AND_TIME,
-            IEC61131Lexer.TIME,
-            IEC61131Lexer.WORD,
-            IEC61131Lexer.LWORD,
-            IEC61131Lexer.DWORD,
-            IEC61131Lexer.BOOL)
+            ANY_BIT,
+            ARRAY,
+            STRING,
+            WSTRING,
+            ANY_DATE,
+            ANY_INT,
+            ANY_NUM,
+            ANY_REAL,
+            REAL,
+            LREAL,
+            INT,
+            DINT,
+            UDINT,
+            SINT,
+            USINT,
+            ULINT,
+            DINT,
+            LINT,
+            DATE,
+            DATE_AND_TIME,
+            TIME,
+            WORD,
+            LWORD,
+            DWORD,
+            BOOL)
 
     private val LITERALS = setOf(
-            IEC61131Lexer.DATE_LITERAL,
-            IEC61131Lexer.INTEGER_LITERAL,
-            IEC61131Lexer.BITS_LITERAL,
-            IEC61131Lexer.CAST_LITERAL,
-            IEC61131Lexer.DIRECT_VARIABLE_LITERAL,
-            IEC61131Lexer.REAL_LITERAL,
-            IEC61131Lexer.STRING_LITERAL,
-            IEC61131Lexer.TOD_LITERAL,
-            IEC61131Lexer.TIME_LITERAL,
-            IEC61131Lexer.WSTRING_LITERAL
+            DATE_LITERAL,
+            INTEGER_LITERAL,
+            BITS_LITERAL,
+            CAST_LITERAL,
+            DIRECT_VARIABLE_LITERAL,
+            REAL_LITERAL,
+            STRING_LITERAL,
+            TOD_LITERAL,
+            TIME_LITERAL,
+            WSTRING_LITERAL
     )
 
     val CONTROL_KEYWORDS = setOf(
-            IEC61131Lexer.IF, IEC61131Lexer.ELSE, IEC61131Lexer.ELSEIF, IEC61131Lexer.FOR, IEC61131Lexer.END_FOR, IEC61131Lexer.WHILE, IEC61131Lexer.END_WHILE, IEC61131Lexer.REPEAT, IEC61131Lexer.END_REPEAT,
-            IEC61131Lexer.DO, IEC61131Lexer.THEN, IEC61131Lexer.UNTIL, IEC61131Lexer.TO, IEC61131Lexer.WITH, IEC61131Lexer.CASE, IEC61131Lexer.END_CASE, IEC61131Lexer.OF
+            IF, ELSE, ELSEIF, FOR, END_FOR,
+            WHILE, END_WHILE, REPEAT, END_REPEAT,
+            END_IF, DO, THEN, UNTIL, TO,
+            WITH, CASE, END_CASE, OF
+    )
+
+    val OPERATORS = setOf(
+            NOT, AND, OR, MOD, DIV, MULT, MINUS, EQUALS, NOT_EQUALS,
+            GREATER_EQUALS, GREATER_THAN, LESS_EQUALS, LESS_THAN,
+            IL_ADD, IL_ANDN, IL_CAL, IL_CALC, IL_CALCN, IL_CD, IL_CLK,
+            IL_CU, IL_DIV, IL_EQ, IL_GE, IL_GT, IL_IN, IL_JMP, IL_JMPC, IL_JMPCN, IL_LD, IL_LDN, IL_LE, IL_LT,
+            IL_MOD, IL_MUL, IL_NE, IL_NOT, IL_ORN, IL_PT, IL_PV, IL_R1, IL_R, IL_RET, IL_RETC, IL_RETCN,
+            IL_S1, IL_S, IL_ST, IL_STN, IL_STQ, IL_SUB, IL_XORN, IL_OR
     )
 
     override fun getStyle(index: Int): Style {
@@ -130,9 +142,10 @@ class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             in CONTROL_KEYWORDS -> colors.control
             in LITERALS -> colors.literal
             in DATATYPE_KEYWORD -> colors.types
+            in OPERATORS -> colors.operators
             IDENTIFIER -> colors.identifier
-            IEC61131Lexer.COMMENT -> colors.comment
-            IEC61131Lexer.LINE_COMMENT -> colors.comment
+            COMMENT -> colors.comment
+            LINE_COMMENT -> colors.comment
             ERROR_CHAR -> colors.error
             else -> colors.default
         }
@@ -142,7 +155,7 @@ class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
 class STChecker(val codeEditor: CodeEditor, val lookup: Lookup) : AbstractParser() {
     val result = DefaultParseResult(this)
     override fun parse(doc: RSyntaxDocument, style: String): ParseResult {
-            result.clearNotices()
+        result.clearNotices()
         val input = DocumentReader(doc)
         val stream = CharStreams.fromReader(input, codeEditor.titleText)
         try {

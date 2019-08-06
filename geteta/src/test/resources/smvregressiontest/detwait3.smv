@@ -74,7 +74,7 @@ INVARSPEC
 	__ERROR__ -> r03_01 | r02_01 | r05_01 | r04_01 | r07_01 | r06_01 | __SENTINEL__;
 
 INIT
-	!r03_01 & r02_01 & !r05_01 & !r04_01 & !r07_01 & !r06_01 & !__ERROR__ & !__SENTINEL__;
+	r03_01 & r02_01 & r05_01 & r04_01 & r07_01 & r06_01 & !__ERROR__ & !__SENTINEL__;
 ASSIGN
 	next(__ERROR__) := r02_01_fail | r03_01_fail | r04_01_fail | r05_01_fail | r06_01_fail | r07_01_fail;
 	next(__SENTINEL__) := r07_01_accept | __SENTINEL__;

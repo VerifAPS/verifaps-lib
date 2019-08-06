@@ -36,7 +36,7 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("detwait1")
         val out = getReachabilityString(gtt)
         Assertions.assertEquals(
-                "r02#(r03)\nr03#(END)", out)
+                "START#(r02)\nr02#(r03)\nr03#(END)", out)
     }
 
     @Test
@@ -44,7 +44,7 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("detwait2")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("r02#(r03,r04)\n" +
+        Assertions.assertEquals("START#(r02)\nr02#(r03,r04)\n" +
                 "r03#(r04)\n" +
                 "r04#(END)", out)
     }
@@ -54,7 +54,8 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("detwait3")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("r02#(r03,r04,r05,r06,r07)\n" +
+        Assertions.assertEquals("START#(r02,r03,r04,r05,r06,r07)\n" +
+                "r02#(r03,r04,r05,r06,r07)\n" +
                 "r03#(r04,r05,r06,r07)\n" +
                 "r04#(r05,r06,r07)\n" +
                 "r05#(r06,r07)\n" +
@@ -68,7 +69,8 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("reachability1")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("r02#(r03)\n" +
+        Assertions.assertEquals("START#(r02)\n" +
+                "r02#(r03)\n" +
                 "r03#(r04,r05)\n" +
                 "r04#(r05)\n" +
                 "r05#(END)", out)
@@ -79,7 +81,8 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("reachability1")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("r02#(r03)\n" +
+        Assertions.assertEquals("START#(r02)\n" +
+                "r02#(r03)\n" +
                 "r03#(r04,r05)\n" +
                 "r04#(r05)\n" +
                 "r05#(END)", out)
@@ -105,7 +108,8 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("reachability2")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("r02#(r03,r04,r05)\n" +
+        Assertions.assertEquals("START#(r02,r03,r04,r05)\n" +
+                "r02#(r03,r04,r05)\n" +
                 "r03#(r04,r05)\n" +
                 "r04#(r05)\n" +
                 "r05#(END)", out)
@@ -116,7 +120,8 @@ class TableRowReachabilityTest : TableTester(){
         val gtt = getTable("reachability3")
         val out = getReachabilityString(gtt)
         println(out)
-        Assertions.assertEquals("a#(b)\n" +
+        Assertions.assertEquals("START#(a)\n" +
+                "a#(b)\n" +
                 "b#(b,c)\n" +
                 "c#(d,e)\n" +
                 "d#(e)\n" +
@@ -124,11 +129,23 @@ class TableRowReachabilityTest : TableTester(){
     }
 
 
-    fun getReachabilityString(gtt: GeneralizedTestTable): String {
-        val sentinelState = TableRow("SENTINEL")
-        val reachable: StateReachability = StateReachability(gtt.region)
+    @Test
+    fun testReachability6() {
+        val gtt = getTable("reachability6")
+        val out = getReachabilityString(gtt)
+        Assertions.assertEquals(
+                "START#(a,b,c)\n" +
+                        "a#(b,c)\n" +
+                        "b#(c)\n" +
+                        "c#(END)", out)
+    }
 
-        return gtt.region.flat()
+
+    fun getReachabilityString(gtt: GeneralizedTestTable): String {
+        val reachable: StateReachability = StateReachability(gtt.region)
+        val states = listOf(reachable.startSentinel) + gtt.region.flat()
+
+        return states
                 .joinToString("\n") { s ->
                     s.id + s.outgoing
                             .map { it.id }

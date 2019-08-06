@@ -101,9 +101,11 @@ object Colors {
 
     val control = style { foreground = violet }
 
-    val structural = style { foreground = violet }
+    val structural = style { foreground = orange }
 
     val identifier = style { foreground = red }
+
+    val operators: Style =style{foreground = magenta}
 
     val literal = style { foreground = green }
 
