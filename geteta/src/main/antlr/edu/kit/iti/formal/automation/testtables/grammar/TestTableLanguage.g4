@@ -33,7 +33,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 */
 
 //structure level
-file  : table*;
+file  : table* EOF;
 table : (r=RELATIONAL {relational=true;})?
         TABLE IDENTIFIER LBRACE
             (signature | freeVariable)*
@@ -93,12 +93,14 @@ FUNCTION : ('FUNCTION'|'function') .*? ('END_FUNCTION'|'end_function');
 //
 cell : chunk (COMMA chunk)*;
 
+cellEOF : cell EOF;
+
 chunk :
 	  dontcare      #cdontcare
 	| variable      #cvariable
 	| constant      #cconstant
 	| singlesided   #csinglesided
-    | interval      #cinterval
+  | interval      #cinterval
 	| expr          #cexpr
 ;
 

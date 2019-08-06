@@ -184,7 +184,7 @@ class GeneralizedTestTable(
         }
         programVariables.forEach {
             vc.getSMVVariable(it)
-            vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT)
+            vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT).cell()
         }
         vc
     }

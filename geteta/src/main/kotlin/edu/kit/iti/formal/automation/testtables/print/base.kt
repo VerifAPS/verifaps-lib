@@ -74,7 +74,7 @@ class PrinterHelper(gtt: GeneralizedTestTable,
     }
 
     fun calculateColumn(column: ProgramVariable): List<PrintCellContent> {
-        var previousContent = GetetaFacade.parseCell("-")
+        var previousContent = GetetaFacade.parseCell("-").cell()!!
         val seq = states.map { PrintCellContent() }
         var currentGroupDuration = 0
 

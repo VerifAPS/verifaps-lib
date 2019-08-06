@@ -51,7 +51,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
                 return SIntegerLiteral(value)
             } else {
                 val dtWord = (columnVariable.dataType as? SMVWordType?)
-                return SWordLiteral(value, dtWord?: SMVTypes.signed(16))
+                return SWordLiteral(value, dtWord ?: SMVTypes.signed(16))
             }
         }
     }
@@ -165,10 +165,12 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
         }
 
         val varText =
-                if (ctx.RV_SEPARATOR() != null && ctx.IDENTIFIER() == null)
-                    columnVariable.name
-                else
-                    ctx.IDENTIFIER().text
+                when {
+                    //no identifier, but RV sep => reference to same variable in other run
+                    ctx.IDENTIFIER() == null && ctx.RV_SEPARATOR() != null -> columnVariable.name
+                    ctx.IDENTIFIER() == null -> throw IllegalStateException()
+                    else -> ctx.IDENTIFIER().text
+                }
 
         val isReference = ctx.RBRACKET() != null
 

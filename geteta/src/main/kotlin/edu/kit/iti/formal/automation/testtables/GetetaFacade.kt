@@ -48,11 +48,11 @@ object GetetaFacade {
 
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
-    fun parseCell(cell: String, enableRelational: Boolean = true): TestTableLanguageParser.CellContext =
-            createParser(cell).also { it.relational = enableRelational }.cell()!!
+    fun parseCell(cell: String, enableRelational: Boolean = true) =
+            createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
 
-    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational),
-            column, programRun, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr
+            = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   programRun: Int, vars: ParseContext): SMVExpr {

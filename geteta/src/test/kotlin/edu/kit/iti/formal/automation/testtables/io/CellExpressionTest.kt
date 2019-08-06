@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SVariable
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 
@@ -37,8 +38,8 @@ import org.junit.jupiter.api.TestFactory
 object CellExpressionTest {
     @TestFactory
     fun createExpressionTests(): List<DynamicTest> {
-        return CASES.map {
-            DynamicTest.dynamicTest(it) { parse(it) }
+        return CASES.map { (a, b) ->
+            DynamicTest.dynamicTest(a) { parse(a, b) }
         }
     }
 
@@ -50,19 +51,24 @@ object CellExpressionTest {
         pc = gtt.parseContext
     }
 
-    fun parse(expr: String) {
+    fun parse(expr: String, exp: String) {
+        println("Test: $expr")
         val v = SVariable.create("Q").withSigned(16)
         val e = GetetaFacade.exprToSMV(expr, v, 0, pc)
-        println(e)
+        println(e.repr())
+        Assertions.assertEquals(exp, e.repr());
     }
 
     internal fun defaultTestTable(run: Int = 0): GeneralizedTestTable {
         val gtt = GeneralizedTestTable()
+        gtt.options.relational = true;
         gtt.add(iovar("a", "input", run))
         gtt.add(iovar("a", "input", 1))
         gtt.add(iovar("b", "input", run))
         gtt.add(iovar("c", "input", run))
         gtt.add(iovar("d", "input", run))
+        gtt.add(iovar("Q", "output", 0))
+        gtt.add(iovar("Q", "output", 1))
         gtt.ensureProgramRuns()
         return gtt
     }
@@ -72,10 +78,27 @@ object CellExpressionTest {
                     if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT,
                     run)
 
-    val CASES = arrayOf(">2",
-            "<52152343243214234", "!=6", "<>-16134", "-243261", "a",
-            "a+b", "(a)+(((b+c)+d))/2", "convert(a,2)", "TRUE", "true", "false",
-            "FALSE", "a[-5]", "[2+2, 6]", "[-61+2, -61]",
-            "0|>a", "0\$a + |>a", "·"
+    val CASES = arrayOf(
+            "|>" to "_1\$Q = Q",
+            ">2" to "Q > 0sd16_2",
+            "<52152343243214234" to "Q < 0sd16_52152343243214234",
+            "!=6" to "Q != 0sd16_6",
+            "<>-16134" to "Q != -0sd16_16134",
+            "-243261" to "-0sd16_243261 = Q",
+            "a" to "_0\$a = Q",
+            "a+b" to "_0\$a + _0\$b",
+            "(a)+(((b+c)+d))/2" to "_0\$a + (_0\$b + _0\$c + _0\$d) / 0sd16_2",
+            "convert(a,2)" to "convert(_0\$a, 0sd16_2)",
+            "TRUE" to "TRUE = Q",
+            "true" to "TRUE = Q",
+            "false" to "FALSE = Q",
+            "FALSE" to "FALSE = Q",
+            "a[-5]" to "_0\$a__history._\$5 = Q",
+            "[2+2, 6]" to "0sd16_2 + 0sd16_2 <= Q & Q <= 0sd16_6",
+            "[-61+2, -61]" to "-0sd16_61 + 0sd16_2 <= Q & Q <= -0sd16_61",
+            "0|>a" to "_0\$a = Q",
+            "|>a" to "_1\$a = Q",
+            "0\$a + |>a" to "_0\$a + _1\$a",
+            "·" to "_1\$Q = Q"
     )
 }
