@@ -1,5 +1,4 @@
-# verifaps-lib 
-
+# verifaps-lib  [![CircleCI](https://circleci.com/gh/VerifAPS/verifaps-lib/tree/develop.svg?style=svg)](https://circleci.com/gh/VerifAPS/verifaps-lib/tree/develop) 
 Library and programs for the verification of software for automated production systems.
 
 * License: GPLv3
