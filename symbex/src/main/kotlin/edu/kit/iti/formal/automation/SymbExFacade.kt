@@ -53,14 +53,13 @@ object SymbExFacade {
     fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
         val se = SymbolicExecutioner()
         val state = SymbolicState()
-        // <name>(i1,i2,i2,...)
+        //<name>(i1,i2,i2,...)
         val fc = Invocation()
         fc.calleeName = decl.name
-        var i = 0
-        for (vd in decl.scope
-                .filterByFlags(VariableDeclaration.INPUT)) {
+        for ((i, vd) in decl.scope
+                .filterByFlags(VariableDeclaration.INPUT).withIndex()) {
             fc.parameters.add(InvocationParameter(SymbolicReference(vd.name)))
-            state[se.lift(vd)] = ts[i++]
+            state[se.lift(vd)] = ts[i]
         }
         se.push(state)
         se.scope.topLevel.registerFunction(decl)
@@ -84,8 +83,7 @@ object SymbExFacade {
     fun simplify(elements: PouElements): PouElements {
         val stSimplifier = getDefaultSimplifier()
         val p = PouElements()
-        elements.filter { it is PouExecutable }
-                .map { it as PouExecutable }
+        elements.filterIsInstance<PouExecutable>()
                 .map(stSimplifier::transform)
                 .forEach { p.add(it) }
         return p
@@ -166,7 +164,11 @@ object SymbExFacade {
         return exc.accept(symbex) as SMVExpr
     }
 
-    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, exc: Expression, scope: Scope) = evaluateExpression(SymbolicState(ssa), exc, scope)
+    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, exc: Expression, scope: Scope): SMVExpr {
+        val ss = SymbolicState()
+        ssa.forEach { (t, u) -> ss[t] = u }
+        return evaluateExpression(ss, exc, scope)
+    }
 
 
     fun evaluateExpression(expr: Expression, scope: Scope): SMVExpr {

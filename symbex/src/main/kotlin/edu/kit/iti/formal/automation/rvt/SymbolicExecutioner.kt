@@ -15,6 +15,8 @@ import java.util.*
 
 /**
  * Created by weigl on 26.11.16.
+ * 2019-08-11 weigl: use definition for common sub expressions (<var>_<linenumer> value of <variable> in linenumber)
+ *                   <var> refers to the last <variable>
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
@@ -66,7 +68,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return if (varCache.containsKey(vd.identifier))
             varCache[vd.identifier]!!
         else {
-            val v = peek().keys.find { name->
+            val v = peek().keys.find { name ->
                 vd.identifier == name.name
             }
             if (v != null) {
@@ -103,6 +105,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     //endregion
 
+    //region visitors
     override fun visit(literal: Literal): SLiteral {
         return this.valueTranslator.translate(literal)
     }
@@ -115,13 +118,13 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         push(SymbolicState())
 
         // initialize root state
-        for (vd in scope!!) {
+        for (vd in scope) {
             val s = lift(vd)
             peek()[s] = s
         }
 
         globalState = SymbolicState()
-        for (variable in scope!!.filterByFlags(VariableDeclaration.GLOBAL))
+        for (variable in scope.filterByFlags(VariableDeclaration.GLOBAL))
             globalState[lift(variable)] = peek()[lift(variable)]!!
 
         programDeclaration.stBody!!.accept(this)
@@ -130,7 +133,9 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     override fun visit(assign: AssignmentStatement): SMVExpr? {
         val s = peek()
-        s[lift(assign.location as SymbolicReference)] = assign.expression.accept(this)!!
+        val key = lift(assign.location)
+        val expr = assign.expression.accept(this)!!
+        s.assign(key, getCounter(assign.startPosition), expr)
         return null
     }
 
@@ -197,7 +202,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
                 val o = inputVars.stream().filter { iv -> iv.name == parameter.name }.findAny()
                 if (o.isPresent) {
                     val e = parameter.expression.accept(this)!!
-                    calleeState[lift(o.get())] = e!!
+                    calleeState[lift(o.get())] = e
                 }
             }
         }
@@ -209,7 +214,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         push(calleeState)
         //endregion
 
-        // execution of body
+        //region execution of body
         fd.stBody?.accept(this)
 
         val returnState = pop()
@@ -227,12 +232,11 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             }
             // TODO handle parameter.getExpression() instanceof Literal, etc.
         }
+        //endregion
 
         //fd.getReturnType() != null
         return calleeState[fd.name]
     }
-
-//endregion
 
     override fun visit(statement: IfStatement): SCaseExpression? {
         val branchStates = SymbolicBranches()
@@ -248,7 +252,9 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         statement.elseBranch.accept(this)
         branchStates.addBranch(SLiteral.TRUE, pop())
 
-        peek().putAll(branchStates.asCompressed())
+        val cur = peek()
+        val combined = branchStates.asCompressed(getCounter(statement.endPosition))
+        cur.map.putAll(combined.map)
         return null
     }
 
@@ -261,9 +267,9 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             branchStates.addBranch(condition, pop())
         }
         push()
-        caseStatement.elseCase!!.accept(this)
+        caseStatement.elseCase.accept(this)
         branchStates.addBranch(SLiteral.TRUE, pop())
-        peek().putAll(branchStates.asCompressed())
+        peek().putAll(branchStates.asCompressed(getCounter(caseStatement.endPosition)))
         return null
     }
 
@@ -296,4 +302,16 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     //ignore
     override fun visit(commentStatement: CommentStatement) = null
+    //endregion
+
+
+    val lineNumberMap = TreeMap<Int, Int>()
+    var assignmentCounter = -1
+    fun getCounter(pos: Position?): Int {
+        val v = ++assignmentCounter
+        if (pos != null) {
+            lineNumberMap[v] = pos.lineNumber
+        }
+        return v
+    }
 }

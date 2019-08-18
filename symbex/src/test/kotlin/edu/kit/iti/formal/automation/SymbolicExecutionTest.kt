@@ -22,13 +22,27 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
+import com.google.common.truth.Truth.assertThat
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.smv.ast.SMVExpr
+import edu.kit.iti.formal.smv.ast.SVariable
+import org.junit.Assume
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+
+private val SymbolicState.definitions: Map<String, String>
+    get() = map.flatMap { (_, b) ->
+        b.values.map { (a, b) -> a.name to b.repr() }
+    }.toMap()
+
+private val Map<SVariable, SMVExpr>.stringifed: Map<String, String>
+    get() = asSequence()
+            .map { (a, b) -> a.name to b.repr() }
+            .toMap()
 
 /**
  * @author Alexander Weigl
@@ -63,16 +77,37 @@ class SymbolicExecutionTest {
     @Test
     fun simpleIfTest() {
         val list = IEC61131Facade.statements(
-                "a := 2; c:= 4; b:=0; IF a = 2 THEN b := 2; ELSE b := 1; c:=2; END_IF;")
+                """
+                    a := 2; 
+                    c:= 4; 
+                    b:=0; 
+                    IF a = 2 THEN  b := 2; 
+                    ELSE b := 1; c:=2; END_IF;""")
         IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
         list.accept(se)
-        Assertions.assertEquals(
+
+        val defs = se.peek().definitions
+        val states = se.peek().stringifed
+
+        defs.forEach { (t, u) -> println("$t = $u") }
+
+        assertThat(defs).also {
+            it.containsEntry("a_0", "0sd16_2")
+            it.containsEntry("c_1", "0sd16_4")
+            it.containsEntry("b_2", "0sd16_0")
+            it.containsEntry("b_3", "0sd16_2")
+            it.containsEntry("b_4", "0sd16_1")
+            it.containsEntry("c_5", "0sd16_2")
+        }
+
+        /*Assertions.assertEquals(
                 "{a=0sd16_2, b=case \n" +
                         "0sd16_2 = 0sd16_2 : 0sd16_2; TRUE : 0sd16_1; \n" +
                         "esac, c=case \n" +
                         "0sd16_2 = 0sd16_2 : 0sd16_4; TRUE : 0sd16_2; \n" +
                         "esac}",
                 se.peek().toString())
+         */
     }
 
     /*
@@ -104,4 +139,31 @@ class SymbolicExecutionTest {
         //Assertions.assertEquals(ss, se.peek());
     }
     */
+
+
+    @Test
+    fun simpleAssignmentTest() {
+        val list = IEC61131Facade.statements(
+                "a := 2;\na := 3;\na:= 4;\nb := a + 1;\nb := a + 1;\nb := b + 1;")
+        IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
+        se.peek().useLineNumber = false
+        list.accept(se)
+
+        val definitions = se.peek().definitions
+
+
+        assertThat(definitions).let {
+            it.containsEntry("a_0", "0sd16_2")
+            it.containsEntry("a_1", "0sd16_3")
+            it.containsEntry("a_2", "0sd16_4")
+            it.containsEntry("b_3", "a_2 + 0sd16_1")
+            it.containsEntry("b_4", "a_2 + 0sd16_1")
+            it.containsEntry("b_5", "b_4 + 0sd16_1")
+        }
+
+        assertThat(se.peek().stringifed).let {
+            it.containsEntry("a", "a_2")
+            it.containsEntry("b", "b_5")
+        }
+    }
 }

@@ -24,21 +24,110 @@ package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import java.lang.IllegalArgumentException
+import java.util.*
+import kotlin.collections.HashMap
+
+data class SymbolicVariable(val variable: SVariable) {
+    val values = TreeMap<SVariable, SMVExpr>()
+    var current = variable
+
+    val value
+        get() = values[current]
+
+    fun push(value: SMVExpr, postfix: String) {
+        current = variable.copy(name = variable.name + postfix)
+        values[current] = value
+    }
+
+    fun clone() : SymbolicVariable {
+        val sv = SymbolicVariable(variable)
+        sv.current = current
+        sv.values.putAll(values)
+        return sv
+    }
+}
 
 /**
  * Created by weigl on 27.11.16.
  */
-data class SymbolicState(private val map: HashMap<SVariable, SMVExpr> = HashMap())
-    : MutableMap<SVariable, SMVExpr> by map {
-    constructor(m: Map<out SVariable, SMVExpr>) : this() {
-        putAll(m)
+data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap())
+    : MutableMap<SVariable, SMVExpr> {
+    constructor(m: SymbolicState) : this() {
+        m.map.forEach { (v, u) -> map[v] = u.clone() }
     }
 
-    operator fun get(x: String) = this[keys.find { it.name.equals(x, true) }]
+    operator fun get(x: String) = this[getKey(x)]
+    fun getKey(x: String) = keys.find { it.name.equals(x, true) }
+
+
+    var useDefinitions: Boolean = true
+    var useLineNumber: Boolean = true
+
+    override val size: Int
+        get() = map.size
+
+    fun getCurrentValues(): Sequence<SMVExpr> =
+            map.values.asSequence().map { it.value!! }
+
+    override fun containsKey(key: SVariable): Boolean = key in map
+    override fun containsValue(value: SMVExpr): Boolean =
+            getCurrentValues().any { it == value }
+
+    override fun get(key: SVariable): SMVExpr? =
+            map[key]?.let {
+                if (useDefinitions) it.current
+                else it.value
+            }
+
+
+    override fun isEmpty(): Boolean = map.isEmpty()
+
+    override val entries: MutableSet<MutableMap.MutableEntry<SVariable, SMVExpr>>
+        get() = map.entries.map { (a, b) ->
+            object : MutableMap.MutableEntry<SVariable, SMVExpr> {
+                override val key: SVariable
+                    get() = a
+                override val value: SMVExpr
+                    get() = if(useDefinitions) b.current else b.value!!
+
+                override fun setValue(newValue: SMVExpr): SMVExpr {
+                    return value
+                }
+            }
+        }.toMutableSet()
+
+    override val keys: MutableSet<SVariable>
+        get() = map.keys
+
+    override val values: MutableCollection<SMVExpr>
+        get() = getCurrentValues().toMutableList()
+
+    override fun clear() = map.clear()
+
+    override fun put(key: SVariable, value: SMVExpr): SMVExpr?
+            = throw IllegalArgumentException("Use assign(...) instead")
+
+    fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
+        val s = map[key] ?: SymbolicVariable(key).also { map[key] = it }
+        val n = "_$assignCounter"
+        s.push(v, n)
+    }
+
+
+    override fun putAll(from: Map<out SVariable, SMVExpr>) {
+        from.forEach { (a, b) -> put(a, b) }
+    }
+
+    override fun remove(key: SVariable): SMVExpr? {
+        val ss = map.remove(key)
+        return ss?.value
+    }
+
 
     override fun toString(): String {
         val sb = StringBuffer()
-        map.entries.joinTo(sb, prefix = "{", postfix = "}") { (k, v) ->
+        entries.joinTo(sb, prefix = "{", postfix = "}") { (k, v) ->
             "${k.name}=${v.repr()}"
         }
         return sb.toString()

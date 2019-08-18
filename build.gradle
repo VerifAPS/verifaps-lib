@@ -169,6 +169,8 @@ subprojects {
         compile 'org.slf4j:slf4j-jdk14:1.7.25'
         compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.6.26'
 
+        testCompile 'com.google.truth:truth:1.0'
+
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
         //testCompile 'org.junit.vintage:junit-vintage-engine:5.5.1'

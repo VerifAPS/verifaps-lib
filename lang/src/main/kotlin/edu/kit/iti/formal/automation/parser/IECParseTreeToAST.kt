@@ -28,7 +28,6 @@ import edu.kit.iti.formal.automation.datatypes.values.DateAndTimeData
 import edu.kit.iti.formal.automation.datatypes.values.DateData
 import edu.kit.iti.formal.automation.datatypes.values.TimeData
 import edu.kit.iti.formal.automation.datatypes.values.TimeofDayData
-import edu.kit.iti.formal.automation.fbd.FbDiagram
 import edu.kit.iti.formal.automation.fbd.FbdBody
 import edu.kit.iti.formal.automation.il.*
 import edu.kit.iti.formal.automation.operators.BinaryOperator
@@ -718,7 +717,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
                 ctx.expression().accept(this) as Expression)
         ast.reference = ctx.RASSIGN() != null
         ast.isAssignmentAttempt = ctx.ASSIGN_ATTEMPT() != null
-        //setPosition(ast, ctx.ctx);
+        ast.ruleContext = ctx
         return ast
     }
 
@@ -803,6 +802,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitIf_statement(
             ctx: IEC61131Parser.If_statementContext): Any {
         val ast = IfStatement()
+        ast.ruleContext = ctx
         for (i in ctx.cond.indices) {
             ast.addGuardedCommand(
                     ctx.cond[i].accept(this) as Expression,
@@ -811,7 +811,6 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         if (ctx.ELSE() != null) {
             ast.elseBranch = ctx.elselist.accept(this) as StatementList
         }
-        //Utils.setPosition(ast, ctx.IF, ctx.END_IF);
         return ast
     }
 
@@ -830,6 +829,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitCase_entry(ctx: IEC61131Parser.Case_entryContext): Any {
         val ast = Case()
+        ast.ruleContext=ctx
         ast.conditions.addAll(allOf(ctx.case_condition()))
         ast.statements = ctx.statement_list().accept(this) as StatementList
         return ast
@@ -901,6 +901,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitSfc_network(ctx: IEC61131Parser.Sfc_networkContext): SFCNetwork {
         network = SFCNetwork()
         network.steps.add(visitInit_step(ctx.init_step()))
+        network.ruleContext=ctx
 
         for (stepContext in ctx.step()) {
             network.steps.add(visitStep(stepContext))
@@ -924,6 +925,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             action.ilBody = ctx.body().ilBody().accept(this) as IlBody
         if (ctx.body().fbBody() != null)
             action.fbBody = ctx.body().fbBody().accept(this) as FbdBody
+        action.ruleContext=ctx
         return action
     }
 
@@ -932,6 +934,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         currentStep.name = ctx.step_name.text
         currentStep.isInitial = true
         visitActionAssociations(ctx.action_association())
+        currentStep.ruleContext=ctx
         return currentStep
     }
 
@@ -958,6 +961,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitStep(ctx: IEC61131Parser.StepContext): SFCStep {
         currentStep = SFCStep()
+        currentStep.ruleContext=ctx
         currentStep.name = ctx.step_name.text
         currentStep.isInitial = false
         visitActionAssociations(ctx.action_association())
@@ -1097,7 +1101,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     //endregion
 
     override fun visitFbBody(ctx: IEC61131Parser.FbBodyContext): FbdBody {
-        val json =  ctx.FBD_CODE().text.removeSurrounding("(***FBD", "***)").trim()
+        val json = ctx.FBD_CODE().text.removeSurrounding("(***FBD", "***)").trim()
         return FbdBody.fromJson(json)
     }
 }
