@@ -342,7 +342,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     val lineNumberMap = TreeMap<Int, Pair<String, Position>>()
     val assignmentCounter = AtomicInteger(-1)
 
-    internal fun assign(vd: VariableDeclaration, value: SMVExpr) {
+    fun assign(vd: VariableDeclaration, value: SMVExpr) {
         val s = lift(vd)
         val cnt = assignmentCounter.incrementAndGet()
         vd.startPosition.run {
@@ -351,7 +351,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         peek().assign(s, cnt, value)
     }
 
-    internal fun assign(ref: SymbolicReference, value: SMVExpr) {
+    fun assign(ref: SymbolicReference, value: SMVExpr) {
         val s = lift(ref)
         val cnt = assignmentCounter.incrementAndGet()
         ref.startPosition?.run {

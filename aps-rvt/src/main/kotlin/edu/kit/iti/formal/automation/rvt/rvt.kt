@@ -4,6 +4,7 @@ import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.CodeWriter
 import mu.KLogging
 import java.io.PrintWriter
 import java.io.Writer
@@ -147,7 +148,7 @@ open class RegressionVerification(
     open fun writeTo(writer: Writer) {
         val sep = "-".repeat(80) + "\n"
         with(writer) {
-            val p = SMVPrinter(PrintWriter(writer))
+            val p = SMVPrinter(CodeWriter(writer))
             glueModule.accept(p);
             this.write(sep)
             oldVersion.accept(p)
@@ -180,7 +181,7 @@ abstract class Miter(val oldVersion: SMVModule, val newVersion: SMVModule) {
     var invarSpec: SMVExpr? = null
     abstract fun build()
     open fun writeTo(writer: Writer) {
-        val p = PrintWriter(writer)
+        val p = CodeWriter(writer)
         module.accept(SMVPrinter(p))
     }
 }

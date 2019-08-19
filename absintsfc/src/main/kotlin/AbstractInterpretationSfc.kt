@@ -190,7 +190,7 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         se.push(SymbolicState())
         for (vd in scope) {
             val s = se.lift(vd)
-            se.peek()[s] = s
+            se.assign(vd, s)
         }
         return se
     }
