@@ -131,7 +131,7 @@ object GetetaFacade {
         outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
         moduleFile.bufferedWriter().use { w ->
-            val p = SMVPrinter(PrintWriter(w))
+            val p = SMVPrinter(CodeWriter(w))
             modules.forEach { it.accept(p) }
         }
         val adapter = NuXMVProcess(moduleFile)

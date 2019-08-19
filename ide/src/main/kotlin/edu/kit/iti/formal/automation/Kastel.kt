@@ -16,6 +16,7 @@ import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
 import java.io.PrintWriter
 import java.math.BigInteger
@@ -96,7 +97,7 @@ object KastelDemonstrator {
 
             val smvFile = File(FOLDER, "noif_${imb.historyLength}.smv")
             smvFile.bufferedWriter().use {
-                imb.product.forEach { m -> m.accept(SMVPrinter(PrintWriter(it))) }
+                imb.product.forEach { m -> m.accept(SMVPrinter(CodeWriter(it))) }
             }
             Console.writeln("File $smvFile written")
         }
