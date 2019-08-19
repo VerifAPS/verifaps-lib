@@ -109,7 +109,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         printSectionSingle("TRANS", m.transExpr)
 
         if (m.initAssignments.size > 0 || m.nextAssignments.size > 0) {
-            stream.print("ASSIGN").increaseIndent().nl()
+            stream.print("ASSIGN").increaseIndent()
             printAssignments("init", m.initAssignments)
             printAssignments("next", m.nextAssignments)
             stream.decreaseIndent()
@@ -133,6 +133,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
             expr.accept(this)
             stream.print(";")
         }
+        stream.decreaseIndent()
     }
 
     private fun printAssignments(func: String, a: List<SAssignment>) {
@@ -201,7 +202,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
                 else v
 
         if (vars.isNotEmpty()) {
-            stream.print(type).nl()
+            stream.print(type).increaseIndent()
 
             for (svar in vars) {
                 stream.nl()
@@ -211,7 +212,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
                 stream.print(";")
             }
 
-            stream.print("-- end of $type").nl()
+            stream.decreaseIndent().nl().print("-- end of $type").nl()
         }
     }
 
