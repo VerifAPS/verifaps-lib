@@ -49,11 +49,8 @@ class FacadeTest {
                 SVariable.create("c").asBool())
         //System.out.println(state);
         Assertions.assertNotEquals(null, state)
-        Assertions.assertEquals(
-                "case \n" +
-                        "a : b; TRUE : c; \n" +
-                        "esac",
-                state.repr())
+        Assertions.assertEquals("case a : b; TRUE : c; esac".cleanWhitespace(),
+                state.repr().cleanWhitespace())
     }
 
     @Test

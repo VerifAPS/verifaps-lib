@@ -97,9 +97,17 @@ class ModuleBuilder(val program: PouExecutable,
             }
         }
 
+        insertDefinitions(finalState.getAllDefinitions())
         insertVariables(stateVariables)
         insertInputVariables(inputVars)
     }
+
+    private fun insertDefinitions(definitions: Map<SVariable, SMVExpr>) {
+        definitions.forEach { (k, v) -> addDefinition(k, v) }
+    }
+
+    private fun addDefinition(k: SVariable, v: SMVExpr) =
+            module.definitions.add(SAssignment(k,v))
 
     private fun insertInputVariables(decls: List<VariableDeclaration>) {
         decls.map { this.typeTranslator.translate(it) }

@@ -164,22 +164,20 @@ subprojects {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         compile group: 'org.jetbrains', name: 'annotations', version: '17.0.0'
-        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-        //compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-        compile 'org.slf4j:slf4j-jdk14:1.7.25'
-        compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.6.26'
+        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
+        compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
+        compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.5'
 
         testCompile 'com.google.truth:truth:1.0'
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
-        //testCompile 'org.junit.vintage:junit-vintage-engine:5.5.1'
         testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.1'
 
         testCompile project(':utils-test')
 
-        testCompile 'org.jetbrains.spek:spek-api:1.2.1'
-        testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.2.1'
+        //testCompile 'org.jetbrains.spek:spek-api:1.2.1'
+        //testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.2.1'
         //compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
     }
 

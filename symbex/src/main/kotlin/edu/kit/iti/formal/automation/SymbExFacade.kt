@@ -47,23 +47,20 @@ import java.util.*
  */
 object SymbExFacade {
     fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr {
-        return evaluateFunction(decl, Arrays.asList(*args))
+        return evaluateFunction(decl, listOf(*args))
     }
 
     fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
         val se = SymbolicExecutioner()
-        val state = SymbolicState()
         //<name>(i1,i2,i2,...)
-        val fc = Invocation()
-        fc.calleeName = decl.name
         for ((i, vd) in decl.scope
                 .filterByFlags(VariableDeclaration.INPUT).withIndex()) {
-            fc.parameters.add(InvocationParameter(SymbolicReference(vd.name)))
-            state[se.lift(vd)] = ts[i]
+            se.assign(vd, ts[i])
         }
-        se.push(state)
-        se.scope.topLevel.registerFunction(decl)
-        return fc.accept(se) as SMVExpr
+        se.visit(decl as PouExecutable)
+        val uf =  se.peek().unfolded()
+        val v = uf.entries.find { (k,v)-> k.name == decl.name }!!.value
+        return v
     }
 
     fun getDefaultSimplifier(): SimplifierPipelineST0 =

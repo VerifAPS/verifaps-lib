@@ -16,23 +16,28 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.joinToExpr
 import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (21.02.19)
  */
-class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope) : Callable<SymbolicState> {
+class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000,
+               scope: Scope,
+               val state: SymbolicState = SymbolicState()) : Callable<SymbolicState> {
     private val context = IlSymbexContext(scope)
 
-    init {
-        val state = SymbolicState()
-        scope.variables.forEach { vd ->
+    fun initState() {
+        context.scope.variables.forEach { vd ->
             val v = context.varCache.computeIfAbsent(vd.name) {
                 SVariable(vd.name, context.typeTranslator.translate(vd.dataType!!))
             }
-            state[v] = v
+            state.assign(v, context.assignCounter.incrementAndGet(), v)
         }
+    }
+
+    init {
         context.onFork(Path(0, maximalSteps, ilBody, context, state = state))
     }
 
@@ -70,6 +75,7 @@ class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope) : Callabl
 }
 
 internal class IlSymbexContext(val scope: Scope) {
+    val assignCounter = AtomicInteger(-1)
     val running = arrayListOf<Path>()
     val terminated = arrayListOf<Path>()
     val errorVariable: SVariable = SVariable.bool("PATH_DIVERGED")
@@ -144,7 +150,7 @@ internal data class Path(
         }
         if (!subMode) {
             if (currentIdx >= ilBody.size) {
-                state[context.errorVariable] = SLiteral.FALSE
+                state.assign(context.errorVariable, context.assignCounter.incrementAndGet(), SLiteral.FALSE)
             } else
                 if (remainingSteps <= 0) {
                     state[context.errorVariable] = SLiteral.TRUE
@@ -194,7 +200,7 @@ internal data class Path(
         } else {
             accumulator
         }
-        state[variable] = varValue
+        state.assign(variable, context.assignCounter.incrementAndGet(), varValue)
     }
 
     fun not() {

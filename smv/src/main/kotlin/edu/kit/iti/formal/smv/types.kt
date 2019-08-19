@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.CodeWriter
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
@@ -143,7 +144,7 @@ data class ModuleType(
 
     override fun toString(): String {
         val stream = StringWriter()
-        val printer = SMVPrinter(PrintWriter(stream))
+        val printer = SMVPrinter(CodeWriter(stream))
         return String.format("${moduleName}(%s)",
                 if (parameters.size > 0) {
                     parameters.joinToString(", ") { it.repr() }

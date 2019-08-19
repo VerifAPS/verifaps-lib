@@ -22,9 +22,9 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SVariable
-import java.lang.IllegalArgumentException
+import edu.kit.iti.formal.smv.SMVAstMutableVisitor
+import edu.kit.iti.formal.smv.SMVAstVisitor
+import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -40,7 +40,7 @@ data class SymbolicVariable(val variable: SVariable) {
         values[current] = value
     }
 
-    fun clone() : SymbolicVariable {
+    fun clone(): SymbolicVariable {
         val sv = SymbolicVariable(variable)
         sv.current = current
         sv.values.putAll(values)
@@ -60,9 +60,7 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
     operator fun get(x: String) = this[getKey(x)]
     fun getKey(x: String) = keys.find { it.name.equals(x, true) }
 
-
     var useDefinitions: Boolean = true
-    var useLineNumber: Boolean = true
 
     override val size: Int
         get() = map.size
@@ -89,7 +87,7 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
                 override val key: SVariable
                     get() = a
                 override val value: SMVExpr
-                    get() = if(useDefinitions) b.current else b.value!!
+                    get() = if (useDefinitions) b.current else b.value!!
 
                 override fun setValue(newValue: SMVExpr): SMVExpr {
                     return value
@@ -105,15 +103,13 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
 
     override fun clear() = map.clear()
 
-    override fun put(key: SVariable, value: SMVExpr): SMVExpr?
-            = throw IllegalArgumentException("Use assign(...) instead")
+    override fun put(key: SVariable, value: SMVExpr): SMVExpr? = throw IllegalArgumentException("Use assign(...) instead")
 
     fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
         val s = map[key] ?: SymbolicVariable(key).also { map[key] = it }
         val n = "_$assignCounter"
         s.push(v, n)
     }
-
 
     override fun putAll(from: Map<out SVariable, SMVExpr>) {
         from.forEach { (a, b) -> put(a, b) }
@@ -124,12 +120,79 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
         return ss?.value
     }
 
-
     override fun toString(): String {
         val sb = StringBuffer()
         entries.joinTo(sb, prefix = "{", postfix = "}") { (k, v) ->
             "${k.name}=${v.repr()}"
         }
         return sb.toString()
+    }
+
+    /**
+     * Get an representation of this state without any use of definitions.
+     */
+    fun unfolded(): Map<SVariable, SMVExpr> {
+        var m = map.map { (a, b) -> a to b.value!! }.toMap()
+        val defs = getAllDefinitions()
+        val r = ExpressionReplacer(defs)
+        while (true) {
+            r.changed = false
+            val updated = m.map { (t, u) ->
+                t to u.accept(r as SMVAstVisitor<SMVAst>) as SMVExpr
+            }.toMap()
+            m = updated
+            if (!r.changed) break
+        }
+        return m
+    }
+
+    fun getAllDefinitions() =
+            map.flatMap { (_, b) -> b.values.entries }
+                    .map { (a, b) -> a to b }
+                    .toMap()
+}
+
+class ExpressionReplacer(private val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
+    var changed = false
+    override fun visit(v: SVariable): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
+    }
+
+    override fun visit(v: SBinaryExpression): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
+    }
+
+    override fun visit(v: SUnaryExpression): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
+    }
+
+    override fun visit(v: SLiteral): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
+    }
+
+    override fun visit(v: SFunction): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
+    }
+
+    override fun visit(v: SQuantified): SMVExpr {
+        val a = assignments[v]
+        return if (a == null) super.visit(v) else {
+            changed = true; a
+        }
     }
 }

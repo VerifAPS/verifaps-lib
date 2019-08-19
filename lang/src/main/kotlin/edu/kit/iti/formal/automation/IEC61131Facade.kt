@@ -19,8 +19,7 @@ import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.BlockingQueue
+import java.util.*
 
 /**
  * IEC61131Facade class.
@@ -139,9 +138,9 @@ object IEC61131Facade {
     }
 
     fun fileResolve(input: List<CharStream>, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
-        val seq = ArrayBlockingQueue<PouElement>(input.size)
-        input.parallelStream().forEach { seq.addAll(file(it)) }
-        val p = PouElements()
+        val seq = LinkedList<PouElement>()
+        input.parallelStream().forEach { synchronized(seq) { seq.addAll(file(it)) } }
+        val p = PouElements(seq)
         if (builtins)
             p.addAll(BuiltinLoader.loadDefault())
         resolveDataTypes(p)

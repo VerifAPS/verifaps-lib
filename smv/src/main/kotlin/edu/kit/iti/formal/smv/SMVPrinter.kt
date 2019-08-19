@@ -1,32 +1,13 @@
 package edu.kit.iti.formal.smv
 
-/*-
- * #%L
- * smv-model
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.CodeWriter
 import org.jetbrains.annotations.NotNull
-import java.io.*
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
 
-class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
+class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     val sort = true
 
     override fun visit(top: SMVAst) {
@@ -86,18 +67,19 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         a.target.accept(this)
         stream.print(" := ")
         a.expr.accept(this)
-        stream.print(";\n")
+        stream.print(";").nl()
     }
 
     override fun visit(ce: SCaseExpression) {
-        stream.print("case \n")
+        stream.print("case").increaseIndent()
         for ((condition, then) in ce.cases) {
-            (condition.accept(this))
+            stream.nl()
+            condition.accept(this)
             stream.print(" : ")
-            (then.accept(this))
+            then.accept(this)
             stream.print("; ")
         }
-        stream.print("\nesac")
+        stream.decreaseIndent().nl().print("esac")
     }
 
     override fun visit(m: SMVModule) {
@@ -111,7 +93,7 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
             }
             stream.print(")")
         }
-        stream.print('\n')
+        stream.nl()
 
         printVariables("IVAR", m.inputVars)
         printVariables("FROZENVAR", m.frozenVars)
@@ -127,58 +109,47 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
         printSectionSingle("TRANS", m.transExpr)
 
         if (m.initAssignments.size > 0 || m.nextAssignments.size > 0) {
-            stream.print("ASSIGN\n")
+            stream.print("ASSIGN").increaseIndent().nl()
             printAssignments("init", m.initAssignments)
             printAssignments("next", m.nextAssignments)
+            stream.decreaseIndent()
         }
-
-        stream.print("\n-- end of module ");
-        stream.print(m.name);
-        stream.print('\n')
+        stream.nl().print("-- end of module ${m.name}").nl()
     }
 
     private fun printSectionSingle(section: String, exprs: List<SMVExpr>) {
         if (!exprs.isEmpty()) {
-            stream.print(section)
-            stream.print("\n")
-            stream.print("\t")
+            stream.print(section).increaseIndent().nl()
             exprs.conjunction().accept(this)
-            stream.print(";\n")
+            stream.print(";").decreaseIndent().nl()
         }
     }
 
 
     private fun printDefinition(assignments: List<SAssignment>) {
-        stream.printf("DEFINE\n")
+        stream.printf("DEFINE").increaseIndent()
         for ((target, expr) in assignments) {
-            stream.print("\t")
-            stream.print(target.name)
-            stream.print(" := ")
+            stream.nl().print(target.name).print(" := ")
             expr.accept(this)
-            stream.print(";\n")
+            stream.print(";")
         }
     }
 
     private fun printAssignments(func: String, a: List<SAssignment>) {
         val assignments = if (sort) a.sortedBy { it.target.name } else a
         for ((target, expr) in assignments) {
-            stream.print("\t")
-            stream.print(func)
-            stream.print('(')
-            stream.print(target.name)
-            stream.print(") := ")
+            stream.nl().print(func).print('(').print(target.name).print(") := ")
             expr.accept(this)
-            stream.print(";\n")
+            stream.print(";")
         }
     }
 
     private fun printSection(section: String, exprs: List<SMVExpr>) {
         if (exprs.isNotEmpty()) {
             exprs.forEach { e ->
-                stream.print(section)
-                stream.print("\n\t")
+                stream.print(section).increaseIndent().nl()
                 e.accept(this)
-                stream.print(";\n\n")
+                stream.decreaseIndent().nl().nl()
             }
         }
     }
@@ -230,20 +201,17 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
                 else v
 
         if (vars.isNotEmpty()) {
-            stream.print(type)
-            stream.print('\n')
+            stream.print(type).nl()
 
             for (svar in vars) {
-                stream.print('\t')
+                stream.nl()
                 printQuoted(svar.name)
                 stream.print(" : ")
-                stream.print(svar.dataType?.repr())
-                stream.print(";\n")
+                stream.print(svar.dataType?.repr() ?: "<")
+                stream.print(";")
             }
 
-            stream.print("-- end of ")
-            stream.print(type)
-            stream.print('\n')
+            stream.print("-- end of $type").nl()
         }
     }
 
@@ -264,19 +232,19 @@ class SMVPrinter(val stream: PrintWriter) : SMVAstVisitor<Unit> {
     companion object {
         @JvmStatic
         fun toString(m: SMVAst): String {
-            val w = StringWriter()
-            val s = PrintWriter(w)
+            val s = CodeWriter()
             val p = SMVPrinter(s)
             m.accept(p)
-            s.close()
-            return w.toString()
+            return s.stream.toString()
         }
 
         @JvmStatic
         fun toFile(m: @NotNull SMVAst, file: @NotNull File, append: Boolean = false) {
-            PrintWriter(BufferedWriter(FileWriter(file, append))).use {
-                val p = SMVPrinter(it)
-                m.accept(p)
+            BufferedWriter(FileWriter(file, append)).use { stream ->
+                CodeWriter(stream).let {
+                    val p = SMVPrinter(it)
+                    m.accept(p)
+                }
             }
         }
     }

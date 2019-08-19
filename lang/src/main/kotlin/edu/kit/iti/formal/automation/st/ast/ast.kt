@@ -1781,13 +1781,15 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
 data class Position(
         val lineNumber: Int = -1,
         val charInLine: Int = -1,
-        val offset: Int = -1) : Cloneable {
+        val offset: Int = -1,
+        val file: String = "") : Cloneable {
 
     companion object {
         fun start(token: Token?) =
                 Position(token?.line ?: -1,
                         token?.charPositionInLine ?: -1,
-                        token?.startIndex ?: -1)
+                        token?.startIndex ?: -1,
+                        token?.tokenSource?.sourceName ?: "")
 
         fun end(token: Token?): Position {
             return if (token == null) Position()
@@ -1796,10 +1798,9 @@ data class Position(
                 val newlines = text.count { it == '\n' }
                 Position(token.line + newlines,
                         text.length - Math.max(0, text.lastIndexOf('\n')),
-                        token.stopIndex)
+                        token.stopIndex, token?.tokenSource.sourceName ?: "")
             }
         }
-
     }
 
     override fun clone() = copy()
