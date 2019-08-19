@@ -60,7 +60,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     }
 
     override fun visit(l: SLiteral) {
-        stream.print(l.dataType!!.format(l.value))
+        stream.print(l.dataType.format(l.value))
     }
 
     override fun visit(a: SAssignment) {
@@ -128,12 +128,13 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
     private fun printDefinition(assignments: List<SAssignment>) {
         stream.printf("DEFINE").increaseIndent()
+
         for ((target, expr) in assignments) {
             stream.nl().print(target.name).print(" := ")
             expr.accept(this)
             stream.print(";")
         }
-        stream.decreaseIndent()
+        stream.decreaseIndent().nl()
     }
 
     private fun printAssignments(func: String, a: List<SAssignment>) {
@@ -217,20 +218,19 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     }
 
 
-    private val RESERVED_KEYWORDS = hashSetOf("A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
-            "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
-            "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
-
     override fun visit(v: SVariable) = printQuoted(v.name)
 
     fun printQuoted(name: String) {
-        if (name in RESERVED_KEYWORDS)
-            stream.print("\"$name\"")
-        else
-            stream.print(name)
+        stream.print(quoted(name))
     }
 
     companion object {
+        private val RESERVED_KEYWORDS = hashSetOf("A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
+                "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
+                "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
+
+        fun quoted(name: String) = if (name in RESERVED_KEYWORDS) "\"$name\"" else name
+
         @JvmStatic
         fun toString(m: SMVAst): String {
             val s = CodeWriter()

@@ -270,41 +270,23 @@ abstract class SMVExpr : SMVAst() {
     abstract val dataType: SMVType?
 
     //region builder methods
-    fun eventually(): SQuantified {
-        return SQuantified(STemporalOperator.F, this)
-    }
+    fun eventually(): SQuantified = SQuantified(STemporalOperator.F, this)
 
-    fun globally(): SQuantified {
-        return SQuantified(STemporalOperator.G, this)
-    }
+    fun globally(): SQuantified = SQuantified(STemporalOperator.G, this)
 
-    operator fun next(): SQuantified {
-        return SQuantified(STemporalOperator.X, this)
-    }
+    operator fun next(): SQuantified = SQuantified(STemporalOperator.X, this)
 
-    fun since(): SQuantified {
-        return SQuantified(STemporalOperator.S, this)
-    }
+    fun since(): SQuantified = SQuantified(STemporalOperator.S, this)
 
-    fun once(): SQuantified {
-        return SQuantified(STemporalOperator.O, this)
-    }
+    fun once(): SQuantified = SQuantified(STemporalOperator.O, this)
 
-    fun until(other: SMVExpr): SQuantified {
-        return SQuantified(STemporalOperator.U, this, other)
-    }
+    fun until(other: SMVExpr): SQuantified = SQuantified(STemporalOperator.U, this, other)
 
-    infix fun equal(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.EQUAL, e)
-    }
+    infix fun equal(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.EQUAL, e)
 
-    infix fun and(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.AND, e)
-    }
+    infix fun and(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.AND, e)
 
-    infix fun or(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.OR, e)
-    }
+    infix fun or(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.OR, e)
 
     fun op(o: SBinaryOperator, e: SMVExpr): SBinaryExpression {
         val product = SBinaryExpression(this, o, e)
@@ -313,17 +295,25 @@ abstract class SMVExpr : SMVAst() {
         return product
     }
 
-    operator fun not(): SUnaryExpression {
-        return SUnaryExpression(SUnaryOperator.NEGATE, this)
-    }
+    operator fun plus(e: SMVExpr) = op(SBinaryOperator.PLUS, e)
+    operator fun div(e: SMVExpr) = op(SBinaryOperator.DIV, e)
+    operator fun minus(e: SMVExpr) = op(SBinaryOperator.MINUS, e)
+    operator fun times(e: SMVExpr) = op(SBinaryOperator.MUL, e)
 
-    fun minus(): SUnaryExpression {
-        return SUnaryExpression(SUnaryOperator.MINUS, this)
-    }
+    infix fun le(e: SMVExpr) = op(SBinaryOperator.LESS_EQUAL, e)
+    infix fun lt(e: SMVExpr) = op(SBinaryOperator.LESS_THAN, e)
+    infix fun ge(e: SMVExpr) = op(SBinaryOperator.GREATER_EQUAL, e)
+    infix fun gt(e: SMVExpr) = op(SBinaryOperator.GREATER_THAN, e)
+    infix fun eq(e: SMVExpr) = op(SBinaryOperator.EQUAL, e)
+    infix fun neq(e: SMVExpr) = op(SBinaryOperator.NOT_EQUAL, e)
 
-    infix fun implies(e: SMVExpr): SMVExpr {
-        return op(SBinaryOperator.IMPL, e)
-    }
+
+
+    operator fun not(): SUnaryExpression = SUnaryExpression(SUnaryOperator.NEGATE, this)
+
+    fun negate(): SUnaryExpression = SUnaryExpression(SUnaryOperator.MINUS, this)
+
+    infix fun implies(e: SMVExpr): SMVExpr = op(SBinaryOperator.IMPL, e)
 
     /**
      * prefiexed and expression

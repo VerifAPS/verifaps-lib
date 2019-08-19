@@ -63,4 +63,16 @@ class FacadeTest {
         //System.out.println(state);
         //Assertions.assertEquals();
     }
+
+    @Test
+    fun testExecute() {
+        val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st")
+        val (toplevels, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
+        val p = toplevels[2] as ProgramDeclaration
+        val ttp = SymbExFacade.execute(p)
+        for (i in 1..9) {
+            println(ttp.get(i))
+        }
+    }
 }
+

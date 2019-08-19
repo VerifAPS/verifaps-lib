@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
+import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
@@ -33,13 +34,15 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.smv.VariableReplacer
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.findProgram
+import java.io.File
 import java.io.StringWriter
-import java.util.*
+import java.math.BigInteger
+import kotlin.math.ceil
+import kotlin.math.log2
 
 /**
  * @author Alexander Weigl
@@ -58,8 +61,8 @@ object SymbExFacade {
             se.assign(vd, ts[i])
         }
         se.visit(decl as PouExecutable)
-        val uf =  se.peek().unfolded()
-        val v = uf.entries.find { (k,v)-> k.name == decl.name }!!.value
+        val uf = se.peek().unfolded()
+        val v = uf.entries.find { (k, v) -> k.name == decl.name }!!.value
         return v
     }
 
@@ -120,9 +123,10 @@ object SymbExFacade {
      * }
      */
 
+    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule = evaluateProgramWithLineMap(exec, skipSimplify).second
 
     @JvmOverloads
-    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule {
+    fun evaluateProgramWithLineMap(exec: PouExecutable, skipSimplify: Boolean = false): Pair<LineMap, SMVModule> {
         val elements = exec.scope.getVisiblePous()
         IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
         val a = if (skipSimplify) exec else simplify(exec)
@@ -132,7 +136,7 @@ object SymbExFacade {
 
         val moduleBuilder = ModuleBuilder(exec, se.peek())
         moduleBuilder.run()
-        return moduleBuilder.module
+        return se.lineNumberMap to moduleBuilder.module
     }
 
     @JvmOverloads
@@ -190,6 +194,48 @@ object SymbExFacade {
             generateRunnableStub(cout, pous)
         }
         return out.toString()
+    }
+
+    @JvmStatic
+    fun execute(program: PouExecutable,
+                skipSimplify: Boolean = false,
+                cycles: Int = 10): VisualizeTrace {
+        val (lineMap, mod) = evaluateProgramWithLineMap(program, skipSimplify)
+
+        mod.name = "main"
+        mod.moduleParameters.forEach { mod.inputVars.add(it) }
+        mod.moduleParameters.clear()
+
+        val counter = createCounterModule(cycles)
+        mod.stateVars.add(SVariable("__counter__", ModuleType(counter.name, listOf())))
+        val tmpFile = File.createTempFile("run_", ".smv")
+        tmpFile.bufferedWriter().use {
+            val p = SMVPrinter(CodeWriter(it))
+            mod.accept(p)
+            counter.accept(p)
+        }
+        val p = NuXMVProcess(tmpFile)
+        findProgram("nuXmv")?.let {
+            p.executablePath = it.absolutePath
+        }
+        p.commands = NuXMVInvariantsCommand.IC3.commands as Array<String>
+        val output = p.call()
+        if (output is NuXMVOutput.Cex) {
+            val cex = output.counterExample
+            return VisualizeTrace(cex, lineMap, program)
+        }
+        throw java.lang.IllegalStateException("no counter example!")
+    }
+
+    private fun createCounterModule(k: Int): SMVModule {
+        val m = SMVModule("counter$k")
+        val dt = SMVWordType(false, ceil(log2(k.toDouble())).toInt())
+        val cnt = SVariable("cnt", dt)
+        m.stateVars.add(cnt)
+        m.initAssignments.add(SAssignment(cnt, SWordLiteral(k.toBigInteger(), dt)))
+        m.nextAssignments.add(SAssignment(cnt, cnt - SWordLiteral(BigInteger.ONE, dt)))
+        m.invariantSpecs.add(cnt gt SWordLiteral(BigInteger.ZERO, dt))
+        return m
     }
 }
 

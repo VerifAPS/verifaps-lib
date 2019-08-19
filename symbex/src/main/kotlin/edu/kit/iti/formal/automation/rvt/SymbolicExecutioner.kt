@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.analysis.toHuman
+import edu.kit.iti.formal.automation.blocks.getRandomLabel
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
@@ -19,6 +20,8 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
+
+typealias LineMap = HashMap<Int, Pair<String, Position>>
 
 /**
  * Created by weigl on 26.11.16.
@@ -236,18 +239,18 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
                     this.valueTranslator.translate(
                             this.initValueTranslator.getInit(outputVar.dataType!!)))
 
-        push(calleeState)
         //endregion
 
         //region execution of body
         val returnState =
                 if (stBody != null) {
+                    push(calleeState)
                     stBody.accept(this)
                     pop()
                 } else if (ilBody != null) {
                     val ilsymbex = IlSymbex(ilBody, scope = scope, state = calleeState)
                     ilsymbex.call()
-                } else{
+                } else {
                     throw IllegalStateException("No executable body found for $fName")
                 }
 
@@ -267,8 +270,14 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         }
         //endregion
 
-        //fd.getReturnType() != null
-        return calleeState[fName]
+        /*val value = calleeState[fName] // store, because of destroying change in next lines
+        calleeState.map.forEach { (t, u) ->
+            // do not leak internal variables to the outside
+            val variable = SVariable("${getRandomLabel()}_${t.name}", t.dataType!!);
+            callerState.map[variable] = u
+        }*/
+        val unfolded = calleeState.unfolded()
+        return unfolded.entries.find { (a, b) -> a.name == fName }?.value
     }
 
     override fun visit(statement: IfStatement): SCaseExpression? {
@@ -339,7 +348,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     //endregion
 
 
-    val lineNumberMap = TreeMap<Int, Pair<String, Position>>()
+    val lineNumberMap = LineMap()
     val assignmentCounter = AtomicInteger(-1)
 
     fun assign(vd: VariableDeclaration, value: SMVExpr) {

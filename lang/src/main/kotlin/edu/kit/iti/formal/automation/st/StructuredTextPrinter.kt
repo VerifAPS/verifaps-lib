@@ -21,7 +21,7 @@ import java.util.*
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-class StructuredTextPrinter
+open class StructuredTextPrinter
 @JvmOverloads constructor(var sb: CodeWriter = CodeWriter()) : AstVisitor<Unit>() {
     private val literals: StringLiterals = SL_ST
     var bodyPrintingOrder = listOf(BodyPrinting.ST, BodyPrinting.SFC, BodyPrinting.IL)
@@ -106,7 +106,6 @@ class StructuredTextPrinter
             sb.printf(literals.assign())
         assignmentStatement.expression.accept(this)
         sb.printf(";")
-
     }
 
 

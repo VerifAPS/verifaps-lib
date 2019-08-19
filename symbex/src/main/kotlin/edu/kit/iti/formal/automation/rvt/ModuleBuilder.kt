@@ -129,8 +129,8 @@ class ModuleBuilder(val program: PouExecutable,
         module.stateVars.add(s)
     }
 
-    private fun addInitAssignment(`var`: SVariable) {
-        val s = program.scope.getVariable(`var`.name)
+    private fun addInitAssignment(variable: SVariable) {
+        val s = program.scope.getVariable(variable.name)
         val e: SMVExpr
         if (s!!.init != null) {
             val sv = s.init as Literal?
@@ -139,7 +139,7 @@ class ModuleBuilder(val program: PouExecutable,
             e = this.valueTranslator.translate(
                     this.initValueTranslator.getInit(s.dataType!!))
         }
-        val a = SAssignment(`var`, e)
+        val a = SAssignment(variable, e)
         module.initAssignments.add(a)
     }
 

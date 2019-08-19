@@ -112,7 +112,7 @@ object SMVTypes {
 }
 
 data class EnumType(var values: List<String>) : SMVType {
-    override fun format(value: Any): String = value.toString()
+    override fun format(value: Any): String = SMVPrinter.quoted(value.toString())
     override fun read(str: String): String = str
     override fun repr(): String = toString()
 
@@ -126,7 +126,7 @@ data class EnumType(var values: List<String>) : SMVType {
     override fun toString(): String {
         return if (values.isEmpty()) "{}"
         else
-            "{" + values.reduce { a, b -> "$a, $b" } + "}"
+            values.joinToString(", ", "{", "}") { format(it) }
     }
 }
 
