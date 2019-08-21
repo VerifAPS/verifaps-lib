@@ -602,7 +602,7 @@ open class StructuredTextPrinter
     override fun visit(localScope: Scope) {
         val variables = VariableScope(localScope.variables)
         variables.groupBy { it.type }
-                .forEach { type, v ->
+                .forEach { (type, v) ->
                     val vars = v.toMutableList()
                     vars.sortWith(compareBy { it.name })
 
@@ -612,16 +612,13 @@ open class StructuredTextPrinter
                     if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
                         sb.printf("_INOUT")
                     } else {
-                        if (VariableDeclaration.INPUT and type != 0)
-                            sb.printf("_INPUT")
-                        if (VariableDeclaration.OUTPUT and type != 0)
-                            sb.printf("_OUTPUT")
-                        if (VariableDeclaration.EXTERNAL and type != 0)
-                            sb.printf("_EXTERNAL")
-                        if (VariableDeclaration.GLOBAL and type != 0)
-                            sb.printf("_GLOBAL")
-                        if (VariableDeclaration.TEMP and type != 0)
-                            sb.printf("_TEMP")
+                        when {
+                            VariableDeclaration.INPUT and type != 0 -> sb.printf("_INPUT")
+                            VariableDeclaration.OUTPUT and type != 0 -> sb.printf("_OUTPUT")
+                            VariableDeclaration.EXTERNAL and type != 0 -> sb.printf("_EXTERNAL")
+                            VariableDeclaration.GLOBAL and type != 0 -> sb.printf("_GLOBAL")
+                            VariableDeclaration.TEMP and type != 0 -> sb.printf("_TEMP")
+                        }
                     }
                     sb.printf(" ")
                     if (VariableDeclaration.CONSTANT and type != 0)
@@ -633,25 +630,29 @@ open class StructuredTextPrinter
 
                     sb.increaseIndent()
                     for (vd in vars) {
-                        sb.nl()
-                        sb.printf(vd.name).printf(" : ")
-                        variableDataType(vd)
-                        when {
-                            vd.initValue != null -> {
-                                sb.printf(" := ")
-                                val (dt, v) = vd.initValue as Value<*, *>
-                                sb.printf(dt.repr(v))
-                            }
-                            vd.init != null -> {
-                                sb.printf(" := ")
-                                vd.init!!.accept(this)
-                            }
-                        }
-                        sb.printf(";")
+                        print(vd)
                     }
                     sb.decreaseIndent().nl().printf("END_VAR")
                     sb.nl()
                 }
+    }
+
+    open fun print(vd: VariableDeclaration) {
+        sb.nl()
+        sb.printf(vd.name).printf(" : ")
+        variableDataType(vd)
+        when {
+            vd.initValue != null -> {
+                sb.printf(" := ")
+                val (dt, v) = vd.initValue as Value<*, *>
+                sb.printf(dt.repr(v))
+            }
+            vd.init != null -> {
+                sb.printf(" := ")
+                vd.init!!.accept(this)
+            }
+        }
+        sb.printf(";")
     }
 
     override fun visit(structureInitialization: StructureInitialization) {

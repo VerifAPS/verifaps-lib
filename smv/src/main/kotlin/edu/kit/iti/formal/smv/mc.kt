@@ -20,8 +20,8 @@ enum class NuXMVInvariantsCommand(vararg val commands: String) {
             "build_model", "check_ltlspec", "quit"),
     INVAR("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
             "build_model", "check_invar", "quit"),
-    BMC("read_model", "fKlatten_hierarchy", "show_vars", "encode_variables",
-            "build_boolean_model", "check_invar_bmc -a een-sorrensen", "quit")
+    BMC("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
+            "build_boolean_model", "bmc_setup", "check_invar_bmc -a een-sorensson", "quit")
 }
 
 /**

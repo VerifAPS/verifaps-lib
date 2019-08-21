@@ -62,7 +62,7 @@ object SymbExFacade {
         }
         se.visit(decl as PouExecutable)
         val uf = se.peek().unfolded()
-        val v = uf.entries.find { (k, v) -> k.name == decl.name }!!.value
+        val v = uf.entries.find { (k, _) -> k.name == decl.name }!!.value
         return v
     }
 
@@ -218,11 +218,12 @@ object SymbExFacade {
         findProgram("nuXmv")?.let {
             p.executablePath = it.absolutePath
         }
-        p.commands = NuXMVInvariantsCommand.IC3.commands as Array<String>
+        //use BMC because of the complete trace
+        p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()
         if (output is NuXMVOutput.Cex) {
             val cex = output.counterExample
-            return VisualizeTrace(cex, lineMap, program)
+            return VisualizeTrace(cex, lineMap, program, CodeWriter())
         }
         throw java.lang.IllegalStateException("no counter example!")
     }

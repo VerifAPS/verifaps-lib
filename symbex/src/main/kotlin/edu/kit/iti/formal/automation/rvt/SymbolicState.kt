@@ -28,6 +28,9 @@ import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import kotlin.collections.HashMap
 
+const val ASSIGN_SEPARATOR: String = "\$"
+
+
 data class SymbolicVariable(val variable: SVariable) {
     val values = TreeMap<SVariable, SMVExpr>()
     var current = variable
@@ -107,8 +110,8 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
 
     fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
         val s = map[key] ?: SymbolicVariable(key).also { map[key] = it }
-        val n = "_$assignCounter"
-        s.push(v, n)
+        val postfix = "$ASSIGN_SEPARATOR$assignCounter"
+        s.push(v, postfix)
     }
 
     override fun putAll(from: Map<out SVariable, SMVExpr>) {

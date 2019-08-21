@@ -34,4 +34,9 @@ PROGRAM ABC
     END_CASE
     w := SEL(x, 0, w+1);
     x := NOT x;
+
+    IF tick and NOT tock THEN
+      x := x AND x;
+    END_IF
+
 END_PROGRAM

@@ -27,14 +27,18 @@ import com.github.jferard.fastods.tool.FastOds
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.rvt.LineMap
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
+import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinter
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.findProgram
 import java.io.File
 import kotlin.system.exitProcess
@@ -78,6 +82,9 @@ class GetetaApp : CliktCommand(
     val odsExport by option("--ods", help = "generate ods counterexample file").file()
     val odsOpen by option("--ods-open").flag()
 
+    val cexPrinter by option("--cexout", help = "prints an analysation of the counter example and the program")
+            .flag()
+
     val drawAutomaton by option("--debug-automaton").flag(default = false)
     val showAutomaton by option("--show-automaton").flag(default = false)
 
@@ -109,7 +116,7 @@ class GetetaApp : CliktCommand(
             Console.info("Mode is ${it.options.mode} for table ${it.name}")
         }
 
-        val modCode = SymbExFacade.evaluateProgram(code, disableSimplify)
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
         Console.info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
@@ -175,42 +182,60 @@ class GetetaApp : CliktCommand(
                     else -> 0
                 }
 
-        runCexAnalysation(b, tt)
+        if (b is NuXMVOutput.Cex) {
+            if (cexPrinter) useCounterExamplePrinter(b, tt, lineMap, code)
+            else Console.info("Use `--cexout' to print a cex analysation.")
+            if (runAnalyzer) runCexAnalysation(b, tt)
+            else Console.info("Use `--row-map' to print possible row mappings.")
+        }
         Console.info("STATUS: $status")
         exitProcess(errorLevel)
     }
 
-    private fun runCexAnalysation(result: NuXMVOutput, tt: List<SMVConstructionModel>) {
-        if (result is NuXMVOutput.Cex) {
-            if (runAnalyzer) {
-                val mappings = tt.map {
-                    GetetaFacade.analyzeCounterExample(
-                            it.automaton, it.testTable, result.counterExample)
-                }
+    private fun runCexAnalysation(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
+        val mappings = tt.map {
+            GetetaFacade.analyzeCounterExample(
+                    it.automaton, it.testTable, result.counterExample)
+        }
 
-                mappings.forEach { mapping ->
-                    Console.info("MAPPING: ==========")
-                    mapping.forEachIndexed { i, m ->
-                        Console.info("{}: {}", i, m.asRowList())
-                    }
-                    Console.info("/End of MAPPING")
-                }
+        mappings.forEach { mapping ->
+            Console.info("MAPPING: ==========")
+            mapping.forEachIndexed { i, m ->
+                Console.info("{}: {}", i, m.asRowList())
+            }
+            Console.info("/End of MAPPING")
+        }
 
-                when {
-                    mappings.isEmpty() -> Console.warn("no row mapping found!")
-                    odsExport != null -> {
-                        val w = ODSCounterExampleWriter(result.counterExample)
-                        tt.zip(mappings).forEach { (t, m) ->
-                            w.addTestTable(t, m)
-                        }
-                        w.run()
-                        w.writer.saveAs(odsExport)
-                        FastOds.openFile(odsExport)
-                    }
-                    else -> Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
+        when {
+            mappings.isEmpty() -> Console.warn("no row mapping found!")
+            odsExport == null -> Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
+            odsExport != null -> {
+                val w = ODSCounterExampleWriter(result.counterExample)
+                tt.zip(mappings).forEach { (t, m) ->
+                    w.addTestTable(t, m)
                 }
-            } else {
-                Console.info("Use `--row-map' to print possible row mappings.")
+                w.run()
+                w.writer.saveAs(odsExport)
+                FastOds.openFile(odsExport)
+            }
+        }
+    }
+
+    private fun useCounterExamplePrinter(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
+                                         lineMap: LineMap,
+                                         program: PouExecutable) {
+        for (model in tt) {
+            val file = File(outputFolder,"cex_${model.testTable.name}.txt")
+            file.bufferedWriter().use {
+                val stream = CodeWriter(it)
+                val cep = CounterExamplePrinter(
+                        automaton = model.automaton,
+                        testTable = model.testTable,
+                        cex = result.counterExample,
+                        lineMap = lineMap,
+                        program = program,
+                        stream = stream)
+                cep.getAll()
             }
         }
     }

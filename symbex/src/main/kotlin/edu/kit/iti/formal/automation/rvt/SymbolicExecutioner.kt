@@ -375,7 +375,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             val sv = SymbolicVariable(t)
             val cnt = assignmentCounter.incrementAndGet()
             lineNumberMap[cnt] = t.name to pos
-            sv.push(u.compress(), "_$cnt")
+            sv.push(u.compress(), "$ASSIGN_SEPARATOR$cnt")
             defines[t]?.let { sv.values.putAll(it) }
             sb.map[t] = sv
         }

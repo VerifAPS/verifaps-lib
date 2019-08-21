@@ -28,4 +28,10 @@ function geteta_minmax_broken() {
     geteta -c MinMax.st --table MinMax_Broken.gtt
 }
 
-EXPORTED_TESTS=(geteta_help geteta_constantprogram geteta_minmax_minimal geteta_minmax geteta_minmax_broken)
+function geteta_cexprinter() {
+  cd geteta/examples/cycles
+  geteta --row-map --cexout -t cycles_wrong.gtt -c cycles.st
+}
+
+#EXPORTED_TESTS=(geteta_help geteta_constantprogram geteta_minmax_minimal geteta_minmax geteta_minmax_broken)
+EXPORTED_TESTS=$(gettests geteta_)
