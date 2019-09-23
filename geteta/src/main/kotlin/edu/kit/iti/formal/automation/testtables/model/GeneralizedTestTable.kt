@@ -27,8 +27,7 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String)
-            = internalVariable(programRunNames).inModule(tableName)
+    open fun externalVariable(programRunNames: List<String>, tableName: String) = internalVariable(programRunNames).inModule(tableName)
 
     open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
 }
@@ -235,7 +234,7 @@ sealed class Duration {
             get() = true
     }
 
-    data class OpenInterval(val lower: Int, var pflag: Boolean) : Duration() {
+    data class OpenInterval(val lower: Int, var pflag: Boolean = false) : Duration() {
         override fun contains(cycles: Int): Boolean = lower <= cycles
 
         override val isUnbounded: Boolean
@@ -311,22 +310,24 @@ fun Duration.isOptional(time: Int): Boolean =
         }
 
 
-sealed class TableNode(open val id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
+sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
     abstract fun count(): Int
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
+    abstract fun clone(): TableNode
 }
 
-data class Region(override val id: String,
+data class Region(override var id: String,
                   var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
     constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumBy { it.count() }
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
     override fun depth() = 1 + (this.children.maxBy { it.depth() }?.depth() ?: 0)
+    override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }
 }
 
-data class TableRow(override val id: String) : TableNode(id) {
+data class TableRow(override var id: String) : TableNode(id) {
     val rawFields: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
 
     /** Input constraints as list. */
@@ -423,4 +424,6 @@ data class TableRow(override val id: String) : TableNode(id) {
         val name = v.name
         return inputExpr[name] ?: outputExpr[name]
     }
+
+    override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
 }

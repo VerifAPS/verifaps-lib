@@ -22,6 +22,7 @@ package edu.kit.iti.formal.automation.testtables.builder
 import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
+import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
@@ -111,8 +112,8 @@ abstract class AbstractTransformer<T : Any> : Transformer<T> {
 
 class AutomataTransformerState(val testTable: GeneralizedTestTable,
                                val automaton: TestTableAutomaton) {
-    val flatRegion = testTable.region.flat()
-    val stateReachability = StateReachability(testTable.region)
+    lateinit var flatRegion: List<TableRow>
+    lateinit var stateReachability: StateReachability
 }
 typealias AutomatonConstructionTransformer = Transformer<AutomataTransformerState>
 

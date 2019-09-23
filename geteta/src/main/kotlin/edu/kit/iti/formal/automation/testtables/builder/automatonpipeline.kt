@@ -1,13 +1,11 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.testtables.model.Duration
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.TableRow
+import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
+import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
-import edu.kit.iti.formal.automation.testtables.model.isOptional
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import kotlin.collections.set
 
@@ -15,7 +13,9 @@ class AutomatonBuilderPipeline(
         val table: GeneralizedTestTable,
         var steps: List<AutomatonConstructionTransformer> = listOf()) {
     init {
-        steps = listOf(InitialAutomataCreator(),
+        steps = listOf(
+                RowGroupExpander(),
+                InitialAutomataCreator(),
                 if (table.options.mode == Mode.CONCRETE_TABLE)
                     AutomatonConcretizerTransformation()
                 else
@@ -33,8 +33,91 @@ class AutomatonBuilderPipeline(
     }
 }
 
+val Duration.minimum: Int
+    get() = when (this) {
+        is Duration.OpenInterval -> lower
+        is Duration.ClosedInterval -> lower
+        is Duration.Omega -> 0
+    }
+
+val Duration.maximum: Int
+    get() = when (this) {
+        is Duration.OpenInterval -> minimum + 1
+        is Duration.ClosedInterval -> upper
+        is Duration.Omega -> 1
+    }
+
+
 val stateNameError = "__ERROR__"
 val stateNameSentinel = "__SENTINEL__"
+
+
+/**
+ * If the gtt contains a row group with a minimum amount of iteration, we expand it under maintaining
+ * the reachability.
+ *
+ * Also maintins [AutomataTransformerState.flatRegion] and [AutomataTransformerState.stateReachability]
+ */
+open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
+    override fun transform() {
+        model.testTable.region = rewrite(model.testTable.region)
+        model.flatRegion = model.testTable.region.flat()
+        model.stateReachability = StateReachability(model.testTable.region)
+    }
+
+    companion object {
+        /**
+         * creates a new region, expand the children and itself.
+         */
+        fun rewrite(region: Region): Region {
+            val m = region.duration.minimum
+            //expand this region if necessary
+            val r = if (m == 0) region else expand(region)
+
+            val children = ArrayList<TableNode>(r.children.size)
+            //expand this region if necessary
+            for (child in r.children) {
+                when (child) {
+                    is TableRow -> children.add(child)
+                    is Region -> children.add(rewrite(child))
+                }
+            }
+            r.children = children
+            return r
+        }
+
+        /**
+         * Unwind the given region
+         */
+        fun expand(r: Region): Region {
+            if (r.duration == Duration.Omega || !r.duration.isRepeatable
+                    || r.duration.minimum == 0) {
+                return r
+            }
+            val seq = ArrayList<TableNode>(r.children.size)
+            val m = r.duration.maximum
+            for (iter in 1..m) {
+                val t = Region(r.id + "_${iter}")
+                t.duration = when {
+                    (iter == m && r.duration is Duration.OpenInterval) ->
+                        Duration.OpenInterval(0, r.duration.pflag)
+                    (r.duration is Duration.ClosedInterval && r.duration.minimum < iter && iter <= r.duration.maximum) ->
+                        Duration.ClosedInterval(0,1, r.duration.pflag)
+                    else ->
+                        Duration.ClosedInterval(1, 1, r.duration.pflag)
+                }
+
+                r.children.forEach {
+                    t.children.add(it.clone().also { it.id = "${t.id}_${it.id}" })
+                }
+                seq.add(t)
+            }
+            val new = Region(r.id, seq)
+            new.duration = Duration.ClosedInterval(1, 1, false)
+            return new
+        }
+    }
+}
 
 class InitialAutomataCreator : AbstractTransformer<AutomataTransformerState>() {
     override fun transform() {
@@ -117,6 +200,7 @@ open class RowStateCreator : AbstractTransformer<AutomataTransformerState>() {
         model.automaton.rowStates[s] = states
     }
 }
+
 
 /**
  * Creates an mutual exclusion for states, based on the progress flag.
