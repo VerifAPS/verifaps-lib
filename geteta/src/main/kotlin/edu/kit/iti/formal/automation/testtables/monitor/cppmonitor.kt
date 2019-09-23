@@ -47,11 +47,15 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     val cppRewriter =
             SmvToCTranslator().also {
                 gtt.programVariables.forEach { pv ->
-                    it.variableReplacement[pv.name] = "input.${pv.name}"
+                    val name = pv.externalVariable(gtt.programRuns, gtt.name).name
+                    it.variableReplacement[name] = "input.${pv.name}"
                 }
                 gtt.constraintVariables.forEach { cv ->
-                    it.variableReplacement[cv.name] = "token.globalVars.${cv.name}"
+                    val name = cv.externalVariable(gtt.programRuns, gtt.name).name
+                    it.variableReplacement[name] = "token.globalVars.${cv.name}"
                 }
+
+                it.rewritingFunction = {it -> it.replace("code$", "input.")}
             }
 
     private fun defineGlobalVarStruct() {
@@ -77,32 +81,72 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     }
 
     fun call(): Monitor {
+        cw.println("#include \"../mon.h\"")
         defineIOStruct(structNameIo, gtt.programVariables)
+
+        defineGlobalVarStruct()
+        defineStateEnum()
 
         cw.println("template <typename io_t>")
                 .cblock("class ${gtt.name.capitalize()}Monitor " +
-                        ": public BaseMonitor<io_t> {", "};") {
-                    defineGlobalVarStruct()
-                    defineStateEnum()
+                        ": public IMonitor<io_t> {", "};") {
+                    println("struct Token {int state; gv_t globalVars;};")
+                    println("vector<Token> tokens;")
+                    println("  int numErrors;")
                     println("public:").nl()
+
+                    println("${gtt.name.capitalize()}Monitor() { reset(); }")
+
                     cblock("void reset() override {", "}") {
-                        println("BaseMonitor::reset();")
+                        print("""
+                            this->state(MonitorState::FINE);
+                            numErrors = 0;
+                            tokens.clear();
+                        """.trimIndent())
                         automaton.getStartStates().forEach {
-                            val state = "${enumStates}::${it.name}"
-                            println("tokens.push_back((struct Token) { .state = $state, .globalVars = ${structNameGv}_default });")
+                            val state = "${enumStates}::${it.name}".also {
+                                createNewToken("tokens  ", it, "${structNameGv}_default")
+                            }
                         }
                     }
 
+                    cw.nl().cblock("void next(const io_t &input) override {", "}") {
+                        print("""
+                                vector<Token> newTokens;
+                                for (auto &&tok : tokens) evaluate(newTokens, tok, input);
+                            
+                                tokens.clear();
+                            
+                                bool hitError = false, hitState = false;
+                                for (auto &&i : newTokens) {
+                                  switch (i.state) {
+                                    case ERROR_STATE:
+                                      hitError = true;
+                                      break;
+                                    case LIGHTNING_STATE:
+                                      break;
+                                    default: {
+                                      hitState = true;
+                                      tokens.push_back(i);
+                                    }
+                                  }
+                                } 
+                                this->state(hitError ? MonitorState::ERROR
+                                               : hitState ? MonitorState::FINE : MonitorState::UNKNOWN);
+                        """.trimIndent())
+                    }
 
-                    cw.nl().cblock("void evaluate (vector<Token> &newTokens, Token &token, const $structNameIo &input) override {",
+                    cw.nl().cblock("void evaluate (vector<Token> &newTokens, " +
+                            "Token &token, const io_t &input) {",
                             "}") {
+                        println("bool __inputcnstr = false, __outputcnstr = false;")
                         //println("bool newToken = false;")
                         cblock("switch(token.state) {", "}") {
                             automaton.rowStates.forEach { (tr, rs) ->
                                 rs.forEach { println("case ${enumStates}::${it.name}:") }
                                 increaseIndent()
-                                nl().print("bool __inputcnstr = ${expr(tr.inputExpr)};")
-                                nl().print("bool __outputcnstr  = ${expr(tr.outputExpr)};")
+                                nl().print("__inputcnstr = ${expr(tr.inputExpr)};")
+                                nl().print("__outputcnstr  = ${expr(tr.outputExpr)};")
 
                                 nl().cblock("switch(token.state) {", "}") {
                                     rs.forEach { generateCase(it) }
@@ -114,6 +158,11 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 }
         monitor.body = cw.stream.toString()
         return monitor
+    }
+
+    private fun createNewToken(vec: String, state: String, globalvars: String) {
+        cw.println("$vec.push_back((struct Token) " +
+                "{ .state = $state, .globalVars = $globalvars });")
     }
 
     private fun generateCase(it: RowState) {
@@ -138,7 +187,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
         cw.nl().cblock("if($condition) {", "}") {
             val to = t.to.name
-            println("newTokens.push_back({.state=$enumStates::$to});")
+            createNewToken("newTokens", "$enumStates::$to", "token.globalVars")
         }
     }
 
@@ -193,7 +242,7 @@ class CppCombinedMonitorGenerationImpl(val name: String,
                             }
                             acc
                         }
-        monitor.types += defineIOStruct("${name}_io_t", combinedVariables)
+        monitor.types += defineIOStruct("T_io_t", combinedVariables)
     }
 
     private fun getOwnBody(): String {
