@@ -44,9 +44,17 @@ table : (r=RELATIONAL {relational=true;})?
 
 opts : OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
-signature : VAR state=STATE? io=(INPUT|OUTPUT)
+signature : VAR var_modifier
     variableDefinition (COMMA variableDefinition)*
     COLON dt=IDENTIFIER osem
+;
+
+var_modifier:
+  (STATE | INPUT | OUTPUT | NEXT | ASSUM | ASSERT)
+;
+
+column:
+  COLUMN var_modifier name=IDENTIFIER COLON dt=IDENTIFIER AS expr (COMMA expr)*
 ;
 
 variableDefinition :
@@ -208,6 +216,10 @@ FI: 'fi';
 GUARD: '::';
 T : 'TRUE' | 'true';
 F : 'FALSE' | 'false';
+COLUMN : 'column' | 'COLUMN';
+NEXT : 'next';
+ASSUM : 'ASSUME' | 'assume';
+ASSERT : 'ASSERT' | 'assert';
 
 IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]*;
 

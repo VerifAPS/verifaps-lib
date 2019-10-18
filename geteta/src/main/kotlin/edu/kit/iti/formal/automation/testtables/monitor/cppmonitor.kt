@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.testtables.monitor
 
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.model.ColumnVariable
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
@@ -55,7 +56,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                     it.variableReplacement[name] = "token.globalVars.${cv.name}"
                 }
 
-                it.rewritingFunction = {it -> it.replace("code$", "input.")}
+                it.rewritingFunction = { it -> it.replace("code$", "input.") }
             }
 
     private fun defineGlobalVarStruct() {
@@ -299,13 +300,14 @@ while (i != std::end(monitors)) {
 }
 
 
-private fun defineIOStruct(typeName: String, variables: MutableList<ProgramVariable>): String {
+private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String {
     val cw = CodeWriter()
     cw.cblock("struct $typeName {", "};") {
-        variables.forEach { pv ->
-            print("${dataType(pv.dataType)}  ${pv.name};")
-                    .println("// ${pv.io}")
-        }
+        variables.filterIsInstance<ProgramVariable>()
+                .forEach { pv ->
+                    print("${dataType(pv.dataType)}  ${pv.name};")
+                            .println("// ${pv.category}")
+                }
     }
     cw.nl().nl()
     return cw.toString()

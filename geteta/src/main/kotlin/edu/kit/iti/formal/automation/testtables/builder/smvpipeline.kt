@@ -3,7 +3,9 @@ package edu.kit.iti.formal.automation.testtables.builder
 import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
+import edu.kit.iti.formal.automation.testtables.model.ProjectionVariable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
@@ -15,6 +17,7 @@ import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
 
@@ -34,6 +37,7 @@ class SmvConstructionPipeline(
         transformers.add(GenerateSmvExpression)
         transformers.add(RegisterDefines)
         transformers.add(DefineStateVariables)
+        transformers.add(DefineProjectionVariables)
         transformers.add(InitialStates)
         transformers.add(DefineTransitions)
         transformers.add(NameSetterTransformer())
@@ -55,6 +59,24 @@ class SmvConstructionPipeline(
     fun transform(): SMVConstructionModel {
         transformers.forEach { a -> a.transform(model) }
         return model
+    }
+}
+
+object DefineProjectionVariables : SmvConstructionTransformer {
+    override fun transform(model: SMVConstructionModel) {
+        model.testTable.programVariables
+                .filterIsInstance<ProjectionVariable>()
+                .forEach {
+                    val zip = it.argumentDefinitions.zip(it.constraint)
+                    for ((v, expr) in zip) {
+                        translate(model, v, expr)
+                    }
+                }
+    }
+
+    private fun translate(model: SMVConstructionModel, variable: SVariable, expr: TestTableLanguageParser.ExprContext) {
+        val smvExpr = GetetaFacade.exprToSmv(expr, model.testTable.parseContext)
+        model.tableModule.definitions.add(SAssignment(variable, smvExpr))
     }
 }
 
@@ -211,7 +233,7 @@ class ModuleParameterTransformer : SmvConstructionTransformer {
                 model.testTable.programVariables.map {
                     val a = it.externalVariable(model.variableContext.programRuns,
                             "_${model.testTable.name}")
-                    if (it.isOutput) a.inNext() else a
+                    if (it.isAssertion) a.inNext() else a
                 }
         )
     }

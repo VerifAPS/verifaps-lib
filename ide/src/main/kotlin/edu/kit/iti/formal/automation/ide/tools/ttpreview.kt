@@ -66,10 +66,10 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
 
     override fun render(gtt: GeneralizedTestTable) {
         try {
-            val ioCompare = compareBy<ProgramVariable> { it.io }
+            val ioCompare = compareBy<ProgramVariable> { it.category }
             val nameCompare = compareBy<ProgramVariable> { it.name }
             val cmp = ioCompare.thenComparing(nameCompare)
-            val vars = gtt.programVariables.toMutableList()
+            val vars = gtt.programVariables.filterIsInstance<ProgramVariable>().toMutableList()
             vars.sortWith(cmp)
             val treeModel = TTTableModel(gtt)
             val rowModel = TTRowModel(vars)

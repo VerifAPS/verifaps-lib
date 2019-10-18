@@ -23,7 +23,7 @@ package edu.kit.iti.formal.automation.testtables.io
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.IoVariableType
+import edu.kit.iti.formal.automation.testtables.model.ColumnCategory
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.smv.SMVTypes
@@ -75,8 +75,8 @@ object CellExpressionTest {
 
     private fun iovar(name: String, io: String, run: Int) =
             ProgramVariable(name, INT, SMVTypes.signed(16),
-                    if (io == "input") IoVariableType.INPUT else IoVariableType.OUTPUT,
-                    run)
+                    if (io == "input") ColumnCategory.ASSUME else ColumnCategory.ASSERT,
+                    programRun = run)
 
     val CASES = arrayOf(
             "|>" to "_1\$Q = Q",

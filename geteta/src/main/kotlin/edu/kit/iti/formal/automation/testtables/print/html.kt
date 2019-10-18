@@ -105,7 +105,7 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
         val c =
                 if (cell.inBetween) "in-between"
                 else ""
-        stream.print("""<td class="cell ${v.name} ${v.dataType} ${v.logicType} ${v.io} $c">$content</td>
+        stream.print("""<td class="cell ${v.name} ${v.dataType} ${v.logicType} ${v.category} $c">$content</td>
         """)
     }
 

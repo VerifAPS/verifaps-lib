@@ -73,7 +73,7 @@ class PrinterHelper(gtt: GeneralizedTestTable,
         gtt.programVariables.forEach { columns[it.name] = calculateColumn(it) }
     }
 
-    fun calculateColumn(column: ProgramVariable): List<PrintCellContent> {
+    fun calculateColumn(column: ColumnVariable): List<PrintCellContent> {
         var previousContent = GetetaFacade.parseCell("-").cell()!!
         val seq = states.map { PrintCellContent() }
         var currentGroupDuration = 0
@@ -126,8 +126,8 @@ abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
 
     protected lateinit var helper: PrinterHelper
     protected var currentRow = 0
-    val input = gtt.programVariables.filter { it.isInput }
-    val output = gtt.programVariables.filter { it.isOutput }
+    val input = gtt.programVariables.filter { it.isAssumption }
+    val output = gtt.programVariables.filter { it.isAssertion }
     val durations = Stack<Pair<Duration, Int>>()
     val depth = gtt.region.depth()
 
@@ -148,7 +148,13 @@ abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
     protected open fun rowEnd() {}
 
     protected open fun printGroupDuration(dur: Duration, rowSpan: Int) {}
+    protected open fun printCell(v: ColumnVariable, row: TableRow) {
+        if(v is ProjectionVariable) printCell(v, row)
+        if(v is ProgramVariable) printCell(v, row)
+    }
     protected open fun printCell(v: ProgramVariable, row: TableRow) {}
+    protected open fun printCell(v: ProjectionVariable, row: TableRow) {}
+
     protected open fun printRowDuration(duration: Duration) {}
 
     override fun print() {

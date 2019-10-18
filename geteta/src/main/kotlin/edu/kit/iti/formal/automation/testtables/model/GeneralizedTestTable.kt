@@ -6,11 +6,13 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.apps.Geteta
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.VariableReplacer
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
@@ -18,9 +20,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-enum class IoVariableType {
-    INPUT, OUTPUT, STATE_INPUT, STATE_OUTPUT
-}
+enum class ColumnCategory { ASSUME, ASSERT }
 
 sealed class Variable : Identifiable {
     abstract override var name: String
@@ -32,13 +32,29 @@ sealed class Variable : Identifiable {
     open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
 }
 
+abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {
+    val isAssumption
+        get() = category == ColumnCategory.ASSUME
+
+    val isAssertion
+        get() = !isAssumption
+
+    abstract fun respondTo(name : String, run : Int?) : Boolean
+}
+
 data class ProgramVariable(
         override var name: String,
         override var dataType: AnyDt,
         override var logicType: SMVType,
-        var io: IoVariableType,
-        var programRun: Int = 0) : Variable() {
+        override var category: ColumnCategory = ColumnCategory.ASSUME,
+        var isState: Boolean = false,
+        var isNext: Boolean = false,
+        var programRun: Int = 0) : ColumnVariable(category) {
 
+    override fun respondTo(name: String, run: Int?)
+            = name == this.name && (run==null || programRun == run)
+
+    var realName: String = name
     /**
      *
      */
@@ -49,15 +65,6 @@ data class ProgramVariable(
      *
      */
     override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$realName", logicType)
-
-
-    var realName: String = name
-
-    val isInput
-        get() = io == IoVariableType.INPUT || io == IoVariableType.STATE_INPUT
-
-    val isOutput
-        get() = !isInput
 }
 
 data class ConstraintVariable(
@@ -67,12 +74,52 @@ data class ConstraintVariable(
         var constraint: TestTableLanguageParser.CellContext? = null)
     : Variable()
 
+data class ProjectionVariable(
+        override var name: String,
+        override var dataType: AnyDt,
+        override var logicType: SMVType,
+        override var category: ColumnCategory = ColumnCategory.ASSUME,
+        var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf())
+    : ColumnVariable(category) {
+
+    val arity : Int
+        get() = constraint.size
+
+    val argumentDefinitions : List<SVariable>
+        get()  = (0 until arity).map { SVariable("${name}_$it") }
+
+
+    override fun respondTo(name: String, run: Int?)
+            = name == this.name
+
+    /**
+     *
+     */
+    override fun externalVariable(programRunNames: List<String>, tableName: String) =
+            SVariable("$tableName.$name", logicType)
+
+    /**
+     *
+     */
+    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("$name", logicType)
+}
+
+data class SmvFunctionDefinition(val body : SMVExpr, val parameter : List<SVariable>) {
+    val arity = parameter.size
+    fun call(args : List<SMVExpr>): SMVExpr {
+        val replacement = parameter.zip(args).toMap()
+        val replacer = VariableReplacer(replacement)
+        return body.clone().accept(replacer) as SMVExpr
+    }
+}
+
 class ParseContext(
         val relational: Boolean = false,
         val programRuns: List<String> = listOf(),
         val vars: MutableMap<Variable, SVariable> = hashMapOf(),
         val refs: MutableMap<SVariable, Int> = hashMapOf(),
-        val fillers: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
+        val functions : MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
+        val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
     public fun isVariable(v: String) = v in this
     public fun getSMVVariable(v: Variable) =
@@ -106,12 +153,23 @@ class ParseContext(
 
         return getSMVVariable(va)
     }
+
+    fun getFunction(varName: String?): SmvFunctionDefinition? {
+        return functions[varName] ?: findDefaultFunction(varName)
+    }
+
+    private fun findDefaultFunction(varName: String?): SmvFunctionDefinition? {
+        if(varName==null) return null
+        if(isVariable(varName)) return null
+
+        return GetetaFacade.DEFAULT_COMPARISON_FUNCTIONS[varName]
+    }
 }
 
 class GeneralizedTestTable(
         var name: String = "anonym",
-        val programVariables: MutableList<ProgramVariable> = ArrayList<ProgramVariable>(),
-        val constraintVariables: MutableList<ConstraintVariable> = ArrayList<ConstraintVariable>(),
+        val programVariables: MutableList<ColumnVariable> = ArrayList(),
+        val constraintVariables: MutableList<ConstraintVariable> = ArrayList(),
         var properties: MutableMap<String, String> = HashMap(),
         var region: Region = Region(0),
         val functions: LookupList<FunctionDeclaration> = ArrayLookupList(),
@@ -153,7 +211,7 @@ class GeneralizedTestTable(
         return a ?: b ?: error("Could not found a variable with $text in signature.")
     }*/
 
-    fun add(v: ProgramVariable) {
+    fun add(v: ColumnVariable) {
         programVariables += v
     }
 
@@ -164,8 +222,6 @@ class GeneralizedTestTable(
     fun addOption(key: String, value: String) {
         properties[key] = value
     }
-
-    fun getIoVariables(i: Int): ProgramVariable = programVariables[i]
 
     val DEFAULT_CELL_CONTENT = "-"
 
@@ -185,18 +241,20 @@ class GeneralizedTestTable(
             vc.getSMVVariable(it)
             vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT).cell()
         }
+
+        functions.forEach { fd ->
+            vc.functions[fd.name] = GetetaFacade.functionToSmv(fd)
+        }
+
         vc
     }
     val maxProgramRun: Int
-        get() = programVariables.map { it.programRun }.maxBy { it } ?: 0
+        get() = programVariables
+                .filterIsInstance(ProgramVariable::class.java)
+                .map { it.programRun }.maxBy { it } ?: 0
 
-    fun getProgramVariables(name: String, run: Int?): ProgramVariable {
-        val pv = if (run == null) {
-            programVariables.find { it.name == name }
-        } else {
-            programVariables.find { (it.name == name || it.realName == name) && it.programRun == run }
-        }
-
+    fun getProgramVariables(name: String, run: Int?): ColumnVariable {
+        val pv = programVariables.find { it.respondTo(name, run) }
         return pv ?: throw IllegalStateException("Could not find variable: $run|>$name.")
     }
 
@@ -328,7 +386,7 @@ data class Region(override var id: String,
 }
 
 data class TableRow(override var id: String) : TableNode(id) {
-    val rawFields: MutableMap<ProgramVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
+    val rawFields: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
 
     /** Input constraints as list. */
     val inputExpr: MutableMap<String, SMVExpr> = hashMapOf()
@@ -392,7 +450,7 @@ data class TableRow(override var id: String) : TableNode(id) {
         inputExpr.clear()
         outputExpr.clear()
 
-        val new = HashMap<ProgramVariable, TestTableLanguageParser.CellContext>()
+        val new = HashMap<ColumnVariable, TestTableLanguageParser.CellContext>()
         for (k in vc.fillers.keys.toHashSet()) {
             val v = rawFields[k]
             if (v != null) {
@@ -405,10 +463,8 @@ data class TableRow(override var id: String) : TableNode(id) {
         }
         rawFields.putAll(new)
 
-        inputExpr.putAll(
-                GetetaFacade.exprsToSMV(vc, new.filter { it.key.isInput })
-        )
-        outputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isOutput }))
+        inputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isAssumption }))
+        outputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isAssertion }))
 
         if (vc.relational)
             vc.programRuns.mapIndexed { i, s ->

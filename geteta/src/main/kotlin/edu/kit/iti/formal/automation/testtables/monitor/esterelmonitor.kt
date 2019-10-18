@@ -26,7 +26,7 @@ object MonitorGenerationEsterel : MonitorGeneration {
             val out = CodeWriter(stream)
             out.write("module $moduleName : ").block {
                 out.nl().print("input ")
-                gtt.programVariables.joinTo(out, ", ") { it.realName }
+                gtt.programVariables.joinTo(out, ", ") { it.name }
                 out.print(";")
 
                 out.nl().print("signal ")

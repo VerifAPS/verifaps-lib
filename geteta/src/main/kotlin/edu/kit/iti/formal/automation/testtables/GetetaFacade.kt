@@ -2,10 +2,12 @@ package edu.kit.iti.formal.automation.testtables
 
 
 import edu.kit.iti.formal.automation.Console
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
@@ -29,7 +31,6 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
-import java.io.PrintWriter
 import java.io.StringWriter
 
 object GetetaFacade {
@@ -51,8 +52,7 @@ object GetetaFacade {
     fun parseCell(cell: String, enableRelational: Boolean = true) =
             createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
 
-    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr
-            = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   programRun: Int, vars: ParseContext): SMVExpr {
@@ -60,6 +60,27 @@ object GetetaFacade {
         val expr = cell.accept(ev)
         Console.debug("parsed: %s to %s", cell, expr)
         return expr
+    }
+
+    fun exprToSMV(u: TestTableLanguageParser.CellContext,
+                  pv: ProjectionVariable, vc: ParseContext): SMVExpr {
+        check(pv.arity == 0) { "Arity of column function is zero. Column ${pv.name}" }
+
+        if (pv.arity > 1) {
+            if (u.chunk(0) is TestTableLanguageParser.CvariableContext) {
+                val varName = u.chunk(0).text
+                val fd = vc.getFunction(varName)
+                if (fd != null) {
+                    check(fd.arity == pv.arity) {
+                        "Arity mismatch in implicit function call $varName in column ${pv.name} "
+                    }
+                    return fd.call(pv.argumentDefinitions)
+                }
+            }
+            throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+        } else {
+            return exprToSMV(u, pv.argumentDefinitions.first(), 0, vc)
+        }
     }
 
     fun parseDuration(duration: String): Duration {
@@ -78,6 +99,22 @@ object GetetaFacade {
     private fun getSMVDataType(dataType: AnyDt): SMVType {
         return DefaultTypeTranslator.INSTANCE.translate(dataType)
                 ?: error("Data type $dataType is not supported by DataTypeTranslator")
+    }
+
+    val DEFAULT_COMPARISON_FUNCTIONS: Map<String, SmvFunctionDefinition> by lazy {
+        val map = HashMap<String, SmvFunctionDefinition>()
+        map["leq"] = getSmvFunction("x <= y", "x", "y")
+        map["geq"] = getSmvFunction("x >= y", "x", "y")
+        map["eq"] = getSmvFunction("x = y", "x", "y")
+        map["neq"] = getSmvFunction("x != y", "x", "y")
+        map["gt"] = getSmvFunction("x > y", "x", "y")
+        map["lt"] = getSmvFunction("x < y", "x", "y")
+        map
+    }
+
+    private fun getSmvFunction(body: String, vararg args: String): SmvFunctionDefinition {
+        val sargs = args.map { SVariable(it) }
+        return SmvFunctionDefinition(SMVFacade.expr(body), sargs)
     }
 
     val DEFAULT_PROGRAM_RUN_NAME = { it: Int -> "_$it$" }
@@ -101,10 +138,15 @@ object GetetaFacade {
     }
 
     fun exprsToSMV(vc: ParseContext,
-                   constraints: Map<ProgramVariable, TestTableLanguageParser.CellContext>)
+                   constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>)
             : Map<String, SMVExpr> = constraints.map { (t, u) ->
-        t.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+        if (t is ProgramVariable)
+            t.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+        else //if(t is ProjectionVariable)
+            t.name to exprToSMV(u, t as ProjectionVariable, vc)
+
     }.toMap()
+
 
     fun delay(ref: SReference): DelayModuleBuilder {
         return DelayModuleBuilder(ref.variable,
@@ -204,6 +246,19 @@ object GetetaFacade {
         val p = DSLTablePrinter(CodeWriter(stream))
         p.print(gtt)
         return stream.toString()
+    }
+
+    fun functionToSmv(fd: FunctionDeclaration): SmvFunctionDefinition {
+        val parameters = fd.scope.variables.filter { it.isInput }
+                .map { DefaultTypeTranslator.INSTANCE.translate(it) }
+        val body = SymbExFacade.evaluateFunction(fd, parameters)
+        return SmvFunctionDefinition(body, parameters)
+    }
+
+    fun exprToSmv(expr: TestTableLanguageParser.ExprContext, parseContext: ParseContext): SMVExpr {
+        val dummy = SVariable("dummy", SMVTypes.BOOLEAN)
+        val visitor = TblLanguageToSmv(dummy, null, parseContext)
+        return expr.accept(visitor)
     }
 
 

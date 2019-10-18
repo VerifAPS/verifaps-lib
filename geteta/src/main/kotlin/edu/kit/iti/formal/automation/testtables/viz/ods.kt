@@ -31,8 +31,8 @@ abstract class ODSWriter {
 }
 
 abstract class ODSTestTableWriter(protected val gtt: GeneralizedTestTable) : ODSWriter() {
-    protected val input = gtt.programVariables.filter { it.isInput }
-    protected val output = gtt.programVariables.filter { it.isOutput }
+    protected val input = gtt.programVariables.filter { it.isAssumption }
+    protected val output = gtt.programVariables.filter { it.isAssertion }
 }
 
 class ODSCounterExampleWriter constructor(
@@ -57,8 +57,8 @@ class ODSCounterExampleWriter constructor(
     }
 
     inner class Impl(val gtt: GeneralizedTestTable, val m: Mapping) {
-        protected val input = gtt.programVariables.filter { it.isInput }
-        protected val output = gtt.programVariables.filter { it.isOutput }
+        protected val input = gtt.programVariables.filter { it.isAssumption }
+        protected val output = gtt.programVariables.filter { it.isAssertion }
 
         fun writeHeader() {
             writeCategories()
@@ -234,7 +234,8 @@ fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle,
     val inputCategory = "INPUT"
     styleMap["INPUT"] = tableStyle.styleCategoryHeader
 
-    gtt.programVariables.filter { it.isInput }
+    gtt.programVariables.filter { it.isAssumption }
+            .filterIsInstance<ProgramVariable>()
             .forEach {
                 val group = arrayOf(inputCategory, "${it.name} : ${it.dataType.name}")
                 cat += ValueDebugColumn(group, it, RandomValueOracle)
@@ -244,7 +245,8 @@ fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle,
 
     val outputCategory = "OUTPUT"
     styleMap[outputCategory] = tableStyle.styleCategoryHeader
-    gtt.programVariables.filter { it.isOutput }
+    gtt.programVariables.filter { it.isAssertion }
+            .filterIsInstance<ProgramVariable>()
             .forEach {
                 val group = arrayOf(outputCategory, "${it.name} : ${it.dataType.name}")
                 cat += ValueDebugColumn(group, it, RandomValueOracle)
@@ -277,7 +279,8 @@ fun createTableWithProgram(program: SMVModule,
     styleMap["INPUT"] = tableStyle.styleCategoryHeader
     val allInputVars = program.inputVars.map { it.name to false }.toMap().toMutableMap()
 
-    gtt.programVariables.filter { it.isInput }
+    gtt.programVariables.filter { it.isAssumption }
+            .filterIsInstance<ProgramVariable>()
             .forEach {
                 allInputVars[it.name] = true
                 val group = arrayOf(inputCategory, it.name)
@@ -293,7 +296,8 @@ fun createTableWithProgram(program: SMVModule,
 
     val outputCategory = "OUTPUT"
     styleMap[outputCategory] = tableStyle.styleCategoryHeader
-    gtt.programVariables.filter { it.isOutput }
+    gtt.programVariables.filter { it.isAssertion }
+            .filterIsInstance<ProgramVariable>()
             .forEach {
                 val group = arrayOf(outputCategory, it.name)
                 cat += ConstraintDebugColumn(group, it)

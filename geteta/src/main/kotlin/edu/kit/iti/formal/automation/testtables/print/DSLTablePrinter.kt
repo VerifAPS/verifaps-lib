@@ -27,14 +27,41 @@ class DSLTablePrinter(val stream: CodeWriter) {
         stream.decreaseIndent().nl().printf("}")
     }
 
+    fun print(v: ColumnVariable) {
+        if(v is ProgramVariable) print(v)
+        if(v is ProjectionVariable) print(v)
+    }
+
+    fun print(v: ProjectionVariable){
+        if(v.category==ColumnCategory.ASSUME)
+            stream.print("assume ")
+        else
+            stream.print("assert ")
+
+    }
+
     fun print(v: ProgramVariable) {
-        stream.nl().printf("var ").printf(
-                when (v.io) {
-                    IoVariableType.INPUT -> "input "
-                    IoVariableType.OUTPUT -> "output "
-                    IoVariableType.STATE_INPUT -> "state input "
-                    IoVariableType.STATE_OUTPUT -> "state output "
-                })
+        stream.nl().printf("column ")
+        if(v.isState) {
+            stream.print("state ")
+            if(v.category==ColumnCategory.ASSUME)
+                stream.print("assume ")
+            else
+                stream.print("assert ")
+            if(v.isNext)
+                stream.print("next")
+        } else {
+            if(v.category==ColumnCategory.ASSERT)
+                if(v.isNext)
+                    stream.print("output ")
+                else
+                    stream.print("assert ")
+            else
+                if(v.isNext)
+                    stream.print("assume next")
+                else
+                    stream.print("input")
+        }
 
         if (v.realName == v.name) {
             stream.printf(v.name).printf(" : ").print(v.dataType)

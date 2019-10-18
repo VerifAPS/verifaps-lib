@@ -45,16 +45,45 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         }
     }
 
+    data class VariableModifier(
+            val category: ColumnCategory,
+            val next: Boolean,
+            val state: Boolean
+    )
+
+    fun visit(ctx: TestTableLanguageParser.Var_modifierContext): VariableModifier {
+        val assert = ctx.ASSERT() != null
+        val assume = ctx.ASSUM() != null
+        val next = ctx.NEXT() != null
+        val input = ctx.INPUT() != null
+        val output = ctx.OUTPUT() != null
+        val type = when {
+            (assert || input) && !(output || assert) -> ColumnCategory.ASSUME
+            !(assume || input) && (output || assert) -> ColumnCategory.ASSERT
+            else -> throw RuntimeException("Modifier clash in line ${ctx.start.line}.")
+        }
+        return VariableModifier(type, output || next, ctx.STATE() != null)
+    }
+
+    override fun visitColumn(ctx: TestTableLanguageParser.ColumnContext) {
+        val modifier = visit(ctx.var_modifier())
+        require(!modifier.next) {
+            "Next modifier You provided a wrong set of modifier '$modifier' for column in line ${ctx.start.line}."
+        }
+
+        val name = ctx.name.text
+        val dt = scope.resolveDataType(ctx.dt.text)
+        val exprs = ctx.expr()
+        val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
+        val type = modifier.category
+        val c = ProjectionVariable(name, dt, lt, type, exprs)
+        current.add(c)
+    }
+
     override fun visitSignature(ctx: TestTableLanguageParser.SignatureContext) {
         val dt = scope.resolveDataType(ctx.dt.text)
-        val isState = ctx.state != null
-        val type = if (isState) {
-            if (ctx.io.text == "input") IoVariableType.STATE_INPUT
-            else IoVariableType.STATE_OUTPUT
-        } else {
-            if (ctx.io.text == "input") IoVariableType.INPUT
-            else IoVariableType.OUTPUT
-        }
+        val modifier = visit(ctx.var_modifier())
+        val type = modifier.category
         val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
 
         ctx.variableDefinition().forEach {
@@ -73,7 +102,8 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
                     val newName: String? = it.newName?.text
                     val realName = it.n.text
                     val programRun = it.INTEGER().text.toInt()
-                    val v = ProgramVariable(realName, dt, lt, type, programRun)
+                    val v = ProgramVariable(realName, dt, lt, type,
+                            modifier.state, modifier.next, programRun)
                     if (newName != null) {
                         v.realName = v.name
                         v.name = newName
@@ -83,7 +113,7 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
                 is TestTableLanguageParser.VariableRunsDefinitionContext -> {
                     val realName = it.n.text
                     it.INTEGER().map { it.text.toInt() }.forEach { i ->
-                        val v = ProgramVariable(realName, dt, lt, type, i)
+                        val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, i)
                         current.add(v)
                     }
                 }
@@ -112,7 +142,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     var currentId = 0
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
-        val id = ctx.id?.text ?: "g"+(ctx.idi?.text?.toInt() ?: ++currentId)
+        val id = ctx.id?.text ?: "g" + (ctx.idi?.text?.toInt() ?: ++currentId)
         val r = Region(id)
         if (ctx.time() != null)
             r.duration = ctx.time().accept(TimeParser())
