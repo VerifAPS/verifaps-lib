@@ -25,7 +25,9 @@ DEFINE
     r03_01_acceptp := r03_01_accept & !r03_progress;
     r02_01_accept := r02_01 & r02_fwd;
     r02_01_fail := r02_01 & r02_fail;
-    r02_01_acceptp := r02_01_accept & !r02_progress;INVARSPEC
+    r02_01_acceptp := r02_01_accept & !r02_progress;
+
+INVARSPEC
     __ERROR__ -> r03_01 | r02_01 | __SENTINEL__
 
 INIT

@@ -69,7 +69,9 @@ DEFINE
     r07_01_acceptp := r07_01_accept & !r07_progress;
     r06_01_accept := r06_01 & r06_fwd;
     r06_01_fail := r06_01 & r06_fail;
-    r06_01_acceptp := r06_01_accept & !r06_progress;INVARSPEC
+    r06_01_acceptp := r06_01_accept & !r06_progress;
+
+INVARSPEC
     __ERROR__ -> r03_01 | r02_01 | r05_01 | r04_01 | r07_01 | r06_01 | __SENTINEL__
 
 INIT

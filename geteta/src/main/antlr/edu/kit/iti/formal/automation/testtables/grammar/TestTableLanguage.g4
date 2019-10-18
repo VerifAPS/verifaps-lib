@@ -36,7 +36,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 file  : table* EOF;
 table : (r=RELATIONAL {relational=true;})?
         TABLE IDENTIFIER LBRACE
-            (signature | freeVariable)*
+            (signature | freeVariable | column)*
             opts?
             group
             function*

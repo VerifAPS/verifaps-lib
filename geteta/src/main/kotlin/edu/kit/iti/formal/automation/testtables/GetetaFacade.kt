@@ -23,6 +23,7 @@ import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import edu.kit.iti.formal.automation.testtables.viz.CounterExampleAnalyzer
 import edu.kit.iti.formal.automation.testtables.viz.Mapping
 import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
@@ -64,20 +65,24 @@ object GetetaFacade {
 
     fun exprToSMV(u: TestTableLanguageParser.CellContext,
                   pv: ProjectionVariable, vc: ParseContext): SMVExpr {
-        check(pv.arity == 0) { "Arity of column function is zero. Column ${pv.name}" }
+        require(pv.arity != 0) { "Arity of column function is zero. Column ${pv.name}" }
 
         if (pv.arity > 1) {
-            if (u.chunk(0) is TestTableLanguageParser.CvariableContext) {
-                val varName = u.chunk(0).text
-                val fd = vc.getFunction(varName)
-                if (fd != null) {
-                    check(fd.arity == pv.arity) {
-                        "Arity mismatch in implicit function call $varName in column ${pv.name} "
-                    }
-                    return fd.call(pv.argumentDefinitions)
+            return when (u.chunk().first()) {
+                is TestTableLanguageParser.CvariableContext -> {
+                    val varName = u.chunk(0).text
+                    val fd = vc.getFunction(varName)
+                    return if (fd != null) {
+                        check(fd.arity == pv.arity) {
+                            "Arity mismatch in implicit function call $varName in column ${pv.name} "
+                        }
+                        fd.call(pv.argumentDefinitions)
+                    } else
+                        throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
                 }
+                is TestTableLanguageParser.CdontcareContext -> SLiteral.TRUE
+                else -> throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
             }
-            throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
         } else {
             return exprToSMV(u, pv.argumentDefinitions.first(), 0, vc)
         }

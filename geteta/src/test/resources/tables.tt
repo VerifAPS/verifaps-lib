@@ -203,3 +203,17 @@ table reachability6 {
           row c [1, 1] { }
     }
 }
+
+//
+table columns {
+    var input CLK : BOOLEAN
+    var output x,y : INT
+    column assert Sum : INT as x+y
+    column assert Equal : INT as x, y
+
+    group {
+      row A 1 { Sum: 0}
+      row B 1 { Equal: eq }
+      row C 1 { Equal: leq }
+    }
+}

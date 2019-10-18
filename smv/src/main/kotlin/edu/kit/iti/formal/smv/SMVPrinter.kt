@@ -149,7 +149,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     private fun printSection(section: String, exprs: List<SMVExpr>) {
         if (exprs.isNotEmpty()) {
             exprs.forEach { e ->
-                stream.print(section).increaseIndent().nl()
+                stream.nl().print(section).increaseIndent().nl()
                 e.accept(this)
                 stream.decreaseIndent().nl().nl()
             }

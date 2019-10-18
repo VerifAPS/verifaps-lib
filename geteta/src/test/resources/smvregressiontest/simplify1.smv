@@ -91,7 +91,9 @@ DEFINE
     g_01_acceptp := g_01_accept & !g_progress;
     h_01_accept := h_01 & h_fwd;
     h_01_fail := h_01 & h_fail;
-    h_01_acceptp := h_01_accept & !h_progress;INVARSPEC
+    h_01_acceptp := h_01_accept & !h_progress;
+
+INVARSPEC
     __ERROR__ -> a_01 | b_01 | c_01 | d_01 | e_01 | f_01 | g_01 | h_01 | __SENTINEL__
 
 INIT
