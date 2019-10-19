@@ -6,7 +6,6 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.apps.Geteta
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
@@ -39,7 +38,7 @@ abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory
     val isAssertion
         get() = !isAssumption
 
-    abstract fun respondTo(name : String, run : Int?) : Boolean
+    abstract fun respondTo(name: String, run: Int?): Boolean
 }
 
 data class ProgramVariable(
@@ -51,8 +50,7 @@ data class ProgramVariable(
         var isNext: Boolean = false,
         var programRun: Int = 0) : ColumnVariable(category) {
 
-    override fun respondTo(name: String, run: Int?)
-            = name == this.name && (run==null || programRun == run)
+    override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
 
     var realName: String = name
     /**
@@ -82,15 +80,14 @@ data class ProjectionVariable(
         var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf())
     : ColumnVariable(category) {
 
-    val arity : Int
+    val arity: Int
         get() = constraint.size
 
-    val argumentDefinitions : List<SVariable>
-        get()  = (0 until arity).map { SVariable("${name}_$it") }
+    val argumentDefinitions: List<SVariable>
+        get() = (0 until arity).map { SVariable("${name}_$it") }
 
 
-    override fun respondTo(name: String, run: Int?)
-            = name == this.name
+    override fun respondTo(name: String, run: Int?) = name == this.name
 
     /**
      *
@@ -104,9 +101,9 @@ data class ProjectionVariable(
     override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("$name", logicType)
 }
 
-data class SmvFunctionDefinition(val body : SMVExpr, val parameter : List<SVariable>) {
+data class SmvFunctionDefinition(val body: SMVExpr, val parameter: List<SVariable>) {
     val arity = parameter.size
-    fun call(args : List<SMVExpr>): SMVExpr {
+    fun call(args: List<SMVExpr>): SMVExpr {
         val replacement = parameter.zip(args).toMap()
         val replacer = VariableReplacer(replacement)
         return body.clone().accept(replacer) as SMVExpr
@@ -118,7 +115,7 @@ class ParseContext(
         val programRuns: List<String> = listOf(),
         val vars: MutableMap<Variable, SVariable> = hashMapOf(),
         val refs: MutableMap<SVariable, Int> = hashMapOf(),
-        val functions : MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
+        val functions: MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
         val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
     public fun isVariable(v: String) = v in this
@@ -159,8 +156,8 @@ class ParseContext(
     }
 
     private fun findDefaultFunction(varName: String?): SmvFunctionDefinition? {
-        if(varName==null) return null
-        if(isVariable(varName)) return null
+        if (varName == null) return null
+        if (isVariable(varName)) return null
 
         return GetetaFacade.DEFAULT_COMPARISON_FUNCTIONS[varName]
     }
@@ -277,11 +274,36 @@ class GeneralizedTestTable(
 operator fun <T : Identifiable> Iterable<T>.get(text: String) = find { it.name == text }
 operator fun <T : Identifiable> Iterable<T>.contains(text: String) = this[text] != null
 
+enum class DurationModifier {
+    NONE,
+    PFLAG_IO,
+    HFLAG_IO,
+    PFLAG_I,
+    HFLAG_I;
+
+    fun repr(): String = when (this) {
+        DurationModifier.NONE -> ""
+        DurationModifier.PFLAG_IO -> "progress"
+        DurationModifier.HFLAG_IO -> "hold"
+        DurationModifier.PFLAG_I -> "progress input"
+        DurationModifier.HFLAG_I -> "hold input"
+    }
+
+    fun latex(): String = when (this) {
+        DurationModifier.NONE -> ""
+        DurationModifier.PFLAG_IO -> "\\progress"
+        DurationModifier.HFLAG_IO -> "\\hold"
+        DurationModifier.PFLAG_I -> "\\progressinput"
+        DurationModifier.HFLAG_I -> "\\holdinput"
+    }
+
+}
 
 sealed class Duration {
     object Omega : Duration() {
-        override fun contains(cycles: Int): Boolean = true
+        override var modifier: DurationModifier = DurationModifier.NONE
 
+        override fun contains(cycles: Int): Boolean = true
         override val isUnbounded: Boolean
             get() = true
         override val isOneStep: Boolean
@@ -292,7 +314,7 @@ sealed class Duration {
             get() = true
     }
 
-    data class OpenInterval(val lower: Int, var pflag: Boolean = false) : Duration() {
+    data class OpenInterval(val lower: Int, override var modifier: DurationModifier = DurationModifier.NONE) : Duration() {
         override fun contains(cycles: Int): Boolean = lower <= cycles
 
         override val isUnbounded: Boolean
@@ -305,7 +327,7 @@ sealed class Duration {
             get() = true
     }
 
-    data class ClosedInterval(val lower: Int, val upper: Int, val pflag: Boolean = false) : Duration() {
+    data class ClosedInterval(val lower: Int, val upper: Int, override var modifier: DurationModifier = DurationModifier.NONE) : Duration() {
         override fun contains(cycles: Int): Boolean = cycles in lower..upper
 
         override val isUnbounded: Boolean
@@ -318,6 +340,7 @@ sealed class Duration {
             get() = !isOneStep
     }
 
+    abstract var modifier: DurationModifier
     /**
      * returns true, iff the step can be applied arbitrary often (no upper bound)
      * @return
@@ -368,7 +391,7 @@ fun Duration.isOptional(time: Int): Boolean =
         }
 
 
-sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1, false)) {
+sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1)) {
     abstract fun count(): Int
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int

@@ -154,10 +154,10 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
                 is Duration.Omega -> "\\TIMEOMEGA"
                 is Duration.ClosedInterval -> {
                     (if (d.lower == d.upper) "{${d.lower}"
-                    else "[${d.lower},${d.upper}]$") + (if (d.pflag) "\\DWAIT" else "")
+                    else "[${d.lower},${d.upper}]$") + d.modifier.latex()
                 }
                 is Duration.OpenInterval ->
-                    String.format("$\\geq%s$", d.lower) + (if (d.pflag) "\\DWAIT" else "")
+                    String.format("$\\geq%s$", d.lower) + d.modifier.latex()
             }
 
     private fun tikzMark(varName: String): String {

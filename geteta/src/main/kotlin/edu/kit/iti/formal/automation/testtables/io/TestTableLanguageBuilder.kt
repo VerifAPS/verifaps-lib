@@ -180,27 +180,38 @@ class TimeParser : TestTableLanguageBaseVisitor<Duration>() {
                 ctx.INTEGER().text.toInt() +
                         if (ctx.op.text == ">") 1 else 0
         return Duration.OpenInterval(
-                lower, ctx.pflag != null
-        )
+                lower, accept(ctx.duration_flags()))
+    }
+
+    private fun accept(flags: TestTableLanguageParser.Duration_flagsContext?): DurationModifier {
+        if (flags == null) return DurationModifier.NONE
+        return if (flags.PFLAG() != null)
+            if (flags.INPUT() != null) DurationModifier.PFLAG_I
+            else DurationModifier.PFLAG_IO
+        else if (flags.INPUT() != null)
+            DurationModifier.HFLAG_I
+        else
+            DurationModifier.HFLAG_IO
+
     }
 
     override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration {
         return Duration.ClosedInterval(
                 ctx.l.text.toInt(),
                 ctx.u.text.toInt(),
-                ctx.pflag != null)
+                accept(ctx.duration_flags()))
     }
 
     override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration {
-        return Duration.OpenInterval(ctx.l.text.toInt(), ctx.pflag != null)
+        return Duration.OpenInterval(ctx.l.text.toInt(), accept(ctx.duration_flags()))
     }
 
     override fun visitTimeFixed(ctx: TestTableLanguageParser.TimeFixedContext): Duration {
         val i = ctx.INTEGER().text.toInt()
-        return Duration.ClosedInterval(i, i, false)
+        return Duration.ClosedInterval(i, i)
     }
 
-    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration.OpenInterval(0, false)
+    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration.OpenInterval(0)
 
     override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
 }

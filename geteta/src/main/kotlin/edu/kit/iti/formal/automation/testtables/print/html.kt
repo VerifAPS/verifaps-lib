@@ -142,10 +142,10 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
                 is Duration.Omega -> options.omegaRepetition
                 is Duration.ClosedInterval -> {
                     (if (d.lower == d.upper) "${d.lower}"
-                    else "[${d.lower},${d.upper}]") + (if (d.pflag) options.progressFlag else "")
+                    else "[${d.lower},${d.upper}]") + d.modifier.repr()
                 }
                 is Duration.OpenInterval ->
-                    String.format("${options.mathGreaterEquals}%s", d.lower) + (if (d.pflag) options.progressFlag else "")
+                    String.format("${options.mathGreaterEquals}%s", d.lower) + d.modifier.repr()
             }
 }
 

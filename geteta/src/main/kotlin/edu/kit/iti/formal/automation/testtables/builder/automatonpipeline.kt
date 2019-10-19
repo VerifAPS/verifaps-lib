@@ -90,21 +90,24 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
          * Unwind the given region
          */
         fun expand(r: Region): Region {
-            if (r.duration == Duration.Omega || !r.duration.isRepeatable
-                    || r.duration.minimum == 0) {
+            val duration = r.duration
+            val dmodifier = duration.modifier
+            if (duration == Duration.Omega || !duration.isRepeatable
+                    || duration.minimum == 0) {
                 return r
             }
             val seq = ArrayList<TableNode>(r.children.size)
-            val m = r.duration.maximum
+            val m = duration.maximum
             for (iter in 1..m) {
                 val t = Region(r.id + "_${iter}")
+
                 t.duration = when {
-                    (iter == m && r.duration is Duration.OpenInterval) ->
-                        Duration.OpenInterval(0, r.duration.pflag)
-                    (r.duration is Duration.ClosedInterval && r.duration.minimum < iter && iter <= r.duration.maximum) ->
-                        Duration.ClosedInterval(0,1, r.duration.pflag)
+                    (iter == m && duration is Duration.OpenInterval) ->
+                        Duration.OpenInterval(0, dmodifier)
+                    (duration is Duration.ClosedInterval && duration.minimum < iter && iter <= duration.maximum) ->
+                        Duration.ClosedInterval(0,1, dmodifier)
                     else ->
-                        Duration.ClosedInterval(1, 1, r.duration.pflag)
+                        Duration.ClosedInterval(1, 1, dmodifier)
                 }
 
                 r.children.forEach {
@@ -113,7 +116,7 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
                 seq.add(t)
             }
             val new = Region(r.id, seq)
-            new.duration = Duration.ClosedInterval(1, 1, false)
+            new.duration = Duration.ClosedInterval(1, 1, dmodifier)
             return new
         }
     }
@@ -305,7 +308,7 @@ class AutomatonConcretizerTransformation : RowStateCreator() {
     override fun createRowStates(s: TableRow): List<RowState> {
         val cto = model.testTable.options.cycles
         val c = cto.getCount(s.id, s.duration)
-        s.duration = Duration.ClosedInterval(c, c, false)
+        s.duration = Duration.ClosedInterval(c, c)
         return super.createRowStates(s)
     }
 }

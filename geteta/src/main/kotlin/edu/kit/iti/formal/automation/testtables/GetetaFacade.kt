@@ -90,7 +90,7 @@ object GetetaFacade {
 
     fun parseDuration(duration: String): Duration {
         if (duration == "wait")//old attributes
-            return Duration.OpenInterval(0, true)
+            return Duration.OpenInterval(0)
         val parser = createParser(duration)
         val p = parser.time()
         return p.accept(TimeParser())

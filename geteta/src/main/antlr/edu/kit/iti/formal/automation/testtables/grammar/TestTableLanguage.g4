@@ -73,13 +73,18 @@ pause: {relational}? PAUSE INTEGER+;
 
 
 time :
-      MINUS (pflag=PFLAG)? #timeDontCare
-    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (pflag=PFLAG)? #timeSingleSided
-    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (pflag=PFLAG)? #timeClosedInterval
-    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (pflag=PFLAG)? #timeOpenInterval
+      MINUS (duration_flags)? #timeDontCare
+    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (duration_flags)? #timeSingleSided
+    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (duration_flags)? #timeClosedInterval
+    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (duration_flags)? #timeOpenInterval
     | INTEGER #timeFixed
     | omega=OMEGA #timeOmega
-    ;
+;
+
+duration_flags:
+      PFLAG INPUT?
+    | HFLAG INPUT?
+;
 
 OMEGA:'omega';
 
@@ -108,7 +113,7 @@ chunk :
 	| variable      #cvariable
 	| constant      #cconstant
 	| singlesided   #csinglesided
-  | interval      #cinterval
+    | interval      #cinterval
 	| expr          #cexpr
 ;
 
@@ -188,7 +193,8 @@ RELATIONAL : 'relational';
 TABLE:'table';
 LBRACE:'{';
 RBRACE:'}';
-PFLAG: '>>' | '_p';
+PFLAG: 'progress';
+HFLAG: 'hold';
 AND: '&' | 'AND';
 COMMA:	',';
 DIV: '/';
