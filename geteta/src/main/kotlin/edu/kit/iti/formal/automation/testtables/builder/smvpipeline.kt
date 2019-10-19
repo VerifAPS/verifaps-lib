@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
+import edu.kit.iti.formal.automation.testtables.model.DurationModifier
 import edu.kit.iti.formal.automation.testtables.model.ProjectionVariable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
@@ -182,11 +183,7 @@ object RegisterDefines : SmvConstructionTransformer {
 }
 
 internal val Duration.pflag: Boolean
-    get() = when (this) {
-        is Duration.Omega -> false
-        is Duration.OpenInterval -> this.pflag
-        is Duration.ClosedInterval -> this.pflag
-    }
+    get() = this.modifier == DurationModifier.PFLAG_I || this.modifier == DurationModifier.PFLAG_IO
 
 /**
  * Triggers the generation of the SMV expression with in the Rows.

@@ -69,9 +69,13 @@ class FacadeTest {
         val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st")
         val (toplevels, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val p = toplevels[2] as ProgramDeclaration
-        val ttp = SymbExFacade.execute(p)
-        for (i in 1..9) {
-            println(ttp.get(i))
+        try {
+            val ttp = SymbExFacade.execute(p)
+            for (i in 1..9) {
+                println(ttp.get(i))
+            }
+        }catch (e : IOException) {
+            Assumptions.assumeTrue(e.message?.startsWith("Cannot run program") ?: false)
         }
     }
 }

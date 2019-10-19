@@ -39,7 +39,7 @@ object IntConverter : StringConverter<Int> {
     override fun to(t: Int): String = t.toString()
 }
 
-object stringConverter : StringConverter<String> {
+object strConverter : StringConverter<String> {
     override fun from(s: String) = s
     override fun to(t: String): String = t
 }
@@ -81,10 +81,10 @@ open class Options(
     }
 
     protected val integer = MapperN(null, IntConverter)
-    protected val string = MapperN(null, stringConverter)
+    protected val string = MapperN(null, strConverter)
     protected val boolean = MapperN(null, booleanConverter)
     protected fun integer(default: Int) = Mapper(default, IntConverter)
-    protected fun string(default: String) = Mapper(default, stringConverter)
+    protected fun string(default: String) = Mapper(default, strConverter)
     protected fun boolean(default:Boolean) = Mapper(default, booleanConverter)
 
     protected fun <T> any(default: T,
