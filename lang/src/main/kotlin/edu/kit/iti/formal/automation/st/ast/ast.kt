@@ -53,13 +53,22 @@ interface HasScope {
     var scope: Scope
 }
 
+interface HasPragma {
+    val pragmas: MutableList<Pragma>
+    fun findAttributePragma(name: String) = findPragma<Pragma.Attribute>().find { it.name == name }
+}
+
+inline fun <reified T> HasPragma.findPragma() = pragmas.filterIsInstance<T>()
+
 
 //region Declaration and Toplevel
-abstract class PouElement : Top(), Identifiable, Comparable<PouElement> {
+abstract class PouElement : Top(), Identifiable, HasPragma, Comparable<PouElement> {
     var comment: String = ""
     override fun compareTo(other: PouElement): Int {
         return name.compareTo(other.name)
     }
+
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
 data class PouElements(val elements: MutableList<PouElement> = arrayListOf())
@@ -451,8 +460,9 @@ object EMPTY_EXPRESSION : Expression() {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this);
 }
 
-abstract class Statement : Top() {
+abstract class Statement : Top(), HasPragma {
     abstract override fun clone(): Statement
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
 
@@ -677,7 +687,7 @@ data class IfStatement(
 
 data class InvocationStatement(
         var callee: SymbolicReference = SymbolicReference(),
-        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement() {
+        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement(), HasPragma {
     var invoked: Invoked? = null
 
 
@@ -687,6 +697,7 @@ data class InvocationStatement(
     val outputParameters: List<InvocationParameter>
         get() = parameters.filter { it.isOutput }
 
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 
     constructor(fnName: String, vararg expr: Expression)
             : this(SymbolicReference(fnName), expr.map { InvocationParameter(it) }.toMutableList())
@@ -1815,6 +1826,7 @@ abstract class Reference : Initialization() {
 }
 
 class VariableBuilder(val scope: VariableScope) {
+    var pragma: List<Pragma>? = null
     private val stack = Stack<Int>()
     private var initialization: Initialization? = null
     private var identifiers: MutableList<Token> = arrayListOf()
@@ -1911,6 +1923,7 @@ class VariableBuilder(val scope: VariableScope) {
     fun create(): VariableBuilder {
         for (id in identifiers) {
             val vd = VariableDeclaration(id.text.trim('`'), peek(), type!!)
+            pragma?.run { forEach { vd.pragmas += it.clone() } }
             vd.token = id
             this.scope.add(vd)
         }
@@ -1941,7 +1954,11 @@ class VariableBuilder(val scope: VariableScope) {
 data class VariableDeclaration(
         override var name: String = ANONYM,
         var type: Int = 0
-) : Top(), Comparable<VariableDeclaration>, Identifiable {
+) : Top(), Comparable<VariableDeclaration>, Identifiable, HasPragma {
+
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
+
+
     var typeDeclaration: TypeDeclaration? = null
     /**
      * determined by the typeDeclaration

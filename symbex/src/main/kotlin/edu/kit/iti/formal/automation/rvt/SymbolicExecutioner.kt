@@ -2,12 +2,12 @@ package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.analysis.toHuman
-import edu.kit.iti.formal.automation.blocks.getRandomLabel
 import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
 import edu.kit.iti.formal.automation.il.IlSymbex
 import edu.kit.iti.formal.automation.operators.Operators
+import edu.kit.iti.formal.automation.rvt.pragma.SmvBody
 import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
@@ -122,9 +122,15 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable)
-    override fun visit(programDeclaration: ProgramDeclaration): SCaseExpression? = visit(programDeclaration as PouExecutable)
-    fun visit(programDeclaration: PouExecutable): SCaseExpression? {
-        scope = programDeclaration.scope
+    override fun visit(programDeclaration: ProgramDeclaration) = visit(programDeclaration as PouExecutable)
+    fun visit(exec: PouExecutable): SMVExpr? {
+        exec.findAttributePragma("smv_body")?.let {
+            val smvBody = SmvBody(it)
+            //TODO do not execute body use value of smvBody instead
+            //TODO allow introduction of new smv input variables
+        }
+
+        scope = exec.scope
 
         push(SymbolicState())
 
@@ -138,7 +144,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         for (variable in scope.filterByFlags(VariableDeclaration.GLOBAL))
             globalState[lift(variable)] = peek()[lift(variable)]!!
 
-        programDeclaration.stBody!!.accept(this)
+        exec.stBody!!.accept(this)
         return null
     }
 

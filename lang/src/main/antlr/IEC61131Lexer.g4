@@ -35,66 +35,18 @@ IL_CODE: '//IL\n' -> pushMode(il);
 /******
  * DATATYPES
  */
-ANY
-:
-	 A N Y
-;
-
-ANY_BIT
-:
- A N Y '_' B I T
-;
-
-ANY_DATE
-:
-	A N Y '_' D A T E
-;
-
-ANY_DERIVED
-:
-	 A N Y '_' D E R I V E D
-;
-
-ANY_ELEMENTARY
-:
-	 A N Y '_' E L E M E N T A R Y
-;
-
-ANY_INT
-:
-	 A N Y '_' I N T
-;
-
-ANY_MAGNITUDE
-:
-	 A N Y '_' M A G N I T U D E
-;
-
-ANY_NUM
-:
-	 A N Y '_' N U M
-;
-
-ANY_REAL
-:
-	 A N Y '_' R E A L
-;
-
-ANY_STRING
-:
-	A N Y '_' S T R I N G
-;
-
-ARRAY
-:
-	 A R R A Y
-;
-
-BOOL
-:
-	B O O L
-;
-
+ANY: A N Y;
+ANY_BIT: A N Y '_' B I T;
+ANY_DATE: A N Y '_' D A T E;
+ANY_DERIVED:	 A N Y '_' D E R I V E D;
+ANY_ELEMENTARY:	 A N Y '_' E L E M E N T A R Y;
+ANY_INT:	 A N Y '_' I N T;
+ANY_MAGNITUDE:	 A N Y '_' M A G N I T U D E;
+ANY_NUM:	 A N Y '_' N U M;
+ANY_REAL:	 A N Y '_' R E A L;
+ANY_STRING:	A N Y '_' S T R I N G;
+ARRAY:	 A R R A Y;
+BOOL:	B O O L;
 BYTE
 :
 	B Y T E
@@ -526,15 +478,11 @@ GREATER_THAN
 	'>'
 ;
 
-LBRACKET
-:
-	'['
-;
+LBRACE:'{';
+RBRACE:'}';
+LBRACKET: '[';
 
-LESS_EQUALS
-:
-	'<='
-;
+LESS_EQUALS: '<=';
 
 LESS_THAN
 :

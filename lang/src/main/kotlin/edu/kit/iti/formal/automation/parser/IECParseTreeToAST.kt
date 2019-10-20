@@ -42,6 +42,7 @@ import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import java.math.BigInteger
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * @author Alexander Weigl, Augusto Modanese
@@ -65,6 +66,52 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
                 ast.add(accept)
         }
         return ast
+    }
+
+    override fun visitLibrary_element_declaration(ctx: IEC61131Parser.Library_element_declarationContext): Any {
+        val elemen = oneOf<Any>(ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
+                ctx.function_declaration(), ctx.global_variable_list_declaration(), ctx.interface_declaration(),
+                ctx.namespace_declaration())
+        if (ctx.pragma() != null) {
+            if (elemen is HasPragma) {
+                val p = ctx.pragma().map { it.accept(this) as Pragma }
+                elemen.pragmas.addAll(p)
+            } else {
+                throw RuntimeException("Pragma not supported at line ${ctx.start.line}.")
+            }
+        }
+        return elemen!!;
+    }
+
+    override fun visitNamespace_elements(ctx: IEC61131Parser.Namespace_elementsContext): Any {
+        val elemen = oneOf<Any>(ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
+                ctx.function_declaration(), ctx.interface_declaration(),
+                ctx.namespace_declaration())
+
+        if (ctx.pragma() != null) {
+            if (elemen is HasPragma) {
+                val p = ctx.pragma().map { it.accept(this) as Pragma }
+                elemen.pragmas.addAll(p)
+            } else {
+                throw RuntimeException("Pragma not supported at line ${ctx.start.line}.")
+            }
+        }
+        return elemen!!
+    }
+
+    override fun visitPragma(ctx: IEC61131Parser.PragmaContext): Any {
+        val rawParameters = HashMap<String,String>()
+        var position : Int = 0;
+        ctx.pragma_arg().forEach {
+            val value = it.value.text.trim('\'', '"')
+            if(it.ASSIGN()==null)
+                rawParameters["#"+(position++)] = value
+            else
+                rawParameters[it.arg.text.trim('"', '\'')] = value
+        }
+        val p = makePragma(ctx.type.text, rawParameters)
+                ?: throw IllegalArgumentException("Pragma ${ctx.type.text} in line ${ctx.type.line} not supported")
+        return p
     }
 
     override fun visitCast(ctx: IEC61131Parser.CastContext): Literal {
@@ -416,6 +463,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitVar_decl(ctx: IEC61131Parser.Var_declContext): Any? {
         gather.clear()
+        val p = ctx.pragma().map { it.accept(this) as Pragma }
+        if (!p.isNullOrEmpty()) gather.pragma = p
         ctx.variable_keyword().accept(this)
         ctx.var_decl_inner().accept(this)
         return null
@@ -705,10 +754,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return i
     }
 
+
     override fun visitStatement_list(
             ctx: IEC61131Parser.Statement_listContext): Any {
         return StatementList(allOf(ctx.statement()))
     }
+
 
     override fun visitAssignment_statement(
             ctx: IEC61131Parser.Assignment_statementContext): Any {
@@ -722,11 +773,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitStatement(ctx: IEC61131Parser.StatementContext): Any? {
-        return oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
+        val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
                 ctx.case_statement(), ctx.invocation_statement(),
                 ctx.jump_statement(), ctx.label_statement(),
-                ctx.for_statement())
+                ctx.for_statement()) as Statement
+        val p = ctx.pragma().map { it.accept(this) as Pragma }
+        if (p.isNullOrEmpty()) statement.pragmas += p
+        return statement
     }
 
 
@@ -829,7 +883,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitCase_entry(ctx: IEC61131Parser.Case_entryContext): Any {
         val ast = Case()
-        ast.ruleContext=ctx
+        ast.ruleContext = ctx
         ast.conditions.addAll(allOf(ctx.case_condition()))
         ast.statements = ctx.statement_list().accept(this) as StatementList
         return ast
@@ -901,7 +955,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitSfc_network(ctx: IEC61131Parser.Sfc_networkContext): SFCNetwork {
         network = SFCNetwork()
         network.steps.add(visitInit_step(ctx.init_step()))
-        network.ruleContext=ctx
+        network.ruleContext = ctx
 
         for (stepContext in ctx.step()) {
             network.steps.add(visitStep(stepContext))
@@ -925,7 +979,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             action.ilBody = ctx.body().ilBody().accept(this) as IlBody
         if (ctx.body().fbBody() != null)
             action.fbBody = ctx.body().fbBody().accept(this) as FbdBody
-        action.ruleContext=ctx
+        action.ruleContext = ctx
         return action
     }
 
@@ -934,7 +988,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         currentStep.name = ctx.step_name.text
         currentStep.isInitial = true
         visitActionAssociations(ctx.action_association())
-        currentStep.ruleContext=ctx
+        currentStep.ruleContext = ctx
         return currentStep
     }
 
@@ -961,7 +1015,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitStep(ctx: IEC61131Parser.StepContext): SFCStep {
         currentStep = SFCStep()
-        currentStep.ruleContext=ctx
+        currentStep.ruleContext = ctx
         currentStep.name = ctx.step_name.text
         currentStep.isInitial = false
         visitActionAssociations(ctx.action_association())

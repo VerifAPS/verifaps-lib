@@ -23,14 +23,25 @@ namespace_declaration
 
 namespace_elements
 :
-      data_type_declaration
+    pragma*
+    (  data_type_declaration
 	| function_declaration
     | class_declaration
     | interface_declaration
 	| function_block_declaration
 	//not allowed | program_declaration
 	| namespace_declaration
+	)
 ;
+
+pragma:
+    LBRACE type=IDENTIFIER
+    (pragma_arg (COMMA pragma_arg)*)?
+    RBRACE
+;
+
+pragma_arg: (arg=string ASSIGN)? value=string;
+
 
 full_qualified_identifier
 :
@@ -44,20 +55,22 @@ using_directive
 
 library_element_declaration
 :
-	  data_type_declaration
-	| function_declaration
-  | class_declaration
-  | interface_declaration
-	| function_block_declaration
-	| program_declaration
-	| global_variable_list_declaration
-  | namespace_declaration
+    pragma*
+    (  data_type_declaration
+    | function_declaration
+    | class_declaration
+    | interface_declaration
+    | function_block_declaration
+    | program_declaration
+    | global_variable_list_declaration
+    | namespace_declaration
+    )
 //	| configuration_declaration
 ;
 
 constant
 :
-    integer
+      integer
 	| real
 	| string
 	| time
@@ -320,6 +333,7 @@ var_decls
 
 var_decl
 :
+    pragma*
     variable_keyword
     var_decl_inner
     END_VAR
@@ -688,7 +702,8 @@ statement_list
 
 statement
 :
-  	  label_statement
+    pragma*
+  	( label_statement
 	| assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
   	| return_statement SEMICOLON
@@ -699,6 +714,7 @@ statement
     | while_statement
     | repeat_statement
     | exit_statement SEMICOLON
+    )
 ;
 
 jump_statement
@@ -781,6 +797,7 @@ if_statement
 	(ELSE elselist = statement_list)?
 	END_IF SEMICOLON?
 ;
+
 
 case_statement
 :
