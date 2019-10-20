@@ -4,9 +4,9 @@ function geteta_help() {
     geteta --help
 }
 
-function geteta_w() {
-  geteta $@ 2>&1 > /tmp/log.txt
-}
+#function geteta_w() {
+#  geteta $@ 2>&1 > /tmp/log.txt
+#}
 
 function geteta_constantprogram() {
     cd geteta/examples/constantprogram

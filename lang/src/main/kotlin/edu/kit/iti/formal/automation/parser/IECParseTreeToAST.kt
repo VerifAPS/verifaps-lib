@@ -69,18 +69,20 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitLibrary_element_declaration(ctx: IEC61131Parser.Library_element_declarationContext): Any {
-        val elemen = oneOf<Any>(ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
+        val elemen = oneOf<Top>(
+                ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
                 ctx.function_declaration(), ctx.global_variable_list_declaration(), ctx.interface_declaration(),
-                ctx.namespace_declaration())
-        if (ctx.pragma() != null) {
+                ctx.namespace_declaration(), ctx.program_declaration())
+        if (ctx.pragma() != null && elemen != null) {
             if (elemen is HasPragma) {
                 val p = ctx.pragma().map { it.accept(this) as Pragma }
                 elemen.pragmas.addAll(p)
             } else {
-                throw RuntimeException("Pragma not supported at line ${ctx.start.line}.")
+                throw RuntimeException("Pragma not supported ${elemen.nodeName} " +
+                        "at line ${ctx.start.tokenSource.sourceName}:${ctx.start.line}.")
             }
         }
-        return elemen!!;
+        return elemen!!
     }
 
     override fun visitNamespace_elements(ctx: IEC61131Parser.Namespace_elementsContext): Any {

@@ -22,7 +22,7 @@ class ProjectionVariableTest : TableTester() {
 
         checkDefinition(b, "Sum_0", "code\$x + code\$y")
         checkDefinition(b, "A_out_Sum", "0sd16_0 = Sum_0");
-        checkDefinition(b, "A_out_Equal", "TRUE");
+        checkDefinition(b,  "A_out_Equal", "TRUE");
 
 
         checkDefinition(b, "Equal_0", "code\$x");
