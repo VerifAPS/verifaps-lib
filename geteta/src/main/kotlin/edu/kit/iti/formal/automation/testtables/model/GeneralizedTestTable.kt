@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.model
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.Identifiable
@@ -17,6 +18,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 
 enum class ColumnCategory { ASSUME, ASSERT }
@@ -122,16 +124,16 @@ class ParseContext(
     public fun getSMVVariable(v: Variable) =
             vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
-    fun getReference(columnVariable: SVariable, i: Int): SMVExpr {
-        if (i == 0) {
-            return columnVariable
-        } else {
-            val ref = SReference(i, columnVariable)
-            val max = Math.max(refs.getOrDefault(columnVariable, i), i)
-            refs[columnVariable] = max
-            return ref.asVariable()
-        }
-    }
+    fun getReference(variable: SVariable, cycles: Int): SVariable =
+            if (cycles == 0) {
+                variable
+            } else {
+                val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
+                val ref =  SVariable(newName, variable.dataType!!)
+                val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
+                refs[variable] = max
+                ref
+            }
 
     operator fun contains(varText: String) = vars.keys.any { it.name == varText }
 

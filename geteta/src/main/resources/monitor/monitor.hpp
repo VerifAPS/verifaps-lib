@@ -115,3 +115,31 @@ class CombinedOrMonitor : public CombinedMonitor<io_t> {
   virtual MonitorState aggregate() const override { return FINE; };
 };
 // endregion
+
+
+template <typename T, int size>
+class sregister {
+public:
+    explicit sregister() :
+        buf(new T[size]) {}
+
+    ~sregister() { delete buf; }
+
+    void push(const T item) {
+      current = (current+1) % size;
+      T[current] = item;
+    }
+
+    T get(int pos) const {
+      auto pos = (current + pos) % size;
+      if(pos<0) pos += size();
+      return T[pos];
+    }
+
+    //size_t size() const {return size;}
+
+    T operator[](int pos) const { return get(pos); }
+private:
+    T* buf;
+    size_t current = 0;
+};

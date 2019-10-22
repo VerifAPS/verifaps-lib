@@ -153,11 +153,6 @@ object GetetaFacade {
     }.toMap()
 
 
-    fun delay(ref: SReference): DelayModuleBuilder {
-        return DelayModuleBuilder(ref.variable,
-                ref.cycles)
-    }
-
     /*
     fun runNuXMV(folder: String, technique: VerificationTechnique, vararg modules: SMVModule): NuXMVOutput {
         return runNuXMV(folder, Arrays.asList(*modules), technique)

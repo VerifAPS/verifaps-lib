@@ -21,5 +21,5 @@ data class Monitor(
         var types: String = "",
         var preamble: String = "",
         var postamble: String = "",
-        var initAtStart: Boolean = true
+        var static: Boolean = true
 )

@@ -1,18 +1,18 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.multiple
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
-import edu.kit.iti.formal.automation.testtables.monitor.CMonitorGenerator
-import edu.kit.iti.formal.automation.testtables.monitor.CppCombinedMonitorGeneration
-import edu.kit.iti.formal.automation.testtables.monitor.CppMonitorGenerator
-import edu.kit.iti.formal.automation.testtables.monitor.MonitorGenerationST
+import edu.kit.iti.formal.automation.testtables.monitor.*
+import java.io.File
 
 /**
  *
@@ -30,8 +30,16 @@ enum class CodeOutput {
 
 class MonitorApp : CliktCommand(name = "ttmonitor",
         help = "Construction of monitors from test tables for Runtime Verification") {
-    val table by option("--table", "-t", help = "table file", metavar = "FILE")
-            .file(exists = true, readable = true).multiple(required = true)
+    val table by argument(help = "table file", name = "FILE")
+            .file(exists = true, readable = true)
+            .multiple(required = true)
+
+    val output by option("--output", "-o", help = "destination to write output files")
+            .file()
+            .default(File("output.cpp"))
+
+    val writeHeader by option("--write-header", help = "Write the 'monitor.h' header file.")
+            .flag("--dont-write-header", default = false)
 
     val format by option("--format", "-f", help = "code format, possible values: " +
             CodeOutput.values().joinToString(",") { it.name })
@@ -39,6 +47,13 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .default(CodeOutput.CPP)
 
     override fun run() {
+        if (writeHeader && format == CodeOutput.CPP) {
+            output.absoluteFile.parentFile.mkdirs()
+            for ((a, b) in CPP_RESOURCES) {
+                File(output.absoluteFile.parentFile, a).bufferedWriter().use { it.write(b) }
+            }
+        }
+
         val gtts = table.flatMap { GetetaFacade.readTable(it) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
@@ -58,16 +73,16 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
                     }
                 } else {
                     when (format) {
-                        CodeOutput.STRCUTURED_TEXT -> TODO()
-                        CodeOutput.ESTEREL -> TODO()
-                        CodeOutput.C -> CppCombinedMonitorGeneration.generate("mcombined", pairs)
-                        CodeOutput.CPP -> TODO()
+                        CodeOutput.CPP -> CppCombinedMonitorGeneration.generate("mcombined", pairs)
+                        else -> TODO()
                     }
                 }
-        println(output.preamble)
-        println(output.types)
-        println(output.body)
-        println(output.postamble)
+        this.output.bufferedWriter().use {
+            it.write(output.preamble)
+            it.write(output.types)
+            it.write(output.body)
+            it.write(output.postamble)
+        }
     }
 }
 

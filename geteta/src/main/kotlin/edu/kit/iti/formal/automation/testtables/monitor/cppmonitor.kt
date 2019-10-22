@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.monitor
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -24,7 +25,7 @@ val CPP_RESOURCES by lazy { listOf(readResource("monitor.hpp")) }
 
 
 /**
- * TODO extrinsic reset
+ * TODO double the state variable of the system (prev, next value).
  * @author Alexander Weigl
  * @version 1 (14.07.19)
  */
@@ -50,10 +51,16 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     val cw = CodeWriter()
 
     val structNameIo = "${gtt.name}_io_t"
-    val structNameGv = "gv_t"
+    val structNameGv = "${gtt.name}_gv_t"
     val enumStates = "${gtt.name.capitalize()}States"
     val cppRewriter =
             SmvToCTranslator().also {
+                //val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
+                for ((a, b) in gtt.parseContext.refs) {
+                    val ref = gtt.parseContext.getReference(a, b)
+                    it.variableReplacement[ref.name] = "_h_${a.name}[b]"
+                }
+
                 gtt.programVariables.forEach { pv ->
                     val name = pv.externalVariable(gtt.programRuns, gtt.name).name
                     it.variableReplacement[name] = "input.${pv.name}"
@@ -66,46 +73,46 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 it.rewritingFunction = { it -> it.replace("code$", "input.") }
             }
 
-    private fun defineGlobalVarStruct() {
-        cw.cblock("struct $structNameGv {", "};") {
-            gtt.constraintVariables.forEach { pv ->
-                println("${dataType(pv.dataType)}  ${pv.name};")
+    private fun defineGlobalVarStruct() =
+            CodeWriter.with {
+                cblock("struct $structNameGv {", "};") {
+                    gtt.constraintVariables.forEach { pv ->
+                        println("${dataType(pv.dataType)}  ${pv.name};")
+                    }
+                    gtt.constraintVariables.forEach { pv ->
+                        println("bool is_bound_${pv.name};")
+                    }
+                }.nl()
+                println("const struct $structNameGv ${structNameGv}_default;").nl().nl()
             }
-            gtt.constraintVariables.forEach { pv ->
-                println("bool is_bound_${pv.name};")
-            }
-        }.nl()
-        cw.println("const struct $structNameGv ${structNameGv}_default;").nl().nl()
-    }
 
-    private fun defineStateEnum() {
-        cw.cblock("enum $enumStates {", "};") {
+    private fun defineStateEnum() = CodeWriter.with {
+        cblock("enum $enumStates {", "};") {
             val states = automaton.getRowStates() +
                     automaton.stateError + automaton.stateSentinel
             val rows = states.joinToString(",") { it.name }
             append(rows)
         }
-        cw.nl().nl()
+        nl().nl()
     }
 
     fun call(): Monitor {
-        cw.println("#include \"../mon.h\"")
-        defineIOStruct(structNameIo, gtt.programVariables)
-
-        defineGlobalVarStruct()
-        defineStateEnum()
+        monitor.types += defineIOStruct(structNameIo, gtt.programVariables)
+        monitor.types += defineGlobalVarStruct()
+        monitor.types += defineStateEnum()
 
         cw.println("template <typename io_t>")
                 .cblock("class ${gtt.name.capitalize()}Monitor " +
                         ": public IMonitor<io_t> {", "};") {
-                    println("struct Token {int state; gv_t globalVars;};")
-                    println("vector<Token> tokens;")
-                    println("  int numErrors;")
-                    println("public:").nl()
+                    +("struct Token {int state; gv_t globalVars;};")
+                    +("vector<Token> tokens;")
+                    +("int numErrors;")
+                    historyValuesDeclaration(gtt)
+                    +"public:"
 
-                    println("${gtt.name.capitalize()}Monitor() { reset(); }")
+                    constructor("${gtt.name.capitalize()}Monitor") { +"reset();" }
 
-                    cblock("void reset() override {", "}") {
+                    method("void", "reset", "override") {
                         print("""
                             this->state(MonitorState::FINE);
                             numErrors = 0;
@@ -118,12 +125,11 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                         }
                     }
 
-                    cw.nl().cblock("void next(const io_t &input) override {", "}") {
+                    nl().method("void", "next", "const io_t &input", "override") {
                         resetCode(this)
-                        print("""
+                        +"""
                                 vector<Token> newTokens;
                                 for (auto &&tok : tokens) evaluate(newTokens, tok, input);
-                            
                                 tokens.clear();
                             
                                 bool hitError = false, hitState = false;
@@ -139,41 +145,43 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                                       tokens.push_back(i);
                                     }
                                   }
-                                } 
+                                }  
                                 this->state(hitError ? MonitorState::ERROR
                                                : hitState ? MonitorState::FINE : MonitorState::UNKNOWN);
-                        """.trimIndent())
+                        """.trimIndent()
+                        historyValuesUpdate(gtt)
                     }
 
-                    cw.nl().cblock("void evaluate (vector<Token> &newTokens, " +
-                            "Token &token, const io_t &input) {",
-                            "}") {
-                        println("bool __inputcnstr = false, __outputcnstr = false;")
-                        //println("bool newToken = false;")
-                        cblock("switch(token.state) {", "}") {
+                    nl().method("void", "evaluate",
+                            "vector<Token> &newTokens", "Token &token", "const io_t &input") {
+                        +"bool __inputcnstr = false, __outputcnstr = false;"
+                        switch("token.state") {
                             automaton.rowStates.forEach { (tr, rs) ->
-                                rs.forEach { println("case ${enumStates}::${it.name}:") }
+                                rs.forEach { +"case ${enumStates}::${it.name}:" }
                                 increaseIndent()
                                 nl().print("__inputcnstr = ${expr(tr.inputExpr)};")
                                 nl().print("__outputcnstr  = ${expr(tr.outputExpr)};")
-
-                                nl().cblock("switch(token.state) {", "}") {
+                                nl().switch("token.state") {
                                     rs.forEach { generateCase(it) }
                                 }
+                                +"break;"
                                 decreaseIndent()
                             }
                         }
                     }
                 }
+
+        monitor.postamble = CPP_FOOTER
+        monitor.preamble = CPP_HEADER
         monitor.body = cw.stream.toString()
         return monitor
     }
 
     private fun resetCode(writer: CodeWriter) {
-        gtt.options.monitor.reset?.let { cond ->
+        gtt.options.monitor.resetTrigger?.let { cond ->
             val sexpr = GetetaFacade.exprToSMV(cond, EMPTY_COLUMN, 0, gtt.parseContext)
             val expr = sexpr.accept(cppRewriter)
-            writer . cblock ("if($expr && state() == UNKNOWN) {", "}") {
+            writer.cblock("if($expr && state() == UNKNOWN) {", "}") {
                 +"reset()"
             }
         }
@@ -227,10 +235,18 @@ class CppCombinedMonitorGenerationImpl(
         val input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
         val aggregation: String = "CombinedAndMonitor") {
 
-    private val base: MonitorGeneration = CppMonitorGenerator
-    private val containsDynamic = input.any { (a, b) -> a.options.monitor.dynamic }
-    private val subMonitors = input.map { (a, b) -> base.generate(a, b) }
-    private val startMon = subMonitors.filter { it.initAtStart }//.map { it.name }
+    private val containsDynamic =
+            input.any { (a, b) -> !a.options.monitor.dynamicTrigger.isNullOrBlank() }
+
+    private val subGenerators = input.map { (a, b) -> CppMonitorGeneratorImpl(a, b) }
+    private val subMonitors = subGenerators.map { g -> g.call() }
+
+    private val staticMonitors
+        get() = subMonitors.asSequence().filter { it.static }//.map { it.name }
+
+    private val dynamicMonitors
+        get() = subMonitors.asSequence().filter { it.static }//.map { it.name }
+
     private val monitor = Monitor()
 
     fun call(): Monitor {
@@ -244,7 +260,6 @@ class CppCombinedMonitorGenerationImpl(
         monitor.body = subMonitors.joinToString("\n\n") { it.body } + ownBody
         monitor.preamble = CPP_HEADER
         monitor.postamble = CPP_FOOTER
-
     }
 
     private fun inputStruct() {
@@ -259,30 +274,30 @@ class CppCombinedMonitorGenerationImpl(
                             }
                             acc
                         }
-        monitor.types += defineIOStruct("T_io_t", combinedVariables)
+        monitor.types += subMonitors.joinToString("\n") { it.types }
+        monitor.types += defineIOStruct("${name}_io_t", combinedVariables)
     }
 
-    private fun getOwnBody(): String {
-        val ownBody = CodeWriter()
-        ownBody.cblock("class $name : public $aggregation<io_t> {", "};") {
-            if (containsDynamic)
-                +"vector<IMonitor<io_t> *> monitors;"
+    private fun getOwnBody(): String =
+            CodeWriter.with {
+                cblock("class $name : public $aggregation<io_t> {", "};") {
+                    if (containsDynamic)
+                        +"vector<IMonitor<io_t> *> monitors;"
 
-            startMon.forEach { +"${it.name} ${it.instanceName};" }
+                    staticMonitors.forEach { +"${it.name} ${it.instanceName};" }
 
-            +"public:"
-            genConsructor(ownBody)
-            genReset(ownBody)
-            genEval(ownBody)
-            genBefore()
-            genAfter()
-        }
-        return ownBody.stream.toString()
-    }
+                    +"public:"
+                    genConsructor()
+                    genReset()
+                    genEval()
+                    genBefore()
+                    genAfter()
+                }
+            }
 
     private fun CodeWriter.genAfter() {
-        cblock("void cleanup() override {", "}") {
-            println("""            
+        method("void", "cleanup", "override") {
+            +"""            
             auto pred = [](IMonitor<io_t> *m) {
                 return /*m->is(DYNAMIC) &&*/ m->state() == UNKNOWN;
             };
@@ -290,49 +305,45 @@ class CppCombinedMonitorGenerationImpl(
             copy_if(monitors.begin(), monitors.end(), forDeletion.begin(), pred);
             for (auto m : forDeletion) { delete m; }
             remove_if(monitors.begin(), monitors.end(), pred);
-        """.trimIndent())
+            """.trimIndent()
         }
     }
 
     private fun CodeWriter.genBefore() {
-        cblock("void before(const io_t &input) override {", "}") {
-            if (containsDynamic) {
-                input.forEachIndexed { index, (a, b) ->
-                    if (a.options.monitor.dynamic) {
-                        val m = subMonitors[index]
-
-                        val trigger = a.options.monitor.trigger?.let {
-                            GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, a.parseContext)
-                        } ?: "false"
-
-                        cblock("if($trigger) {", "}") {
-                            println("monitors.push_back(${m.name}());")
-                        }
+        method("void", "before", "const io_t &input", "override") {
+            input.forEachIndexed { index, (a, b) ->
+                a.options.monitor.dynamicTrigger?.let { trigger ->
+                    val m = subMonitors[index]
+                    val e = GetetaFacade.exprToSMV(trigger, EMPTY_COLUMN, 0, a.parseContext)
+                    val ctrigger = e.accept(subGenerators[index].cppRewriter)
+                    ift(ctrigger) {
+                        println("auto m = new ${m.name}();")
+                        println("monitors.push_back(m);")
                     }
                 }
             }
         }
     }
 
-    private fun genEval(ownBody: CodeWriter) {
-        ownBody.cblock("void eval(const io_t &input) override {", "}") {
-            startMon.forEach {
+    private fun CodeWriter.genEval() {
+        method("void", "eval", "const io_t &input", "override") {
+            staticMonitors.forEach {
                 val n = it.instanceName
-                println("$n.next(input); combine(${n}.state());")
+                +"$n.next(input); combine(${n}.state());"
             }
             if (containsDynamic)
                 println("for(auto& m: monitors) {m->next(input); combine(m->state());}")
         }
     }
 
-    private fun genConsructor(ownBody: CodeWriter) {
-        val init = startMon.joinToString(", ") { "${it.instanceName}()" }
-        ownBody.cblock("$name() : $init  {", "}") { +"reset();" }
-        ownBody.cblock("~$name() {", "}") { +"for (auto m : forDeletion) { delete m; }" }
+    private fun CodeWriter.genConsructor() {
+        val init = staticMonitors.toList().map { "${it.instanceName}()" }
+        constructor(name, init) { +"reset();" }
+        method("", "~$name") { +"for (auto m : forDeletion) { delete m; }" }
     }
 
-    private fun genReset(body: CodeWriter) {
-        body.cblock("virtual void reset() override {", "}") {
+    private fun CodeWriter.genReset() {
+        method("virtual void", "reset", "override") {
             if (containsDynamic)
                 +"for (auto m : monitors) m->reset();"
             subMonitors.forEach {
@@ -345,20 +356,79 @@ class CppCombinedMonitorGenerationImpl(
         get() = "_" + this.name.toLowerCase()
 }
 
-
-private fun readResource(name: String) =
-        name to CppMonitorGenerator.javaClass.getResourceAsStream("monitors/$name")
-                .use { it.bufferedReader().readText() }
-
-private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String {
-    val cw = CodeWriter()
-    cw.cblock("struct $typeName {", "};") {
-        variables.filterIsInstance<ProgramVariable>()
-                .forEach { pv ->
-                    print("${dataType(pv.dataType)}  ${pv.name};")
-                            .println("// ${pv.category}")
-                }
+private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {
+    for ((a, b) in gtt.parseContext.refs) {
+        if (b > 0) {
+            val dt = TranslateToCppFacade.translate(a.dataType)
+            +"sregister<$dt, $b> ${a.name};"
+        }
     }
-    cw.nl().nl()
-    return cw.toString()
 }
+
+private fun CodeWriter.historyValuesUpdate(gtt: GeneralizedTestTable) {
+    for ((a, b) in gtt.parseContext.refs) {
+        if (b > 0) {
+            +"_h_${a.name}.push(input.${a.name});"
+        }
+    }
+}
+
+
+private fun CodeWriter.constructor(name: String, inits: Iterable<String> = listOf(), fn: CodeWriter.() -> Unit): CodeWriter {
+    val a = inits.joinToString(", ")
+    val b = if (a.isBlank()) "" else ": $a"
+    cblock("$name() $b {", "}", fn)
+    return this
+}
+
+private fun CodeWriter.method(ret: String = "", name: String,
+                              args: Iterable<String>, fn: CodeWriter.() -> Unit) {
+    val params = args.filter { ' ' in it }.joinToString(", ")
+    val mods = args.filter { ' ' !in it }.joinToString(" ")
+    cblock("$ret $name($params) $mods {", "}", fn)
+}
+
+private fun CodeWriter.method(ret: String = "", name: String,
+                              vararg args: String, fn: CodeWriter.() -> Unit) = method(ret, name, args.toList(), fn)
+
+private fun CodeWriter.ift(cond: String = "", fn: CodeWriter.() -> Unit): CodeWriter {
+    cblock("if($cond) {", "}", fn)
+    return this
+}
+
+private fun CodeWriter.e(cond: String = "", fn: CodeWriter.() -> Unit) {
+    cblock("else {", "}", fn)
+}
+
+private fun CodeWriter.switch(cond: String, fn: CodeWriter.() -> Unit): CodeWriter {
+    cblock("switch($cond) {", "}", fn)
+    return this
+}
+
+private fun CodeWriter.case(cond: String, fn: CodeWriter.() -> Unit): CodeWriter {
+    cblock("case $cond:", "", fn)
+    return this
+}
+
+
+private fun readResource(name: String): Pair<String, String> {
+    val content = CppMonitorGenerator.javaClass.getResourceAsStream("/monitor/$name")
+            ?.use { it.bufferedReader().readText() }
+    if(content == null)
+    {
+        Console.error("Could not read resource: $name")
+    }
+    return name to (content?:"")
+}
+
+private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String =
+        CodeWriter.with {
+            cblock("struct $typeName {", "};") {
+                variables.filterIsInstance<ProgramVariable>()
+                        .forEach { pv ->
+                            print("${dataType(pv.dataType)}  ${pv.name};")
+                                    .println("// ${pv.category}")
+                        }
+            }
+            nl().nl()
+        }
