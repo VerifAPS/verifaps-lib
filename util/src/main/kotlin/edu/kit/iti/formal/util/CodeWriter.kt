@@ -86,4 +86,8 @@ open class CodeWriter(var stream: Writer = StringWriter())
         printf(tail)
         return this
     }
+
+    operator fun CharSequence.unaryPlus() {
+        this@CodeWriter.append(this@unaryPlus)
+    }
 }

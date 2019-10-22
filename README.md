@@ -24,10 +24,12 @@ $ ./gradlew check
 
 * iec61131-lang -- Parser and AST for StructuredText and Sequential Function Chart.
 * geteta -- Framework for generalized Test Tables.
-* casestudies -- contains generic programs and programs for specific case studies.
+* ide -- contains generic programs and programs for specific case studies.
 * flycheck  -- interface for syntax and type checking of Structured Text files.
 * iec-modularization -- Modularized regression verification.
 * iec-run -- Interpreter for Structured Text
 * iec-xml -- Loading and Parsing of PCLOpenXML projects.
 * smv-model -- Model and parser for SMV. Also includes nuXmv interface.
 * web-backend -- Backend for the web frontend. (upcoming)
+
+## Changelog

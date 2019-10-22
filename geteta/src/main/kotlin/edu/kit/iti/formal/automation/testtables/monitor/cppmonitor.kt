@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.monitor
 
+import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.ColumnVariable
@@ -15,14 +16,11 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
 
-val EMPTY_COLUMN = SVariable("ERROR", SMVTypes.BOOLEAN);
-val CPP_PREAMBLE by lazy {
-    CppMonitorGenerator.javaClass.getResourceAsStream("monitors/preamble.hpp").use {
-        it.bufferedReader().readText()
-    }
-}
+val EMPTY_COLUMN = SVariable("ERROR", SMVTypes.BOOLEAN)
 
-val CPP_POSTAMBLE = ""
+val CPP_HEADER by lazy { readResource("header.cpp").second }
+val CPP_FOOTER by lazy { readResource("footer.cpp").second }
+val CPP_RESOURCES by lazy { listOf(readResource("monitor.hpp")) }
 
 
 /**
@@ -37,6 +35,15 @@ object CppMonitorGenerator : MonitorGeneration {
         return impl.call()
     }
 }
+
+object CppCombinedMonitorGeneration : CombinedMonitorGeneration {
+    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor {
+        return CppCombinedMonitorGenerationImpl(name, input).call()
+    }
+
+    override val key = "cpp"
+}
+
 
 class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton) {
     val monitor = Monitor(gtt.name, "", "")
@@ -112,6 +119,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                     }
 
                     cw.nl().cblock("void next(const io_t &input) override {", "}") {
+                        resetCode(this)
                         print("""
                                 vector<Token> newTokens;
                                 for (auto &&tok : tokens) evaluate(newTokens, tok, input);
@@ -161,6 +169,16 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         return monitor
     }
 
+    private fun resetCode(writer: CodeWriter) {
+        gtt.options.monitor.reset?.let { cond ->
+            val sexpr = GetetaFacade.exprToSMV(cond, EMPTY_COLUMN, 0, gtt.parseContext)
+            val expr = sexpr.accept(cppRewriter)
+            writer . cblock ("if($expr && state() == UNKNOWN) {", "}") {
+                +"reset()"
+            }
+        }
+    }
+
     private fun createNewToken(vec: String, state: String, globalvars: String) {
         cw.println("$vec.push_back((struct Token) " +
                 "{ .state = $state, .globalVars = $globalvars });")
@@ -204,31 +222,29 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
 }
 
-object CppCombinedMonitorGeneration : CombinedMonitorGeneration {
-    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor {
-        return CppCombinedMonitorGenerationImpl(name, input).call()
-    }
+class CppCombinedMonitorGenerationImpl(
+        val name: String,
+        val input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
+        val aggregation: String = "CombinedAndMonitor") {
 
-    override val key = "cpp"
-}
-
-class CppCombinedMonitorGenerationImpl(val name: String,
-                                       val input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>) {
     private val base: MonitorGeneration = CppMonitorGenerator
     private val containsDynamic = input.any { (a, b) -> a.options.monitor.dynamic }
     private val subMonitors = input.map { (a, b) -> base.generate(a, b) }
+    private val startMon = subMonitors.filter { it.initAtStart }//.map { it.name }
     private val monitor = Monitor()
 
     fun call(): Monitor {
-        generate(); return monitor
+        generate()
+        return monitor
     }
 
     private fun generate() {
         inputStruct()
         val ownBody = getOwnBody()
         monitor.body = subMonitors.joinToString("\n\n") { it.body } + ownBody
-        monitor.preamble = CPP_PREAMBLE
-        monitor.postamble = CPP_POSTAMBLE
+        monitor.preamble = CPP_HEADER
+        monitor.postamble = CPP_FOOTER
+
     }
 
     private fun inputStruct() {
@@ -248,57 +264,91 @@ class CppCombinedMonitorGenerationImpl(val name: String,
 
     private fun getOwnBody(): String {
         val ownBody = CodeWriter()
-        ownBody.cblock("class $name : CombinedMonitor<io_t> {", "};") {
+        ownBody.cblock("class $name : public $aggregation<io_t> {", "};") {
             if (containsDynamic)
-                println("vector<IMonitor<io_t> &> monitors;")
+                +"vector<IMonitor<io_t> *> monitors;"
 
-            println("public:")
-            val startMon = subMonitors.filter { it.initAtStart }.map { it.name }
-            startMon.forEach { println("$it ${it.toLowerCase()};") }
+            startMon.forEach { +"${it.name} ${it.instanceName};" }
 
-            val init = startMon.joinToString(", ") { "${it.toLowerCase()}()" }
-            cblock("$name() : $init  {", "}") { }
-            ownBody.cblock("void eval(const io_t &&input) {", "}") {
-                startMon.forEach {
-                    val n = it.toLowerCase()
-                    println("$n.next(input); combine(${n}.state());")
-                }
-                if (containsDynamic)
-                    println("for(auto& m: monitors) {m.next(input); combine(m.state());}")
-            }
-
-            if (containsDynamic) {
-                cblock("void before(const io_t &&input) {", "}") {
-                    input.forEachIndexed { index, (a, b) ->
-                        if (a.options.monitor.dynamic) {
-                            val m = subMonitors[index]
-
-                            val trigger = a.options.monitor.trigger?.let {
-                                GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, a.parseContext)
-                            } ?: "false"
-
-                            cblock("if($trigger) {", "}") {
-                                println("monitors.push_back(${m.name}());")
-                            }
-                        }
-                    }
-                }
-                cblock("void cleanUpMonitors(const io_t &&input) {", "}") {
-                    println("""
-auto i = std::begin(monitors);
-while (i != std::end(monitors)) {
-    if (i.state() == MonitorState::UNKNOWN)
-        i = inv.erase(i);
-    else
-        ++i;
-}""".trimIndent())
-                }
-            }
+            +"public:"
+            genConsructor(ownBody)
+            genReset(ownBody)
+            genEval(ownBody)
+            genBefore()
+            genAfter()
         }
         return ownBody.stream.toString()
     }
+
+    private fun CodeWriter.genAfter() {
+        cblock("void cleanup() override {", "}") {
+            println("""            
+            auto pred = [](IMonitor<io_t> *m) {
+                return /*m->is(DYNAMIC) &&*/ m->state() == UNKNOWN;
+            };
+            vector<IMonitor<io_t> *> forDeletion(monitors.size());
+            copy_if(monitors.begin(), monitors.end(), forDeletion.begin(), pred);
+            for (auto m : forDeletion) { delete m; }
+            remove_if(monitors.begin(), monitors.end(), pred);
+        """.trimIndent())
+        }
+    }
+
+    private fun CodeWriter.genBefore() {
+        cblock("void before(const io_t &input) override {", "}") {
+            if (containsDynamic) {
+                input.forEachIndexed { index, (a, b) ->
+                    if (a.options.monitor.dynamic) {
+                        val m = subMonitors[index]
+
+                        val trigger = a.options.monitor.trigger?.let {
+                            GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, a.parseContext)
+                        } ?: "false"
+
+                        cblock("if($trigger) {", "}") {
+                            println("monitors.push_back(${m.name}());")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun genEval(ownBody: CodeWriter) {
+        ownBody.cblock("void eval(const io_t &input) override {", "}") {
+            startMon.forEach {
+                val n = it.instanceName
+                println("$n.next(input); combine(${n}.state());")
+            }
+            if (containsDynamic)
+                println("for(auto& m: monitors) {m->next(input); combine(m->state());}")
+        }
+    }
+
+    private fun genConsructor(ownBody: CodeWriter) {
+        val init = startMon.joinToString(", ") { "${it.instanceName}()" }
+        ownBody.cblock("$name() : $init  {", "}") { +"reset();" }
+        ownBody.cblock("~$name() {", "}") { +"for (auto m : forDeletion) { delete m; }" }
+    }
+
+    private fun genReset(body: CodeWriter) {
+        body.cblock("virtual void reset() override {", "}") {
+            if (containsDynamic)
+                +"for (auto m : monitors) m->reset();"
+            subMonitors.forEach {
+                +"${it.instanceName}.reset();"
+            }
+        }
+    }
+
+    private val Monitor.instanceName: String
+        get() = "_" + this.name.toLowerCase()
 }
 
+
+private fun readResource(name: String) =
+        name to CppMonitorGenerator.javaClass.getResourceAsStream("monitors/$name")
+                .use { it.bufferedReader().readText() }
 
 private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String {
     val cw = CodeWriter()

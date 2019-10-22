@@ -23,222 +23,222 @@ VAR
     upper : signed word[16];
 -- end of VAR
 DEFINE
-    mode_116 := mode_9;
-    mode_130 := mode_9;
-    mode_141 := case
-        I_0 != Q_112 : mode_116; 
-        TRUE : mode_130; 
+    mode$116 := mode$9;
+    mode$130 := mode$9;
+    mode$141 := case
+        I$0 != Q$112 : mode$116; 
+        TRUE : mode$130; 
     esac;
-    mode_152 := case
-        upper_10 < lower_8 : mode_9; 
-        TRUE : mode_141; 
+    mode$152 := case
+        upper$10 < lower$8 : mode$9; 
+        TRUE : mode$141; 
     esac;
-    mode_163 := case
-        mode_9 = LEARN : mode_55; 
-        TRUE : mode_152; 
+    mode$163 := case
+        mode$9 = LEARN : mode$55; 
+        TRUE : mode$152; 
     esac;
-    mode_55 := mode_9;
-    mode_9 := mode;
-    Q_1 := Q;
-    Q_112 := case
-        upper_10 <= (case
-            lower_8 >= I_0 : lower_8; 
-            TRUE : I_0; 
-        esac) : upper_10; 
+    mode$55 := mode$9;
+    mode$9 := mode;
+    Q$1 := Q;
+    Q$112 := case
+        upper$10 <= (case
+            lower$8 >= I$0 : lower$8; 
+            TRUE : I$0; 
+        esac) : upper$10; 
         TRUE : case
-            lower_8 >= I_0 : lower_8; 
-            TRUE : I_0; 
+            lower$8 >= I$0 : lower$8; 
+            TRUE : I$0; 
         esac; 
     esac;
-    Q_117 := Q_112;
-    Q_131 := Q_112;
-    Q_142 := case
-        I_0 != Q_112 : Q_117; 
-        TRUE : Q_131; 
+    Q$117 := Q$112;
+    Q$131 := Q$112;
+    Q$142 := case
+        I$0 != Q$112 : Q$117; 
+        TRUE : Q$131; 
     esac;
-    Q_153 := case
-        upper_10 < lower_8 : Q_68; 
-        TRUE : Q_142; 
+    Q$153 := case
+        upper$10 < lower$8 : Q$68; 
+        TRUE : Q$142; 
     esac;
-    Q_164 := case
-        mode_9 = LEARN : Q_66; 
-        TRUE : Q_153; 
+    Q$164 := case
+        mode$9 = LEARN : Q$66; 
+        TRUE : Q$153; 
     esac;
-    Q_56 := Q_1;
-    Q_66 := 0sd16_0;
-    Q_68 := 0sd16_0;
-    learn_118 := learn_7;
-    learn_132 := learn_7;
-    learn_143 := case
-        I_0 != Q_112 : learn_118; 
-        TRUE : learn_132; 
+    Q$56 := Q$1;
+    Q$66 := 0sd16_0;
+    Q$68 := 0sd16_0;
+    learn$118 := learn$7;
+    learn$132 := learn$7;
+    learn$143 := case
+        I$0 != Q$112 : learn$118; 
+        TRUE : learn$132; 
     esac;
-    learn_154 := case
-        upper_10 < lower_8 : learn_7; 
-        TRUE : learn_143; 
+    learn$154 := case
+        upper$10 < lower$8 : learn$7; 
+        TRUE : learn$143; 
     esac;
-    learn_165 := case
-        mode_9 = LEARN : learn_57; 
-        TRUE : learn_154; 
+    learn$165 := case
+        mode$9 = LEARN : learn$57; 
+        TRUE : learn$154; 
     esac;
-    learn_57 := learn_7;
-    learn_7 := learn;
-    W_115 := TRUE;
-    W_121 := case
-        cntHeat_113 = 0sd16_0 : W_115; 
-        TRUE : W_2; 
+    learn$57 := learn$7;
+    learn$7 := learn;
+    W$115 := TRUE;
+    W$121 := case
+        cntHeat$113 = 0sd16_0 : W$115; 
+        TRUE : W$2; 
     esac;
-    W_129 := FALSE;
-    W_135 := case
-        cntQuench_127 = 0sd16_0 : W_129; 
-        TRUE : W_2; 
+    W$129 := FALSE;
+    W$135 := case
+        cntQuench$127 = 0sd16_0 : W$129; 
+        TRUE : W$2; 
     esac;
-    W_146 := case
-        I_0 != Q_112 : W_121; 
-        TRUE : W_135; 
+    W$146 := case
+        I$0 != Q$112 : W$121; 
+        TRUE : W$135; 
     esac;
-    W_157 := case
-        upper_10 < lower_8 : W_69; 
-        TRUE : W_146; 
+    W$157 := case
+        upper$10 < lower$8 : W$69; 
+        TRUE : W$146; 
     esac;
-    W_168 := case
-        mode_9 = LEARN : W_67; 
-        TRUE : W_157; 
+    W$168 := case
+        mode$9 = LEARN : W$67; 
+        TRUE : W$157; 
     esac;
-    W_2 := W;
-    W_60 := W_2;
-    W_67 := FALSE;
-    W_69 := TRUE;
-    lower_120 := lower_8;
-    lower_134 := lower_8;
-    lower_145 := case
-        I_0 != Q_112 : lower_120; 
-        TRUE : lower_134; 
+    W$2 := W;
+    W$60 := W$2;
+    W$67 := FALSE;
+    W$69 := TRUE;
+    lower$120 := lower$8;
+    lower$134 := lower$8;
+    lower$145 := case
+        I$0 != Q$112 : lower$120; 
+        TRUE : lower$134; 
     esac;
-    lower_156 := case
-        upper_10 < lower_8 : lower_8; 
-        TRUE : lower_145; 
+    lower$156 := case
+        upper$10 < lower$8 : lower$8; 
+        TRUE : lower$145; 
     esac;
-    lower_167 := case
-        mode_9 = LEARN : lower_59; 
-        TRUE : lower_156; 
+    lower$167 := case
+        mode$9 = LEARN : lower$59; 
+        TRUE : lower$156; 
     esac;
-    lower_32 := case
-        lower_8 <= I_0 : lower_8; 
-        TRUE : I_0; 
+    lower$32 := case
+        lower$8 <= I$0 : lower$8; 
+        TRUE : I$0; 
     esac;
-    lower_59 := case
-        learn_7 : lower_32; 
-        TRUE : lower_8; 
+    lower$59 := case
+        learn$7 : lower$32; 
+        TRUE : lower$8; 
     esac;
-    lower_8 := lower;
-    upper_10 := upper;
-    upper_119 := upper_10;
-    upper_133 := upper_10;
-    upper_144 := case
-        I_0 != Q_112 : upper_119; 
-        TRUE : upper_133; 
+    lower$8 := lower;
+    upper$10 := upper;
+    upper$119 := upper$10;
+    upper$133 := upper$10;
+    upper$144 := case
+        I$0 != Q$112 : upper$119; 
+        TRUE : upper$133; 
     esac;
-    upper_155 := case
-        upper_10 < lower_8 : upper_10; 
-        TRUE : upper_144; 
+    upper$155 := case
+        upper$10 < lower$8 : upper$10; 
+        TRUE : upper$144; 
     esac;
-    upper_166 := case
-        mode_9 = LEARN : upper_58; 
-        TRUE : upper_155; 
+    upper$166 := case
+        mode$9 = LEARN : upper$58; 
+        TRUE : upper$155; 
     esac;
-    upper_54 := case
-        upper_10 >= I_0 : upper_10; 
-        TRUE : I_0; 
+    upper$54 := case
+        upper$10 >= I$0 : upper$10; 
+        TRUE : I$0; 
     esac;
-    upper_58 := case
-        learn_7 : upper_54; 
-        TRUE : upper_10; 
+    upper$58 := case
+        learn$7 : upper$54; 
+        TRUE : upper$10; 
     esac;
-    cntQuench_114 := WAIT_AFTER_WARNING_3;
-    cntQuench_122 := cntQuench_114;
-    cntQuench_127 := cntQuench_6 - 0sd16_1;
-    cntQuench_136 := cntQuench_127;
-    cntQuench_147 := case
-        I_0 != Q_112 : cntQuench_122; 
-        TRUE : cntQuench_136; 
+    cntQuench$114 := WAIT_AFTER_WARNING$3;
+    cntQuench$122 := cntQuench$114;
+    cntQuench$127 := cntQuench$6 - 0sd16_1;
+    cntQuench$136 := cntQuench$127;
+    cntQuench$147 := case
+        I$0 != Q$112 : cntQuench$122; 
+        TRUE : cntQuench$136; 
     esac;
-    cntQuench_158 := case
-        upper_10 < lower_8 : cntQuench_6; 
-        TRUE : cntQuench_147; 
+    cntQuench$158 := case
+        upper$10 < lower$8 : cntQuench$6; 
+        TRUE : cntQuench$147; 
     esac;
-    cntQuench_169 := case
-        mode_9 = LEARN : cntQuench_61; 
-        TRUE : cntQuench_158; 
+    cntQuench$169 := case
+        mode$9 = LEARN : cntQuench$61; 
+        TRUE : cntQuench$158; 
     esac;
-    cntQuench_6 := cntQuench;
-    cntQuench_61 := cntQuench_6;
-    I_0 := I;
-    I_123 := I_0;
-    I_137 := I_0;
-    I_148 := case
-        I_0 != Q_112 : I_123; 
-        TRUE : I_137; 
+    cntQuench$6 := cntQuench;
+    cntQuench$61 := cntQuench$6;
+    I$0 := I;
+    I$123 := I$0;
+    I$137 := I$0;
+    I$148 := case
+        I$0 != Q$112 : I$123; 
+        TRUE : I$137; 
     esac;
-    I_159 := case
-        upper_10 < lower_8 : I_0; 
-        TRUE : I_148; 
+    I$159 := case
+        upper$10 < lower$8 : I$0; 
+        TRUE : I$148; 
     esac;
-    I_170 := case
-        mode_9 = LEARN : I_62; 
-        TRUE : I_159; 
+    I$170 := case
+        mode$9 = LEARN : I$62; 
+        TRUE : I$159; 
     esac;
-    I_62 := I_0;
-    WAIT_AFTER_WARNING_125 := WAIT_AFTER_WARNING_3;
-    WAIT_AFTER_WARNING_139 := WAIT_AFTER_WARNING_3;
-    WAIT_AFTER_WARNING_150 := case
-        I_0 != Q_112 : WAIT_AFTER_WARNING_125; 
-        TRUE : WAIT_AFTER_WARNING_139; 
+    I$62 := I$0;
+    WAIT_AFTER_WARNING$125 := WAIT_AFTER_WARNING$3;
+    WAIT_AFTER_WARNING$139 := WAIT_AFTER_WARNING$3;
+    WAIT_AFTER_WARNING$150 := case
+        I$0 != Q$112 : WAIT_AFTER_WARNING$125; 
+        TRUE : WAIT_AFTER_WARNING$139; 
     esac;
-    WAIT_AFTER_WARNING_161 := case
-        upper_10 < lower_8 : WAIT_AFTER_WARNING_3; 
-        TRUE : WAIT_AFTER_WARNING_150; 
+    WAIT_AFTER_WARNING$161 := case
+        upper$10 < lower$8 : WAIT_AFTER_WARNING$3; 
+        TRUE : WAIT_AFTER_WARNING$150; 
     esac;
-    WAIT_AFTER_WARNING_172 := case
-        mode_9 = LEARN : WAIT_AFTER_WARNING_64; 
-        TRUE : WAIT_AFTER_WARNING_161; 
+    WAIT_AFTER_WARNING$172 := case
+        mode$9 = LEARN : WAIT_AFTER_WARNING$64; 
+        TRUE : WAIT_AFTER_WARNING$161; 
     esac;
-    WAIT_AFTER_WARNING_3 := WAIT_AFTER_WARNING;
-    WAIT_AFTER_WARNING_64 := WAIT_AFTER_WARNING_3;
-    cntHeat_113 := cntHeat_5 - 0sd16_1;
-    cntHeat_124 := cntHeat_113;
-    cntHeat_128 := WAIT_BEFORE_WARNING_4;
-    cntHeat_138 := cntHeat_128;
-    cntHeat_149 := case
-        I_0 != Q_112 : cntHeat_124; 
-        TRUE : cntHeat_138; 
+    WAIT_AFTER_WARNING$3 := WAIT_AFTER_WARNING;
+    WAIT_AFTER_WARNING$64 := WAIT_AFTER_WARNING$3;
+    cntHeat$113 := cntHeat$5 - 0sd16_1;
+    cntHeat$124 := cntHeat$113;
+    cntHeat$128 := WAIT_BEFORE_WARNING$4;
+    cntHeat$138 := cntHeat$128;
+    cntHeat$149 := case
+        I$0 != Q$112 : cntHeat$124; 
+        TRUE : cntHeat$138; 
     esac;
-    cntHeat_160 := case
-        upper_10 < lower_8 : cntHeat_5; 
-        TRUE : cntHeat_149; 
+    cntHeat$160 := case
+        upper$10 < lower$8 : cntHeat$5; 
+        TRUE : cntHeat$149; 
     esac;
-    cntHeat_171 := case
-        mode_9 = LEARN : cntHeat_63; 
-        TRUE : cntHeat_160; 
+    cntHeat$171 := case
+        mode$9 = LEARN : cntHeat$63; 
+        TRUE : cntHeat$160; 
     esac;
-    cntHeat_5 := cntHeat;
-    cntHeat_63 := cntHeat_5;
-    WAIT_BEFORE_WARNING_126 := WAIT_BEFORE_WARNING_4;
-    WAIT_BEFORE_WARNING_140 := WAIT_BEFORE_WARNING_4;
-    WAIT_BEFORE_WARNING_151 := case
-        I_0 != Q_112 : WAIT_BEFORE_WARNING_126; 
-        TRUE : WAIT_BEFORE_WARNING_140; 
+    cntHeat$5 := cntHeat;
+    cntHeat$63 := cntHeat$5;
+    WAIT_BEFORE_WARNING$126 := WAIT_BEFORE_WARNING$4;
+    WAIT_BEFORE_WARNING$140 := WAIT_BEFORE_WARNING$4;
+    WAIT_BEFORE_WARNING$151 := case
+        I$0 != Q$112 : WAIT_BEFORE_WARNING$126; 
+        TRUE : WAIT_BEFORE_WARNING$140; 
     esac;
-    WAIT_BEFORE_WARNING_162 := case
-        upper_10 < lower_8 : WAIT_BEFORE_WARNING_4; 
-        TRUE : WAIT_BEFORE_WARNING_151; 
+    WAIT_BEFORE_WARNING$162 := case
+        upper$10 < lower$8 : WAIT_BEFORE_WARNING$4; 
+        TRUE : WAIT_BEFORE_WARNING$151; 
     esac;
-    WAIT_BEFORE_WARNING_173 := case
-        mode_9 = LEARN : WAIT_BEFORE_WARNING_65; 
-        TRUE : WAIT_BEFORE_WARNING_162; 
+    WAIT_BEFORE_WARNING$173 := case
+        mode$9 = LEARN : WAIT_BEFORE_WARNING$65; 
+        TRUE : WAIT_BEFORE_WARNING$162; 
     esac;
-    WAIT_BEFORE_WARNING_4 := WAIT_BEFORE_WARNING;
-    WAIT_BEFORE_WARNING_65 := WAIT_BEFORE_WARNING_4;
+    WAIT_BEFORE_WARNING$4 := WAIT_BEFORE_WARNING;
+    WAIT_BEFORE_WARNING$65 := WAIT_BEFORE_WARNING$4;
 ASSIGN
     init(Q) := 0sd16_0;
     init(W) := FALSE;
@@ -248,14 +248,14 @@ ASSIGN
     init(cntQuench) := 0sd16_3;
     init(lower) := 0sd16_32766;
     init(upper) := -0sd16_32767;
-    next(Q) := Q_164;
-    next(W) := W_168;
-    next(WAIT_AFTER_WARNING) := WAIT_AFTER_WARNING_172;
-    next(WAIT_BEFORE_WARNING) := WAIT_BEFORE_WARNING_173;
-    next(cntHeat) := cntHeat_171;
-    next(cntQuench) := cntQuench_169;
-    next(lower) := lower_167;
-    next(upper) := upper_166;
+    next(Q) := Q$164;
+    next(W) := W$168;
+    next(WAIT_AFTER_WARNING) := WAIT_AFTER_WARNING$172;
+    next(WAIT_BEFORE_WARNING) := WAIT_BEFORE_WARNING$173;
+    next(cntHeat) := cntHeat$171;
+    next(cntQuench) := cntQuench$169;
+    next(lower) := lower$167;
+    next(upper) := upper$166;
 -- end of module MinMax
 MODULE table(code$mode, code$learn, code$I, code$Q, code$W)
 FROZENVAR
@@ -265,9 +265,11 @@ FROZENVAR
 VAR
     __ERROR__ : boolean;
     __SENTINEL__ : boolean;
+    g2_1_r03_01 : boolean;
+    g2_1_r04_01 : boolean;
+    g2_2_r03_01 : boolean;
+    g2_2_r04_01 : boolean;
     r01_01 : boolean;
-    r03_01 : boolean;
-    r04_01 : boolean;
     r07_01 : boolean;
     r09_01 : boolean;
     r09_02 : boolean;
@@ -315,22 +317,42 @@ DEFINE
     r01_progress := r01_fwd & !FALSE;
     r01_fail := r01_in & !r01_out;
     r01_fwd := r01_in & r01_out;
-    r03_out_Q := 0sd16_0 = code$Q;
+    r03_out_Q := 0sd16_1 != 0sd16_2;
     r03_out_W := FALSE = code$W;
     r03_out := r03_out_Q & r03_out_W;
-    r03_in_mode := LEARN = code$mode;
+    r03_in_mode := ACTIVE = code$mode;
     r03_in_I := TRUE;
-    r03_in_learn := FALSE = code$learn;
+    r03_in_learn := TRUE;
     r03_in := r03_in_mode & r03_in_I & r03_in_learn;
     r03_progress := r03_fwd & !FALSE;
     r03_fail := r03_in & !r03_out;
     r03_fwd := r03_in & r03_out;
-    r04_out_Q := p <= code$Q & code$Q <= q;
+    r04_out_Q := 0sd16_1 != 0sd16_2;
     r04_out_W := FALSE = code$W;
     r04_out := r04_out_Q & r04_out_W;
-    r04_in_mode := LEARN = code$mode;
-    r04_in_I := p <= code$I & code$I <= q;
-    r04_in_learn := TRUE = code$learn;
+    r04_in_mode := ACTIVE = code$mode;
+    r04_in_I := TRUE;
+    r04_in_learn := TRUE;
+    r04_in := r04_in_mode & r04_in_I & r04_in_learn;
+    r04_progress := r04_fwd & !FALSE;
+    r04_fail := r04_in & !r04_out;
+    r04_fwd := r04_in & r04_out;
+    r03_out_Q := 0sd16_1 != 0sd16_2;
+    r03_out_W := FALSE = code$W;
+    r03_out := r03_out_Q & r03_out_W;
+    r03_in_mode := ACTIVE = code$mode;
+    r03_in_I := TRUE;
+    r03_in_learn := TRUE;
+    r03_in := r03_in_mode & r03_in_I & r03_in_learn;
+    r03_progress := r03_fwd & !FALSE;
+    r03_fail := r03_in & !r03_out;
+    r03_fwd := r03_in & r03_out;
+    r04_out_Q := 0sd16_1 != 0sd16_2;
+    r04_out_W := FALSE = code$W;
+    r04_out := r04_out_Q & r04_out_W;
+    r04_in_mode := ACTIVE = code$mode;
+    r04_in_I := TRUE;
+    r04_in_learn := TRUE;
     r04_in := r04_in_mode & r04_in_I & r04_in_learn;
     r04_progress := r04_fwd & !FALSE;
     r04_fail := r04_in & !r04_out;
@@ -425,6 +447,102 @@ DEFINE
     r19_progress := r19_fwd & !FALSE;
     r19_fail := r19_in & !r19_out;
     r19_fwd := r19_in & r19_out;
+    r07_out_Q := p <= code$Q & code$Q <= q;
+    r07_out_W := FALSE = code$W;
+    r07_out := r07_out_Q & r07_out_W;
+    r07_in_mode := ACTIVE = code$mode;
+    r07_in_I := p <= code$I & code$I <= q;
+    r07_in_learn := TRUE;
+    r07_in := r07_in_mode & r07_in_I & r07_in_learn;
+    r07_progress := r07_fwd & !FALSE;
+    r07_fail := r07_in & !r07_out;
+    r07_fwd := r07_in & r07_out;
+    r09_out_Q := code$Q <= q;
+    r09_out_W := FALSE = code$W;
+    r09_out := r09_out_Q & r09_out_W;
+    r09_in_mode := ACTIVE = code$mode;
+    r09_in_I := code$I > q;
+    r09_in_learn := TRUE;
+    r09_in := r09_in_mode & r09_in_I & r09_in_learn;
+    r09_progress := r09_fwd & !FALSE;
+    r09_fail := r09_in & !r09_out;
+    r09_fwd := r09_in & r09_out;
+    r10_out_Q := code$Q <= q;
+    r10_out_W := TRUE = code$W;
+    r10_out := r10_out_Q & r10_out_W;
+    r10_in_mode := ACTIVE = code$mode;
+    r10_in_I := code$I > q;
+    r10_in_learn := TRUE;
+    r10_in := r10_in_mode & r10_in_I & r10_in_learn;
+    r10_progress := r10_fwd & !FALSE;
+    r10_fail := r10_in & !r10_out;
+    r10_fwd := r10_in & r10_out;
+    r12_out_Q := p <= code$Q & code$Q <= q;
+    r12_out_W := TRUE = code$W;
+    r12_out := r12_out_Q & r12_out_W;
+    r12_in_mode := ACTIVE = code$mode;
+    r12_in_I := p <= code$I & code$I <= q;
+    r12_in_learn := TRUE;
+    r12_in := r12_in_mode & r12_in_I & r12_in_learn;
+    r12_progress := r12_fwd & !FALSE;
+    r12_fail := r12_in & !r12_out;
+    r12_fwd := r12_in & r12_out;
+    r13_out_Q := p <= code$Q & code$Q <= q;
+    r13_out_W := FALSE = code$W;
+    r13_out := r13_out_Q & r13_out_W;
+    r13_in_mode := ACTIVE = code$mode;
+    r13_in_I := p <= code$I & code$I <= q;
+    r13_in_learn := TRUE;
+    r13_in := r13_in_mode & r13_in_I & r13_in_learn;
+    r13_progress := r13_fwd & !FALSE;
+    r13_fail := r13_in & !r13_out;
+    r13_fwd := r13_in & r13_out;
+    r15_out_Q := code$Q >= p;
+    r15_out_W := TRUE = code$W;
+    r15_out := r15_out_Q & r15_out_W;
+    r15_in_mode := ACTIVE = code$mode;
+    r15_in_I := code$I < p;
+    r15_in_learn := TRUE;
+    r15_in := r15_in_mode & r15_in_I & r15_in_learn;
+    r15_progress := r15_fwd & !FALSE;
+    r15_fail := r15_in & !r15_out;
+    r15_fwd := r15_in & r15_out;
+    r16_out_Q := code$Q >= p;
+    r16_out_W := TRUE = code$W;
+    r16_out := r16_out_Q & r16_out_W;
+    r16_in_mode := ACTIVE = code$mode;
+    r16_in_I := code$I < p;
+    r16_in_learn := TRUE;
+    r16_in := r16_in_mode & r16_in_I & r16_in_learn;
+    r16_progress := r16_fwd & !FALSE;
+    r16_fail := r16_in & !r16_out;
+    r16_fwd := r16_in & r16_out;
+    r18_out_Q := p <= code$Q & code$Q <= q;
+    r18_out_W := TRUE = code$W;
+    r18_out := r18_out_Q & r18_out_W;
+    r18_in_mode := ACTIVE = code$mode;
+    r18_in_I := p <= code$I & code$I <= q;
+    r18_in_learn := TRUE;
+    r18_in := r18_in_mode & r18_in_I & r18_in_learn;
+    r18_progress := r18_fwd & !FALSE;
+    r18_fail := r18_in & !r18_out;
+    r18_fwd := r18_in & r18_out;
+    r19_out_Q := p <= code$Q & code$Q <= q;
+    r19_out_W := FALSE = code$W;
+    r19_out := r19_out_Q & r19_out_W;
+    r19_in_mode := ACTIVE = code$mode;
+    r19_in_I := p <= code$I & code$I <= q;
+    r19_in_learn := TRUE;
+    r19_in := r19_in_mode & r19_in_I & r19_in_learn;
+    r19_progress := r19_fwd & !FALSE;
+    r19_fail := r19_in & !r19_out;
+    r19_fwd := r19_in & r19_out;
+    g2_2_r03_01_accept := g2_2_r03_01 & r03_fwd;
+    g2_2_r03_01_fail := g2_2_r03_01 & r03_fail;
+    g2_2_r03_01_acceptp := g2_2_r03_01_accept & !r03_progress;
+    g2_2_r04_01_accept := g2_2_r04_01 & r04_fwd;
+    g2_2_r04_01_fail := g2_2_r04_01 & r04_fail;
+    g2_2_r04_01_acceptp := g2_2_r04_01_accept & !r04_progress;
     r10_01_accept := r10_01 & r10_fwd;
     r10_01_fail := r10_01 & r10_fail;
     r10_01_acceptp := r10_01_accept & !r10_progress;
@@ -446,18 +564,12 @@ DEFINE
     r12_05_accept := r12_05 & r12_fwd;
     r12_05_fail := r12_05 & r12_fail;
     r12_05_acceptp := r12_05_accept & !r12_progress;
-    r03_01_accept := r03_01 & r03_fwd;
-    r03_01_fail := r03_01 & r03_fail;
-    r03_01_acceptp := r03_01_accept & !r03_progress;
     r13_01_accept := r13_01 & r13_fwd;
     r13_01_fail := r13_01 & r13_fail;
     r13_01_acceptp := r13_01_accept & !r13_progress;
     r16_01_accept := r16_01 & r16_fwd;
     r16_01_fail := r16_01 & r16_fail;
     r16_01_acceptp := r16_01_accept & !r16_progress;
-    r04_01_accept := r04_01 & r04_fwd;
-    r04_01_fail := r04_01 & r04_fail;
-    r04_01_acceptp := r04_01_accept & !r04_progress;
     r15_01_accept := r15_01 & r15_fwd;
     r15_01_fail := r15_01 & r15_fail;
     r15_01_acceptp := r15_01_accept & !r15_progress;
@@ -488,6 +600,9 @@ DEFINE
     r15_10_accept := r15_10 & r15_fwd;
     r15_10_fail := r15_10 & r15_fail;
     r15_10_acceptp := r15_10_accept & !r15_progress;
+    g2_1_r04_01_accept := g2_1_r04_01 & r04_fwd;
+    g2_1_r04_01_fail := g2_1_r04_01 & r04_fail;
+    g2_1_r04_01_acceptp := g2_1_r04_01_accept & !r04_progress;
     r07_01_accept := r07_01 & r07_fwd;
     r07_01_fail := r07_01 & r07_fail;
     r07_01_acceptp := r07_01_accept & !r07_progress;
@@ -539,50 +654,56 @@ DEFINE
     r19_01_accept := r19_01 & r19_fwd;
     r19_01_fail := r19_01 & r19_fail;
     r19_01_acceptp := r19_01_accept & !r19_progress;
+    g2_1_r03_01_accept := g2_1_r03_01 & r03_fwd;
+    g2_1_r03_01_fail := g2_1_r03_01 & r03_fail;
+    g2_1_r03_01_acceptp := g2_1_r03_01_accept & !r03_progress;
+
 INVARSPEC
-    __ERROR__ -> r10_01 | r01_01 | r12_01 | r12_02 | r12_03 | r12_04 | r12_05 | r03_01 | r13_01 | r16_01 | r04_01 | r15_01 | r15_02 | r15_03 | r15_04 | r15_05 | r15_06 | r15_07 | r15_08 | r15_09 | r15_10 | r07_01 | r18_01 | r18_02 | r18_03 | r18_04 | r18_05 | r09_01 | r09_02 | r09_03 | r09_04 | r09_05 | r09_06 | r09_07 | r09_08 | r09_09 | r09_10 | r19_01 | __SENTINEL__
+    __ERROR__ -> g2_2_r03_01 | g2_2_r04_01 | r10_01 | r01_01 | r12_01 | r12_02 | r12_03 | r12_04 | r12_05 | r13_01 | r16_01 | r15_01 | r15_02 | r15_03 | r15_04 | r15_05 | r15_06 | r15_07 | r15_08 | r15_09 | r15_10 | g2_1_r04_01 | r07_01 | r18_01 | r18_02 | r18_03 | r18_04 | r18_05 | r09_01 | r09_02 | r09_03 | r09_04 | r09_05 | r09_06 | r09_07 | r09_08 | r09_09 | r09_10 | r19_01 | g2_1_r03_01 | __SENTINEL__
 
 INIT
-    !r10_01 & r01_01 & !r12_01 & !r12_02 & !r12_03 & !r12_04 & !r12_05 & !r03_01 & !r13_01 & !r16_01 & !r04_01 & !r15_01 & !r15_02 & !r15_03 & !r15_04 & !r15_05 & !r15_06 & !r15_07 & !r15_08 & !r15_09 & !r15_10 & !r07_01 & !r18_01 & !r18_02 & !r18_03 & !r18_04 & !r18_05 & !r09_01 & !r09_02 & !r09_03 & !r09_04 & !r09_05 & !r09_06 & !r09_07 & !r09_08 & !r09_09 & !r09_10 & !r19_01 & !__ERROR__ & !__SENTINEL__ & 0sd16_0 = p & 0sd16_5 = q;
+    !g2_2_r03_01 & !g2_2_r04_01 & !r10_01 & r01_01 & !r12_01 & !r12_02 & !r12_03 & !r12_04 & !r12_05 & !r13_01 & !r16_01 & !r15_01 & !r15_02 & !r15_03 & !r15_04 & !r15_05 & !r15_06 & !r15_07 & !r15_08 & !r15_09 & !r15_10 & !g2_1_r04_01 & !r07_01 & !r18_01 & !r18_02 & !r18_03 & !r18_04 & !r18_05 & !r09_01 & !r09_02 & !r09_03 & !r09_04 & !r09_05 & !r09_06 & !r09_07 & !r09_08 & !r09_09 & !r09_10 & !r19_01 & !g2_1_r03_01 & !__ERROR__ & !__SENTINEL__ & 0sd16_0 = p & 0sd16_5 = q;
 ASSIGN
-    next(__ERROR__) := r01_01_fail | r03_01_fail | r04_01_fail | r07_01_fail | r09_01_fail | r09_02_fail | r09_03_fail | r09_04_fail | r09_05_fail | r09_06_fail | r09_07_fail | r09_08_fail | r09_09_fail | r09_10_fail | r10_01_fail | r12_01_fail | r12_02_fail | r12_03_fail | r12_04_fail | r12_05_fail | r13_01_fail | r15_01_fail | r15_02_fail | r15_03_fail | r15_04_fail | r15_05_fail | r15_06_fail | r15_07_fail | r15_08_fail | r15_09_fail | r15_10_fail | r16_01_fail | r18_01_fail | r18_02_fail | r18_03_fail | r18_04_fail | r18_05_fail | r19_01_fail;
+    next(__ERROR__) := r01_01_fail | g2_1_r03_01_fail | g2_1_r04_01_fail | g2_2_r03_01_fail | g2_2_r04_01_fail | r07_01_fail | r09_01_fail | r09_02_fail | r09_03_fail | r09_04_fail | r09_05_fail | r09_06_fail | r09_07_fail | r09_08_fail | r09_09_fail | r09_10_fail | r10_01_fail | r12_01_fail | r12_02_fail | r12_03_fail | r12_04_fail | r12_05_fail | r13_01_fail | r15_01_fail | r15_02_fail | r15_03_fail | r15_04_fail | r15_05_fail | r15_06_fail | r15_07_fail | r15_08_fail | r15_09_fail | r15_10_fail | r16_01_fail | r18_01_fail | r18_02_fail | r18_03_fail | r18_04_fail | r18_05_fail | r19_01_fail | r07_01_fail | r09_01_fail | r09_02_fail | r09_03_fail | r09_04_fail | r09_05_fail | r09_06_fail | r09_07_fail | r09_08_fail | r09_09_fail | r09_10_fail | r10_01_fail | r12_01_fail | r12_02_fail | r12_03_fail | r12_04_fail | r12_05_fail | r13_01_fail | r15_01_fail | r15_02_fail | r15_03_fail | r15_04_fail | r15_05_fail | r15_06_fail | r15_07_fail | r15_08_fail | r15_09_fail | r15_10_fail | r16_01_fail | r18_01_fail | r18_02_fail | r18_03_fail | r18_04_fail | r18_05_fail | r19_01_fail;
     next(__SENTINEL__) := r19_01_accept | __SENTINEL__;
+    next(g2_1_r03_01) := r01_01_accept | g2_1_r03_01_accept;
+    next(g2_1_r04_01) := g2_1_r03_01_accept | g2_1_r04_01_accept;
+    next(g2_2_r03_01) := g2_1_r04_01_accept | g2_2_r04_01_accept | g2_2_r03_01_accept;
+    next(g2_2_r04_01) := g2_2_r03_01_accept | g2_2_r04_01_accept;
     next(r01_01) := r01_01_accept;
-    next(r03_01) := r01_01_accept | r04_01_accept | r03_01_accept;
-    next(r04_01) := r03_01_accept | r04_01_accept;
-    next(r07_01) := r04_01_accept | r19_01_accept | r07_01_accept;
-    next(r09_01) := r04_01_accept | r07_01_accept | r19_01_accept;
-    next(r09_02) := r09_01_accept;
-    next(r09_03) := r09_02_accept;
-    next(r09_04) := r09_03_accept;
-    next(r09_05) := r09_04_accept;
-    next(r09_06) := r09_05_accept;
-    next(r09_07) := r09_06_accept;
-    next(r09_08) := r09_07_accept;
-    next(r09_09) := r09_08_accept;
-    next(r09_10) := r09_09_accept;
-    next(r10_01) := r09_10_accept | r10_01_accept;
-    next(r12_01) := r10_01_accept;
-    next(r12_02) := r12_01_accept;
-    next(r12_03) := r12_02_accept;
-    next(r12_04) := r12_03_accept;
-    next(r12_05) := r12_04_accept;
-    next(r13_01) := r12_05_accept | r13_01_accept;
-    next(r15_01) := r13_01_accept;
-    next(r15_02) := r15_01_accept;
-    next(r15_03) := r15_02_accept;
-    next(r15_04) := r15_03_accept;
-    next(r15_05) := r15_04_accept;
-    next(r15_06) := r15_05_accept;
-    next(r15_07) := r15_06_accept;
-    next(r15_08) := r15_07_accept;
-    next(r15_09) := r15_08_accept;
-    next(r15_10) := r15_09_accept;
-    next(r16_01) := r15_10_accept | r16_01_accept;
-    next(r18_01) := r16_01_accept;
-    next(r18_02) := r18_01_accept;
-    next(r18_03) := r18_02_accept;
-    next(r18_04) := r18_03_accept;
-    next(r18_05) := r18_04_accept;
-    next(r19_01) := r18_05_accept | r19_01_accept;
+    next(r07_01) := g2_1_r04_01_accept | g2_2_r04_01_accept | r19_01_accept | r19_01_accept | r07_01_accept;
+    next(r09_01) := g2_1_r04_01_accept | g2_2_r04_01_accept | r07_01_accept | r19_01_accept | r07_01_accept | r19_01_accept;
+    next(r09_02) := r09_01_accept | r09_01_accept;
+    next(r09_03) := r09_02_accept | r09_02_accept;
+    next(r09_04) := r09_03_accept | r09_03_accept;
+    next(r09_05) := r09_04_accept | r09_04_accept;
+    next(r09_06) := r09_05_accept | r09_05_accept;
+    next(r09_07) := r09_06_accept | r09_06_accept;
+    next(r09_08) := r09_07_accept | r09_07_accept;
+    next(r09_09) := r09_08_accept | r09_08_accept;
+    next(r09_10) := r09_09_accept | r09_09_accept;
+    next(r10_01) := r09_10_accept | r09_10_accept | r10_01_accept;
+    next(r12_01) := r10_01_accept | r10_01_accept;
+    next(r12_02) := r12_01_accept | r12_01_accept;
+    next(r12_03) := r12_02_accept | r12_02_accept;
+    next(r12_04) := r12_03_accept | r12_03_accept;
+    next(r12_05) := r12_04_accept | r12_04_accept;
+    next(r13_01) := r12_05_accept | r12_05_accept | r13_01_accept;
+    next(r15_01) := r13_01_accept | r13_01_accept;
+    next(r15_02) := r15_01_accept | r15_01_accept;
+    next(r15_03) := r15_02_accept | r15_02_accept;
+    next(r15_04) := r15_03_accept | r15_03_accept;
+    next(r15_05) := r15_04_accept | r15_04_accept;
+    next(r15_06) := r15_05_accept | r15_05_accept;
+    next(r15_07) := r15_06_accept | r15_06_accept;
+    next(r15_08) := r15_07_accept | r15_07_accept;
+    next(r15_09) := r15_08_accept | r15_08_accept;
+    next(r15_10) := r15_09_accept | r15_09_accept;
+    next(r16_01) := r15_10_accept | r15_10_accept | r16_01_accept;
+    next(r18_01) := r16_01_accept | r16_01_accept;
+    next(r18_02) := r18_01_accept | r18_01_accept;
+    next(r18_03) := r18_02_accept | r18_02_accept;
+    next(r18_04) := r18_03_accept | r18_03_accept;
+    next(r18_05) := r18_04_accept | r18_04_accept;
+    next(r19_01) := r18_05_accept | r18_05_accept | r19_01_accept;
 -- end of module table

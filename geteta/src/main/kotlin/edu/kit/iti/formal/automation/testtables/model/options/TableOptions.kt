@@ -111,6 +111,7 @@ class TableOptions(properties: MutableMap<String, String>) : Options("", propert
 }
 
 class MonitorOptions(properties: MutableMap<String, String>) : Options("monitor", properties) {
+    val reset by string
     val dynamic by boolean(false)
     val trigger by string
 }
