@@ -55,6 +55,7 @@ table UpDownCounter {
 table IntroExample {
   var input A, B : INT
   var output Y : INT
+  gvar p : INT
 
   group  { 
   	group - {  
@@ -64,4 +65,11 @@ table IntroExample {
    	}
    	row >= 1 { A: 0; Y: =p}
    }
+}
+
+table Identity {
+  gvar p : INT
+  var input I : INT
+  var output O : INT
+  group { row { I: p; O: p } }
 }

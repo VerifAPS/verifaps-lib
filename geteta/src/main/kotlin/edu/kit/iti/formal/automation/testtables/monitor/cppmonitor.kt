@@ -22,7 +22,7 @@ val EMPTY_COLUMN = SVariable("ERROR", SMVTypes.BOOLEAN)
 
 val CPP_HEADER by lazy { readResource("header.cpp").second }
 val CPP_FOOTER by lazy { readResource("footer.cpp").second }
-val CPP_RESOURCES by lazy { listOf(readResource("monitor.hpp")) }
+val CPP_RESOURCES by lazy { listOf(readResource("monitor.h")) }
 
 
 /**
@@ -59,7 +59,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 //val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
                 for ((a, b) in gtt.parseContext.refs) {
                     val ref = gtt.parseContext.getReference(a, b)
-                    it.variableReplacement[ref.name] = "_h_${a.name}[b]"
+                    it.variableReplacement[ref.name] = "_h_${a.name.replace("code\$","")}[$b]"
                 }
 
                 gtt.programVariables.forEach { pv ->
@@ -67,10 +67,10 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                     it.variableReplacement[name] = "input.${pv.name}"
                 }
                 gtt.constraintVariables.forEach { cv ->
-                    val name = cv.externalVariable(gtt.programRuns, gtt.name).name
+                    val name = cv.internalVariable(gtt.programRuns).name
                     it.variableReplacement[name] = "token.globalVars.${cv.name}"
                 }
-
+                println(it.variableReplacement)
                 it.rewritingFunction = { it -> it.replace("code$", "input.") }
             }
 
@@ -94,11 +94,11 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                         println("bool is_bound_${pv.name};")
                     }
                 }.nl()
-                println("const struct $structNameGv ${structNameGv}_default;").nl().nl()
+                println("const struct $structNameGv ${structNameGv}_default = {};").nl().nl()
             }
 
     private fun defineStateEnum() = CodeWriter.with {
-        cblock("enum $enumStates {", "};") {
+        cblock("enum class $enumStates {", "};") {
             val states = automaton.getRowStates() +
                     automaton.stateError + automaton.stateSentinel
             val rows = states.joinToString(",") { it.name }
@@ -115,10 +115,10 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         cw.println("template <typename io_t>")
                 .cblock("class ${gtt.name.capitalize()}Monitor " +
                         ": public IMonitor<io_t> {", "};") {
-                    +("struct Token {int state; gv_t globalVars;};")
+                    +("struct Token {int state; $structNameGv globalVars;};")
                     +("vector<Token> tokens;")
                     +("int numErrors;")
-                    historyValuesDeclaration(gtt)
+                    this.historyValuesDeclaration(gtt)
                     +"public:"
 
                     constructor("${gtt.name.capitalize()}Monitor") { +"reset();" }
@@ -193,14 +193,14 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     private fun CodeWriter.bindGlobalVariables() {
         for (gv in gtt.constraintVariables) {
             val gvsvar = gtt.parseContext.getSMVVariable(gv)
-            ift("!token.gv.${gv.name}_bound") {
+            ift("!token.globalVars.${gv.name}_bound") {
                 switch("token.state") {
                     automaton.rowStates.forEach { (tr, rs) ->
                         (tr.inputExpr.values + tr.outputExpr.values).findAssignment(gvsvar)
                                 ?.let { equality ->
-                                    rs.forEach { +"case ${it.name}:" }
-                                    +"token.gv.${gv.name}_bound = true;"
-                                    +"token.gv.${gv.name} = ${equality.accept(cppRewriter)};"
+                                    rs.forEach { +"case ${enumStates}::${it.name}:" }
+                                    +"token.globalVars.${gv.name}_bound = true;"
+                                    +"token.globalVars.${gv.name} = ${equality.accept(cppRewriter)};"
                                     +"break;"
                                 }
                     }
@@ -262,7 +262,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 fun CodeWriter.assertVariableBound(gtt: GeneralizedTestTable, tableRow: TableRow) {
     val globalVars = tableRow.getUsedGlobalVariables(gtt)
     for (gv in globalVars) {
-        +"assert token.gv.${gv.name}_bound;"
+        +"assert(token.globalVars.${gv.name}_bound);"
     }
 }
 
@@ -295,7 +295,7 @@ fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
             .toHashSet()
 
     if (assignments.size > 1) {
-        throw IllegalStateException("There are possible conflicting assignments to a global variable in one row. $assignments")
+        Console.warn("There are possible conflicting assignments for global variable $gv in one row. $assignments")
     }
 
     return assignments.firstOrNull()
@@ -430,9 +430,9 @@ class CppCombinedMonitorGenerationImpl(
 
 private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {
     for ((a, b) in gtt.parseContext.refs) {
-        if (b > 0) {
+        if (b < 0) {
             val dt = TranslateToCppFacade.translate(a.dataType)
-            +"sregister<$dt, $b> ${a.name};"
+            +"sregister<$dt, ${-b}> _h_${a.name.replace("code\$","")};"
         }
     }
 }
@@ -440,7 +440,7 @@ private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {
 private fun CodeWriter.historyValuesUpdate(gtt: GeneralizedTestTable) {
     for ((a, b) in gtt.parseContext.refs) {
         if (b > 0) {
-            +"_h_${a.name}.push(input.${a.name});"
+            +"_h_${a.name}.push(input.${a.name.replace("code\$","")});"
         }
     }
 }

@@ -60,7 +60,7 @@ class UnwindODS : CliktCommand(
 
         Console.info("Program {} found!", if (smvModule != null) "" else "not")
 
-        val gtts = table.flatMap { GetetaFacade.readTable(it) }
+        val gtts = table.flatMap { GetetaFacade.readTables(it) }
                 .map {
                     it.ensureProgramRuns()
                     it.generateSmvExpression()

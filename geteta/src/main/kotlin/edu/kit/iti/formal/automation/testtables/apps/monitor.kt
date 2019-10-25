@@ -3,16 +3,14 @@ package edu.kit.iti.formal.automation.testtables.apps
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
-import com.github.ajalt.clikt.parameters.options.convert
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.monitor.*
-import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.automation.testtables.monitor.Monitor
 import java.io.File
 
 /**
@@ -39,6 +37,8 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .file()
             .default(File("output.cpp"))
 
+    val filter by option("--monitor", "-m", help = "manually select the gtts").multiple()
+
     val writeHeader by option("--write-header", help = "Write the 'monitor.h' header file.")
             .flag("--dont-write-header", default = false)
 
@@ -47,31 +47,47 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .convert { CodeOutput.valueOf(it.toUpperCase()) }
             .default(CodeOutput.CPP)
 
+    val disableCombinedMonitor by option("--disable-combined").flag("--combined")
+
     override fun run() {
+        Console.configureLoggingConsole()
+        Console.info("Files: $table")
+        Console.info("Filter: $filter")
+
         if (writeHeader && format == CodeOutput.CPP) {
             output.absoluteFile.parentFile.mkdirs()
             for ((a, b) in CPP_RESOURCES) {
+                Console.info("Write resource file $a.")
                 File(output.absoluteFile.parentFile, a).bufferedWriter().use { it.write(b) }
             }
         }
 
-        val gtts = table.flatMap { GetetaFacade.readTable(it) }.map {
+        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it
-        }
+        }.filter { filter.isEmpty() || it.name in filter }
+        Console.info("Tables: ${gtts.joinToString { it.name }}")
+
 
         val pairs = gtts.map { it to GetetaFacade.constructTable(it).automaton }
 
         val output =
-                if (table.size == 1) {
-                    val (gtt, automaton) = pairs.first()
-                    when (format) {
-                        CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
-                        CodeOutput.ESTEREL -> TODO()
-                        CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
-                        CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton)
+                if (gtts.size == 1 || disableCombinedMonitor) {
+                    val monitor = Monitor()
+                    for ((gtt, automaton) in pairs) {
+                        val m = when (format) {
+                            CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
+                            CodeOutput.ESTEREL -> TODO()
+                            CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
+                            CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton)
+                        }
+                        monitor.preamble = m.preamble
+                        monitor.types += m.types
+                        monitor.body += m.body
+                        monitor.postamble = m.postamble
                     }
+                    monitor
                 } else {
                     when (format) {
                         CodeOutput.CPP -> CppCombinedMonitorGeneration.generate("mcombined", pairs)

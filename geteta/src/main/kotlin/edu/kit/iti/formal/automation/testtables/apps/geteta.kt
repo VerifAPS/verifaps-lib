@@ -96,7 +96,7 @@ class GetetaApp : CliktCommand(
 
         val gtts = table.flatMap {
             Console.info("Use table file ${it.absolutePath}")
-            GetetaFacade.readTable(it)
+            GetetaFacade.readTables(it)
         }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()

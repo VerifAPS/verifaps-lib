@@ -72,7 +72,7 @@ class Reteta : CliktCommand(
         }
 
         //read table
-        val gtts = table.flatMap { GetetaFacade.readTable(it) }.map {
+        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it.simplify()

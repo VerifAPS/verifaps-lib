@@ -221,7 +221,7 @@ object GetetaFacade {
         return s.toString()
     }
 
-    fun readTable(file: File): List<GeneralizedTestTable> {
+    fun readTables(file: File): List<GeneralizedTestTable> {
         return parseTableDSL(file)
     }
 

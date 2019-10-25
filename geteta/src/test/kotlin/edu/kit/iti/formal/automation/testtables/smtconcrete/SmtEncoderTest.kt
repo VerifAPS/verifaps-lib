@@ -11,7 +11,7 @@ import java.io.File
 class SmtEncoderTest {
     @Test
     fun test() {
-        val gtt = GetetaFacade.readTable(File("examples/MinMax/MinMax.tt.txt")).first()
+        val gtt = GetetaFacade.readTables(File("examples/MinMax/MinMax.tt.txt")).first()
         gtt.programRuns += ""
         gtt.generateSmvExpression()
 

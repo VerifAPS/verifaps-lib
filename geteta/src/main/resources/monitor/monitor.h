@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <assert.h>
 
 using namespace std;
 
@@ -73,7 +74,7 @@ class IMonitor {
 template <typename io_t>
 class CombinedMonitor : public IMonitor<io_t> {
  public:
-  CombinedMonitor() : monitors() { reset(); }
+  CombinedMonitor() { this->reset(); }
 
   virtual ~CombinedMonitor() {}
 
@@ -127,13 +128,13 @@ public:
 
     void push(const T item) {
       current = (current+1) % size;
-      T[current] = item;
+      buf[current] = item;
     }
 
     T get(int pos) const {
-      auto pos = (current + pos) % size;
-      if(pos<0) pos += size();
-      return T[pos];
+      auto p = (current + pos) % size;
+      if(p<0) p += size;
+      return buf[p];
     }
 
     //size_t size() const {return size;}

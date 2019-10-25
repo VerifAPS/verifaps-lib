@@ -44,7 +44,7 @@ class PrinterApp : CliktCommand() {
             .file(exists = true, readable = true).multiple()
 
     override fun run() {
-        val gtts = file.flatMap { GetetaFacade.readTable(it) }.map {
+        val gtts = file.flatMap { GetetaFacade.readTables(it) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it
