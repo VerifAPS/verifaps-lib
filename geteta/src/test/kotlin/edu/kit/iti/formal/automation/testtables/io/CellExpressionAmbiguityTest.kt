@@ -55,7 +55,7 @@ class CellExpressionAmbiguityTest {
 
     @Test
     fun testInvalidReferencePositive() {
-        assertThrows<ProgramAbortionException> {
+        assertThrows<Exception> {
             GetetaFacade.exprToSMV("b[2]",
                     SVariable.create("a").asBool(), 0, pc)
         }
@@ -78,5 +78,4 @@ class CellExpressionAmbiguityTest {
             return SVariable.create("a").asBool()
         }
     }
-
 }

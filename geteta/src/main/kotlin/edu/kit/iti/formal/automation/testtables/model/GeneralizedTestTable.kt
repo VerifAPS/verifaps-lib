@@ -127,7 +127,9 @@ class ParseContext(
     fun getReference(variable: SVariable, cycles: Int): SVariable =
             if (cycles == 0) {
                 variable
-            } else {
+            } else if (cycles> 0) {
+                throw IllegalArgumentException("no future references are allowed.")
+            }else{
                 val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
                 val ref = SVariable(newName, variable.dataType!!)
                 val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
