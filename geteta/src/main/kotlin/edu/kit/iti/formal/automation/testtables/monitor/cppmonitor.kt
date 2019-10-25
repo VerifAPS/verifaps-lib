@@ -4,16 +4,17 @@ import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.model.ColumnVariable
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
+import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.Transition
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
 import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.ast.SBinaryExpression
+import edu.kit.iti.formal.smv.ast.SBinaryOperator
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.find
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
 
@@ -72,6 +73,16 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
                 it.rewritingFunction = { it -> it.replace("code$", "input.") }
             }
+
+    val resetTrigger = gtt.options.monitor.resetTrigger?.let {
+        val e = GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, gtt.parseContext)
+        e.accept(cppRewriter)
+    }
+
+    val dynamicTrigger = gtt.options.monitor.dynamicTrigger?.let {
+        val e = GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, gtt.parseContext)
+        e.accept(cppRewriter)
+    }
 
     private fun defineGlobalVarStruct() =
             CodeWriter.with {
@@ -154,13 +165,15 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
                     nl().method("void", "evaluate",
                             "vector<Token> &newTokens", "Token &token", "const io_t &input") {
-                        +"bool __inputcnstr = false, __outputcnstr = false;"
+                        +"bool __assumption = false, __assertion = false;"
+                        bindGlobalVariables()
                         switch("token.state") {
                             automaton.rowStates.forEach { (tr, rs) ->
                                 rs.forEach { +"case ${enumStates}::${it.name}:" }
                                 increaseIndent()
-                                nl().print("__inputcnstr = ${expr(tr.inputExpr)};")
-                                nl().print("__outputcnstr  = ${expr(tr.outputExpr)};")
+                                assertVariableBound(gtt, tr)
+                                nl().print("__assumption = ${expr(tr.inputExpr)};")
+                                nl().print("__assertion  = ${expr(tr.outputExpr)};")
                                 nl().switch("token.state") {
                                     rs.forEach { generateCase(it) }
                                 }
@@ -177,11 +190,28 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         return monitor
     }
 
+    private fun CodeWriter.bindGlobalVariables() {
+        for (gv in gtt.constraintVariables) {
+            val gvsvar = gtt.parseContext.getSMVVariable(gv)
+            ift("!token.gv.${gv.name}_bound") {
+                switch("token.state") {
+                    automaton.rowStates.forEach { (tr, rs) ->
+                        (tr.inputExpr.values + tr.outputExpr.values).findAssignment(gvsvar)
+                                ?.let { equality ->
+                                    rs.forEach { +"case ${it.name}:" }
+                                    +"token.gv.${gv.name}_bound = true;"
+                                    +"token.gv.${gv.name} = ${equality.accept(cppRewriter)};"
+                                    +"break;"
+                                }
+                    }
+                }
+            }
+        }
+    }
+
     private fun resetCode(writer: CodeWriter) {
-        gtt.options.monitor.resetTrigger?.let { cond ->
-            val sexpr = GetetaFacade.exprToSMV(cond, EMPTY_COLUMN, 0, gtt.parseContext)
-            val expr = sexpr.accept(cppRewriter)
-            writer.cblock("if($expr && state() == UNKNOWN) {", "}") {
+        resetTrigger?.let { cond ->
+            writer.ift("$cond && state() == UNKNOWN") {
                 +"reset()"
             }
         }
@@ -204,11 +234,11 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
     private fun handleTransition(t: Transition) {
         val condition = when (t.type) {
-            TransitionType.ACCEPT -> "__inputcnstr && __outputcnstr"
+            TransitionType.ACCEPT -> "__assumption && __assertion"
             TransitionType.ACCEPT_PROGRESS ->
-                "__inputcnstr && __outputcnstr"
+                "__assumption && __assertion"
             TransitionType.FAIL ->
-                "__inputcnstr && !__outputcnstr"
+                "__assumption && !__assertion"
             TransitionType.TRUE -> "true"
         }
 
@@ -227,8 +257,50 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         }
         return sb.toString()
     }
-
 }
+
+fun CodeWriter.assertVariableBound(gtt: GeneralizedTestTable, tableRow: TableRow) {
+    val globalVars = tableRow.getUsedGlobalVariables(gtt)
+    for (gv in globalVars) {
+        +"assert token.gv.${gv.name}_bound;"
+    }
+}
+
+
+private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SVariable> =
+        filter { gv -> seq.any { expr -> expr.find { it == gv } != null } }
+
+
+/** Searches for equality of gv with other terms. TODO look only for top level formulas */
+fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
+    val getExpr: (SMVExpr) -> SMVExpr? = { eq: SMVExpr ->
+        if (eq is SBinaryExpression) {
+            val (left, op, right) = eq
+            if (op == SBinaryOperator.EQUAL) {
+                when {
+                    left == gv -> right
+                    right == gv -> left
+                    else -> null
+                }
+            } else {
+                null
+            }
+        } else {
+            null
+        }
+    }
+    val pred = { eq: SMVExpr -> getExpr(eq) != null }
+    val assignments = map { it.find(pred) }
+            .filterNotNull().mapNotNull(getExpr)
+            .toHashSet()
+
+    if (assignments.size > 1) {
+        throw IllegalStateException("There are possible conflicting assignments to a global variable in one row. $assignments")
+    }
+
+    return assignments.firstOrNull()
+}
+
 
 class CppCombinedMonitorGenerationImpl(
         val name: String,
@@ -245,7 +317,7 @@ class CppCombinedMonitorGenerationImpl(
         get() = subMonitors.asSequence().filter { it.static }//.map { it.name }
 
     private val dynamicMonitors
-        get() = subMonitors.asSequence().filter { it.static }//.map { it.name }
+        get() = subMonitors.asSequence().filter { !it.static }//.map { it.name }
 
     private val monitor = Monitor()
 
@@ -313,12 +385,12 @@ class CppCombinedMonitorGenerationImpl(
         method("void", "before", "const io_t &input", "override") {
             input.forEachIndexed { index, (a, b) ->
                 a.options.monitor.dynamicTrigger?.let { trigger ->
-                    val m = subMonitors[index]
-                    val e = GetetaFacade.exprToSMV(trigger, EMPTY_COLUMN, 0, a.parseContext)
-                    val ctrigger = e.accept(subGenerators[index].cppRewriter)
-                    ift(ctrigger) {
-                        println("auto m = new ${m.name}();")
-                        println("monitors.push_back(m);")
+                    subGenerators[index].dynamicTrigger?.let { ctrigger ->
+                        val m = subMonitors[index]
+                        ift(ctrigger) {
+                            +("auto m = new ${m.name}();")
+                            +("monitors.push_back(m);")
+                        }
                     }
                 }
             }
@@ -406,7 +478,7 @@ private fun CodeWriter.switch(cond: String, fn: CodeWriter.() -> Unit): CodeWrit
 }
 
 private fun CodeWriter.case(cond: String, fn: CodeWriter.() -> Unit): CodeWriter {
-    cblock("case $cond:", "", fn)
+    cblock("case $cond:", "break", fn)
     return this
 }
 
@@ -414,11 +486,10 @@ private fun CodeWriter.case(cond: String, fn: CodeWriter.() -> Unit): CodeWriter
 private fun readResource(name: String): Pair<String, String> {
     val content = CppMonitorGenerator.javaClass.getResourceAsStream("/monitor/$name")
             ?.use { it.bufferedReader().readText() }
-    if(content == null)
-    {
+    if (content == null) {
         Console.error("Could not read resource: $name")
     }
-    return name to (content?:"")
+    return name to (content ?: "")
 }
 
 private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String =

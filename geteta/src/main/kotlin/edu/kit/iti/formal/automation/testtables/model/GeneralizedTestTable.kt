@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.automation.testtables.model
 
-import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.st.ArrayLookupList
 import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
@@ -100,7 +100,7 @@ data class ProjectionVariable(
     /**
      *
      */
-    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("$name", logicType)
+    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable(name, logicType)
 }
 
 data class SmvFunctionDefinition(val body: SMVExpr, val parameter: List<SVariable>) {
@@ -129,7 +129,7 @@ class ParseContext(
                 variable
             } else {
                 val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
-                val ref =  SVariable(newName, variable.dataType!!)
+                val ref = SVariable(newName, variable.dataType!!)
                 val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
                 refs[variable] = max
                 ref
@@ -507,4 +507,26 @@ data class TableRow(override var id: String) : TableNode(id) {
     }
 
     override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
+}
+
+
+fun TableRow.getUsedGlobalVariables(gtt: GeneralizedTestTable): List<ConstraintVariable> {
+    fun contains(cv: ConstraintVariable, ctx: TestTableLanguageParser.CellContext?): Boolean {
+        return if (ctx != null) {
+            var found = false
+            ctx.accept(object : TestTableLanguageBaseVisitor<Unit>() {
+                override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) {
+                    if (ctx.name.text == cv.name) found = true
+                    super.visitVariable(ctx)
+                }
+            })
+            found
+        } else
+            false
+    }
+
+    val seq = rawFields.values
+    return gtt.constraintVariables.filter { gv ->
+        seq.any { ctx -> contains(gv, ctx) }
+    }
 }

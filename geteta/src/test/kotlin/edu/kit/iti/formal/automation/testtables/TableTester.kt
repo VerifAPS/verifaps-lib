@@ -26,6 +26,8 @@ open class TableTester {
     fun getTable(s: String): GeneralizedTestTable {
         val t = gtts.find { it.name == s }
         Assertions.assertNotNull(t)
-        return t!!
+        t!!.ensureProgramRuns()
+        t.generateSmvExpression()
+        return t
     }
 }

@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.monitor.*
+import edu.kit.iti.formal.smt.SExpr
 import java.io.File
 
 /**

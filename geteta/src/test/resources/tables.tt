@@ -3,7 +3,7 @@ table detwait1 {
     var output o : INT
 
     group {
-        row [1,1]>> { i:1; o: 1 }
+        row [1,1] progress { i:1; o: 1 }
         row [1,1] { i:2; o: 2 }
     }
 }
@@ -13,8 +13,8 @@ table detwait2 {
     var output o : INT
 
     group {
-        row [1,1]>> { i:-; o: - }
-        row [0,1]>> { i:1; o: 1 }
+        row [1,1]progress { i:-; o: - }
+        row [0,1]progress { i:1; o: 1 }
         row [1,1] { i:2; o: 2 }
     }
 }
@@ -24,8 +24,8 @@ table detwait3 {
     var output o : INT
 
     group {
-        row [0,1]>> { i:-; o: - }
-        row [0,1]>> { i:1; o: 1 }
+        row [0,1]progress { i:-; o: - }
+        row [0,1]progress { i:1; o: 1 }
         row [0,1] { i:2; o: 2 }
         row [0,1] { i:3; o: 3 }
         row [0,1] { i:4; o: 4 }
@@ -215,5 +215,24 @@ table columns {
       row A 1 { Sum: 0}
       row B 1 { Equal: eq }
       row C 1 { Equal: leq }
+    }
+}
+
+
+//Tests for monitor generation
+
+table monitor_binding {
+    var input CLK : BOOLEAN
+    var output x,y : INT
+    gvar ga  : INT
+    gvar gb  : BOOLEAN
+
+    group {
+      row R1 1 { CLK: =gb; x: ga=y }
+      row R2 1 {
+        CLK: = NOT gb
+        x: =2*(ga*2)-1/3;
+       }
+
     }
 }

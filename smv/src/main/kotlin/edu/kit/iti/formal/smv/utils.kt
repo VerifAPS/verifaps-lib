@@ -34,7 +34,6 @@ open class HistoryModuleBuilder(
         val name: String = "History",
         val variables: List<SVariable>,
         val length: Int) : Runnable {
-
     val module = SMVModule(name)
     val moduleType = ModuleType(name, variables)
 
@@ -65,5 +64,47 @@ open class HistoryModuleBuilder(
 
     override fun run() {
         variables.forEach { addVariable(it) }
+    }
+}
+
+
+fun SMVExpr.find(pred: (SMVExpr) -> Boolean) = this.accept(FindSExpr(pred))
+
+class FindSExpr(val pred: (SMVExpr) -> Boolean) : SMVAstDefaultVisitor<SMVExpr>() {
+    override fun defaultVisit(top: SMVAst): SMVExpr? = null
+    override fun visit(v: SVariable): SMVExpr? {
+        if (pred(v)) return v
+        return super.visit(v)
+    }
+
+    override fun visit(be: SBinaryExpression): SMVExpr? {
+        if (pred(be)) return be
+        return super.visit(be)
+    }
+
+    override fun visit(ue: SUnaryExpression): SMVExpr? {
+        if (pred(ue)) return ue
+        return super.visit(ue)
+    }
+
+    override fun visit(l: SLiteral): SMVExpr? {
+        if (pred(l)) return l
+        return super.visit(l)
+    }
+
+    override fun visit(ce: SCaseExpression): SMVExpr? {
+        if (pred(ce)) return ce
+        return super.visit(ce)
+    }
+
+
+    override fun visit(func: SFunction): SMVExpr? {
+        if (pred(func)) return func
+        return super.visit(func)
+    }
+
+    override fun visit(quantified: SQuantified): SMVExpr? {
+        if (pred(quantified)) return quantified
+        return super.visit(quantified)
     }
 }
