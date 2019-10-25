@@ -13,6 +13,7 @@ import java.awt.Color
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.JScrollPane
+import javax.swing.JTabbedPane
 import javax.swing.JTable
 import javax.swing.event.EventListenerList
 import javax.swing.event.TreeModelListener
@@ -23,34 +24,37 @@ import javax.swing.tree.TreePath
 
 
 interface GetetaPreviewService {
-    fun render(text: GeneralizedTestTable)
+    fun render(text: List<GeneralizedTestTable>)
 }
 
 class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPreviewService {
-    val outline = Outline()
-    val viewRender = JScrollPane(outline)
+    private var renderDataProvider: RenderDataProvider
+    private var tableCellRenderer: DefaultTableCellRenderer
+    val rootPane = JTabbedPane()
+    //val outline = Outline()
+    //val viewRender = JScrollPane(outline)
 
     init {
         contentPane.layout = BorderLayout()
-        contentPane.add(viewRender)
+        contentPane.add(rootPane)
         titleText = "Test Table Preview"
 
+        //outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
+        tableCellRenderer = object : DefaultTableCellRenderer() {
+            override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean,
+                                                       hasFocus: Boolean, row: Int, column: Int): Component {
+                val ctx =
+                        when (value) {
+                            is TestTableLanguageParser.CellContext -> value.text
+                            is TableNode -> value.id
+                            else -> value.toString()
+                        }
+                return super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column)
+            }
+        }
 
-        outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
-                object : DefaultTableCellRenderer() {
-                    override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean,
-                                                               hasFocus: Boolean, row: Int, column: Int): Component {
-                        val ctx =
-                                when (value) {
-                                    is TestTableLanguageParser.CellContext -> value.text
-                                    is TableNode -> value.id
-                                    else -> value.toString()
-                                }
-                        return super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column)
-                    }
-                })
-
-        outline.renderDataProvider = object : RenderDataProvider {
+        //outline.renderDataProvider =
+        renderDataProvider = object : RenderDataProvider {
             override fun getTooltipText(o: Any?): String = ""
             override fun getIcon(o: Any?): Icon? = null
             override fun getBackground(o: Any?): Color = Color.WHITE
@@ -64,7 +68,20 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
         }
     }
 
-    override fun render(gtt: GeneralizedTestTable) {
+    override fun render(gtts: List<GeneralizedTestTable>) {
+        val selectedIndex = rootPane.selectedIndex
+        ((rootPane.tabCount - 1) downTo 0).forEach { rootPane.removeTabAt(it) }
+        gtts.forEach(this::render)
+        rootPane.selectedIndex = selectedIndex
+    }
+
+    fun render(gtt: GeneralizedTestTable) {
+        val outline = Outline();
+        val scrollPane = JScrollPane(outline)
+        outline.renderDataProvider = renderDataProvider
+        outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java, tableCellRenderer)
+        rootPane.addTab(gtt.name, scrollPane)
+
         try {
             val ioCompare = compareBy<ProgramVariable> { it.category }
             val nameCompare = compareBy<ProgramVariable> { it.name }

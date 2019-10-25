@@ -239,4 +239,4 @@ INTEGER: NUMBER;
 WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);
 COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
-ERROR_CHAR:. -> channel(HIDDEN);
+ERROR_CHAR: . -> channel(HIDDEN);

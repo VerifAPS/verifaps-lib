@@ -1,0 +1,67 @@
+// ffsdfsfsafsaf
+// afdsafdsf
+// afsadfdsaf
+
+table RSFlipFlow {
+	var input R, S : BOOLEAN
+	var output Q : BOOLEAN
+
+	group {
+		row { Q: FALSE }
+		group omega {
+			row >= 1 { 
+				R: TRUE 
+				S: - 
+				Q: FALSE
+			}
+
+			row - { 
+				R: FALSE
+				S: -
+				Q: FALSE
+			}
+
+			row >= 1 { 
+				R: FALSE
+				S: TRUE
+				Q: TRUE
+			}
+
+			row >= 1 { 
+				R: FALSE
+				S: -
+				Q: TRUE
+			}
+		}
+	}
+}
+
+
+
+table UpDownCounter {
+	var output Q : INT
+	group {
+		row { Q: 0 }
+		group omega {
+			row >= 1 { Q: Q[-1] + 1 }
+			row >= 1 { Q: 100 }
+			row >= 1 { Q: Q[-1] - 1 }
+			row >= 1 { Q: 0 }
+		}
+	}
+}
+
+
+table IntroExample {
+  var input A, B : INT
+  var output Y : INT
+
+  group  { 
+  	group - {  
+	  	row 2 { A:21; B:=p; Y:[A,B] }
+	  	row 1 { A:[5,10]; B:=B[-1]; Y: >= A, <= B  }
+	  	row >=1 {A:>5, =2*B; B: =2*A; Y:=A[-2]-B[-1] }
+   	}
+   	row >= 1 { A: 0; Y: =p}
+   }
+}

@@ -1,0 +1,2408 @@
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_1
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_0
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_1
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_2
+        micro := macro; // micro = 0sd16_2
+    END_IF
+END_PROGRAM
+// macro = 0sd16_2
+// micro = 0sd16_2
+// o = 0sd16_1
+(*******************************************************************************
+ * Table rows:
+ *     ✔ Row r01 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_2
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_1
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_2
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_3
+        micro := macro; // micro = 0sd16_3
+    END_IF
+END_PROGRAM
+// macro = 0sd16_2
+// micro = 0sd16_1
+// o = 0sd16_2
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r02 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_2
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_2
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_2
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_3
+        micro := macro; // micro = 0sd16_3
+    END_IF
+END_PROGRAM
+// macro = 0sd16_3
+// micro = 0sd16_3
+// o = 0sd16_2
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r02 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_3
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_2
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_3
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_4
+        micro := macro; // micro = 0sd16_4
+    END_IF
+END_PROGRAM
+// macro = 0sd16_3
+// micro = 0sd16_2
+// o = 0sd16_3
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r03 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_3
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_3
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_3
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_4
+        micro := macro; // micro = 0sd16_4
+    END_IF
+END_PROGRAM
+// macro = 0sd16_3
+// micro = 0sd16_1
+// o = 0sd16_3
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r03 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_3
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_3
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_3
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_4
+        micro := macro; // micro = 0sd16_4
+    END_IF
+END_PROGRAM
+// macro = 0sd16_4
+// micro = 0sd16_4
+// o = 0sd16_3
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r03 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_4
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_3
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_4
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_5
+        micro := macro; // micro = 0sd16_5
+    END_IF
+END_PROGRAM
+// macro = 0sd16_4
+// micro = 0sd16_3
+// o = 0sd16_4
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r04 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_4
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_4
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_4
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_5
+        micro := macro; // micro = 0sd16_5
+    END_IF
+END_PROGRAM
+// macro = 0sd16_4
+// micro = 0sd16_2
+// o = 0sd16_4
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r04 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_4
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_4
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_4
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_5
+        micro := macro; // micro = 0sd16_5
+    END_IF
+END_PROGRAM
+// macro = 0sd16_4
+// micro = 0sd16_1
+// o = 0sd16_4
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r04 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_4
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_4
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_4
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_5
+        micro := macro; // micro = 0sd16_5
+    END_IF
+END_PROGRAM
+// macro = 0sd16_5
+// micro = 0sd16_5
+// o = 0sd16_4
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r04 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_5
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_4
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_5
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_6
+        micro := macro; // micro = 0sd16_6
+    END_IF
+END_PROGRAM
+// macro = 0sd16_5
+// micro = 0sd16_4
+// o = 0sd16_5
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r05 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_5
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_5
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_5
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_6
+        micro := macro; // micro = 0sd16_6
+    END_IF
+END_PROGRAM
+// macro = 0sd16_5
+// micro = 0sd16_3
+// o = 0sd16_5
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r05 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_5
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_5
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_5
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_6
+        micro := macro; // micro = 0sd16_6
+    END_IF
+END_PROGRAM
+// macro = 0sd16_5
+// micro = 0sd16_2
+// o = 0sd16_5
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r05 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_5
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_5
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_5
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_6
+        micro := macro; // micro = 0sd16_6
+    END_IF
+END_PROGRAM
+// macro = 0sd16_5
+// micro = 0sd16_1
+// o = 0sd16_5
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r05 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_5
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_5
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_5
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_6
+        micro := macro; // micro = 0sd16_6
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_6
+// o = 0sd16_5
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r05 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_6
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_5
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_5
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_5
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_4
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_3
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_2
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_6
+// micro = 0sd16_1
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_6
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_6
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_7
+        micro := macro; // micro = 0sd16_7
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_7
+// o = 0sd16_6
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r06 ✔ --> ✔: ✔ (Time: 6)
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_7
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_6
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_6
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_6
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_6
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_5
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_5
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_4
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_3
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_2
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_7
+// micro = 0sd16_1
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 6)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_7
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_7
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_8
+        micro := macro; // micro = 0sd16_8
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_8
+// o = 0sd16_7
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r07 ✔ --> ✔: ✔ (Time: 7)
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_8
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_7
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_7
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_7
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_7
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_6
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_6
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_6
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_5
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_5
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_4
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_3
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_2
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 6)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_8
+// micro = 0sd16_1
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 7)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_8
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_8
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_9
+        micro := macro; // micro = 0sd16_9
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_9
+// o = 0sd16_8
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r08 ✔ --> ✔: ✔ (Time: 8)
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_9
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_8
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_8
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_8
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_8
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_7
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_7
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_7
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_6
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_6
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_6
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_5
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_5
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_4
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_3
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 6)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_2
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 7)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_9
+// micro = 0sd16_1
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 8)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_9
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_9
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_10
+        micro := macro; // micro = 0sd16_10
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_10
+// o = 0sd16_9
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r09 ✔ --> ✔: ✔ (Time: 9)
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_10
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_9
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_9
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_9
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_9
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_8
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_8
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_8
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_7
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_7
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 3)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_7
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_6
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_6
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 4)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_6
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_5
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_5
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 5)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_5
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_4
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_4
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 6)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_4
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_3
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_3
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 7)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_2
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_2
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 8)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_2
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_1
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_10
+// micro = 0sd16_1
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 9)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_10
+        
+        micro : INT := INT#1;// micro = 0sd16_1
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_10
+    micro := (micro - INT#1); // micro = 0sd16_0
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_11
+        micro := macro; // micro = 0sd16_11
+    END_IF
+END_PROGRAM
+// macro = 0sd16_11
+// micro = 0sd16_11
+// o = 0sd16_10
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r10 ✔ --> ✔: ✔ (Time: 10)
+ *     ✗ Row r11 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM cycles
+    VAR_INPUT  
+        i : BOOL := FALSE;
+    END_VAR
+    
+    VAR  
+        macro : INT := INT#1;// macro = 0sd16_11
+        
+        micro : INT := INT#1;// micro = 0sd16_11
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        o : INT := INT#0;// o = 0sd16_10
+        
+    END_VAR
+    
+    
+    o := macro; // o = 0sd16_11
+    micro := (micro - INT#1); // micro = 0sd16_10
+    IF (micro = INT#0) THEN
+        macro := (macro + INT#1); // macro = 0sd16_12
+        micro := macro; // micro = 0sd16_12
+    END_IF
+END_PROGRAM
+// macro = 0sd16_11
+// micro = 0sd16_10
+// o = 0sd16_11
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row r01 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r02 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r03 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r04 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r05 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r06 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r07 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r08 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r09 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row r10 ✔ --> ✗: ✗ (Time: )
+ *     ✔ Row r11 ✔ --> ✗: ✗ (Time: 1)
+
+*******************************************************************************)

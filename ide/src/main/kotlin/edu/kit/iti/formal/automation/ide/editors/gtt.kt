@@ -21,6 +21,7 @@ import org.fife.ui.rsyntaxtextarea.parser.AbstractParser
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
+import java.lang.NullPointerException
 import javax.swing.Icon
 
 /**
@@ -80,9 +81,9 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
 
 class TestTableLanguageSupport(lookup: Lookup) : BaseLanguageSupport() {
     override fun createParser(textArea: CodeEditor, lookup: Lookup)
-        = TTParser(textArea, lookup)
+            = TTParser(textArea, lookup)
     override val mimeType: String = "text/gtt"
-    override val extension: Collection<String> = setOf("gtt", ".tt.txt")
+    override val extension: Collection<String> = setOf("gtt", ".tt.txt", ".tt")
     override val syntaxScheme: SyntaxScheme = TestTableSyntaxScheme(lookup)
     override val antlrLexerFactory: AntlrLexerFactory
         get() = object : AntlrLexerFactory {
@@ -175,7 +176,6 @@ class TTOverviewTransformer(val editor: CodeEditor) {
 }
 
 class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() {
-    //val timer = Timer(500) { _ -> EVENT_BUS.post(EventGetetaUpdate(textArea.text)) }
     val problemList by lookup.with<ProblemList>()
     val outlineService by lookup.with<OutlineService>()
     val previewService by lookup.with<GetetaPreviewService>()
@@ -190,7 +190,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
             val gtt =  GetetaFacade.parseTableDSL(ctx)
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
-            previewService.render(gtt.first())//TODO
+            previewService.render(gtt)
             outlineService.show(node)
             problemList.set(textArea, listOf())
         } catch (e: SyntaxErrorReporter.ParserException) {
@@ -199,6 +199,8 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
                         it.line, it.offendingSymbol?.startIndex ?: -1,
                         it.offendingSymbol?.text?.length ?: -1))
             }
+        } catch (e : NullPointerException) {
+
         }
         return res
     }

@@ -11,8 +11,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxScheme
 import org.fife.ui.rsyntaxtextarea.parser.Parser
 import java.awt.Color
 
-//data class ParserData(val ruleNames: Array<String>, val vocabulary: Vocabulary, val atn: ATN)
-
 interface LanguageSupport {
     fun createParser(textArea: CodeEditor, lookup: Lookup): Parser? = null
 

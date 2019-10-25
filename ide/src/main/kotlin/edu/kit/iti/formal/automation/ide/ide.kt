@@ -357,7 +357,8 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         val e = globalPort.focusHistory.history.find { it is CodeEditor }
         lookup.register(editor)
         globalPort.addDockable(editor)
-        editor.setLocationsAside(e)
+        if(e!=null)
+            editor.setLocationsAside(e)
         editor.isVisible = true
     }
 
