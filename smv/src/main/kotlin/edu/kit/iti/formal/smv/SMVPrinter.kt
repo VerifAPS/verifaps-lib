@@ -33,7 +33,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
     private fun precedence(expr: SMVExpr): Int {
         if (expr is SBinaryExpression) {
-            val (_, operator) = expr
+            val operator = expr.operator
             return operator.precedence()
         }
         if (expr is SUnaryExpression) {

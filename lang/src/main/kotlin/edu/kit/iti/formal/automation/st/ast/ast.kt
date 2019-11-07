@@ -188,88 +188,6 @@ data class ClassDeclaration(
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-
-val InterfaceDeclaration.definedMethods: List<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in allInterfaces) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-infix fun MethodDeclaration.sameSignature(other: MethodDeclaration): Boolean {
-    if (name != other.name)
-        return false
-
-    val input1 = scope.variables.filter { it.isInput }
-    val input2 = scope.variables.filter { it.isInput }
-
-    for (v1 in input1) {
-        val v2 = input2.find { it.name == v1.name } ?: return false
-        if (v2.dataType != v1.dataType) return false
-    }
-
-    for (v2 in input2) {
-        val v1 = input2.find { it.name == v2.name } ?: return false
-        if (v2.dataType != v1.dataType) return false
-    }
-    return true
-}
-
-val ClassDeclaration.declaredMethods: Collection<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in allInterfaces) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-val ClassDeclaration.definedMethods: Collection<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in parents) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-val ClassDeclaration.parents: List<ClassDeclaration>
-    get() {
-        var c = parent.obj
-        val seq = arrayListOf<ClassDeclaration>()
-        while (c != null) {
-            seq.add(c)
-            c = parent.obj;
-            if (c in seq) break
-        }
-        return seq
-    }
-
-val ClassDeclaration.allInterfaces: List<InterfaceDeclaration>
-    get() {
-        val seq = arrayListOf<InterfaceDeclaration>()
-        interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
-        parents.forEach { c ->
-            c.interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
-        }
-        return seq
-    }
-
-val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
-    get() {
-        val seq = arrayListOf<InterfaceDeclaration>()
-        interfaces.forEach {
-            it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) }
-        }
-        return seq
-    }
-
-
 interface HasInterfaces : Identifiable {
     val interfaces: RefList<InterfaceDeclaration>
 }
@@ -606,7 +524,7 @@ data class ForStatement(
         var variable: String = ANONYM,
         var start: Expression = EMPTY_EXPRESSION,
         var stop: Expression = EMPTY_EXPRESSION,
-        var step: Expression? = EMPTY_EXPRESSION,
+        var step: Expression? = null,
         var statements: StatementList = StatementList()) : Statement() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -1435,6 +1353,7 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
     constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
+    constructor(value:Int) : this(INT, value.toBigInteger())
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, INT)
 

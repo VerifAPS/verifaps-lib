@@ -136,6 +136,10 @@ object SymbExFacade {
 
         val moduleBuilder = ModuleBuilder(exec, se.peek())
         moduleBuilder.run()
+        /*//debug
+        for (entry in se.lineNumberMap) {
+            System.out.format("%05d: %s %s\n", entry.key, entry.value.first, entry.value.second)
+        }*/
         return se.lineNumberMap to moduleBuilder.module
     }
 

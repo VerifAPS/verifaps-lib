@@ -23,15 +23,14 @@ namespace_declaration
 
 namespace_elements
 :
-    pragma*
-    (  data_type_declaration
-	| function_declaration
-    | class_declaration
-    | interface_declaration
-	| function_block_declaration
-	//not allowed | program_declaration
-	| namespace_declaration
-	)
+  pragma*
+  ( data_type_declaration
+  | function_declaration
+  | class_declaration
+  | interface_declaration
+  | function_block_declaration
+  | namespace_declaration
+  )
 ;
 
 pragma:
@@ -390,7 +389,12 @@ body :
       sfc
     | IL_CODE ilBody /*| ladder_diagram | fb_diagram | instruction_list |*/
     | fbBody
-    | statement_list
+    | stBody
+;
+
+label_statement: id=IDENTIFIER COLON;
+stBody:
+  startlbl=label_statement? startstmts=statement_list (lbls+=label_statement stmts+=statement_list)*
 ;
 
 fbBody: FBD_CODE;
@@ -703,12 +707,11 @@ statement_list
 statement
 :
     pragma*
-  	( label_statement
-	| assignment_statement SEMICOLON
+  	( assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
   	| return_statement SEMICOLON
   	| jump_statement SEMICOLON
-	| if_statement
+	  | if_statement
     | case_statement
     | for_statement
     | while_statement
@@ -719,10 +722,6 @@ statement
 
 jump_statement
 : JMP id=IDENTIFIER
-;
-
-label_statement
-: id=IDENTIFIER COLON
 ;
 
 assignment_statement

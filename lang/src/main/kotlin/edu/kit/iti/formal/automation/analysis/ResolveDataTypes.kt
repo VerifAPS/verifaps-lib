@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.analysis
 
-import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.VOID
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
@@ -26,18 +25,17 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         when (obj) {
             is TypeDeclaration -> obj.initialization?.accept(this)
         }
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     override fun visit(functionDeclaration: FunctionDeclaration) {
         super.visit(functionDeclaration)
         functionDeclaration.returnType.resolve(scope::resolveDataType)
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
+        if (functionBlockDeclaration.parent.identifier != null) {
+            functionBlockDeclaration.parent.resolve(scope::resolveFunctionBlock)
+        }
         return super.visit(functionBlockDeclaration)
     }
 
@@ -48,31 +46,30 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
         }
     }
 
-    /*
-    override fun visit(init : IdentifierInitializer) {
 
-    }*/
-
-    override fun visit(classDeclaration: ClassDeclaration) {
-        if (classDeclaration.parent.identifier != null) {
-            classDeclaration.parent.resolve(scope::resolveClass)
+    override fun visit(clazz: ClassDeclaration) {
+        if (clazz.parent.identifier != null) {
+            clazz.parent.resolve(scope::resolveClass)
             //assert(classDeclaration.parentClass != null)
         }
-        val seq = classDeclaration.interfaces
+        val seq = clazz.interfaces
         seq.forEach { it.resolve(scope::resolveInterface) }
-        return super.visit(classDeclaration)
+        return super.visit(clazz)
     }
 
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         val seq = interfaceDeclaration.interfaces
         seq.forEach { it.resolve(scope::resolveInterface) }
+
+        for (method in interfaceDeclaration.methods) {
+            method.isAbstract = true
+        }
         return super.visit(interfaceDeclaration)
     }
 
-    override fun visit(methodDeclaration: MethodDeclaration) {
-        super.visit(methodDeclaration)
-        methodDeclaration.returnType.resolve(scope::resolveDataType)
-
+    override fun visit(method: MethodDeclaration) {
+        super.visit(method)
+        method.returnType.resolve(scope::resolveDataType)
     }
 
     override fun visit(gvlDecl: GlobalVariableListDeclaration) {

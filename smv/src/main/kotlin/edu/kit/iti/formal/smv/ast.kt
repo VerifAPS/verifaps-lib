@@ -3,7 +3,9 @@ package edu.kit.iti.formal.smv.ast
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.util.HasMetadata
 import edu.kit.iti.formal.util.HasMetadataImpl
+import edu.kit.iti.formal.util.meta
 import org.antlr.v4.runtime.Token
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -26,10 +28,15 @@ interface SOperator {
  * @author Alexander Weigl
  * @version 1 (09.04.18)
  */
-sealed class SMVAst : HasMetadata by HasMetadataImpl() {
+sealed class SMVAst : HasMetadata {
     fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
     abstract fun clone(): SMVAst
+
+    private val metadata by lazy{ HasMetadataImpl()}
+    override fun <T> getMetadata(clazz: Class<T>): T? = metadata.getMetadata(clazz)
+    override fun <T : Any> setMetadata(clazz: Class<T>, obj: T) = metadata.setMetadata(clazz, obj)
+    override fun getAllMetadata(): Collection<Any> = metadata.getAllMetadata()
 }
 
 data class SAssignment(
@@ -48,10 +55,26 @@ data class SAssignment(
     override fun clone() = copy()
 }
 
-data class SBinaryExpression(var left: SMVExpr,
+class SBinaryExpression(private var _left: SMVExpr,
                              var operator: SBinaryOperator,
-                             var right: SMVExpr)
+                             private var _right: SMVExpr)
     : SMVExpr() {
+
+    var left : SMVExpr
+        get() = _left
+        set(value) {
+            if(value === this) throw IllegalArgumentException()
+            _left = value
+        }
+
+    var right : SMVExpr
+        get() = _right
+        set(value) {
+            if(value === this) throw IllegalArgumentException()
+            _right = value
+        }
+
+
 
     override val dataType: SMVType?
         get() = SMVTypes.infer(left.dataType!!, right.dataType!!)

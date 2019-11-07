@@ -543,16 +543,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ast.addAction(act.accept(this) as ActionDeclaration)
         }
 
-        if (ctx.body().statement_list() != null)
-            ast.stBody = ctx.body().statement_list().accept(this) as StatementList
+        if (ctx.body().stBody() != null)
+            ast.stBody = ctx.body().stBody().accept(this) as StatementList
         if (ctx.body().sfc() != null)
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
         if (ctx.body().ilBody() != null)
             ast.ilBody = ctx.body().ilBody().accept(this) as IlBody
         if (ctx.body().fbBody() != null)
             ast.fbBody = ctx.body().fbBody().accept(this) as FbdBody
-
-
         return ast
     }
 
@@ -619,8 +617,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         //currentTopLevelScopeElement = ast;
         ast.scope = ctx.var_decls().accept(this) as Scope
 
-        if (ctx.body().statement_list() != null)
-            ast.stBody = ctx.body().statement_list().accept(this) as StatementList
+        if (ctx.body().stBody() != null)
+            ast.stBody = ctx.body().stBody().accept(this) as StatementList
 
         //currentTopLevelScopeElement = ast.getParent();
         return ast
@@ -634,8 +632,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         //currentTopLevelScopeElement = ast
         ast.scope = ctx.var_decls().accept(this) as Scope
 
-        if (ctx.body().statement_list() != null)
-            ast.stBody = ctx.body().statement_list().accept(this) as StatementList
+        if (ctx.body().stBody() != null)
+            ast.stBody = ctx.body().stBody().accept(this) as StatementList
         if (ctx.body().sfc() != null)
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
         if (ctx.body().ilBody() != null)
@@ -778,8 +776,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
                 ctx.case_statement(), ctx.invocation_statement(),
-                ctx.jump_statement(), ctx.label_statement(),
-                ctx.for_statement()) as Statement
+                ctx.jump_statement(), ctx.for_statement()) as Statement
         val p = ctx.pragma().map { it.accept(this) as Pragma }
         if (p.isNullOrEmpty()) statement.pragmas += p
         return statement
@@ -973,8 +970,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitAction(ctx: IEC61131Parser.ActionContext): ActionDeclaration {
         val action = ActionDeclaration()
         action.name = ctx.IDENTIFIER().symbol.text
-        if (ctx.body().statement_list() != null)
-            action.stBody = ctx.body().statement_list().accept(this) as StatementList
+        if (ctx.body().stBody() != null)
+            action.stBody = ctx.body().stBody().accept(this) as StatementList
         if (ctx.body().sfc() != null)
             action.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
         if (ctx.body().ilBody() != null)
@@ -984,6 +981,22 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         action.ruleContext = ctx
         return action
     }
+
+    override fun visitStBody(ctx: IEC61131Parser.StBodyContext): Any {
+        val statements = StatementList()
+        if(ctx.startlbl!=null)
+            statements.add(ctx.startlbl.accept() )
+        statements.addAll(ctx.startstmts.accept());
+
+        for(i in 0 until ctx.lbls.size) {
+            statements.add(ctx.lbls[i].accept() )
+            statements.addAll(ctx.stmts[i].accept())
+        }
+        return statements
+    }
+
+    inline fun <T> ParserRuleContext?.accept(): T = this?.accept(this@IECParseTreeToAST) as T
+
 
     override fun visitInit_step(ctx: IEC61131Parser.Init_stepContext): SFCStep {
         currentStep = SFCStep()

@@ -275,11 +275,10 @@ private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SV
 fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
     val getExpr: (SMVExpr) -> SMVExpr? = { eq: SMVExpr ->
         if (eq is SBinaryExpression) {
-            val (left, op, right) = eq
-            if (op == SBinaryOperator.EQUAL) {
+            if (eq.operator == SBinaryOperator.EQUAL) {
                 when {
-                    left == gv -> right
-                    right == gv -> left
+                    eq.left == gv -> eq.right
+                    eq.right == gv -> eq.left
                     else -> null
                 }
             } else {

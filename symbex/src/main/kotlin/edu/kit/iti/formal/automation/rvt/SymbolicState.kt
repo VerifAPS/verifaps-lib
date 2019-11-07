@@ -110,7 +110,7 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
 
     fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
         val s = map[key] ?: SymbolicVariable(key).also { map[key] = it }
-        val postfix = "$ASSIGN_SEPARATOR$assignCounter"
+        val postfix = String.format("%s%05d", ASSIGN_SEPARATOR, assignCounter)
         s.push(v, postfix)
     }
 
