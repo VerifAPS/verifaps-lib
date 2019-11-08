@@ -1,29 +1,59 @@
 package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.Console
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.datatypes.values.MultiDimArrayValue
+import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.operators.Operators
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import org.antlr.v4.runtime.misc.Interval
 import org.antlr.v4.runtime.misc.IntervalSet
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.ceil
 import kotlin.math.floor
 
-
+/**
+ * An abstract type is a mapping of a variable name to a an element of the lattice.
+ */
 typealias AState<T> = HashMap<String, T>
 
+/**
+ * An lattice is defined as several operations needed on the elements of the lattice.
+ */
 interface AiLattice<T> {
-    val operations: AbstractOperations<T>
     fun branchReducer(a: T, b: T): T
     fun isAlwaysTrue(t: T): Boolean
     fun isAlwaysFalse(t: T): Boolean
     fun isTrueable(t: T): Boolean
     fun isFalseable(t: T): Boolean
     fun stateEquals(a: AState<T>, b: AState<T>): Boolean
+    fun add(leftValue: T, rightValue: T): T
+    fun sub(leftValue: T, rightValue: T): T
+    fun div(leftValue: T, rightValue: T): T
+    fun mult(leftValue: T, rightValue: T): T
+    fun power(leftValue: T, rightValue: T): T
+    fun and(leftValue: T, rightValue: T): T
+    fun or(leftValue: T, rightValue: T): T
+    fun xor(leftValue: T, rightValue: T): T
+    fun gt(leftValue: T, rightValue: T): T
+    fun lt(leftValue: T, rightValue: T): T
+    fun ge(leftValue: T, rightValue: T): T
+    fun le(leftValue: T, rightValue: T): T
+    fun equals(leftValue: T, rightValue: T): T
+    fun notEquals(leftValue: T, rightValue: T): T
+    fun literal(literal: Literal): T
+    fun not(rightValue: T): T
+    fun minus(rightValue: T): T
+    fun emptyElement(): T
+    fun invocation(calleeName: String, dt: AnyDt?, parameters: List<T>): T
+    fun byDatatype(dataType: AnyDt): T
+    fun declare(state: AState<T>, name: String, value: Value<AnyDt, Any>)
+    fun havoc(state: AState<T>, name: String, dt: AnyDt)
 }
 
 
@@ -35,13 +65,38 @@ interface AiLattice<T> {
 class AbstractInterpretation<T>(val lattice: AiLattice<T>, val startSpace: AState<T>) {
     var space = startSpace;
 
-    fun interpretFixpoint(e: PouExecutable): Map<String, T> {
+    /**
+     * Initialize the scope, given by the default values of the datatype or initialisation.
+     */
+    fun interpret(scope: Scope) {
+        for (variable in scope.variables) {
+            lattice.declare(space, variable.name, (variable.initValue as Value<AnyDt, Any>))
+        }
+    }
+
+
+    /**
+     * Havoc the input and inout variables.
+     */
+    fun havocInputVariables(scope: Scope) {
+        for (variable in scope.variables.filter { it.isInput || it.isInOut }) {
+            lattice.havoc(space, variable.name, variable.dataType!!)
+        }
+    }
+
+    fun interpretFixpoint(e: Top, scope: Scope? = null, havoc: Boolean = false): Map<String, T> {
+        if (scope != null) interpret(scope)
         do {
+            if (scope != null && havoc) havocInputVariables(scope)
             val oldSpace = HashMap(space)
             interpret(e);
-            val newSpace = space
-        } while (newSpace == oldSpace)
-        return space;
+            val newSpace = HashMap(space)
+
+            println(oldSpace)
+            println(newSpace)
+
+        } while (!lattice.stateEquals(newSpace, oldSpace)) //TODO maybe projection on non-input variables?!
+        return space
     }
 
     fun interpret(e: Top): AState<T> {
@@ -51,16 +106,15 @@ class AbstractInterpretation<T>(val lattice: AiLattice<T>, val startSpace: AStat
         return space
     }
 
-    fun evaluateExpression(expression: Expression): T {
-        val expressionEvaluator = AbstractExpressionEvaluator(space, lattice.operations)
+    fun interpret(expression: Expression): T {
+        val expressionEvaluator = AbstractExpressionEvaluator(space, lattice)
         return expression.accept(expressionEvaluator)
     }
 }
 
 class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : AstVisitor<Unit>() {
     private val maxIterations = 10000
-
-    val stack = LinkedList<AState<T>>()
+    private val stack = LinkedList<AState<T>>()
 
     init {
         stack.push(init)
@@ -96,7 +150,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
     }
 
     fun evaluate(expr: Expression): T {
-        val eval = AbstractExpressionEvaluator(peek(), lattice.operations)
+        val eval = AbstractExpressionEvaluator(peek(), lattice)
         return expr.accept(eval)
     }
 
@@ -104,15 +158,15 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
         val branchStates = LinkedList<AState<T>>()
         for ((cond, branch) in ifStatement.conditionalBranches) {
             if (evaluateTrue(cond)) {
-                dup();
+                dup()
                 branch.accept(this)
-                branchStates += pop();
+                branchStates += pop()
             }
         }
         if (ifStatement.elseBranch.isNotEmpty()) {
-            dup();
+            dup()
             ifStatement.elseBranch.accept(this)
-            branchStates += pop();
+            branchStates += pop()
         }
 
         val variables = branchStates.groupByVariables()
@@ -141,7 +195,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
             incrAssign.accept(this)
             val new = peek()
             if (lattice.stateEquals(old, new)) break //Fixpoint reached
-            iter++;
+            iter++
         }
     }
 
@@ -183,24 +237,9 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
     }
 }
 
-private class LoopAbortException : Throwable()
-private class BodyAbortException : Throwable()
-
-private fun <T> Collection<AState<T>>.groupByVariables(): Map<String, List<T>> {
-    val seq = HashMap<String, MutableList<T>>()
-    for (a in this) {
-        for ((k, v) in a) {
-            if (k !in seq) {
-                seq[k] = LinkedList()
-            }
-            seq[k]?.add(v)
-        }
-    }
-    return seq
-}
 
 class AbstractExpressionEvaluator<T>(val state: AState<T>,
-                                     val operator: AbstractOperations<T>) : AstVisitor<T>() {
+                                     val operator: AiLattice<T>) : AstVisitor<T>() {
     override fun defaultVisit(obj: Any): T {
         TODO("${obj.javaClass} is not covered")
     }
@@ -257,37 +296,91 @@ class AbstractExpressionEvaluator<T>(val state: AState<T>,
     override fun visit(invocation: Invocation): T {
         val parameters = invocation.inputParameters.map { it.expression.accept(this) }
         val dt = invocation.invoked.returnType
-        return operator.invocation(invocation.calleeName,
-                dt, parameters);
+        return operator.invocation(invocation.calleeName, dt, parameters)
     }
 }
 
-interface AbstractOperations<T> {
-    fun add(leftValue: T, rightValue: T): T
-    fun sub(leftValue: T, rightValue: T): T
-    fun div(leftValue: T, rightValue: T): T
-    fun mult(leftValue: T, rightValue: T): T
-    fun power(leftValue: T, rightValue: T): T
-    fun and(leftValue: T, rightValue: T): T
-    fun or(leftValue: T, rightValue: T): T
-    fun xor(leftValue: T, rightValue: T): T
-    fun gt(leftValue: T, rightValue: T): T
-    fun lt(leftValue: T, rightValue: T): T
-    fun ge(leftValue: T, rightValue: T): T
-    fun le(leftValue: T, rightValue: T): T
-    fun equals(leftValue: T, rightValue: T): T
-    fun notEquals(leftValue: T, rightValue: T): T
-    fun literal(literal: Literal): T
-    fun not(rightValue: T): T
-    fun minus(rightValue: T): T
-    fun emptyElement(): T
-    fun invocation(calleeName: String, dt: AnyDt?, parameters: List<T>): T
-}
 
 /**
  * see https://de.wikipedia.org/wiki/Intervallarithmetik#Grundrechenarten
  */
-class IntOperations : AbstractOperations<IntervalSet> {
+class IntLattice : AiLattice<IntervalSet> {
+    override fun declare(state: AState<IntervalSet>, name: String, value: Value<AnyDt, Any>) {
+        value.dataType.accept(object : DataTypeVisitorNN<Unit> {
+            override fun defaultVisit(obj: Any) {}
+            override fun visit(real: AnyReal) {
+                val v = (value.value as BigDecimal).toDouble()
+                state[name] = IntervalSet.of(floor(v).toInt(), floor(v).toInt())
+            }
+
+            override fun visit(anyInt: AnyInt) {
+                val v = (value.value as BigInteger).toInt()
+                state[name] = IntervalSet.of(v)
+            }
+
+            override fun visit(bool: AnyBit.BOOL) {
+                val v = (value.value as Boolean)
+                state[name] = IntervalSet.of(if (v) 1 else 0)
+            }
+
+            override fun visit(anyBit: AnyBit) {
+                val v = (value.value as BigInteger).toInt()
+                state[name] = IntervalSet.of(v)
+            }
+
+            override fun visit(arrayType: ArrayType) {
+                val arrayInit = value.value as MultiDimArrayValue
+                for (idx in arrayType.allIndices()) {
+                    val n = idx.joinToString(",", "$name[", "]")
+                    val value1 = arrayInit[idx]
+                    declare(state, n, value1)
+                }
+            }
+
+            override fun visit(recordType: RecordType) {
+                for (idx in recordType.fields) {
+                    val n = "$name.${idx.name}"
+                    declare(state, n, idx.initValue as Value<AnyDt, Any>)
+                }
+            }
+        })
+    }
+
+    override fun havoc(space: AState<IntervalSet>, name: String, dt: AnyDt) {
+        dt.accept(object : DataTypeVisitorNN<Unit> {
+            override fun defaultVisit(obj: Any) {}
+            override fun visit(real: AnyReal) {
+                space[name] = IntervalSet.of(Int.MIN_VALUE, Int.MAX_VALUE)
+            }
+
+            override fun visit(anyInt: AnyInt) {
+                space[name] = IntervalSet.of(anyInt.lowerBound.toInt(), anyInt.upperBound.toInt())
+            }
+
+            override fun visit(bool: AnyBit.BOOL) {
+                space[name] = IntervalSet.of(0, 1)
+            }
+
+            override fun visit(anyBit: AnyBit) {
+                visit(AnyInt(anyBit.bitLength, false))
+            }
+
+            override fun visit(arrayType: ArrayType) {
+                for (idx in arrayType.allIndices()) {
+                    val n = idx.joinToString(",", "name[", "]")
+                    havoc(space, n, arrayType.fieldType)
+                }
+            }
+
+            override fun visit(recordType: RecordType) {
+                for (idx in recordType.fields) {
+                    val n = "$name.${idx.name}"
+                    havoc(space, n, idx.dataType!!)
+                }
+            }
+        })
+    }
+
     private val INTERVAL_FALSE = Interval(0, 0)
     private val INTERVAL_TRUE = Interval(1, 1)
     private val INTERVAL_ALL = Interval(0, 1)
@@ -438,6 +531,13 @@ class IntOperations : AbstractOperations<IntervalSet> {
         return s
     }
 
+    override fun byDatatype(dataType: AnyDt): IntervalSet {
+        return dataType.accept(object : DataTypeVisitorNN<IntervalSet> {
+            override fun defaultVisit(obj: Any) = IntervalSet(0)
+            override fun visit(enumerateType: EnumerateType) = IntervalSet(enumerateType.get(enumerateType.defValue)!!)
+        })
+    }
+
     override fun not(rightValue: IntervalSet): IntervalSet {
         val s = emptyElement()
         if (0 in rightValue) s.add(1)
@@ -458,6 +558,41 @@ class IntOperations : AbstractOperations<IntervalSet> {
     override fun invocation(calleeName: String, dt: AnyDt?, parameters: List<IntervalSet>): IntervalSet {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun branchReducer(a: IntervalSet, b: IntervalSet): IntervalSet {
+        val s = IntervalSet()
+        s.addAll(a)
+        s.addAll(b)
+        return s
+    }
+
+    override fun isAlwaysTrue(t: IntervalSet) = 1 in t && t.size() == 1
+    override fun isAlwaysFalse(t: IntervalSet) = 0 in t && t.size() == 1
+    override fun isTrueable(t: IntervalSet) = 1 in t
+    override fun isFalseable(t: IntervalSet) = 0 in t
+
+    override fun stateEquals(a: AState<IntervalSet>, b: AState<IntervalSet>): Boolean {
+        if(a===b) return true
+        if (a.keys != b.keys) return false
+        return a.keys.all { k ->
+            val x = a[k]
+            val y = b[k]
+            Objects.equals(x, y)
+        }
+    }
+}
+
+private fun <T> Collection<AState<T>>.groupByVariables(): Map<String, List<T>> {
+    val seq = HashMap<String, MutableList<T>>()
+    for (a in this) {
+        for ((k, v) in a) {
+            if (k !in seq) {
+                seq[k] = LinkedList()
+            }
+            seq[k]?.add(v)
+        }
+    }
+    return seq
 }
 
 private operator fun Interval.plus(ri: Interval): Interval {
@@ -473,7 +608,6 @@ private operator fun Interval.times(ri: Interval): Interval {
     val s = listOf(a * ri.a, a * ri.b, b * ri.a, b * ri.b)
     return Interval(s.min()!!, s.max()!!)
 }
-
 
 private fun Interval.power(ri: Interval): Interval {
     val s = listOf(a.pow(ri.a), a.pow(ri.b), b.pow(ri.a), b.pow(ri.b))
@@ -498,25 +632,6 @@ private operator fun Interval.contains(i: Int): Boolean {
     return a <= i && i <= b;
 }
 
-class IntLattice : AiLattice<IntervalSet> {
-    override val operations = IntOperations()
-
-    override fun branchReducer(a: IntervalSet, b: IntervalSet): IntervalSet {
-        val s = IntervalSet()
-        s.addAll(a)
-        s.addAll(b)
-        return s
-    }
-
-    override fun isAlwaysTrue(t: IntervalSet) = 1 in t && t.size() == 1
-    override fun isAlwaysFalse(t: IntervalSet) = 0 in t && t.size() == 1
-    override fun isTrueable(t: IntervalSet) = 1 in t
-    override fun isFalseable(t: IntervalSet) = 0 in t
-
-    override fun stateEquals(a: AState<IntervalSet>, b: AState<IntervalSet>): Boolean {
-        return a == b
-    }
-}
 
 /*sealed class IntTree {
     abstract val lower: Int

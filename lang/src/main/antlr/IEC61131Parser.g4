@@ -322,7 +322,8 @@ function_declaration
 	FUNCTION identifier=name COLON
 	( returnET=elementary_type_name	| returnID=IDENTIFIER)
 	var_decls
-	funcBody END_FUNCTION
+	funcBody
+	END_FUNCTION
 ;
 
 var_decls
@@ -443,7 +444,8 @@ program_declaration
 	PROGRAM identifier=IDENTIFIER
 	var_decls
 	action*
-	body END_PROGRAM
+	body
+	END_PROGRAM
 ;
 
 global_variable_list_declaration

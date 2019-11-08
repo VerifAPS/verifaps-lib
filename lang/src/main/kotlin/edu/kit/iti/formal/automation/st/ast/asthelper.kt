@@ -47,7 +47,7 @@ operator fun SymbolicReference.get(it: Iterable<Int>): SymbolicReference {
 
 
 operator fun SymbolicReference.get(fieldName: String): SymbolicReference = copy(sub = SymbolicReference(fieldName))
-
+operator fun SymbolicReference.get(it: IntArray) = this[it.toList()]
 
 infix fun SymbolicReference.assignTo(init: Expression?) = AssignmentStatement(this, init!!)
 

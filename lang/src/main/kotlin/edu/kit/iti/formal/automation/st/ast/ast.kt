@@ -2056,7 +2056,7 @@ data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
     val startValue: Int
         get() = start.value.intValueExact()
     val stopValue: Int
-        get() = start.value.intValueExact()
+        get() = stop.value.intValueExact()
 
     override fun clone() = Range(start.clone(), stop.clone())
     fun toIntRange(): IntRange = startValue..stopValue

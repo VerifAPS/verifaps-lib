@@ -138,7 +138,7 @@ object EvaluateInitialization : AstVisitor<Value<*, *>>() {
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
         val type = ArrayType(v[0].dataType, listOf())
-        return VArray(type, MultiDimArrayValue(type, ArrayList(v)))
+        return VArray(type, MultiDimArrayValue(type, v.first(), v))
     }
 
     override fun visit(si: StructureInitialization): Value<*, *> {

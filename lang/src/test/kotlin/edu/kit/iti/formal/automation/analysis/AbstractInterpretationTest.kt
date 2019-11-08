@@ -1,6 +1,8 @@
 package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
+import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.misc.IntervalSet
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -14,11 +16,11 @@ import org.junit.jupiter.params.provider.CsvSource
  * @version 1 (07.11.19)
  */
 internal class AbstractInterpretationTest {
-    lateinit var  ai: AbstractInterpretation<IntervalSet>
-    lateinit var start : AState<IntervalSet>
+    lateinit var ai: AbstractInterpretation<IntervalSet>
+    lateinit var start: AState<IntervalSet>
 
     @BeforeEach
-    fun setup(){
+    fun setup() {
         start = AState()
         start["a"] = IntervalSet(1, 2, 3, 4, 5)
         start["b"] = IntervalSet(10, 11)
@@ -51,7 +53,7 @@ internal class AbstractInterpretationTest {
     ])
     fun testVariablesAndExpr(expr: String, exp: String) {
         println("Expr: $expr")
-        val a = ai.evaluateExpression(IEC61131Facade.expr(expr))
+        val a = ai.interpret(IEC61131Facade.expr(expr))
         val set = IntervalSet()
         exp.split(",").forEach {
             if (".." in it) {
@@ -66,7 +68,7 @@ internal class AbstractInterpretationTest {
 
 
     @Test
-    fun testIf(){
+    fun testIf() {
         val stmt = IEC61131Facade.statements("""
             IF u THEN 
                 q := 20;
@@ -107,5 +109,14 @@ internal class AbstractInterpretationTest {
         val result = ai.interpret(stmt)
         println(result["q"])
         Assertions.assertEquals(IntervalSet.of(1), result["q"])
+    }
+
+    @Test
+    fun testArrayRecordInit() {
+        val res = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/ai_complex1_test.st")!!
+        val pous = IEC61131Facade.fileResolve(CharStreams.fromStream(res))
+        Assertions.assertEquals(0, pous.second.size)
+        val p = pous.first[1] as ProgramDeclaration
+        val state = ai.interpretFixpoint(p.stBody!!, p.scope, true)
     }
 }
