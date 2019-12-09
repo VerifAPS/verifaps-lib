@@ -111,12 +111,4 @@ internal class AbstractInterpretationTest {
         Assertions.assertEquals(IntervalSet.of(1), result["q"])
     }
 
-    @Test
-    fun testArrayRecordInit() {
-        val res = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/ai_complex1_test.st")!!
-        val pous = IEC61131Facade.fileResolve(CharStreams.fromStream(res))
-        Assertions.assertEquals(0, pous.second.size)
-        val p = pous.first[1] as ProgramDeclaration
-        val state = ai.interpretFixpoint(p.stBody!!, p.scope, true)
-    }
 }

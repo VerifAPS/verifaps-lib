@@ -26,34 +26,6 @@ package edu.kit.iti.formal.automation.oo
  * Façade for object-oriented IEC 61131-3.
  *
  * @author Augusto Modanese
- *
+ */
 object OOIEC61131Facade {
-    private val FIND_EFFECTIVE_SUBTYPES_LIMIT = 10
-
-    /**
-     * Find all instances of classes and FBs belonging to the given top level element..
-     * @param element The top level element to visit.
-     * @param globalScope Global scope after data types have been resolved.
-     * @return The instance scope containing all instances.
-     */
-    fun findInstances(element: PouElement<*>, globalScope: Scope): InstanceScope {
-        val instanceScope = InstanceScope(globalScope)
-        element.accept(FindInstances(instanceScope))
-        return instanceScope
-    }
-
-    fun findEffectiveSubtypes(topLevelElements: PouElements,
-                              globalScope: Scope, instanceScope: InstanceScope): EffectiveSubtypeScope {
-        val findEffectiveSubtypes = FindEffectiveSubtypes(globalScope, instanceScope)
-        var i: Int
-        i = 0
-        while (i < FIND_EFFECTIVE_SUBTYPES_LIMIT && !findEffectiveSubtypes.fixpointReached()) {
-            findEffectiveSubtypes.prepareRun()
-            topLevelElements.accept<Any>(findEffectiveSubtypes)
-            i++
-        }
-        //System.out.println("Done: fixpoint isType " + findEffectiveSubtypes.fixpointReached() + " after " + i + " steps");
-        return findEffectiveSubtypes.effectiveSubtypeScope
-    }
 }
-*/

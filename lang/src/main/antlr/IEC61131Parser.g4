@@ -13,7 +13,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 start
 :
-	(library_element_declaration)*
+	(library_element_declaration)* EOF
 ;
 
 namespace_declaration
@@ -208,7 +208,6 @@ type_declaration
 	  ( R_EDGE
 	  | F_EDGE
 	  )?
-	| enumerated_specification
 	)
 	( ASSIGN i=initializations)?
 ;

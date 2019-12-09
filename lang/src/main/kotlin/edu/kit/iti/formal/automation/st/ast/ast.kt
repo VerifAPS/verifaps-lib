@@ -181,8 +181,8 @@ data class ClassDeclaration(
         override val interfaces: RefList<InterfaceDeclaration> = RefList(),
         override val methods: MutableList<MethodDeclaration> = arrayListOf(),
         val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>()) :
-        HasInterfaces,
-        HasScope, HasMethods, PouElement(), Classifier {
+        HasInterfaces, HasScope, HasMethods, PouElement(), Classifier {
+
 
     override fun clone() = copy()
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -1353,7 +1353,7 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
     constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
-    constructor(value:Int) : this(INT, value.toBigInteger())
+    constructor(value: Int) : this(INT, value.toBigInteger())
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, INT)
 

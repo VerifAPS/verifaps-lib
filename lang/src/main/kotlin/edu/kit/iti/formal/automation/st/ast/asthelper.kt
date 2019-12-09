@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st.ast
 
+import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.INT
 import java.util.*
@@ -156,4 +157,26 @@ val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
         }
         return seq
     }
+
+val ClassDeclaration.hasParent
+    get() = parent.identifier != null || parent.obj != null
+val FunctionBlockDeclaration.hasParent
+    get() = parent.identifier != null || parent.obj != null
+
+val ClassDeclaration.effectiveVariables: VariableScope
+    get() {
+        val variables = if(hasParent) parent.obj!!.effectiveVariables else VariableScope()
+        variables.addAll(scope.variables)
+        return variables
+    }
+
+val FunctionBlockDeclaration.effectiveVariables: VariableScope
+    get() {
+        val variables = if(hasParent) parent.obj!!.effectiveVariables else VariableScope()
+        variables.addAll(scope.variables)
+        return variables
+    }
+
+
+
 //endregion
