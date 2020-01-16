@@ -23,23 +23,26 @@ import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
-import java.util.concurrent.Callable
 
 /**
  * @author Alexander Weigl
  * @version 1 (13.12.16)
  */
-class MultiModelGluer(moduleName: String = "main")  {
+class MultiModelGluer(moduleName: String = "main") {
     val product = SMVModule(moduleName)
 
     fun addProgramRun(runName: String, module: SMVModule) {
-        product.inputVars.addAll(module.moduleParameters)
+        val inputVars = module.moduleParameters.map {
+            SVariable("$runName\$${it.name}", it.dataType!!)
+        }
+
+        product.inputVars.addAll(inputVars)
         product.stateVars.add(
                 SVariable(runName,
-                        ModuleType(module.name, module.moduleParameters)))
+                        ModuleType(module.name, inputVars)))
     }
 
-    fun addTable(tableName : String, type : SMVType) {
+    fun addTable(tableName: String, type: SMVType) {
         product.stateVars.add(SVariable(tableName, type))
     }
 }

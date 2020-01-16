@@ -18,7 +18,6 @@ import edu.kit.iti.formal.smv.ModuleType
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
 
@@ -33,9 +32,13 @@ class SmvConstructionPipeline(
     init {
         model.testTable.ensureProgramRuns()
 
-        if (model.testTable.options.relational)
-            transformers.add(PauseAdder)
         transformers.add(GenerateSmvExpression)
+
+        if (model.testTable.options.relational) {
+            transformers.add(PlayPauseToAssumption)
+            transformers.add(BackwardToAssumption)
+        }
+
         transformers.add(RegisterDefines)
         transformers.add(DefineStateVariables)
         transformers.add(DefineProjectionVariables)

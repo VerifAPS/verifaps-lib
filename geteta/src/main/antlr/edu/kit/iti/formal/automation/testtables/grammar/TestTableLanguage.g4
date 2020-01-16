@@ -17,34 +17,27 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
     public boolean relational = false;
 }
-    /*public Set<String> variables = new HashSet<>();
-
-
-	private boolean isVariable() {
-        String next = getCurrentToken().getText();
-		return variables.contains(next);
-	}
-
-    private void addVariable(Token realName, Token newName) {
-        Token tok = (newName != null) ? newName : realName;
-        if (tok != null) {variables.add(tok.getText()); }
-    }
-}
-*/
 
 //structure level
 file  : table* EOF;
-table : (r=RELATIONAL {relational=true;})?
-        TABLE IDENTIFIER LBRACE
+table : tableHeader LBRACE
             (signature | freeVariable | column)*
             opts?
             group
             function*
-         RBRACE;
+         RBRACE
+;
 
-opts : OPTIONS LBRACE (kv)*  RBRACE;
+tableHeader:
+    {relational=false;} TABLE name=IDENTIFIER                                            #tableHeaderFunctional
+  | RELATIONAL {relational=true;} TABLE name=IDENTIFIER LPAREN
+  run+=IDENTIFIER (COMMA run+=IDENTIFIER)* RPAREN #tableHeaderRelational
+;
+
+opts: OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
-signature : VAR var_modifier
+
+signature: VAR var_modifier
     variableDefinition (COMMA variableDefinition)*
     COLON dt=IDENTIFIER osem
 ;
@@ -54,23 +47,27 @@ var_modifier:
 ;
 
 column:
-  COLUMN var_modifier name=IDENTIFIER COLON dt=IDENTIFIER AS expr (COMMA expr)*
+  COLUMN var_modifier name=IDENTIFIER (COLON dt=IDENTIFIER)? AS expr (COMMA expr)*
 ;
 
 variableDefinition :
         {!relational}? n=IDENTIFIER (AS newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
-      | {relational}? INTEGER RV_SEPARATOR  n=IDENTIFIER (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
-      | {relational}? n=IDENTIFIER (OF INTEGER+)                                  #variableRunsDefinition
+      | {relational}? intOrId RV_SEPARATOR  n=IDENTIFIER (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
+      | {relational}? n=IDENTIFIER (OF intOrId+)                                  #variableRunsDefinition
 ;
 
 osem : ';'?;
 
 group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
-
-row : ROW (id=IDENTIFIER|idi=i)? time? LBRACE (pause osem)? (kc osem)* RBRACE;
+intOrId: id=IDENTIFIER | idi=i;
+row : ROW intOrId? time? LBRACE (controlCommands)? (kc osem)* RBRACE;
 kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER COLON value=cell;
-pause: {relational}? PAUSE INTEGER+;
-
+controlCommands: {relational}? (controlCommand osem?)+;
+controlCommand:
+    PAUSE COLON (runs+=intOrId)* #controlPause
+  | PLAY COLON (runs+=intOrId)*  #controlPlay
+  | BACKWARD LPAREN intOrId RPAREN COLON (runs+=intOrId)* #controlBackward
+;
 
 time :
       MINUS (duration_flags)? #timeDontCare
@@ -180,9 +177,11 @@ guardedcommand
 
 VAR:'var';
 AS:'as';
-OF:'OF';
+OF:'of';
 OPTIONS:'options';
-PAUSE:'pause';
+PAUSE:'\\pause';
+BACKWARD:'\\backward';
+PLAY:'\\play';
 ROW:'row';
 GROUP:'group';
 STATE: 'state';
@@ -227,7 +226,7 @@ NEXT : 'next';
 ASSUM : 'ASSUME' | 'assume';
 ASSERT : 'ASSERT' | 'assert';
 
-IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]*;
+IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
 
 RV_SEPARATOR : '|>'|'·'|'$';
 

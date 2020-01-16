@@ -21,7 +21,6 @@ import org.fife.ui.rsyntaxtextarea.parser.AbstractParser
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
-import java.lang.NullPointerException
 import javax.swing.Icon
 
 /**
@@ -80,8 +79,7 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
 }
 
 class TestTableLanguageSupport(lookup: Lookup) : BaseLanguageSupport() {
-    override fun createParser(textArea: CodeEditor, lookup: Lookup)
-            = TTParser(textArea, lookup)
+    override fun createParser(textArea: CodeEditor, lookup: Lookup) = TTParser(textArea, lookup)
     override val mimeType: String = "text/gtt"
     override val extension: Collection<String> = setOf("gtt", ".tt.txt", ".tt")
     override val syntaxScheme: SyntaxScheme = TestTableSyntaxScheme(lookup)
@@ -125,7 +123,14 @@ class TTOverviewTransformer(val editor: CodeEditor) {
         }
 
         override fun visitTable(ctx: TestTableLanguageParser.TableContext): OverviewStructureNode? {
-            val root = OverviewStructureNode(StructureData(ctx.IDENTIFIER().text, editor, ROOT_ICON))
+            val name =
+                    when (val header = ctx.tableHeader()) {
+                        is TestTableLanguageParser.TableHeaderFunctionalContext -> header.name.text
+                        is TestTableLanguageParser.TableHeaderRelationalContext -> header.name.text
+                        else -> ""
+                    }
+
+            val root = OverviewStructureNode(StructureData(name, editor, ROOT_ICON))
             ctx.freeVariable().mapAndAddTo(root)
             ctx.signature().mapAndUnpackTo(root)
             ctx.opts()?.accept(this)?.also { root.add(it) }
@@ -187,7 +192,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
         //parser.errorReporter.isPrint = true
         try {
             val ctx = parser.file()
-            val gtt =  GetetaFacade.parseTableDSL(ctx)
+            val gtt = GetetaFacade.parseTableDSL(ctx)
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
             previewService.render(gtt)
@@ -199,7 +204,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
                         it.line, it.offendingSymbol?.startIndex ?: -1,
                         it.offendingSymbol?.text?.length ?: -1))
             }
-        } catch (e : NullPointerException) {
+        } catch (e: NullPointerException) {
 
         }
         return res

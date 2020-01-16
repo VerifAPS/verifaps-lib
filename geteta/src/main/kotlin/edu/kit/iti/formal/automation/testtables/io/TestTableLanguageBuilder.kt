@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.io
 
+import edu.kit.iti.formal.automation.Console
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
@@ -10,6 +11,7 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVis
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import org.antlr.v4.runtime.CharStreams
+import kotlin.system.exitProcess
 
 /**
  *
@@ -26,13 +28,37 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         scope.types.register("BOOLEAN", AnyBit.BOOL)
     }
 
+
+    private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
+        val idx = current.programRuns.indexOf(it.id.text)
+        if (idx < 0) error("Program run unknown ${it.id.text}")
+        else idx
+    } else it.i().text.toInt()
+
+
     override fun visitTable(ctx: TestTableLanguageParser.TableContext) {
         current = GeneralizedTestTable()
         testTables += current
-        current.name = ctx.IDENTIFIER().text
+        ctx.tableHeader().accept(this)
         visitChildren(ctx)
+    }
 
-        current.options.relational = ctx.r != null
+    override fun visitTableHeaderFunctional(ctx: TestTableLanguageParser.TableHeaderFunctionalContext) {
+        current.name = ctx.name.text
+        current.options.relational = false
+        current.ensureProgramRuns()
+    }
+
+    override fun visitTableHeaderRelational(ctx: TestTableLanguageParser.TableHeaderRelationalContext) {
+        current.name = ctx.name.text
+        current.options.relational = true
+        current.programRuns = ctx.run.map { it.text }
+        if (current.programRuns.size <= 1) {
+            Console.fatal(
+                    "The number of program runs are less than 2 for relational table ${current.name}. " +
+                            "Either this is not a relational table, or program runs are missing.")
+            exitProcess(1)
+        }
     }
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext) {
@@ -89,6 +115,8 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         ctx.variableDefinition().forEach {
             when (it) {
                 is TestTableLanguageParser.VariableAliasDefinitionSimpleContext -> {
+
+
                     val newName: String? = it.newName?.text
                     val realName = it.n.text
                     val v = ProgramVariable(realName, dt, lt, type)
@@ -101,7 +129,7 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
                 is TestTableLanguageParser.VariableAliasDefinitionRelationalContext -> {
                     val newName: String? = it.newName?.text
                     val realName = it.n.text
-                    val programRun = it.INTEGER().text.toInt()
+                    val programRun = getProgramRun(it.intOrId())
                     val v = ProgramVariable(realName, dt, lt, type,
                             modifier.state, modifier.next, programRun)
                     if (newName != null) {
@@ -112,10 +140,12 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
                 }
                 is TestTableLanguageParser.VariableRunsDefinitionContext -> {
                     val realName = it.n.text
-                    it.INTEGER().map { it.text.toInt() }.forEach { i ->
-                        val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, i)
-                        current.add(v)
-                    }
+                    it.intOrId()
+                            .map { getProgramRun(it) }
+                            .forEach { i ->
+                                val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, i)
+                                current.add(v)
+                            }
                 }
             }
         }
@@ -141,6 +171,14 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
 class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBaseVisitor<TableNode>() {
     var currentId = 0
 
+
+    private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
+        val idx = gtt.programRuns.indexOf(it.id.text)
+        if (idx < 0) error("Program run unknown ${it.id.text}")
+        else idx
+    } else it.i().text.toInt()
+
+
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
         val id = ctx.id?.text ?: "g" + (ctx.idi?.text?.toInt() ?: ++currentId)
         val r = Region(id)
@@ -155,22 +193,73 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     }
 
 
+    fun rowId(ctx: TestTableLanguageParser.IntOrIdContext?): String =
+            ctx?.id?.text ?: String.format("r%02d", ctx?.idi?.text?.toInt() ?: ++currentId)
+
+    lateinit var currentRow: TableRow
+
+
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): TableRow {
-        val id = ctx.id?.text ?: String.format("r%02d", ctx.idi?.text?.toInt() ?: ++currentId)
-        val s = TableRow(id)
-        s.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
+        val id = rowId(ctx.intOrId())
+        currentRow = TableRow(id)
+        currentRow.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
         ctx.kc().forEach {
             val name = it.IDENTIFIER().text
             val run = it.INTEGER()?.text?.toInt()
             //val column = gtt.getSMVVariable(it.key.text)
             //val cell = IOFacade.exprToSMV(it.cell(), column, gtt);
-            s.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
+            currentRow.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
         }
 
-        if (ctx.pause() != null) {
-            s.pauseProgramRuns = ctx.pause().INTEGER().map { it.text.toInt() }.toMutableList()
+        if (gtt.options.relational) {
+            ctx.controlCommands()?.let { it.accept(this) }
         }
-        return s
+        return currentRow
+    }
+
+    override fun visitControlPause(ctx: TestTableLanguageParser.ControlPauseContext): TableNode {
+        ctx.intOrId().forEach { it ->
+            val run = getProgramRun(it)
+            val pause = ControlCommand.Pause(run)
+            val play = ControlCommand.Play(run)
+            if (play in currentRow.controlCommands) {
+                currentRow.controlCommands.remove(play)
+                Console.info("Contradition with play-command in row ${currentRow.id}. Removing the play-command.")
+            }
+            currentRow.controlCommands.add(pause)
+        }
+        return currentRow
+    }
+
+    override fun visitControlPlay(ctx: TestTableLanguageParser.ControlPlayContext): TableNode {
+        ctx.intOrId().forEach { it ->
+            val run = getProgramRun(it)
+            val pause = ControlCommand.Pause(run)
+            val play = ControlCommand.Play(run)
+            if (pause in currentRow.controlCommands) {
+                currentRow.controlCommands.remove(pause)
+                Console.info("Contradition with pause-command in row ${currentRow.id}. Removing the pause-command.")
+            }
+            currentRow.controlCommands.add(play)
+        }
+        return currentRow
+    }
+
+    override fun visitControlBackward(ctx: TestTableLanguageParser.ControlBackwardContext): TableNode {
+        val target = rowId(ctx.intOrId)
+        ctx.runs.forEach { it ->
+            val run = it.text.toInt()
+            val backward = ControlCommand.Backward(run, target)
+            val conflict = currentRow.controlCommands
+                    .filterIsInstance<ControlCommand.Backward>()
+                    .filter { it.affectedProgramRun == run }
+            if (conflict.isNotEmpty())
+                Console.info("A backward-command already exists in row ${currentRow.id}. " +
+                        "Removing the previous command.")
+            currentRow.controlCommands.removeAll(conflict)
+            currentRow.controlCommands.add(backward)
+        }
+        return currentRow
     }
 }
 

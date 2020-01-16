@@ -13,11 +13,13 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
 import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
+import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
 import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
 import edu.kit.iti.formal.smv.ast.SMVModule
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.system.exitProcess
 
 object RetetaApp {
     @JvmStatic
@@ -28,7 +30,12 @@ object RetetaApp {
 
 class Reteta : CliktCommand(
         epilog = "Reteta -- Tooling for Relational Test Tables.",
-        name = "geteta.sh") {
+        name = "reteta") {
+
+    val invokeModelChecker by option("--model-check", help = "the model checker is invoked when set [default:true]")
+            .flag("--dont-model-check", default = true)
+
+    val printAugmentedPrograms by option(help = "prints the augmented programs into files: <name>.st").flag()
 
     val disableSimplify by option("--no-simplify", help = "disable")
             .flag(default = false)
@@ -49,7 +56,7 @@ class Reteta : CliktCommand(
 
     val programs by option("-P", "--program", metavar = "NAME")
             .convert { File(it) }
-            .multiple()
+            .multiple(required = true)
 
     val nuxmv by option("--nuxmv", help = "Path to nuXmv binary.", envvar = "NUXMV")
             .file(exists = true)
@@ -67,25 +74,30 @@ class Reteta : CliktCommand(
 
         val superEnumType = GetetaFacade.createSuperEnum(programs.map { it.scope })
 
-        val programRunNames = programs.mapIndexed { index, it ->
+        /*val programRunNames = programs.mapIndexed { index, it ->
             "${it.name.toLowerCase()}$$index"
-        }
+        }*/
 
         //read table
         val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
-            it.ensureProgramRuns()
-            it.generateSmvExpression()
             it.simplify()
         }
 
         gtts.forEach { table ->
-            table.programRuns = programRunNames
+            val chapterMarks = table.chapterMarksForProgramRuns
+            val augmentedPrograms = programs.mapIndexed { idx, exec ->
+                val rttPipeline = RTTCodeAugmentation(chapterMarks[idx]!!)
+                val s = rttPipeline.transform(TransformationState(exec))
+                val p = ProgramDeclaration(exec.name, s.scope, s.stBody)
 
-            val rttPipeline = RTTCodeAugmentation()
-            val augmentedPrograms = programs.map {
-                val s = rttPipeline.transform(TransformationState(it))
-                SymbExFacade.evaluateProgram(ProgramDeclaration(scope = s.scope, stBody = s.stBody),
-                        disableSimplify)
+                if (printAugmentedPrograms) {
+                    File(outputFolder).mkdirs()
+                    File(outputFolder, "${exec.name}.st").bufferedWriter().use {
+                        IEC61131Facade.printTo(it, p)
+                    }
+                }
+
+                SymbExFacade.evaluateProgram(p, disableSimplify)
             }
 
             if (!table.options.relational) {
@@ -95,7 +107,7 @@ class Reteta : CliktCommand(
             val tt = GetetaFacade.constructSMV(table, superEnumType)
             val modTable = tt.tableModule
             val mainModule = MultiModelGluer().apply {
-                programRunNames.zip(augmentedPrograms).forEach { (n, p) ->
+                table.programRuns.zip(augmentedPrograms).forEach { (n, p) ->
                     addProgramRun(n, p)
                 }
                 addTable("_${table.name}", tt.ttType!!)
@@ -106,23 +118,24 @@ class Reteta : CliktCommand(
             modules.add(modTable)
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
-            val b = GetetaFacade.runNuXMV(
-                    nuxmv.absolutePath,
-                    this.table.first().nameWithoutExtension, modules,
-                    table.options.verificationTechnique)
+            if (invokeModelChecker) {
+                val b = GetetaFacade.runNuXMV(
+                        nuxmv.absolutePath,
+                        outputFolder,
+                        modules,
+                        table.options.verificationTechnique)
+            }
         }
     }
 
     fun readPrograms(): List<PouExecutable> {
         val programs = IEC61131Facade.readProgramsWithLibrary(library, programs)
-        return if (programs.any { it != null }) {
+        return if (programs.any { it == null }) {
             Console.fatal("In some given program there is no PROGRAM declaration!")
-            System.exit(1)
+            exitProcess(1)
             listOf()
         } else {
-            val a = ArrayList<PouExecutable>()
-            programs.forEach { if (it != null) a.add(it) }
-            a
+            programs.filterNotNull().toMutableList()
         }
     }
 }
@@ -138,4 +151,3 @@ internal fun GeneralizedTestTable.simplify(): GeneralizedTestTable {
     Console.info("No rows unreachable!")
     return this
 }
-

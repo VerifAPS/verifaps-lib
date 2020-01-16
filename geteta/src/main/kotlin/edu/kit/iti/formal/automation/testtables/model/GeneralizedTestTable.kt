@@ -127,9 +127,9 @@ class ParseContext(
     fun getReference(variable: SVariable, cycles: Int): SVariable =
             if (cycles == 0) {
                 variable
-            } else if (cycles> 0) {
+            } else if (cycles > 0) {
                 throw IllegalArgumentException("no future references are allowed.")
-            }else{
+            } else {
                 val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
                 val ref = SVariable(newName, variable.dataType!!)
                 val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
@@ -147,7 +147,8 @@ class ParseContext(
 
         val va = if (programRun != null)
             vars.keys.find { it.name == v && (it as? ProgramVariable)?.programRun == programRun }
-                    ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature.")
+                    ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature. " +
+                            "Signature is ${vars.keys.joinToString { it.name }}")
         else
             vars.keys.find { it.name == v }
                     ?: throw IllegalArgumentException("Could not find a variable for $v in signature.")
@@ -260,12 +261,14 @@ class GeneralizedTestTable(
     }
 
     fun ensureProgramRuns() {
-        val max = 1 + maxProgramRun
-        if (max == 1 && programRuns.isEmpty()) {
-            programRuns += "code\$"
-        } else {
-            while (programRuns.size < max) {
-                programRuns += "_${programRuns.size}\$"
+        if (programRuns.isEmpty()) {
+            val max = 1 + maxProgramRun
+            if (max == 1 && programRuns.isEmpty()) {
+                programRuns += "code\$"
+            } else {
+                while (programRuns.size < max) {
+                    programRuns += "_${programRuns.size}\$"
+                }
             }
         }
     }
@@ -439,9 +442,25 @@ data class TableRow(override var id: String) : TableNode(id) {
     val defProgress = SVariable("${id}_progress", SMVTypes.BOOLEAN)
 
     /**
+     * List
+     */
+    var controlCommands: MutableList<ControlCommand> = arrayListOf()
+
+    /**
      * name of runs to pause in that specific state.
      */
-    var pauseProgramRuns: MutableList<Int> = arrayListOf()
+    val pauseProgramRuns: List<Int>
+        get() = controlCommands.filterIsInstance<ControlCommand.Pause>()
+                .map { it.affectedProgramRun }
+
+    val backwardProgramRuns: List<Int>
+        get() = controlCommands.filterIsInstance<ControlCommand.Backward>()
+                .map { it.affectedProgramRun }
+
+    val backwardTargetedRows: List<String>
+        get() = controlCommands.filterIsInstance<ControlCommand.Backward>()
+                .map { it.jumpToRow }
+
 
     /*override val automataStates: MutableList<AutomatonState> = ArrayList()
         get() {
@@ -492,15 +511,6 @@ data class TableRow(override var id: String) : TableNode(id) {
 
         inputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isAssumption }))
         outputExpr.putAll(GetetaFacade.exprsToSMV(vc, new.filter { it.key.isAssertion }))
-
-        if (vc.relational)
-            vc.programRuns.mapIndexed { i, s ->
-                val pexpr = if (i in pauseProgramRuns)
-                    vc.getSMVVariable(i, VARIABLE_PAUSE)
-                else vc.getSMVVariable(i, VARIABLE_PAUSE).not()
-                inputExpr.put(VARIABLE_PAUSE, pexpr)
-            }
-
     }
 
     fun constraintOf(v: ProgramVariable): SMVExpr? {
@@ -509,6 +519,14 @@ data class TableRow(override var id: String) : TableNode(id) {
     }
 
     override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
+}
+
+sealed class ControlCommand() {
+    abstract val affectedProgramRun: Int
+
+    data class Backward(override var affectedProgramRun: Int, var jumpToRow: String) : ControlCommand()
+    data class Pause(override var affectedProgramRun: Int) : ControlCommand()
+    data class Play(override var affectedProgramRun: Int) : ControlCommand()
 }
 
 
@@ -532,3 +550,19 @@ fun TableRow.getUsedGlobalVariables(gtt: GeneralizedTestTable): List<ConstraintV
         seq.any { ctx -> contains(gv, ctx) }
     }
 }
+
+/**
+ * Returns a map, which maps a program run to the set of targeted table rows by the backward command.
+ */
+val GeneralizedTestTable.chapterMarksForProgramRuns: Map<Int, Set<String>>
+    get() {
+        val m =
+                programRuns.mapIndexed { index, _ -> index to TreeSet<String>() }
+                        .toMap()
+        region.flat().flatMap { it.controlCommands }
+                .filterIsInstance<ControlCommand.Backward>()
+                .forEach {
+                    m[it.affectedProgramRun]!!.add(it.jumpToRow)
+                }
+        return m
+    }
