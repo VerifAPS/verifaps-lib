@@ -63,6 +63,14 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext) {
         current.region = ctx.accept(RegionVisitor(current)) as Region
+        val nodeIds = mutableSetOf<String>()
+        current.region.visit { node ->
+            if (node.id in nodeIds) {
+                Console.fatal("Duplication of row/group id ${node.id}.")
+                exitProcess(2)
+            }
+            nodeIds.add(node.id)
+        }
     }
 
     override fun visitOpts(ctx: TestTableLanguageParser.OptsContext) {

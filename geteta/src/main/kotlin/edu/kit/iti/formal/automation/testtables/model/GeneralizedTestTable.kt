@@ -9,7 +9,6 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
-import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.VariableReplacer
@@ -403,6 +402,7 @@ sealed class TableNode(open var id: String, var duration: Duration = Duration.Cl
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
     abstract fun clone(): TableNode
+    abstract fun visit(visitor: (TableNode) -> Unit)
 }
 
 data class Region(override var id: String,
@@ -413,6 +413,10 @@ data class Region(override var id: String,
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
     override fun depth() = 1 + (this.children.maxBy { it.depth() }?.depth() ?: 0)
     override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }
+    override fun visit(visitor: (TableNode) -> Unit) {
+        visitor(this)
+        children.forEach { it.visit(visitor) }
+    }
 }
 
 data class TableRow(override var id: String) : TableNode(id) {
@@ -519,6 +523,7 @@ data class TableRow(override var id: String) : TableNode(id) {
     }
 
     override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
+    override fun visit(visitor: (TableNode) -> Unit) = visitor(this)
 }
 
 sealed class ControlCommand() {
