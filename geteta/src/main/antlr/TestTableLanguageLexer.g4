@@ -16,6 +16,8 @@ private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
 public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 public boolean relational = false;
 }
+
+
 SEMICOLON:';';
 OMEGA:'omega';
 GVAR:'gvar';
@@ -73,9 +75,8 @@ NEXT : 'next';
 ASSUM : 'ASSUME' | 'assume';
 ASSERT : 'ASSERT' | 'assert';
 
+FQ_VARIABLE : (DIGIT+|IDENTIFIER)? ('|>'|'·'|'::') IDENTIFIER?;
 IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
-
-RV_SEPARATOR : '|>'|'·'|'$';
 
 fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;

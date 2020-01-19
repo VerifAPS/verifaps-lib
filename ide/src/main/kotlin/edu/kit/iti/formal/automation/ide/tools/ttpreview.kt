@@ -117,7 +117,7 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
             val vars = gtt.programVariables.filterIsInstance<ProgramVariable>().toMutableList()
             vars.sortWith(cmp)
             val treeModel = TTTableModel(gtt)
-            val rowModel = TTRowModel(vars)
+            val rowModel = if (gtt.options.relational) RTTRowModel(gtt.programRuns, vars) else TTRowModel(vars)
             val mdl = DefaultOutlineModel.createOutlineModel(
                     treeModel, rowModel, true, "Groups")
             outline.model = mdl
@@ -174,6 +174,51 @@ class TTRowModel(val columns: List<ProgramVariable>) : RowModel {
     override fun getColumnClass(column: Int): Class<*> = TestTableLanguageParser.CellContext::class.java
     override fun getColumnCount(): Int = 1 + columns.size
 }
+
+class RTTRowModel(val programRuns: List<String>, val columns: List<ProgramVariable>) : RowModel {
+    val columnNames = arrayListOf<String>()
+
+    init {
+        columnNames += "Duration"
+        programRuns.forEach {
+            columnNames += "<html><center>$it<br>run</center></html>"
+        }
+        columns.forEach {
+            columnNames += "<html><center>${programRuns[it.programRun]}$${it.name}<br>${it.humanCategory}</center>"
+        }
+    }
+
+    override fun getValueFor(node: Any?, column: Int): Any {
+        if (column == 0 && node is TableNode) {
+            return node.duration.repr()
+        }
+        if ((column - 1) >= 0 && (column - 1) < programRuns.size && node is TableRow) {
+            val run = column - 1
+            return node.controlCommands.filter { it.affectedProgramRun == run }
+                    .joinToString(", ") { it.toString() }
+        }
+        if (node is TableRow) {
+            val c = columns[column - 1 - programRuns.size]
+            return node.rawFields[c] ?: ""
+        }
+        return ""
+    }
+
+    override fun setValueFor(node: Any?, column: Int, value: Any?) {}
+    override fun isCellEditable(node: Any?, column: Int): Boolean = false
+    override fun getColumnName(column: Int): String = columnNames[column]
+
+    override fun getColumnClass(column: Int): Class<*> {
+        if (column == 0)
+            return String.javaClass
+        if ((column - 1) >= 0 && (column - 1) < programRuns.size)
+            return String.javaClass
+        return TestTableLanguageParser.CellContext::class.java
+    }
+
+    override fun getColumnCount(): Int = 1 + programRuns.size + columns.size
+}
+
 
 class TTTableModel(val gtt: GeneralizedTestTable) : TreeModel {
     protected var listenerList: EventListenerList = EventListenerList()

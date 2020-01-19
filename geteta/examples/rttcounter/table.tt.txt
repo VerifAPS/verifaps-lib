@@ -1,4 +1,4 @@
-relational table T(P, Q) {
+relational table T(P, Q) { 
    var output c of 0 1 : INT
 
     group omega  {

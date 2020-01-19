@@ -98,9 +98,9 @@ class EditorFactoryImpl(val lookup: Lookup,
 
     override fun getLanguage(it: File): LanguageSupport? {
         for (language in languageSupports) {
-            if (it.extension in language.extension) {
-                return language
-            }
+            for (ext in language.extension)
+                if (it.toString().endsWith(ext))
+                    return language
         }
         return null
     }

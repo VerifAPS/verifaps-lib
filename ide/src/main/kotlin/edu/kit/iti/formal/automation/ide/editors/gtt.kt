@@ -52,6 +52,9 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             TestTableLanguageLexer.INPUT,
             TestTableLanguageLexer.OUTPUT,
             TestTableLanguageLexer.VAR,
+            TestTableLanguageLexer.BACKWARD,
+            TestTableLanguageLexer.PLAY,
+            TestTableLanguageLexer.PAUSE,
             TestTableLanguageLexer.STATE
     )
     private val SEPS = setOf(
@@ -75,6 +78,7 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             in STRUCTURAL_KEYWORDS -> Colors.structural
             //in CONTROL_KEYWORDS -> colors.control
             in LITERALS -> Colors.literal
+            TestTableLanguageLexer.FQ_VARIABLE -> Colors.identifier
             IDENTIFIER -> Colors.identifier
             TestTableLanguageLexer.COMMENT -> Colors.comment
             TestTableLanguageLexer.LINE_COMMENT -> Colors.comment

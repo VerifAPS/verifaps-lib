@@ -39,7 +39,7 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs "src/main/java", antlrOutputDir
+            srcDirs "src/main/java", file("${project.buildDir}/generated-src/antlr/main")
         }
     }
 }

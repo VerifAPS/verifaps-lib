@@ -6,8 +6,8 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
@@ -33,6 +33,11 @@ sealed class Variable : Identifiable {
 }
 
 abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {
+    open val humanCategory: String
+        get() {
+            return category.name
+        }
+
     val isAssumption
         get() = category == ColumnCategory.ASSUME
 
@@ -50,6 +55,20 @@ data class ProgramVariable(
         var isState: Boolean = false,
         var isNext: Boolean = false,
         var programRun: Int = 0) : ColumnVariable(category) {
+
+    override val humanCategory: String
+        get() {
+            return when {
+                !isNext && isState && category == ColumnCategory.ASSUME -> "state assume"
+                !isNext && isState && category == ColumnCategory.ASSERT -> "state assert"
+                isNext && isState && category == ColumnCategory.ASSUME -> "state' assume"
+                isNext && isState && category == ColumnCategory.ASSERT -> "state' assert"
+                isNext && !isState && category == ColumnCategory.ASSERT -> "output"
+                !isNext && isState && category == ColumnCategory.ASSUME -> "input"
+                else -> ""
+            }
+        }
+
 
     override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
 

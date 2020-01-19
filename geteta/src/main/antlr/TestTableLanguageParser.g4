@@ -31,8 +31,8 @@ table : tableHeader LBRACE
 ;
 
 tableHeader:
-    {relational=false;} TABLE name=IDENTIFIER                                            #tableHeaderFunctional
-  | RELATIONAL {relational=true;} TABLE name=IDENTIFIER LPAREN
+               {relational=false;} TABLE name=IDENTIFIER                     #tableHeaderFunctional
+  | RELATIONAL {relational=true; } TABLE name=IDENTIFIER LPAREN
   run+=IDENTIFIER (COMMA run+=IDENTIFIER)* RPAREN #tableHeaderRelational
 ;
 
@@ -53,9 +53,10 @@ column:
 ;
 
 variableDefinition :
-        {!relational}? n=IDENTIFIER (AS newName=IDENTIFIER)?                      #variableAliasDefinitionSimple
-      | {relational}? intOrId RV_SEPARATOR  n=IDENTIFIER (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
-      | {relational}? n=IDENTIFIER (OF intOrId+)                                  #variableRunsDefinition
+         n=IDENTIFIER (AS newName=IDENTIFIER)?  #variableAliasDefinitionSimple
+      |  ({relational}? LBRACE run+=intOrId (COMMA run+=intOrId)* RBRACE)
+         n=IDENTIFIER #variableAliasDefinitionMulti
+      | {relational}? n=FQ_VARIABLE (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
 ;
 
 osem : SEMICOLON?;
@@ -63,7 +64,7 @@ osem : SEMICOLON?;
 group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
 intOrId: id=IDENTIFIER | idi=i;
 row : ROW intOrId? time? LBRACE (controlCommands)? (kc osem)* RBRACE;
-kc: ({relational}? INTEGER RV_SEPARATOR)? IDENTIFIER COLON value=cell;
+kc: (FQ_VARIABLE|IDENTIFIER) COLON value=cell;
 controlCommands: {relational}? (controlCommand osem?)+;
 controlCommand:
     PAUSE COLON (runs+=intOrId)* #controlPause
@@ -156,7 +157,7 @@ expr
 
 variable:
         name=IDENTIFIER (LBRACKET i RBRACKET)?
-      | {relational}? INTEGER? RV_SEPARATOR name=IDENTIFIER? (LBRACKET i RBRACKET)?
+      | {relational}? FQ_VARIABLE (LBRACKET i RBRACKET)?
 ;
 
 // if

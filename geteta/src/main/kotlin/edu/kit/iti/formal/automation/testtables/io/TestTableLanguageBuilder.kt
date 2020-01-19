@@ -7,12 +7,13 @@ import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.util.fail
 import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.tree.TerminalNode
 
 /**
  *
@@ -135,8 +136,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
                 }
                 is TestTableLanguageParser.VariableAliasDefinitionRelationalContext -> {
                     val newName: String? = it.newName?.text
-                    val realName = it.n.text
-                    val programRun = getProgramRun(it.intOrId())
+                    val (programRun, realName) = resolveName(it.FQ_VARIABLE(), current)
                     val v = ProgramVariable(realName, dt, lt, type,
                             modifier.state, modifier.next, programRun)
                     if (newName != null) {
@@ -145,7 +145,15 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
                     }
                     current.add(v)
                 }
-                is TestTableLanguageParser.VariableRunsDefinitionContext -> {
+                is TestTableLanguageParser.VariableAliasDefinitionMultiContext -> {
+                    val runs = it.run.map { getProgramRun(it)}
+                    for(r in runs) {
+                        val realName = it.n.text
+                        val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, r)
+                        current.add(v)
+                    }
+                }
+                /*is TestTableLanguageParser.VariableRunsDefinitionContext -> {
                     val realName = it.n.text
                     it.intOrId()
                             .map { getProgramRun(it) }
@@ -153,7 +161,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
                                 val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, i)
                                 current.add(v)
                             }
-                }
+                }*/
             }
         }
     }
@@ -211,11 +219,16 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
         currentRow = TableRow(id)
         currentRow.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
         ctx.kc().forEach {
-            val name = it.IDENTIFIER().text
-            val run = it.INTEGER()?.text?.toInt()
-            //val column = gtt.getSMVVariable(it.key.text)
-            //val cell = IOFacade.exprToSMV(it.cell(), column, gtt);
-            currentRow.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
+            val id = it.IDENTIFIER()
+            val fq = it.FQ_VARIABLE()
+            if (id != null) {
+                val name = id.text
+                val run = 0
+                currentRow.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
+            } else {
+                val (run, name) = resolveName(fq, gtt)
+                currentRow.rawFields[gtt.getProgramVariables(name, run)] = it.cell()
+            }
         }
 
         if (gtt.options.relational) {
@@ -310,4 +323,20 @@ class TimeParser : TestTableLanguageParserBaseVisitor<Duration>() {
     override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration.OpenInterval(0)
 
     override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
+}
+
+private fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> {
+    require(current.options.relational) {
+        "Full-qualified variable used in non-relational test table."
+    }
+    val parts = fqVariable.text.split("|>", "·", "::", limit = 1)
+    val name = parts[parts.size - 1]
+
+
+    val runNum = if (parts.size == 1) -1 else
+        parts[0].toIntOrNull() ?: current.programRuns.indexOf(parts[0])
+    require(runNum >= 0)  {
+        "No run is given for variable $name in line ${fqVariable.symbol.line}"
+    }
+    return runNum to name
 }

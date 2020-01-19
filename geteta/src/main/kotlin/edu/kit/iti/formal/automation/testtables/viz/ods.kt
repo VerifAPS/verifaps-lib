@@ -698,7 +698,8 @@ class ODSFormulaPrinter(
 
     override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) = ctx.left.accept(this) + "-" + ctx.right.accept(this)
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) = columnOf(ctx.IDENTIFIER().text, if (ctx.INTEGER() != null) ctx.INTEGER().text.toInt() else 0)
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) =
+            columnOf(ctx.IDENTIFIER().text, 0)//TODO for relational
 
     override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String {
         val ret = StringBuffer()

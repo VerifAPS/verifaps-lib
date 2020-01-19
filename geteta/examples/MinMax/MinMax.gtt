@@ -35,6 +35,6 @@ table MinMaxTbl {
 
 table Abc {
 	var input mode: ENUM
-	group{
+	group{ 
 	}
 }
