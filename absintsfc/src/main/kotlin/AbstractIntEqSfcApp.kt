@@ -3,7 +3,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
 import edu.kit.iti.formal.automation.st.ast.FunctionBlockDeclaration
@@ -11,12 +11,8 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st0.MultiCodeTransformation
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.*
-import org.graphstream.graph.Node
-import org.graphstream.ui.swingViewer.DefaultView
 import java.io.File
 import java.io.PrintWriter
-import org.graphstream.graph.implementations.SingleGraph
-
 
 
 fun main(args: Array<String>) = AbstractIntEqSfcApp().main(args)
@@ -43,7 +39,6 @@ class AbstractIntEqSfcApp : CliktCommand() {
     val output: File by option("--output").file().default(File("output.dot"))
 
     override fun run() {
-        Console.configureLoggingConsole()
         AbstractIntEqSfc(sfcName, leftFile, rightFile, output).run()
     }
 }

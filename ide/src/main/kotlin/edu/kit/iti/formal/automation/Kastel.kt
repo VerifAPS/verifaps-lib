@@ -14,6 +14,8 @@ import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.info
+
 import java.io.File
 import java.math.BigInteger
 
@@ -29,7 +31,6 @@ object KastelDemonstrator {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        Console.configureLoggingConsole()
         SINT.bitLength = 10; INT.bitLength = 10; DINT.bitLength = 10;LINT.bitLength = 10
         USINT.bitLength = 10; UINT.bitLength = 10;UDINT.bitLength = 10; ULINT.bitLength = 10
         runInfoPipeline(INPUT_FILE, prefix="if_%d.smv")
@@ -39,7 +40,7 @@ object KastelDemonstrator {
     fun runInfoPipeline(input: File, prefix: String) {
         val (pous, errors) = IEC61131Facade.fileResolve(input)
         errors.forEach {
-            Console.info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
+            info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
         }
 
         val program = Utils.findProgram(pous)!!
@@ -75,7 +76,7 @@ object KastelDemonstrator {
         simpFile.bufferedWriter().use {
             IEC61131Facade.printTo(it, simplified, true)
         }
-        Console.writeln("File $simpFile written")
+        info("File $simpFile written")
 
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
@@ -86,7 +87,7 @@ object KastelDemonstrator {
                     //,"MoveVelAxis1\$InVelocity"
                     //,"ReadActVelAxis1\$Velocity"
             )// v.endsWith("Velocity")
-            Console.info(String.format("%35s %s", v, (if (b) "high" else "low")))
+            info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b
         }
 
@@ -99,7 +100,7 @@ object KastelDemonstrator {
             smvFile.bufferedWriter().use {
                 imb.product.forEach { m -> m.accept(SMVPrinter(CodeWriter(it))) }
             }
-            Console.writeln("File $smvFile written")
+            info("File $smvFile written")
         }
     }
 }
@@ -148,7 +149,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
         instantiateCode(FIRST_RUN)
         instantiateCode(SECOND_RUN)
 
-        //Console.info("State: ${code.stateVars.map { it.name }}")
+        //info("State: ${code.stateVars.map { it.name }}")
 
         //equal starting state
         main.initExpr.add(
@@ -162,8 +163,8 @@ class PrivacyModelBuilder(private val code: SMVModule,
         // high variables
         val highVar = code.inputVars.filter { isHigh(it.name) }
 
-        //Console.info("lowVar: ${lowVar.map { it.name }}")
-        //Console.info("highVar: ${highVar.map { it.name }}")
+        //info("lowVar: ${lowVar.map { it.name }}")
+        //info("highVar: ${highVar.map { it.name }}")
 
 
         fun conjunction(v: List<SVariable>): SMVExpr {

@@ -1,5 +1,6 @@
 package me.tomassetti.kanvas
 
+import edu.kit.iti.formal.automation.ide.AntlrLexerFactory
 import edu.kit.iti.formal.automation.ide.CodeEditor
 import edu.kit.iti.formal.automation.ide.Lookup
 import me.tomassetti.antlr.None

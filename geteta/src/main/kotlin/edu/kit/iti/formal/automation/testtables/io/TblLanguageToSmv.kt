@@ -2,7 +2,7 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.EnumType
@@ -17,7 +17,7 @@ import java.util.*
  */
 class TblLanguageToSmv(private val columnVariable: SVariable,
                        private val columnProgramRun: Int?,
-                       private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
+                       private val context: ParseContext) : TestTableLanguageParserBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
         return ctx.chunk().map { it.accept(this) }

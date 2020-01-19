@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.automation.ide.tools
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable
+import com.ibm.icu.impl.UCaseProps
 import edu.kit.iti.formal.automation.ide.*
+import edu.kit.iti.formal.automation.ide.services.UserConfiguration
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
@@ -15,7 +17,7 @@ import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
-import kotlin.Comparator
+import kotlin.reflect.KProperty
 
 interface NavigatorService {
     //fun setRootFile(root: File)
@@ -29,9 +31,7 @@ class FileTreePanel(val lookup: Lookup) :
     val treeFiles = JTree(DefaultTreeModel(FolderTreeNode(File("").absoluteFile, this::fileFilter)))
     val txtFolder = JTextField(File("").absolutePath)
 
-    val actionOpenFile = createAction("Open File",
-            accel = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-            fontIcon = FontAwesomeRegular.EDIT) {
+    val actionOpenFile by createActionFromConfig {
         val file = treeFiles.selectionModel.selectionPath.lastPathComponent as FolderTreeNode
         if (file.file.isDirectory)
             actionGoInto.actionPerformed(null)
@@ -49,6 +49,9 @@ class FileTreePanel(val lookup: Lookup) :
             txtFolder.text = file.file.absolutePath
         }
     }
+
+    val actionRenameFile by createActionFromConfig {}
+    val actionDeleteFile by createActionFromConfig { }
 
     val actionGoInto = createAction("Go Into",
             accel = KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_DOWN_MASK),
@@ -110,7 +113,11 @@ class FileTreePanel(val lookup: Lookup) :
                 }
             }
         })
+
         contextMenu.add(actionOpenFile)
+        contextMenu.addSeparator()
+        contextMenu.add(actionRenameFile)
+        contextMenu.add(actionDeleteFile)
         contextMenu.addSeparator()
         contextMenu.add(actionGoUp)
         contextMenu.add(actionGoInto)
@@ -193,6 +200,26 @@ class FileTreePanel(val lookup: Lookup) :
         //return file.extension in suffixes
     }
 }
+
+class ActionConfigBuilder(private val actionPerformed: () -> Unit) {
+    operator fun getValue(panel: FileTreePanel, property: KProperty<*>): IdeAction {
+        val actionName = property.name
+        return createAction(
+                UserConfiguration.getActionText(actionName),
+                menuPath = UserConfiguration.getActionMenuPath(actionName),
+                accel = UserConfiguration.getActionKeyStroke(actionName),
+                prio = UserConfiguration.getActionPrio(actionName),
+                shortDesc = UserConfiguration.getActionShortDesc(actionName),
+                longDesc = UserConfiguration.getActionLongDesc(actionName),
+                smallIcon = UserConfiguration.getActionSmallIcon(actionName),
+                largeIcon = UserConfiguration.getActionLargeIcon(actionName),
+                fontIcon = UserConfiguration.getActionFontIcon(actionName),
+                f = actionPerformed
+        )
+    }
+}
+
+private fun createActionFromConfig(actionPerformed: () -> Unit) = ActionConfigBuilder(actionPerformed)
 
 fun JComponent.registerKeyboardAction(vararg actions: IdeAction, modifier: Int = JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT) {
     actions.forEach { action ->

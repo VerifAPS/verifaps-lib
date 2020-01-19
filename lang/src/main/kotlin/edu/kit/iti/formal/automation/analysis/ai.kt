@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.analysis
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.MultiDimArrayValue
 import edu.kit.iti.formal.automation.datatypes.values.Value
@@ -8,6 +8,7 @@ import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.misc.Interval
 import org.antlr.v4.runtime.misc.IntervalSet
 import java.math.BigDecimal
@@ -510,7 +511,7 @@ class IntLattice : AiLattice<IntervalSet> {
         when (literal) {
             is IntegerLit -> s.add(literal.value.toInt())
             is StringLit -> {
-                Console.info("AI: ${literal.value.hashCode()} is for ${literal.value}")
+                info("AI: ${literal.value.hashCode()} is for ${literal.value}")
                 s.add(literal.value.hashCode())
             }
             is RealLit -> {

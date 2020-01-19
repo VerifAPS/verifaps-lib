@@ -16,8 +16,8 @@ class SyntaxErrorReporter : BaseErrorListener() {
     override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                              charPositionInLine: Int, msg: String?, e: RecognitionException?) {
 
-        val parser = recognizer as Parser
-        val stack = parser.ruleInvocationStack.joinToString(", ")
+        val parser = recognizer as? Parser
+        val stack = parser?.ruleInvocationStack?.joinToString(", ")
 
         val se = SyntaxError(
                 recognizer = recognizer,
@@ -25,7 +25,7 @@ class SyntaxErrorReporter : BaseErrorListener() {
                 source = offendingSymbol?.getTokenSource()?.getSourceName(),
                 line = line,
                 charPositionInLine = charPositionInLine,
-                msg = msg, stack = stack)
+                msg = msg, stack = stack ?: "")
 
         if (isPrint) {
             System.err.printf("[syntax-error] %s:%d:%d: %s (%s)%n", se.source, line, charPositionInLine, msg, stack)

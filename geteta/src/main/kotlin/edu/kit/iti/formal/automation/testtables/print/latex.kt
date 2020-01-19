@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.print
 
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
@@ -182,7 +182,7 @@ class LatexTablePrinter(gtt: GeneralizedTestTable,
  * @author Alexander Weigl
  * @version 1 (01.03.18)
  */
-class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguageBaseVisitor<String>() {
+class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguageParserBaseVisitor<String>() {
     private fun latex(command: String, args: Iterable<String>): String {
         return "\\$command" + args.map { "{$it}" }.joinToString("")
     }

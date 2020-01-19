@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
@@ -20,6 +20,7 @@ import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
+import edu.kit.iti.formal.util.warn
 
 
 class SmvConstructionPipeline(
@@ -207,7 +208,7 @@ class NameSetterTransformer : SmvConstructionTransformer {
         val mt = model.tableModule
         val gtt = model.testTable
         if (gtt.name.isEmpty()) {
-            Console.warn("No table name given. Aborting")
+            warn("No table name given. Aborting")
         } else {
             gtt.name = "table"
         }

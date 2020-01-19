@@ -1,18 +1,20 @@
 package edu.kit.iti.formal.automation.modularization
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.NuXMVProcess
+import edu.kit.iti.formal.util.error
+import edu.kit.iti.formal.util.info
 import java.io.File
 
 fun readProgramsOrError(p: String): PouElements {
     val (c, ok) = IEC61131Facade.fileResolve(File(p))
     if (ok.isNotEmpty()) {
-        ok.forEach { Console.fatal(it.toHuman()) }
+        ok.forEach { error(it.toHuman()) }
         throw IllegalStateException("Aborted due to errors")
     }
     return c
@@ -41,13 +43,13 @@ class ModularProver(val args: ModularizationApp) {
     lateinit var proofTasks: List<ProofTask>
 
     fun printCallSites() {
-        Console.info("Call sites for the old program: ${oldProgram.filename}")
+        info("Call sites for the old program: ${oldProgram.filename}")
         oldProgram.callSites.forEach {
-            Console.info("${it.repr()} in line ${it.statement.startPosition}")
+            info("${it.repr()} in line ${it.statement.startPosition}")
         }
-        Console.info("Call sites for the new program: ${newProgram.filename}")
+        info("Call sites for the new program: ${newProgram.filename}")
         newProgram.callSites.forEach {
-            Console.info("${it.repr()} in line ${it.statement.startPosition}")
+            info("${it.repr()} in line ${it.statement.startPosition}")
         }
     }
 
@@ -88,9 +90,9 @@ class ProveStrategy{
 abstract class PredTask(val name: String) : Pred {
     abstract fun check(): Boolean
     final override fun invoke(): Boolean {
-        Console.info("Run: $name")
+        info("Run: $name")
         val b = check()
-        Console.info("Finish: $name")
+        info("Finish: $name")
         return b
     }
 }
@@ -102,12 +104,12 @@ class SourceEqualTask(val oldProgram: PouExecutable, val newProgram: PouExecutab
 
 class NuXmvTask(val smvFile: File, val logFile: File, name: String = "") : PredTask(name) {
     private fun runSolver(): Boolean {
-        Console.info("Run solver for $name")
+        info("Run solver for $name")
         val nuxmv = NuXMVProcess(smvFile)
         nuxmv.outputFile = logFile
         nuxmv.commands = NuXMVInvariantsCommand.IC3.commands as Array<String>
         val result = nuxmv.call()
-        Console.info("Solver finished for $name with $result")
+        info("Solver finished for $name with $result")
         return when (result) {
             NuXMVOutput.Verified -> true
             is NuXMVOutput.Error -> throw IllegalStateException("Error in SMV file: $smvFile")

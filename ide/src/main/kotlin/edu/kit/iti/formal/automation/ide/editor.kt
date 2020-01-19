@@ -8,16 +8,11 @@ import edu.kit.iti.formal.automation.ide.editors.IECLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.SmvLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.TestTableLanguageSupport
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
-import me.tomassetti.kanvas.AntlrTokenMakerFactory
 import me.tomassetti.kanvas.LanguageSupport
 import me.tomassetti.kanvas.NoneLanguageSupport
 import org.fife.rsta.ui.CollapsibleSectionPanel
 import org.fife.rsta.ui.search.FindToolBar
 import org.fife.rsta.ui.search.ReplaceToolBar
-import org.fife.ui.autocomplete.AbstractCompletionProvider
-import org.fife.ui.autocomplete.AutoCompletion
-import org.fife.ui.autocomplete.Completion
-import org.fife.ui.autocomplete.DefaultCompletionProvider
 import org.fife.ui.rsyntaxtextarea.ErrorStrip
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
@@ -124,6 +119,7 @@ class EditorFactoryImpl(val lookup: Lookup,
             ""
         }
         codeEditor.dirty = false
+        codeEditor.textArea.foldManager.reparse()
         return codeEditor
     }
 

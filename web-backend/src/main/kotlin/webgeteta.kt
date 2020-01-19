@@ -2,7 +2,7 @@ package edu.kit.iti.formal.automation.web
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.print.HTMLTablePrinter

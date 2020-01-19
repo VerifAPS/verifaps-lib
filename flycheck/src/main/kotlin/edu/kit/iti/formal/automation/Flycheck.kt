@@ -16,6 +16,8 @@ import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.st.ast.PouElements
+import edu.kit.iti.formal.util.info
+
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
@@ -94,8 +96,6 @@ class CheckApp : CliktCommand() {
             .multiple()
 
     override fun run() {
-        Console.configureLoggingConsole()
-
         val base = if (includeBuiltIn) BuiltinLoader.loadDefault() else PouElements()
 
         val r = FlycheckRunner(
@@ -125,13 +125,13 @@ class FlycheckRunner(
     private val errorListener = MyAntlrErrorListener(reporter)
 
     fun run() {
-        Console.writeln("Start with parsing")
+        info("Start with parsing")
         streams.forEach { parse(it) }
-        Console.writeln("Resolving...")
+        info("Resolving...")
         resolve()
-        Console.writeln("Checking...")
+        info("Checking...")
         check()
-        Console.writeln("Print.")
+        info("Print.")
         printMessages()
     }
 
@@ -162,7 +162,7 @@ class FlycheckRunner(
             if (json) {
                 println("{ok:true}")
             } else {
-                Console.writeln("Everything is fine.")
+                info("Everything is fine.")
             }
 
         } else {
@@ -171,7 +171,7 @@ class FlycheckRunner(
                 print("[$msg]\n")
                 System.out.flush()
             } else {
-                messages.forEach { Console.writeln(it.toHuman()) }
+                messages.forEach { info(it.toHuman()) }
             }
         }
     }

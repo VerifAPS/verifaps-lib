@@ -1,9 +1,11 @@
 package edu.kit.iti.formal.automation.ide.tools
 
+import edu.kit.iti.formal.automation.ide.JumpService
 import edu.kit.iti.formal.automation.ide.Lookup
 import edu.kit.iti.formal.automation.ide.ToolPane
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
+import org.antlr.v4.runtime.ParserRuleContext
 import org.netbeans.swing.outline.DefaultOutlineModel
 import org.netbeans.swing.outline.Outline
 import org.netbeans.swing.outline.RenderDataProvider
@@ -11,23 +13,27 @@ import org.netbeans.swing.outline.RowModel
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
-import javax.swing.Icon
-import javax.swing.JScrollPane
-import javax.swing.JTabbedPane
-import javax.swing.JTable
+import java.awt.Font
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.*
 import javax.swing.event.EventListenerList
 import javax.swing.event.TreeModelListener
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.TableCellRenderer
 import javax.swing.tree.TreeModel
 import javax.swing.tree.TreePath
 
+private val FONT = Font(Font.MONOSPACED, 0, 14)
 
 interface GetetaPreviewService {
     fun render(text: List<GeneralizedTestTable>)
+    fun select(tableName: String)
 }
 
 class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPreviewService {
+    private val headerRenderer: TableCellRenderer
     private var renderDataProvider: RenderDataProvider
     private var tableCellRenderer: DefaultTableCellRenderer
     val rootPane = JTabbedPane()
@@ -39,6 +45,15 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
         contentPane.add(rootPane)
         titleText = "Test Table Preview"
 
+        headerRenderer = object : DefaultTableCellRenderer() {
+            override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component {
+                val lbl = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column) as JLabel
+                lbl.horizontalAlignment = JLabel.CENTER
+                lbl.font = FONT.deriveFont(Font.BOLD)
+                return lbl
+            }
+        }
+
         //outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java,
         tableCellRenderer = object : DefaultTableCellRenderer() {
             override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean,
@@ -49,7 +64,10 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
                             is TableNode -> value.id
                             else -> value.toString()
                         }
-                return super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column)
+                val lbl = super.getTableCellRendererComponent(table, ctx, isSelected, hasFocus, row, column) as JLabel
+                lbl.horizontalAlignment = JLabel.CENTER
+                lbl.font = FONT
+                return lbl
             }
         }
 
@@ -75,12 +93,22 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
         rootPane.selectedIndex = selectedIndex
     }
 
+    override fun select(tableName: String) {
+        val titles = (0 until rootPane.tabCount).map { rootPane.getTitleAt(it) }
+        val index = titles.indexOf(tableName)
+        if (index >= 0)
+            rootPane.selectedIndex = index
+    }
+
     fun render(gtt: GeneralizedTestTable) {
-        val outline = Outline();
+        val outline = Outline()
         val scrollPane = JScrollPane(outline)
+
         outline.renderDataProvider = renderDataProvider
         outline.setDefaultRenderer(TestTableLanguageParser.CellContext::class.java, tableCellRenderer)
         rootPane.addTab(gtt.name, scrollPane)
+        outline.setSelectionMode(ListSelectionModel.SINGLE_SELECTION)
+        outline.cellSelectionEnabled = true
 
         try {
             val ioCompare = compareBy<ProgramVariable> { it.category }
@@ -94,6 +122,31 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
                     treeModel, rowModel, true, "Groups")
             outline.model = mdl
             outline.isRootVisible = true
+
+            outline.addMouseListener(object : MouseAdapter() {
+                override fun mouseClicked(e: MouseEvent) {
+                    if (e.clickCount == 2) {
+                        val sc = outline.selectedColumn
+                        val sr = outline.selectedRow
+                        val ctx = outline.getValueAt(sr, sc) as? ParserRuleContext
+                        if (ctx == null) return;
+                        val name = ctx.start.tokenSource.sourceName
+                        if (e.isControlDown) {
+                            //lookup.get<JumpService>().changeInEditor(name, ctx.start.startIndex, ctx.stop.stopIndex + 1)
+                        } else {
+                            lookup.get<JumpService>().selectInEditor(name, ctx.start.startIndex, ctx.stop.stopIndex + 1)
+                        }
+                    }
+                }
+            })
+
+
+            (0 until outline.columnCount).forEach { ci ->
+                val n = rowModel.getColumnName(ci)
+                outline.getColumn(n)?.also {
+                    it.headerRenderer = this.headerRenderer
+                }
+            }
         } catch (e: Exception) {
         }
     }

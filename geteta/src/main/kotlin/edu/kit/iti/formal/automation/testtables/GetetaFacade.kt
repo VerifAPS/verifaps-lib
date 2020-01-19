@@ -1,14 +1,13 @@
 package edu.kit.iti.formal.automation.testtables
 
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
 import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
@@ -28,6 +27,7 @@ import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.debug
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -59,7 +59,7 @@ object GetetaFacade {
                   programRun: Int, vars: ParseContext): SMVExpr {
         val ev = TblLanguageToSmv(column, programRun, vars)
         val expr = cell.accept(ev)
-        Console.debug("parsed: %s to %s", cell, expr)
+        debug("parsed: %s to %s", cell, expr)
         return expr
     }
 

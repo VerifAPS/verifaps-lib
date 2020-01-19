@@ -11,7 +11,7 @@ import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.TableRow
@@ -625,7 +625,7 @@ class ODSFormulaPrinter(
         val variable: String,
         val currentRow: Int,
         val var2column: Map<String, Int>)
-    : TestTableLanguageBaseVisitor<String>() {
+    : TestTableLanguageParserBaseVisitor<String>() {
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): String =
             ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
 

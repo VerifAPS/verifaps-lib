@@ -1,4 +1,4 @@
-package me.tomassetti.kanvas
+package edu.kit.iti.formal.automation.ide
 
 import org.antlr.v4.runtime.Lexer
 

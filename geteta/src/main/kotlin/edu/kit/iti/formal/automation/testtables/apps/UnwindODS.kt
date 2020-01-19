@@ -8,7 +8,7 @@ import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -16,6 +16,7 @@ import edu.kit.iti.formal.automation.testtables.viz.DefaultTableStyle
 import edu.kit.iti.formal.automation.testtables.viz.TableUnwinder
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithoutProgram
+import edu.kit.iti.formal.util.info
 
 /**
  *
@@ -50,15 +51,14 @@ class UnwindODS : CliktCommand(
             .default("main")
 
     override fun run() {
-        Console.configureLoggingConsole()
-        Console.info("Program: {} ith library {}", program, library)
+        info("Program: {} ith library {}", program, library)
         val smvModule = if (program != null) {
             IEC61131Facade.readProgramsWithLibrary(library, listOf(program!!), selector)[0]?.let {
                 SymbExFacade.evaluateProgram(it)
             }
         } else null
 
-        Console.info("Program {} found!", if (smvModule != null) "" else "not")
+        info("Program {} found!", if (smvModule != null) "" else "not")
 
         val gtts = table.flatMap { GetetaFacade.readTables(it) }
                 .map {
@@ -70,9 +70,9 @@ class UnwindODS : CliktCommand(
 
         gtts.forEach { gtt->
             val unwinded = TableUnwinder(gtt, HashMap())() //use default
-            Console.info("Unwinded tabe contains {} rows", unwinded.size)
+            info("Unwinded tabe contains {} rows", unwinded.size)
             gtt.constraintVariables.forEach {
-                Console.info("You need to define a cell for {} : {}, manually",
+                info("You need to define a cell for {} : {}, manually",
                         it.name, it.dataType.name)
             }
 
@@ -84,7 +84,7 @@ class UnwindODS : CliktCommand(
 
             table.run()
             table.writer.saveAs(outputFile)
-            Console.info("Table written to {}", outputFile.absolutePath)
+            info("Table written to {}", outputFile.absolutePath)
         }
     }
 }

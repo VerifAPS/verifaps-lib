@@ -4,9 +4,11 @@ import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
 import bibliothek.gui.dock.common.intern.CDockable
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable
+import bibliothek.gui.dock.control.focus.DefaultFocusRequest
 import bibliothek.gui.dock.util.Priority
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.ide.editors.STFoldParser
+import edu.kit.iti.formal.automation.ide.editors.TTFolderParser
 import edu.kit.iti.formal.automation.ide.services.*
 import edu.kit.iti.formal.automation.ide.tools.*
 import edu.kit.iti.formal.automation.st.ast.Position
@@ -18,11 +20,9 @@ import org.fife.rsta.ui.search.ReplaceDialog
 import org.fife.rsta.ui.search.SearchEvent
 import org.fife.rsta.ui.search.SearchListener
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
-import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager
 import org.fife.ui.rtextarea.SearchEngine
 import org.fife.ui.rtextarea.SearchResult
-import org.slf4j.LoggerFactory
 import java.awt.*
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
@@ -34,12 +34,6 @@ import java.util.*
 import javax.swing.*
 import javax.swing.text.BadLocationException
 import kotlin.properties.Delegates
-
-/**
- *
- */
-val IDE_LOGGER = LoggerFactory.getLogger("ide")
-
 
 /**
  *
@@ -357,7 +351,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         val e = globalPort.focusHistory.history.find { it is CodeEditor }
         lookup.register(editor)
         globalPort.addDockable(editor)
-        if(e!=null)
+        if (e != null)
             editor.setLocationsAside(e)
         editor.isVisible = true
     }
@@ -402,9 +396,40 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         lookup.register(window)
     }
 
-    override fun jumpTo(editor: CodeEditor, position: Position) {
-        globalPort.controller.setFocusedDockable(editor.intern(), true)
-        editor.textArea.caretPosition = position.offset
+    override fun jumpTo(editor: CodeEditor, position: Position?) {
+        globalPort.controller.setFocusedDockable(
+                editor.intern(), editor.textArea, true, true, true
+        )
+        if (position != null)
+            editor.textArea.caretPosition = position.offset
+    }
+
+    override fun selectInEditor(name: String, start: Int, stop: Int?) {
+        //lookup.getAll<CodeEditor>().forEach {
+        globalPort.dockables.filterIsInstance<CodeEditor>().forEach {
+            if (it.titleText == name || it.file.toString() == name) {
+                jumpTo(it)
+                it.textArea.caretPosition = start
+                it.textArea.selectionStart = start
+                if (stop != null) {
+                    it.textArea.selectionEnd = stop
+                }
+            }
+        }
+    }
+
+    override fun changeInEditor(editorName: String, start: Int, stop: Int, newText: String) {
+        //lookup.getAll<CodeEditor>().forEach {
+        globalPort.dockables.filterIsInstance<CodeEditor>().forEach {
+            if (it.titleText == editorName || it.file.toString() == editorName) {
+                jumpTo(it)
+                it.textArea.caretPosition = start
+                it.textArea.selectionStart = start
+                if (stop != null) {
+                    it.textArea.selectionEnd = stop
+                }
+            }
+        }
     }
 
     fun showFrame() {
@@ -470,12 +495,14 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             })
 
 
-            val configPaths = ConfigurationPaths()
-            val appConfig = ApplicationConfiguration()
+            val configPaths = ConfigurationPaths
+            val appConfig = ApplicationConfiguration
+            val userConfig = UserConfiguration
             appConfig.properties.load(configPaths.configuration.bufferedReader())
 
             rootLookup.register(configPaths)
             rootLookup.register(appConfig)
+            rootLookup.register(userConfig)
             rootLookup.register<RecentFilesService>(RecentFilesImpl(rootLookup))
             rootLookup.register(Colors)
 
@@ -483,7 +510,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             val editorFactory = EditorFactoryImpl(rootLookup, dockableFactory)
             rootLookup.register<DockableCodeEditorFactory>(dockableFactory)
             rootLookup.register<EditorFactory>(editorFactory)
-            FoldParserManager.get().addFoldParserMapping(editorFactory.ttSupport.mimeType, CurlyFoldParser())
+            FoldParserManager.get().addFoldParserMapping(editorFactory.ttSupport.mimeType, TTFolderParser())
             FoldParserManager.get().addFoldParserMapping(editorFactory.iecSupport.mimeType, STFoldParser())
 
             UIManager.put("Tree.collapsedIcon", IconFontSwing.buildIcon(FontAwesomeRegular.CARET_SQUARE_RIGHT, 12f))
@@ -591,3 +618,6 @@ private fun JComponent.getOrCreate(key: String): JMenu {
     this.add(m)
     return m
 }
+
+private val CControl.dockables: List<CDockable>
+    get() = (0 until cDockableCount).map { getCDockable(it) }

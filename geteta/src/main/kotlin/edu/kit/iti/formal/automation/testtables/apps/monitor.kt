@@ -5,12 +5,13 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.monitor.*
 import edu.kit.iti.formal.automation.testtables.monitor.Monitor
+import edu.kit.iti.formal.util.info
 import java.io.File
 
 /**
@@ -50,14 +51,13 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
     val disableCombinedMonitor by option("--disable-combined").flag("--combined")
 
     override fun run() {
-        Console.configureLoggingConsole()
-        Console.info("Files: $table")
-        Console.info("Filter: $filter")
+        info("Files: $table")
+        info("Filter: $filter")
 
         if (writeHeader && format == CodeOutput.CPP) {
             output.absoluteFile.parentFile.mkdirs()
             for ((a, b) in CPP_RESOURCES) {
-                Console.info("Write resource file $a.")
+                info("Write resource file $a.")
                 File(output.absoluteFile.parentFile, a).bufferedWriter().use { it.write(b) }
             }
         }
@@ -67,7 +67,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             it.generateSmvExpression()
             it
         }.filter { filter.isEmpty() || it.name in filter }
-        Console.info("Tables: ${gtts.joinToString { it.name }}")
+        info("Tables: ${gtts.joinToString { it.name }}")
 
 
         val pairs = gtts.map { it to GetetaFacade.constructTable(it).automaton }

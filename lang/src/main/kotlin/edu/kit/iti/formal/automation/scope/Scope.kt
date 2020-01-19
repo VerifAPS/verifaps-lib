@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.scope
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
+import edu.kit.iti.formal.util.warn
 import java.util.*
 import java.util.function.Supplier
 import java.util.stream.Stream
@@ -357,7 +358,7 @@ data class Scope(val variables: VariableScope = VariableScope())
             return null
 
         if (resolved.size > 1) {
-            Console.warn("Ambiguous call for reference in $callee")
+            warn("Ambiguous call for reference in $callee")
         }
 
         return resolved[0]

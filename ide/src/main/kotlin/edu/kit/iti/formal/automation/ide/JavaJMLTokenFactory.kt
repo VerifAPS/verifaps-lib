@@ -1,11 +1,10 @@
-package me.tomassetti.kanvas
+package edu.kit.iti.formal.automation.ide
 
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Recognizer
 import org.fife.ui.rsyntaxtextarea.Token
 import org.fife.ui.rsyntaxtextarea.TokenImpl
 import org.fife.ui.rsyntaxtextarea.TokenMakerBase
-import org.fife.ui.rsyntaxtextarea.TokenTypes
 import java.util.*
 import javax.swing.text.Segment
 
@@ -25,7 +24,7 @@ class AntlrTokenMakerFactory(val lexerFactory: AntlrLexerFactory) : TokenMakerBa
 
 
     override fun getTokenList(text: Segment?, initialTokenType: Int, startOffset: Int): Token {
-        var initialTokenType = initialTokenType
+        var initTokType = initialTokenType
         val startTime = System.currentTimeMillis()
         resetTokenList()
         requireNotNull(text)
@@ -34,13 +33,13 @@ class AntlrTokenMakerFactory(val lexerFactory: AntlrLexerFactory) : TokenMakerBa
         val lexer = lexerFactory.create(charSeq)
 
         //initialTokenType contains the list of mode stack of the lexer
-        var mode = initialTokenType and 0xF //using four bits for lexer mode
+        var mode = initTokType and 0xF //using four bits for lexer mode
         lexer._mode = mode
-        initialTokenType = initialTokenType shr 4
-        while (initialTokenType > 0) {
-            mode = initialTokenType and 0xF //using four bits for lexer mode
+        initTokType = initTokType shr 4
+        while (initTokType > 0) {
+            mode = initTokType and 0xF //using four bits for lexer mode
             lexer.pushMode(mode)
-            initialTokenType = initialTokenType shr 4
+            initTokType = initTokType shr 4
         }
 
         val tokens = ArrayList<org.antlr.v4.runtime.Token>()
@@ -63,7 +62,22 @@ class AntlrTokenMakerFactory(val lexerFactory: AntlrLexerFactory) : TokenMakerBa
         }
 
         if (tokens.size == 0) {
-            addNullToken()
+            currentToken = TokenImpl(text,
+                    text.offset,
+                    text.offset,
+                    startOffset, 0, 0)
+
+            val token = object : TokenImpl() {
+                override fun isPaintable(): Boolean {
+                    return false
+                }
+            }
+            token.text = null
+            token.offset = -1
+            token.nextToken = null
+            token.type = initialTokenType
+            currentToken.nextToken=token
+            return currentToken
         } else {
             mode = 0
             // skip last artificial '\n' token
@@ -105,7 +119,7 @@ class AntlrTokenMakerFactory(val lexerFactory: AntlrLexerFactory) : TokenMakerBa
         }
 
         val stop = System.currentTimeMillis()
-        println("JavaJMLTokenFactory.getTokenList : " + (stop - startTime) + " ms")
+        //println("JavaJMLTokenFactory.getTokenList : " + (stop - startTime) + " ms")
         return firstToken
     }
 

@@ -2,8 +2,9 @@ package edu.kit.iti.formal.automation.modularization
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
+import edu.kit.iti.formal.util.info
 import java.io.File
 
 /**
@@ -39,15 +40,15 @@ class ModularizationApp() : CliktCommand() {
         if (list) {
             m.printCallSites()
         } else {
-            Console.info("Output folder: ${outputFolder}")
+            info("Output folder: ${outputFolder}")
             m.printCallSites()
-            Console.info("Generate SMV files")
+            info("Generate SMV files")
             m.prepare()
-            Console.info("Files generated")
+            info("Files generated")
             if (run) {
-                Console.info("Start solvers")
+                info("Start solvers")
                 m.runSolvers()
-                Console.info("Solvers ran")
+                info("Solvers ran")
             }
         }
     }

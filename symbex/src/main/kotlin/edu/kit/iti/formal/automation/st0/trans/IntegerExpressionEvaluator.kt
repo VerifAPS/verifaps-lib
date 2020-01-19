@@ -22,11 +22,12 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.util.error
 import java.math.BigInteger
 
 /**
@@ -50,7 +51,7 @@ class IntegerExpressionEvaluator(private val scope: Scope) : AstVisitor<BigInteg
         if (op === Operators.MULT)
             return left * right
 
-        Console.error("Unsupported operation %s", op)
+        error("Unsupported operation %s", op)
         return left
     }
 
@@ -61,7 +62,7 @@ class IntegerExpressionEvaluator(private val scope: Scope) : AstVisitor<BigInteg
         if (op === Operators.MINUS)
             return -left
 
-        Console.error("Unsupported operation %s", op)
+        error("Unsupported operation %s", op)
         return left
     }
 
@@ -79,7 +80,7 @@ class IntegerExpressionEvaluator(private val scope: Scope) : AstVisitor<BigInteg
         try {
             return BigInteger.ZERO//sv.getValue();
         } catch (e: ClassCastException) {
-            Console.error("%s isType not a integer variable", id)
+            error("%s isType not a integer variable", id)
             return BigInteger.ZERO
         }
 

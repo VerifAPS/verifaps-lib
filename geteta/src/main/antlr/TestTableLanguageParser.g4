@@ -1,10 +1,12 @@
-grammar TestTableLanguage;
+parser grammar TestTableLanguageParser;
+
+options {tokenVocab = TestTableLanguageLexer;}
+
 
 @header{
 import java.util.*;
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter;
 }
-
 
 @lexer::members {
 private SyntaxErrorReporter errorReporter = new SyntaxErrorReporter();
@@ -56,7 +58,7 @@ variableDefinition :
       | {relational}? n=IDENTIFIER (OF intOrId+)                                  #variableRunsDefinition
 ;
 
-osem : ';'?;
+osem : SEMICOLON?;
 
 group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
 intOrId: id=IDENTIFIER | idi=i;
@@ -83,22 +85,16 @@ duration_flags:
     | HFLAG INPUT?
 ;
 
-OMEGA:'omega';
-
 freeVariable:
     GVAR name=IDENTIFIER COLON dt=IDENTIFIER (WITH constraint=cell)?
 ;
-GVAR:'gvar';
-WITH:'with';
 
 vardt : arg=IDENTIFIER COLON dt=IDENTIFIER;
-COLON:':';
 
 /*function : 'function' name=IDENTIFIER '(' vardt (',' vardt)*  ')'
             ':' rt=IDENTIFIER STCODE ;*/
 
 function : FUNCTION;
-FUNCTION : ('FUNCTION'|'function') .*? ('END_FUNCTION'|'end_function');
 
 //
 cell : chunk (COMMA chunk)*;
@@ -172,70 +168,3 @@ guardedcommand
       IF (GUARD c=expr ARROW_RIGHT t=expr )+
       FI    // guarded command (case)
 ;
-
-
-
-VAR:'var';
-AS:'as';
-OF:'of';
-OPTIONS:'options';
-PAUSE:'\\pause';
-BACKWARD:'\\backward';
-PLAY:'\\play';
-ROW:'row';
-GROUP:'group';
-STATE: 'state';
-ARROW_RIGHT: '->';
-INPUT: 'input';
-OUTPUT: 'output';
-RELATIONAL : 'relational';
-TABLE:'table';
-LBRACE:'{';
-RBRACE:'}';
-PFLAG: 'progress';
-HFLAG: 'hold';
-AND: '&' | 'AND';
-COMMA:	',';
-DIV: '/';
-EQUALS: '=';
-GREATER_EQUALS:	'>=';
-GREATER_THAN: '>' ;
-LBRACKET: '[' ;
-LESS_EQUALS:	'<=';
-LESS_THAN:'<';
-LPAREN: '(';
-MINUS: '-';
-MOD: '%' | 'MOD' | 'mod';
-MULT: '*';
-NOT: '!' | 'NOT' | 'not';
-NOT_EQUALS: '<>' | '!=';
-OR: '|' | 'OR';
-PLUS: '+';
-POWER: '**';
-RBRACKET: ']';
-RPAREN: ')';
-XOR: 'XOR' | 'xor';
-IF: 'if';
-FI: 'fi';
-//ELSE: 'else';
-GUARD: '::';
-T : 'TRUE' | 'true';
-F : 'FALSE' | 'false';
-COLUMN : 'column' | 'COLUMN';
-NEXT : 'next';
-ASSUM : 'ASSUME' | 'assume';
-ASSERT : 'ASSERT' | 'assert';
-
-IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
-
-RV_SEPARATOR : '|>'|'·'|'$';
-
-fragment DIGIT: '0' .. '9';
-fragment NUMBER: DIGIT+;
-//FLOAT:   '-'? NUMBER '.' NUMBER?;
-INTEGER: NUMBER;
-
-WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);
-COMMENT      : '/*' .*? '*/' -> channel(HIDDEN);
-LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
-ERROR_CHAR: . -> channel(HIDDEN);

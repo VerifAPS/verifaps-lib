@@ -12,7 +12,6 @@ import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
-import me.tomassetti.kanvas.AntlrLexerFactory
 import me.tomassetti.kanvas.BaseLanguageSupport
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer

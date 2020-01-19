@@ -3,7 +3,7 @@ package edu.kit.iti.formal.automation.rvt
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.builtin.BuiltinLoader
@@ -17,8 +17,11 @@ import edu.kit.iti.formal.smv.NuXMVProcess
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.util.fail
+import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
+import kotlin.system.exitProcess
 
 object RvtAps {
     @JvmStatic
@@ -99,8 +102,6 @@ class RvtApsApp : CliktCommand(
     val untilMiterEndTrigger by option("--until-miter-cond", metavar = "FILE").file()
 
     override fun run() {
-        Console.configureLoggingConsole()
-
         val newModule = loadPouExecutable(library, newVersion, newName)
         val oldModule = loadPouExecutable(library, oldVersion, oldName)
         val factory = when (miter) {
@@ -126,20 +127,18 @@ class RvtApsApp : CliktCommand(
         pipeline.build()
         if (!doNotVerify) pipeline.verify()
         else
-            Console.info("Skip verification on user request.")
+            info("Skip verification on user request.")
     }
 }
 
 internal fun loadPouExecutable(library: List<File>, file: File, name: String?): PouExecutable {
-    Console.info("Parse program ${file.absolutePath} with libraries ${library}")
+    info("Parse program ${file.absolutePath} with libraries ${library}")
     val r = if (name != null)
         IEC61131Facade.readProgramsWithLibrary(library, listOf(file), name)[0]
     else
         IEC61131Facade.readProgramsWithLibrary(library, listOf(file))[0]
     if (r == null) {
-        Console.fatal("Could not find a program in $file. Given selector: $name")
-        System.exit(2)
-        throw IllegalStateException()
+        fail("Could not find a program in $file. Given selector: $name")
     } else return r
 }
 
@@ -158,17 +157,17 @@ class RvtApsPipeline(val oldModule: PouExecutable,
     var outputSMV: File? = null
 
     fun build() {
-        Console.info("Symbolic Execution!")
+        info("Symbolic Execution!")
         val newVersion = SymbExFacade.evaluateProgram(newModule, disableST0Pipeline)
         val oldVersion = SymbExFacade.evaluateProgram(oldModule, disableST0Pipeline)
 
-        Console.info("Construction of Miter")
+        info("Construction of Miter")
         val rvt = reveFactory(oldVersion, newVersion)
         rvt.run()
 
         //write output
         outputSMV = File(outputDirectory, outputSMVOutputName)
-        Console.info("Create output folder $outputDirectory")
+        info("Create output folder $outputDirectory")
         outputDirectory.mkdirs()
         outputSMV?.bufferedWriter()?.use { fw -> rvt.writeTo(fw) }
     }
@@ -184,11 +183,11 @@ class RvtApsPipeline(val oldModule: PouExecutable,
         nuxmvResult = mc.call()
         when (nuxmvResult!!) {
             is NuXMVOutput.Verified ->
-                Console.info("verified")
+                info("verified")
             is NuXMVOutput.Cex ->
-                Console.info("not verified, counterexample available in log file")
+                info("not verified, counterexample available in log file")
             is NuXMVOutput.Error ->
-                Console.error("Error occured in nuXmv. Please refer to log file for more information.")
+                error("Error occured in nuXmv. Please refer to log file for more information.")
         }
     }
 

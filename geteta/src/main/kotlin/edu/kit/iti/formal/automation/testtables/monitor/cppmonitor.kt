@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.monitor
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -16,7 +16,9 @@ import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.find
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.error
 import edu.kit.iti.formal.util.joinInto
+import edu.kit.iti.formal.util.warn
 
 val EMPTY_COLUMN = SVariable("ERROR", SMVTypes.BOOLEAN)
 
@@ -294,7 +296,7 @@ fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
             .toHashSet()
 
     if (assignments.size > 1) {
-        Console.warn("There are possible conflicting assignments for global variable $gv in one row. $assignments")
+        warn("There are possible conflicting assignments for global variable $gv in one row. $assignments")
     }
 
     return assignments.firstOrNull()
@@ -486,7 +488,7 @@ private fun readResource(name: String): Pair<String, String> {
     val content = CppMonitorGenerator.javaClass.getResourceAsStream("/monitor/$name")
             ?.use { it.bufferedReader().readText() }
     if (content == null) {
-        Console.error("Could not read resource: $name")
+        error("Could not read resource: $name")
     }
     return name to (content ?: "")
 }

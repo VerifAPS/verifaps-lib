@@ -15,6 +15,8 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.warn
+
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
@@ -179,7 +181,7 @@ object IEC61131Facade {
             : List<PouExecutable?> {
         return programs.map {
             val (elements, error) = filefr(libraryElements + it)
-            error.forEach { Console.warn(it.toHuman()) }
+            error.forEach { warn(it.toHuman()) }
             selector(elements)
         }
     }

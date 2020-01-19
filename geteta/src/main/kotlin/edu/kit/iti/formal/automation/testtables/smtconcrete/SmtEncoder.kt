@@ -2,7 +2,7 @@ package edu.kit.iti.formal.automation.testtables.smtconcrete
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
@@ -237,7 +237,7 @@ class SmtEncoder(
 class TblExprToSExpr(columnVar: String,
                      val programVar: Set<String>,
                      val access: String? = null)
-    : TestTableLanguageBaseVisitor<SExpr>() {
+    : TestTableLanguageParserBaseVisitor<SExpr>() {
 
     val translation: (String) -> String = { it }
 

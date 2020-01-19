@@ -6,7 +6,7 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.smv.SMVType
@@ -539,7 +539,7 @@ fun TableRow.getUsedGlobalVariables(gtt: GeneralizedTestTable): List<ConstraintV
     fun contains(cv: ConstraintVariable, ctx: TestTableLanguageParser.CellContext?): Boolean {
         return if (ctx != null) {
             var found = false
-            ctx.accept(object : TestTableLanguageBaseVisitor<Unit>() {
+            ctx.accept(object : TestTableLanguageParserBaseVisitor<Unit>() {
                 override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) {
                     if (ctx.name.text == cv.name) found = true
                     super.visitVariable(ctx)

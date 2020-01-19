@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.print
 
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
@@ -149,7 +149,7 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
             }
 }
 
-class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageBaseVisitor<String>() {
+class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageParserBaseVisitor<String>() {
     override fun visitCell(ctx: TestTableLanguageParser.CellContext) = ctx.chunk().joinToString(",") { it.accept(this) }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext?): String = options.dontCare

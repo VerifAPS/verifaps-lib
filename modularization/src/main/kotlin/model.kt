@@ -1,12 +1,13 @@
 package edu.kit.iti.formal.automation.modularization
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.st.ast.InvocationStatement
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.util.error
 import java.util.*
 
 /**
@@ -93,7 +94,7 @@ class CallSiteFinder(val entry: ProgramDeclaration, val pous: PouElements) {
                     val fbd = (vd.dataType as FunctionBlockDataType).functionBlock
                     fbd.accept(this)
                 } catch (e: IllegalStateException) {
-                    Console.error("Could not find the function block for call" +
+                    error("Could not find the function block for call" +
                             " ${invocation.ruleContext?.text} in " +
                             " line ${invocation.startPosition.lineNumber}")
                 }

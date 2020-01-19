@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.testtables.model.ColumnCategory
 import edu.kit.iti.formal.automation.testtables.model.ControlCommand
@@ -11,7 +11,7 @@ import edu.kit.iti.formal.automation.testtables.rtt.resetVariable
 import edu.kit.iti.formal.automation.testtables.rtt.setVariable
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SLiteral
-import kotlin.system.exitProcess
+import edu.kit.iti.formal.util.fail
 
 /**
  * Translate the [ControlCommand.Pause] into the assumption
@@ -62,9 +62,8 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
                             if (isJumpTarget) SLiteral.TRUE else SLiteral.FALSE
 
                     if (tableRow.duration.isOneStep) {
-                        Console.fatal("The table row ${tableRow.id} in table ${model.testTable.name} is addressed by a backward-jump, " +
+                        fail("The table row ${tableRow.id} in table ${model.testTable.name} is addressed by a backward-jump, " +
                                 "but does not have the required of duration [1,1]. Please split up the row manually. ")
-                        exitProcess(1)
                     }
                 }
             }

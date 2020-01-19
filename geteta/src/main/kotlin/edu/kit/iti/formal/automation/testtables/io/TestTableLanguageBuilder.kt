@@ -1,24 +1,25 @@
 package edu.kit.iti.formal.automation.testtables.io
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.util.fail
+import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.CharStreams
-import kotlin.system.exitProcess
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (06.07.18)
  */
-class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
+class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     val testTables = arrayListOf<GeneralizedTestTable>()
     private lateinit var current: GeneralizedTestTable
     private val scope = Scope.defaultScope()
@@ -54,10 +55,9 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         current.options.relational = true
         current.programRuns = ctx.run.map { it.text }
         if (current.programRuns.size <= 1) {
-            Console.fatal(
+            fail(
                     "The number of program runs are less than 2 for relational table ${current.name}. " +
                             "Either this is not a relational table, or program runs are missing.")
-            exitProcess(1)
         }
     }
 
@@ -66,8 +66,7 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
         val nodeIds = mutableSetOf<String>()
         current.region.visit { node ->
             if (node.id in nodeIds) {
-                Console.fatal("Duplication of row/group id ${node.id}.")
-                exitProcess(2)
+                fail("Duplication of row/group id ${node.id}.")
             }
             nodeIds.add(node.id)
         }
@@ -176,7 +175,7 @@ class TestTableLanguageBuilder() : TestTableLanguageBaseVisitor<Unit>() {
     }
 }
 
-class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBaseVisitor<TableNode>() {
+class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageParserBaseVisitor<TableNode>() {
     var currentId = 0
 
 
@@ -220,7 +219,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
         }
 
         if (gtt.options.relational) {
-            ctx.controlCommands()?.let { it.accept(this) }
+            ctx.controlCommands()?.accept(this)
         }
         return currentRow
     }
@@ -232,7 +231,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
             val play = ControlCommand.Play(run)
             if (play in currentRow.controlCommands) {
                 currentRow.controlCommands.remove(play)
-                Console.info("Contradition with play-command in row ${currentRow.id}. Removing the play-command.")
+                info("Contradition with play-command in row ${currentRow.id}. Removing the play-command.")
             }
             currentRow.controlCommands.add(pause)
         }
@@ -246,7 +245,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
             val play = ControlCommand.Play(run)
             if (pause in currentRow.controlCommands) {
                 currentRow.controlCommands.remove(pause)
-                Console.info("Contradition with pause-command in row ${currentRow.id}. Removing the pause-command.")
+                info("Contradition with pause-command in row ${currentRow.id}. Removing the pause-command.")
             }
             currentRow.controlCommands.add(play)
         }
@@ -262,7 +261,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
                     .filterIsInstance<ControlCommand.Backward>()
                     .filter { it.affectedProgramRun == run }
             if (conflict.isNotEmpty())
-                Console.info("A backward-command already exists in row ${currentRow.id}. " +
+                info("A backward-command already exists in row ${currentRow.id}. " +
                         "Removing the previous command.")
             currentRow.controlCommands.removeAll(conflict)
             currentRow.controlCommands.add(backward)
@@ -271,7 +270,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageBa
     }
 }
 
-class TimeParser : TestTableLanguageBaseVisitor<Duration>() {
+class TimeParser : TestTableLanguageParserBaseVisitor<Duration>() {
     override fun visitTimeSingleSided(ctx: TestTableLanguageParser.TimeSingleSidedContext): Duration {
         val lower =
                 ctx.INTEGER().text.toInt() +

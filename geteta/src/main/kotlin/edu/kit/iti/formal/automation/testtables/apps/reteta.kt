@@ -3,7 +3,7 @@ package edu.kit.iti.formal.automation.testtables.apps
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
@@ -16,9 +16,11 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
 import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
 import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.util.fail
+import edu.kit.iti.formal.util.info
+import edu.kit.iti.formal.util.warn
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.system.exitProcess
 
 object RetetaApp {
@@ -65,8 +67,7 @@ class Reteta : CliktCommand(
 
     override fun run() {
         if (table.isEmpty() || programs.isEmpty()) {
-            Console.fatal("No code or table file given.")
-            System.exit(1)
+            fail("No code or table file given.")
         }
         //read program
         val programs = readPrograms()
@@ -131,7 +132,7 @@ class Reteta : CliktCommand(
     fun readPrograms(): List<PouExecutable> {
         val programs = IEC61131Facade.readProgramsWithLibrary(library, programs)
         return if (programs.any { it == null }) {
-            Console.fatal("In some given program there is no PROGRAM declaration!")
+            fail("In some given program there is no PROGRAM declaration!")
             exitProcess(1)
             listOf()
         } else {
@@ -141,13 +142,13 @@ class Reteta : CliktCommand(
 }
 
 internal fun GeneralizedTestTable.simplify(): GeneralizedTestTable {
-    Console.info("Apply omega simplification")
+    info("Apply omega simplification")
     val os = OmegaSimplifier(this)
     os.run()
     if (!os.ignored.isEmpty()) {
-        Console.warn("I ignore following rows: %s, because they are behind an \\omega duration.%n", os.ignored)
+        warn("I ignore following rows: %s, because they are behind an \\omega duration.%n", os.ignored)
         return os.product
     }
-    Console.info("No rows unreachable!")
+    info("No rows unreachable!")
     return this
 }

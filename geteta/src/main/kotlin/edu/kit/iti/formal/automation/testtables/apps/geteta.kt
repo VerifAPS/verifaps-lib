@@ -24,7 +24,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.jferard.fastods.tool.FastOds
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.rvt.LineMap
@@ -40,6 +40,8 @@ import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.findProgram
+import edu.kit.iti.formal.util.info
+import edu.kit.iti.formal.util.warn
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -92,10 +94,8 @@ class GetetaApp : CliktCommand(
             help = "verification technique").convert { VerificationTechnique.valueOf(it) }.default(VerificationTechnique.IC3)
 
     override fun run() {
-        Console.configureLoggingConsole()
-
         val gtts = table.flatMap {
-            Console.info("Use table file ${it.absolutePath}")
+            info("Use table file ${it.absolutePath}")
             GetetaFacade.readTables(it)
         }.map {
             it.ensureProgramRuns()
@@ -104,7 +104,7 @@ class GetetaApp : CliktCommand(
         }
 
         //
-        Console.info("Parse program ${program.absolutePath} with libraries ${library}")
+        info("Parse program ${program.absolutePath} with libraries ${library}")
         val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0]
                 ?: throw IllegalStateException("No program given in $program")
 
@@ -113,20 +113,20 @@ class GetetaApp : CliktCommand(
             gtts.forEach { it.options.mode = mode!! }
 
         gtts.forEach {
-            Console.info("Mode is ${it.options.mode} for table ${it.name}")
+            info("Mode is ${it.options.mode} for table ${it.name}")
         }
 
         val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
-        Console.info("Program evaluation")
+        info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
-        Console.info("Super enum built")
+        info("Super enum built")
 
         val tt = gtts.map { gtt -> GetetaFacade.constructSMV(gtt, superEnumType) }
-        Console.info("SMV for table constructed")
+        info("SMV for table constructed")
 
         if (drawAutomaton) {
-            Console.info("Automaton drawing requested. This may took a while.")
+            info("Automaton drawing requested. This may took a while.")
             gtts.zip(tt).forEach { (gtt, tt) ->
                 val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
                         gtt, tt.automaton)
@@ -134,13 +134,13 @@ class GetetaApp : CliktCommand(
                 ad.show = showAutomaton
                 ad.run()
                 if (showAutomaton)
-                    Console.info("Image viewer should open now")
+                    info("Image viewer should open now")
             }
         } else {
-            Console.info("For drawing the automaton use: `--draw-automaton'.")
+            info("For drawing the automaton use: `--draw-automaton'.")
         }
 
-        Console.info("Constructing final SMV file.")
+        info("Constructing final SMV file.")
         val modTable = tt.map { it.tableModule }
         val mainModule = MultiModelGluer().apply {
             val pn = gtts.first().programRuns.first() // only one run in geteta
@@ -156,10 +156,10 @@ class GetetaApp : CliktCommand(
         val folder = File(this.table.first().parent,
                 this.table.first().nameWithoutExtension).absolutePath
         val verificationTechnique = gtts.first().options.verificationTechnique
-        Console.info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
+        info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
         val nuxmv = findProgram(nuxmv)
         if (nuxmv == null) {
-            Console.error("Could not find ${this.nuxmv}.")
+            error("Could not find ${this.nuxmv}.")
             exitProcess(1)
             return
         }
@@ -184,11 +184,11 @@ class GetetaApp : CliktCommand(
 
         if (b is NuXMVOutput.Cex) {
             if (cexPrinter) useCounterExamplePrinter(b, tt, lineMap, code)
-            else Console.info("Use `--cexout' to print a cex analysation.")
+            else info("Use `--cexout' to print a cex analysation.")
             if (runAnalyzer) runCexAnalysation(b, tt)
-            else Console.info("Use `--row-map' to print possible row mappings.")
+            else info("Use `--row-map' to print possible row mappings.")
         }
-        Console.info("STATUS: $status")
+        info("STATUS: $status")
         exitProcess(errorLevel)
     }
 
@@ -199,16 +199,16 @@ class GetetaApp : CliktCommand(
         }
 
         mappings.forEach { mapping ->
-            Console.info("MAPPING: ==========")
+            info("MAPPING: ==========")
             mapping.forEachIndexed { i, m ->
-                Console.info("{}: {}", i, m.asRowList())
+                info("{}: {}", i, m.asRowList())
             }
-            Console.info("/End of MAPPING")
+            info("/End of MAPPING")
         }
 
         when {
-            mappings.isEmpty() -> Console.warn("no row mapping found!")
-            odsExport == null -> Console.info("Use `--ods <table.ods>' to generate a counterexample tables.")
+            mappings.isEmpty() -> warn("no row mapping found!")
+            odsExport == null -> info("Use `--ods <table.ods>' to generate a counterexample tables.")
             odsExport != null -> {
                 val w = ODSCounterExampleWriter(result.counterExample)
                 tt.zip(mappings).forEach { (t, m) ->
