@@ -105,7 +105,7 @@ class GetetaApp : CliktCommand(
 
         //
         info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWithLibrary(library, listOf(program))[0]
+        val code = IEC61131Facade.readProgramsWLP(library, listOf(program))[0]
                 ?: throw IllegalStateException("No program given in $program")
 
         // override mode

@@ -3,7 +3,6 @@ package edu.kit.iti.formal.smv
 import mu.KLogging
 import org.jdom2.input.SAXBuilder
 import java.io.File
-import java.io.IOException
 import java.io.StringReader
 import java.util.concurrent.Callable
 
@@ -72,8 +71,7 @@ class ProcessRunner(val commandLine: Array<String>,
  *
  * @author Alexander Weigl
  */
-class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
-    var commands: Array<String> = arrayOf("quit")
+class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMVOutput> {
     var executablePath = "nuXmv"
     var workingDirectory = moduleFile.parentFile
     var outputFile = File(workingDirectory, "nuxmv.log")
@@ -87,7 +85,6 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
             logger.info(commands.joinToString(" "))
             logger.info("Working Directory: {}", workingDirectory)
             logger.info("Result in {}", outputFile)
-            val commandFile = createIC3CommandFile()
             val pr = ProcessRunner(commands,
                     commandFile,
                     workingDirectory,
@@ -101,20 +98,20 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
         return NuXMVOutput.Error()
     }
 
-    @Throws(IOException::class)
-    private fun createIC3CommandFile(): File {
-        workingDirectory.mkdirs()
-        val f = File(workingDirectory, COMMAND_FILE)
-        f.bufferedWriter().use { fw ->
-            (PREAMBLE + commands + POSTAMBLE).forEach { fw.write(it + "\n") }
-        }
-        return f
-    }
-
     companion object : KLogging() {
-        val COMMAND_FILE = "commands.xmv"
     }
 }
+
+val COMMAND_FILE = "commands.xmv"
+//val commandFile = writeNuxmvCommandFile(commands, File(workingDirectory, NuXMVProcess.COMMAND_FILE))
+
+fun writeNuxmvCommandFile(commands: Array<String>, f: File): File {
+    f.bufferedWriter().use { fw ->
+        (PREAMBLE + commands + POSTAMBLE).forEach { fw.write(it + "\n") }
+    }
+    return f
+}
+
 
 /**
  *

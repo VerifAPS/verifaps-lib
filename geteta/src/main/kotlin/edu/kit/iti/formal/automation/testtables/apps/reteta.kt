@@ -15,7 +15,10 @@ import edu.kit.iti.formal.automation.testtables.algorithms.OmegaSimplifier
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
 import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
+import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
+import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.util.currentDebugLevel
 import edu.kit.iti.formal.util.fail
 import edu.kit.iti.formal.util.info
 import edu.kit.iti.formal.util.warn
@@ -26,13 +29,20 @@ import kotlin.system.exitProcess
 object RetetaApp {
     @JvmStatic
     fun main(args: Array<String>) {
-        Reteta().main(args)
+        try {
+            Reteta().main(args)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            exitProcess(-1)
+        }
     }
 }
 
 class Reteta : CliktCommand(
         epilog = "Reteta -- Tooling for Relational Test Tables.",
         name = "reteta") {
+
+    val verbose by option("--verbose", "-v", help = "verbose output").counted()
 
     val invokeModelChecker by option("--model-check", help = "the model checker is invoked when set [default:true]")
             .flag("--dont-model-check", default = true)
@@ -53,19 +63,22 @@ class Reteta : CliktCommand(
             .convert { File(it) }
             .multiple()
 
-    val verificationTechnique by option("-v", "--technique",
+    val verificationTechnique by option("--technique",
             help = "verification technique")
 
     val programs by option("-P", "--program", metavar = "NAME")
-            .convert { File(it) }
+            //.convert { File(it) }
             .multiple(required = true)
 
     val nuxmv by option("--nuxmv", help = "Path to nuXmv binary.", envvar = "NUXMV")
             .file(exists = true)
-            .required()
 
+    val drawAutomaton by option("--debug-automaton").flag(default = false)
+    val showAutomaton by option("--show-automaton").flag(default = false)
 
     override fun run() {
+        currentDebugLevel = verbose
+
         if (table.isEmpty() || programs.isEmpty()) {
             fail("No code or table file given.")
         }
@@ -93,9 +106,11 @@ class Reteta : CliktCommand(
 
                 if (printAugmentedPrograms) {
                     File(outputFolder).mkdirs()
-                    File(outputFolder, "${exec.name}.st").bufferedWriter().use {
+                    val out = File(outputFolder, "${exec.name}.st")
+                    out.bufferedWriter().use {
                         IEC61131Facade.printTo(it, p)
                     }
+                    info("Write augmented program into $out.")
                 }
 
                 SymbExFacade.evaluateProgram(p, disableSimplify)
@@ -105,7 +120,24 @@ class Reteta : CliktCommand(
                 throw IllegalStateException()
             }
 
+
             val tt = GetetaFacade.constructSMV(table, superEnumType)
+
+            if (drawAutomaton) {
+                info("Automaton drawing requested. This may took a while.")
+                val ad = AutomatonDrawer(File(outputFolder, "${table.name}.dot"), table, tt.automaton)
+                ad.runDot = true
+                ad.show = showAutomaton
+                ad.run()
+                if (showAutomaton)
+                    info("Image viewer should open now")
+            } else {
+                info("For drawing the automaton use: `--draw-automaton'.")
+            }
+
+            val out = GetetaFacade.print(table)
+            File(outputFolder, "table.gtt").bufferedWriter().use { it.write(out) }
+
             val modTable = tt.tableModule
             val mainModule = MultiModelGluer().apply {
                 table.programRuns.zip(augmentedPrograms).forEach { (n, p) ->
@@ -119,24 +151,41 @@ class Reteta : CliktCommand(
             modules.add(modTable)
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
+            val pNuxmv = GetetaFacade.createNuXMVProcess(
+                    outputFolder, modules, nuxmv?.absolutePath ?: "nuxmv",
+                    table.options.verificationTechnique)
             if (invokeModelChecker) {
-                val b = GetetaFacade.runNuXMV(
-                        nuxmv.absolutePath,
-                        outputFolder,
-                        modules,
-                        table.options.verificationTechnique)
+                val b = pNuxmv.call()
+                when (b) {
+                    NuXMVOutput.Verified -> {
+                        info("Verified!")
+                    }
+                    is NuXMVOutput.Cex -> {
+                        info("Not verified. Counter example available.")
+                        exitProcess(67)
+                    }
+                    is NuXMVOutput.Error -> {
+                        for (e in b.errors) {
+                            error(e)
+                        }
+                        exitProcess(1)
+                    }
+                }
+            } else {
+                info("Model checker skipped due to `--dont-model-check` flag.")
             }
         }
     }
 
     fun readPrograms(): List<PouExecutable> {
-        val programs = IEC61131Facade.readProgramsWithLibrary(library, programs)
-        return if (programs.any { it == null }) {
-            fail("In some given program there is no PROGRAM declaration!")
-            exitProcess(1)
-            listOf()
+        info("Provided library code: $library")
+        info("Reading programs (in order): $programs")
+        val programs = IEC61131Facade.readProgramsWLPN(library, programs)
+        val nullIndex = programs.indexOf(null)
+        if (nullIndex >= 0) {
+            fail("Could not find an executable pou in '${this.programs[nullIndex]}'.")
         } else {
-            programs.filterNotNull().toMutableList()
+            return programs.filterNotNull().toMutableList()
         }
     }
 }

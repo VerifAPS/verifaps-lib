@@ -53,7 +53,7 @@ class UnwindODS : CliktCommand(
     override fun run() {
         info("Program: {} ith library {}", program, library)
         val smvModule = if (program != null) {
-            IEC61131Facade.readProgramsWithLibrary(library, listOf(program!!), selector)[0]?.let {
+            IEC61131Facade.readProgramsWLN(library, listOf(program!!), listOf(selector)).first()?.let {
                 SymbExFacade.evaluateProgram(it)
             }
         } else null

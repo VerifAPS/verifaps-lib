@@ -166,7 +166,8 @@ class TTOverviewTransformer(val editor: CodeEditor) {
 
         override fun visitSignature(ctx: TestTableLanguageParser.SignatureContext): OverviewStructureNode {
             val root = OverviewStructureNode(StructureData(""))
-            ctx.variableDefinition().forEach {
+            //TODO Handle remaining variable cases for relational tables
+            ctx.variableDefinition().variableAliasDefinitionSimple().forEach {
                 root.add(OverviewStructureNode(StructureData(it.text + " : " + ctx.dt.text,
                         editor, null, Position.start(it.start))))
             }

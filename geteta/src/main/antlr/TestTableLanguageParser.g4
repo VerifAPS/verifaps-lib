@@ -39,25 +39,27 @@ tableHeader:
 opts: OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
 
-signature: VAR var_modifier
-    variableDefinition (COMMA variableDefinition)*
-    COLON dt=IDENTIFIER osem
+signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem
 ;
 
 var_modifier:
-  (STATE | INPUT | OUTPUT | NEXT | ASSUM | ASSERT)
+  (STATE | INPUT | OUTPUT | NEXT | ASSUM | ASSERT)+
 ;
 
 column:
   COLUMN var_modifier name=IDENTIFIER (COLON dt=IDENTIFIER)? AS expr (COMMA expr)*
 ;
 
+variableAliasDefinitionSimple: n=IDENTIFIER (AS newName=IDENTIFIER)?;
+variableAliasDefinitionMulti:
+    LBRACE run+=intOrId (COMMA run+=intOrId)* RBRACE n+=IDENTIFIER (COMMA n+=IDENTIFIER)*;
+variableAliasDefinitionRelational: n=FQ_VARIABLE (AS newName=IDENTIFIER)?;
 variableDefinition :
-         n=IDENTIFIER (AS newName=IDENTIFIER)?  #variableAliasDefinitionSimple
-      |  ({relational}? LBRACE run+=intOrId (COMMA run+=intOrId)* RBRACE)
-         n=IDENTIFIER #variableAliasDefinitionMulti
-      | {relational}? n=FQ_VARIABLE (AS newName=IDENTIFIER)? #variableAliasDefinitionRelational
+        {!relational}? variableAliasDefinitionSimple (COMMA variableAliasDefinitionSimple)*
+      | {relational}? variableAliasDefinitionMulti
+      | {relational}? variableAliasDefinitionRelational
 ;
+
 
 osem : SEMICOLON?;
 
@@ -67,8 +69,8 @@ row : ROW intOrId? time? LBRACE (controlCommands)? (kc osem)* RBRACE;
 kc: (FQ_VARIABLE|IDENTIFIER) COLON value=cell;
 controlCommands: {relational}? (controlCommand osem?)+;
 controlCommand:
-    PAUSE COLON (runs+=intOrId)* #controlPause
-  | PLAY COLON (runs+=intOrId)*  #controlPlay
+    PAUSE COLON (runs+=intOrId (COMMA runs+=intOrId)*) #controlPause
+  | PLAY COLON (runs+=intOrId (COMMA runs+=intOrId)*)  #controlPlay
   | BACKWARD LPAREN intOrId RPAREN COLON (runs+=intOrId)* #controlBackward
 ;
 
@@ -107,7 +109,7 @@ chunk :
 	| variable      #cvariable
 	| constant      #cconstant
 	| singlesided   #csinglesided
-    | interval      #cinterval
+  | interval      #cinterval
 	| expr          #cexpr
 ;
 

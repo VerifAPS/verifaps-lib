@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
+import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
@@ -218,12 +219,14 @@ object SymbExFacade {
             mod.accept(p)
             counter.accept(p)
         }
-        val p = NuXMVProcess(tmpFile)
+        val commandFile = File("cmd.xmv")
+        writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
+        val p = NuXMVProcess(tmpFile, commandFile)
         findProgram("nuXmv")?.let {
             p.executablePath = it.absolutePath
         }
         //use BMC because of the complete trace
-        p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
+        //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()
         if (output is NuXMVOutput.Cex) {
             val cex = output.counterExample

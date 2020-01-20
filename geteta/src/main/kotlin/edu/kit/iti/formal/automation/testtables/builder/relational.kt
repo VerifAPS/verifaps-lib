@@ -6,9 +6,7 @@ import edu.kit.iti.formal.automation.testtables.model.ColumnCategory
 import edu.kit.iti.formal.automation.testtables.model.ControlCommand
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
-import edu.kit.iti.formal.automation.testtables.rtt.VARIABLE_PAUSE
-import edu.kit.iti.formal.automation.testtables.rtt.resetVariable
-import edu.kit.iti.formal.automation.testtables.rtt.setVariable
+import edu.kit.iti.formal.automation.testtables.rtt.*
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.util.fail
@@ -21,17 +19,17 @@ import edu.kit.iti.formal.util.fail
 object PlayPauseToAssumption : AbstractTransformer<SMVConstructionModel>() {
     override fun transform() {
         // Add the pause variable into the table signature
-        model.testTable.programRuns.forEachIndexed { i, _ ->
-            model.testTable.programVariables +=
-                    ProgramVariable(VARIABLE_PAUSE, AnyBit.BOOL, SMVTypes.BOOLEAN,
-                            ColumnCategory.ASSUME, programRun = i)
+        val pauseVars = model.testTable.programRuns.mapIndexed { i, _ ->
+            ProgramVariable(pauseVariableP(), AnyBit.BOOL, SMVTypes.BOOLEAN,
+                    ColumnCategory.ASSUME, programRun = i)
         }
-
+        model.testTable.programVariables.addAll(pauseVars)
         model.testTable.region.flat().forEach {
-            val pauseProgramRuns = it.pauseProgramRuns
-            model.testTable.programRuns.forEachIndexed { i, _ ->
-                val stutter = i in pauseProgramRuns
-                it.inputExpr[VARIABLE_PAUSE] = if (stutter) SLiteral.TRUE else SLiteral.FALSE
+            pauseVars.forEachIndexed { i, run ->
+                val stutter = i in it.pauseProgramRuns
+                val variable = run.internalVariable(model.testTable.programRuns)
+                it.inputExpr[variable.name] =
+                        if (stutter) variable else variable.not()
             }
         }
     }
@@ -44,10 +42,10 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
         cmarks.forEach { (run, tableRows) ->
             tableRows.forEach { row ->
                 model.testTable.programVariables +=
-                        ProgramVariable(setVariable(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
+                        ProgramVariable(setVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
                                 ColumnCategory.ASSUME, programRun = run)
                 model.testTable.programVariables +=
-                        ProgramVariable(resetVariable(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
+                        ProgramVariable(resetVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
                                 ColumnCategory.ASSUME, programRun = run)
             }
         }
@@ -56,9 +54,10 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
         //translate backward(n)
         for (tableRow in rows) {
             for ((run, targets) in cmarks) {
+                val runName = model.testTable.programRuns[run]
                 for (target in targets) {
                     val isJumpTarget = tableRow.id == target
-                    tableRow.inputExpr[setVariable(tableRow.id)] = //TODO how to distinguish from the other inputs? run is needed
+                    tableRow.inputExpr[setVariableTT(tableRow.id, runName)] = //TODO how to distinguish from the other inputs? run is needed
                             if (isJumpTarget) SLiteral.TRUE else SLiteral.FALSE
 
                     if (tableRow.duration.isOneStep) {
@@ -72,11 +71,12 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
                     tableRow.controlCommands.filterIsInstance<ControlCommand.Backward>()
 
             for ((run, targets) in cmarks) {
+                val runName = model.testTable.programRuns[run]
                 for (target in targets) {
                     val resetActivated = null != backwardCommands.find {
                         it.affectedProgramRun == run && it.jumpToRow == target
                     }
-                    tableRow.inputExpr[resetVariable(target)] = if (resetActivated) SLiteral.TRUE else SLiteral.FALSE
+                    tableRow.inputExpr[resetVariableTT(target, runName)] = if (resetActivated) SLiteral.TRUE else SLiteral.FALSE
                 }
             }
         }

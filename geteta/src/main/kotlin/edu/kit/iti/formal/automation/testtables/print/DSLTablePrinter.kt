@@ -2,8 +2,15 @@ package edu.kit.iti.formal.automation.testtables.print
 
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
-import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.automation.testtables.rtt.pauseVariableTT
+import edu.kit.iti.formal.automation.testtables.rtt.resetVariableTT
+import edu.kit.iti.formal.automation.testtables.rtt.setVariableTT
+import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.conjunction
+import edu.kit.iti.formal.util.CodeWriter
 
 /**
  *
@@ -11,7 +18,19 @@ import edu.kit.iti.formal.automation.testtables.model.*
  * @version 1 (13.07.18)
  */
 class DSLTablePrinter(val stream: CodeWriter) {
+    lateinit var gtt: GeneralizedTestTable
+    //lateinit var controlFields: List<String>
     fun print(gtt: GeneralizedTestTable) {
+        this.gtt = gtt
+
+        /*controlFields = gtt.programRuns.map { pauseVariableTT(it) } +
+                gtt.chapterMarksForProgramRuns.flatMap { (run, rows) ->
+                    rows.map { setVariableTT(it, gtt.programRuns[run]) }
+                } +
+                gtt.chapterMarksForProgramRuns.flatMap { (run, rows) ->
+                    rows.map { resetVariableTT(it, gtt.programRuns[run]) }
+                }*/
+
         stream.printf("table ${gtt.name} {")
         stream.increaseIndent()
         gtt.programVariables.forEach(this::print)
@@ -28,12 +47,12 @@ class DSLTablePrinter(val stream: CodeWriter) {
     }
 
     fun print(v: ColumnVariable) {
-        if(v is ProgramVariable) print(v)
-        if(v is ProjectionVariable) print(v)
+        if (v is ProgramVariable) print(v)
+        if (v is ProjectionVariable) print(v)
     }
 
-    fun print(v: ProjectionVariable){
-        if(v.category==ColumnCategory.ASSUME)
+    fun print(v: ProjectionVariable) {
+        if (v.category == ColumnCategory.ASSUME)
             stream.print("assume ")
         else
             stream.print("assert ")
@@ -42,22 +61,22 @@ class DSLTablePrinter(val stream: CodeWriter) {
 
     fun print(v: ProgramVariable) {
         stream.nl().printf("column ")
-        if(v.isState) {
+        if (v.isState) {
             stream.print("state ")
-            if(v.category==ColumnCategory.ASSUME)
+            if (v.category == ColumnCategory.ASSUME)
                 stream.print("assume ")
             else
                 stream.print("assert ")
-            if(v.isNext)
+            if (v.isNext)
                 stream.print("next")
         } else {
-            if(v.category==ColumnCategory.ASSERT)
-                if(v.isNext)
+            if (v.category == ColumnCategory.ASSERT)
+                if (v.isNext)
                     stream.print("output ")
                 else
                     stream.print("assert ")
             else
-                if(v.isNext)
+                if (v.isNext)
                     stream.print("assume next")
                 else
                     stream.print("input")
@@ -101,9 +120,35 @@ class DSLTablePrinter(val stream: CodeWriter) {
                 stream.printf("row ${r.id} ")
                 print(r.duration)
                 stream.printf("{").increaseIndent()
-                r.rawFields
-                        .filter { (_, u) -> u != null }
-                        .forEach { (t, u) -> stream.nl().printf("${t.name}: ${u?.text}") }
+                val play = (gtt.programRuns.indices) - r.pauseProgramRuns
+                stream.nl().printf("\\play: %s", play.joinToString(", "))
+                if (r.pauseProgramRuns.isNotEmpty())
+                    stream.nl().printf("\\pause: %s", r.pauseProgramRuns.joinToString(", "))
+                r.controlCommands.filterIsInstance<ControlCommand.Backward>()
+                        .forEach {
+                            stream.nl().printf("\\backward(%s): %s", it.jumpToRow, it.affectedProgramRun)
+                        }
+
+                /*controlFields.forEach { it ->
+                    stream.nl().printf("// $it: ${r.inputExpr[it]?.repr()}")
+                }*/
+
+                gtt.programVariables.forEach {
+                    val raw = r.rawFields[it]
+                    val smvName = it.internalVariable(gtt.programRuns).name
+                    val unfolded = r.inputExpr[smvName]?.repr() ?: r.outputExpr[smvName]?.repr() ?: ""
+                    val name = when (it) {
+                        is ProgramVariable -> "${gtt.programRuns[it.programRun]}::${it.name}"
+                        else -> it.name
+                    }
+                    stream.nl().printf("$name: ${raw?.text} //$unfolded")
+                }
+
+                val input = r.inputExpr.values.conjunction(SLiteral.TRUE)
+                val output = r.outputExpr.values.conjunction(SLiteral.TRUE)
+                stream.nl().printf("// input: ${input.repr()}")
+                stream.nl().printf("// output: ${output.repr()}")
+
                 stream.decreaseIndent().nl().printf("}")
             }
         }
@@ -114,7 +159,6 @@ class DSLTablePrinter(val stream: CodeWriter) {
         is Duration.ClosedInterval -> "[${d.lower}, ${d.upper}]" + d.modifier.repr()
         is Duration.OpenInterval -> ">= ${d.lower}" + d.modifier.repr()
     })
-
 
 
     fun print(fs: FunctionDeclaration) {

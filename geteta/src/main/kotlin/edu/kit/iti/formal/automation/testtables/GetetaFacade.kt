@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.automation.testtables
 
 
-
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
@@ -59,7 +58,7 @@ object GetetaFacade {
                   programRun: Int, vars: ParseContext): SMVExpr {
         val ev = TblLanguageToSmv(column, programRun, vars)
         val expr = cell.accept(ev)
-        debug("parsed: %s to %s", cell, expr)
+        debug("parsed: ${cell.text} to $expr")
         return expr
     }
 
@@ -145,11 +144,12 @@ object GetetaFacade {
     fun exprsToSMV(vc: ParseContext,
                    constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>)
             : Map<String, SMVExpr> = constraints.map { (t, u) ->
-        if (t is ProgramVariable)
-            t.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
-        else //if(t is ProjectionVariable)
+        if (t is ProgramVariable) {
+            val n = t.internalVariable(vc.programRuns)//"${vc.programRuns[t.programRun]}${t.name}"
+            n.name to exprToSMV (u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+        } else {
             t.name to exprToSMV(u, t as ProjectionVariable, vc)
-
+        }
     }.toMap()
 
 
@@ -169,6 +169,12 @@ object GetetaFacade {
     fun runNuXMV(nuXmvPath: String, folder: String,
                  modules: List<SMVModule>,
                  vt: VerificationTechnique): NuXMVOutput {
+        val adapter = createNuXMVProcess(folder, modules, nuXmvPath, vt)
+        return adapter.call()
+    }
+
+    fun createNuXMVProcess(folder: String, modules: List<SMVModule>,
+                           nuXmvPath: String, vt: VerificationTechnique): NuXMVProcess {
         val outputFolder = File(folder)
         outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
@@ -176,11 +182,13 @@ object GetetaFacade {
             val p = SMVPrinter(CodeWriter(w))
             modules.forEach { it.accept(p) }
         }
-        val adapter = NuXMVProcess(moduleFile)
+        val commandFile = File(folder, COMMAND_FILE)
+        writeNuxmvCommandFile(vt.commands, commandFile)
+
+        val adapter = NuXMVProcess(moduleFile, commandFile)
         adapter.executablePath = nuXmvPath
         adapter.workingDirectory = outputFolder
-        adapter.commands = vt.commands
-        return adapter.call()
+        return adapter
     }
 
     fun createSuperEnum(scopes: List<Scope>): EnumType {

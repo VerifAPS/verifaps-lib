@@ -3,14 +3,25 @@ package edu.kit.iti.formal.util
 import java.util.logging.Level
 import kotlin.system.exitProcess
 
+var currentDebugLevel = 0
+
 enum class ConsoleColor {
     Black, Red, Green, Yellow, Blue, Magenta, Cyan, White
 }
 
 private val startTime = System.currentTimeMillis()
-private val format = "[%10.3f] %s [%6s]%n"
+private val format = "[%10.3f] (%s) %s [%6s]%n"
 
 fun printConsole(level: Level, message: String, origin: String) {
+    val l = when(level) {
+        Level.FINE -> 1
+        Level.FINER -> 2
+        Level.FINEST -> 3
+        else -> 0
+    }
+
+    if(l> currentDebugLevel) return
+
     val curTime = System.currentTimeMillis()
     val diffTime = (curTime - startTime) / 1000.0
     val color = when (level) {
@@ -20,11 +31,13 @@ fun printConsole(level: Level, message: String, origin: String) {
         Level.INFO -> ConsoleColor.Blue
         Level.WARNING -> ConsoleColor.Yellow
         Level.SEVERE -> ConsoleColor.Red
-        else -> ConsoleColor.White
+        else -> ConsoleColor.Black
     }
 
-    System.out.format(format, diffTime, colorize(color, ConsoleColor.Black, message),
-            colorize(ConsoleColor.Yellow, ConsoleColor.White, origin))
+    System.out.format(format, diffTime,
+            level,
+            colorizeFg(color, message),
+            colorizeFg(ConsoleColor.Yellow, origin))
 }
 
 fun debug(msg: String, vararg args: Any?) = printConsole(Level.FINE, String.format(msg, args), getOrigin())

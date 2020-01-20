@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.st.ast.Position
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.*
@@ -86,15 +87,15 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     )
 
     fun visit(ctx: TestTableLanguageParser.Var_modifierContext): VariableModifier {
-        val assert = ctx.ASSERT() != null
-        val assume = ctx.ASSUM() != null
-        val next = ctx.NEXT() != null
-        val input = ctx.INPUT() != null
-        val output = ctx.OUTPUT() != null
+        val assert = ctx.ASSERT().isNotEmpty()
+        val assume = ctx.ASSUM().isNotEmpty()
+        val next = ctx.NEXT().isNotEmpty()
+        val input = ctx.INPUT().isNotEmpty()
+        val output = ctx.OUTPUT().isNotEmpty()
         val type = when {
             (assert || input) && !(output || assert) -> ColumnCategory.ASSUME
             !(assume || input) && (output || assert) -> ColumnCategory.ASSERT
-            else -> throw RuntimeException("Modifier clash in line ${ctx.start.line}.")
+            else -> throw RuntimeException("Modifier clash in line ${Position.start(ctx.start)}.")
         }
         return VariableModifier(type, output || next, ctx.STATE() != null)
     }
@@ -119,12 +120,23 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
         val modifier = visit(ctx.var_modifier())
         val type = modifier.category
         val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
-
-        ctx.variableDefinition().forEach {
-            when (it) {
-                is TestTableLanguageParser.VariableAliasDefinitionSimpleContext -> {
-
-
+        val vd = ctx.variableDefinition()
+        val vdm = vd.variableAliasDefinitionMulti()
+        val vds = vd.variableAliasDefinitionSimple()
+        val vdr = vd.variableAliasDefinitionRelational()
+        when {
+            null != vdm -> {
+                val runs = vdm.run.map { getProgramRun(it) }
+                for (r in runs) {
+                    for (n in vdm.n) {
+                        val realName = n.text
+                        val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, r)
+                        current.add(v)
+                    }
+                }
+            }
+            vds.isNotEmpty() -> {
+                vds.forEach {
                     val newName: String? = it.newName?.text
                     val realName = it.n.text
                     val v = ProgramVariable(realName, dt, lt, type)
@@ -134,34 +146,17 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
                     }
                     current.add(v)
                 }
-                is TestTableLanguageParser.VariableAliasDefinitionRelationalContext -> {
-                    val newName: String? = it.newName?.text
-                    val (programRun, realName) = resolveName(it.FQ_VARIABLE(), current)
-                    val v = ProgramVariable(realName, dt, lt, type,
-                            modifier.state, modifier.next, programRun)
-                    if (newName != null) {
-                        v.realName = v.name
-                        v.name = newName
-                    }
-                    current.add(v)
+            }
+            vdr != null -> {
+                val newName: String? = vdr.newName?.text
+                val (programRun, realName) = resolveName(vdr.FQ_VARIABLE(), current)
+                val v = ProgramVariable(realName, dt, lt, type,
+                        modifier.state, modifier.next, programRun)
+                if (newName != null) {
+                    v.realName = v.name
+                    v.name = newName
                 }
-                is TestTableLanguageParser.VariableAliasDefinitionMultiContext -> {
-                    val runs = it.run.map { getProgramRun(it)}
-                    for(r in runs) {
-                        val realName = it.n.text
-                        val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, r)
-                        current.add(v)
-                    }
-                }
-                /*is TestTableLanguageParser.VariableRunsDefinitionContext -> {
-                    val realName = it.n.text
-                    it.intOrId()
-                            .map { getProgramRun(it) }
-                            .forEach { i ->
-                                val v = ProgramVariable(realName, dt, lt, type, modifier.state, modifier.next, i)
-                                current.add(v)
-                            }
-                }*/
+                current.add(v)
             }
         }
     }
@@ -325,18 +320,22 @@ class TimeParser : TestTableLanguageParserBaseVisitor<Duration>() {
     override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
 }
 
-private fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> {
+internal fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> =
+        resolveName(fqVariable.text, current, Position.start(fqVariable.symbol))
+
+//TODO Write tests
+internal fun resolveName(fqVariable: String, current: GeneralizedTestTable, pos: Position? = null): Pair<Int, String> {
     require(current.options.relational) {
         "Full-qualified variable used in non-relational test table."
     }
-    val parts = fqVariable.text.split("|>", "·", "::", limit = 1)
+    val parts = fqVariable.split("|>", "·", "::", limit = 2)
     val name = parts[parts.size - 1]
 
 
     val runNum = if (parts.size == 1) -1 else
         parts[0].toIntOrNull() ?: current.programRuns.indexOf(parts[0])
-    require(runNum >= 0)  {
-        "No run is given for variable $name in line ${fqVariable.symbol.line}"
+    require(runNum >= 0) {
+        "No run is given for variable $name in $pos"
     }
     return runNum to name
 }

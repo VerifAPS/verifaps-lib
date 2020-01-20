@@ -55,7 +55,7 @@ data class SAssignment(
     override fun clone() = copy()
 }
 
-class SBinaryExpression(private var _left: SMVExpr,
+data class SBinaryExpression(private var _left: SMVExpr,
                              var operator: SBinaryOperator,
                              private var _right: SMVExpr)
     : SMVExpr() {

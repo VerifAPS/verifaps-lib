@@ -4,9 +4,7 @@ package edu.kit.iti.formal.automation.modularization
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
-import edu.kit.iti.formal.smv.NuXMVInvariantsCommand
-import edu.kit.iti.formal.smv.NuXMVOutput
-import edu.kit.iti.formal.smv.NuXMVProcess
+import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.util.error
 import edu.kit.iti.formal.util.info
 import java.io.File
@@ -72,7 +70,7 @@ class ModularProver(val args: ModularizationApp) {
     * Prove equality of module under abstraction
 */
 
-class ProveStrategy{
+class ProveStrategy {
     fun equalityOf(oldProgram: ModularProgram,
                    newProgram: ModularProgram,
                    callSitePairs: CallSiteMapping,
@@ -105,9 +103,10 @@ class SourceEqualTask(val oldProgram: PouExecutable, val newProgram: PouExecutab
 class NuXmvTask(val smvFile: File, val logFile: File, name: String = "") : PredTask(name) {
     private fun runSolver(): Boolean {
         info("Run solver for $name")
-        val nuxmv = NuXMVProcess(smvFile)
+        val cmdFile = File(COMMAND_FILE)
+        writeNuxmvCommandFile(NuXMVInvariantsCommand.IC3.commands as Array<String>, cmdFile)
+        val nuxmv = NuXMVProcess(smvFile, cmdFile)
         nuxmv.outputFile = logFile
-        nuxmv.commands = NuXMVInvariantsCommand.IC3.commands as Array<String>
         val result = nuxmv.call()
         info("Solver finished for $name with $result")
         return when (result) {

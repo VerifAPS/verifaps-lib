@@ -8,9 +8,12 @@ import edu.kit.iti.formal.automation.st0.MultiCodeTransformation
 import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.CodeTransformation
 
-const val VARIABLE_PAUSE: String = "__PAUSE__"
-fun setVariable(row: String) = "__SET_$row"
-fun resetVariable(row: String) = "__RESET_$row"
+fun pauseVariableP() = "__PAUSE__"
+fun pauseVariableTT(run: String): String = "${run}${pauseVariableP()}"
+fun setVariableP(row: String) = "__SET_$row"
+fun resetVariableP(row: String) = "__RESET_$row"
+fun setVariableTT(row: String, run: String) = "${run}${setVariableP(row)}"
+fun resetVariableTT(row: String, run: String) = "${run}${resetVariableP(row)}"
 
 
 /**
@@ -29,9 +32,9 @@ private class AddSetAndReset(val chapterMarks: Set<String>) : CodeTransformation
         val newBody = StatementList()
         chapterMarks.forEach { row ->
             // new input variables
-            val vdSet = VariableDeclaration(setVariable(row), VariableDeclaration.INPUT,
+            val vdSet = VariableDeclaration(setVariableP(row), VariableDeclaration.INPUT,
                     SimpleTypeDeclaration(AnyBit.BOOL, BooleanLit.LFALSE))
-            val vdReset = VariableDeclaration(resetVariable(row), VariableDeclaration.INPUT,
+            val vdReset = VariableDeclaration(resetVariableP(row), VariableDeclaration.INPUT,
                     SimpleTypeDeclaration(AnyBit.BOOL, BooleanLit.LFALSE))
             state.scope.add(vdSet)
             state.scope.add(vdReset)
@@ -59,6 +62,7 @@ private class AddSetAndReset(val chapterMarks: Set<String>) : CodeTransformation
 }
 
 private class AddStuttering : CodeTransformation {
+
     override fun transform(state: TransformationState): TransformationState {
         addPauseVariable(state.scope)
         state.stBody = addIfStatement(state.stBody)
@@ -68,14 +72,14 @@ private class AddStuttering : CodeTransformation {
     private fun addIfStatement(stBody: StatementList): StatementList {
         val s = StatementList()
         val _if = IfStatement()
-        _if.addGuardedCommand(SymbolicReference(VARIABLE_PAUSE), StatementList())
+        _if.addGuardedCommand(SymbolicReference(pauseVariableP()), StatementList())
         _if.elseBranch = stBody
         s.add(_if)
         return s
     }
 
     private fun addPauseVariable(scope: Scope) {
-        val vd = VariableDeclaration(VARIABLE_PAUSE, VariableDeclaration.INPUT,
+        val vd = VariableDeclaration(pauseVariableP(), VariableDeclaration.INPUT,
                 SimpleTypeDeclaration(AnyBit.BOOL, BooleanLit.LFALSE)
         )
         scope.add(vd)

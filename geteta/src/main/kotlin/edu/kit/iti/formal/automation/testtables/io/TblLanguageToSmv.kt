@@ -166,7 +166,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
                 "Full-qualified variable used in non-relational test table."
             }
 
-            val parts = fqVariable.text.split("|>", "·", "\$", limit = 1)
+            val parts = fqVariable.text.split("|>", "·", "::", limit = 2)
             val name = if (parts[1].isEmpty()) columnVariable.name else parts[1]
             val runNum =
                     if (parts[0].isEmpty()) 1 - columnProgramRun!!

@@ -46,7 +46,8 @@ class DefaultValueTranslator : ValueTranslator {
 
         return when (dt) {
             is AnyBit.BOOL -> SBooleanLiteral(v as Boolean)
-            is AnyInt -> SWordLiteral(v as BigInteger, smvDt as SMVWordType)
+            is AnyInt -> SWordLiteral(v as BigInteger, //FIXME: smvDt as SMVWordType, hack for only 16 bit.
+                    SMVWordType(true, 16))
             is AnyBit -> SWordLiteral((v as Bits).toBigInt(), smvDt as SMVWordType)
             else -> SGenericLiteral(init.value, smvDt)
         }
