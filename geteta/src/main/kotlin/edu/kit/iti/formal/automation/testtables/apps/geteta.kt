@@ -35,7 +35,7 @@ import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
-import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinter
+import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.util.CodeWriter
@@ -183,7 +183,7 @@ class GetetaApp : CliktCommand(
                 }
 
         if (b is NuXMVOutput.Cex) {
-            if (cexPrinter) useCounterExamplePrinter(b, tt, lineMap, code)
+            if (cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
             else info("Use `--cexout' to print a cex analysation.")
             if (runAnalyzer) runCexAnalysation(b, tt)
             else info("Use `--row-map' to print possible row mappings.")
@@ -220,23 +220,23 @@ class GetetaApp : CliktCommand(
             }
         }
     }
+}
 
-    private fun useCounterExamplePrinter(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
-                                         lineMap: LineMap,
-                                         program: PouExecutable) {
-        for (model in tt) {
-            val file = File(outputFolder,"cex_${model.testTable.name}.txt")
-            file.bufferedWriter().use {
-                val stream = CodeWriter(it)
-                val cep = CounterExamplePrinter(
-                        automaton = model.automaton,
-                        testTable = model.testTable,
-                        cex = result.counterExample,
-                        lineMap = lineMap,
-                        program = program,
-                        stream = stream)
-                cep.getAll()
-            }
+fun useCounterExamplePrinter(
+        outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
+        lineMap: LineMap, program: PouExecutable) {
+    for (model in tt) {
+        val file = File(outputFolder, "cex_${model.testTable.name}.txt")
+        file.bufferedWriter().use {
+            val stream = CodeWriter(it)
+            val cep = CounterExamplePrinterWithProgram(
+                    automaton = model.automaton,
+                    testTable = model.testTable,
+                    cex = result.counterExample,
+                    lineMap = lineMap,
+                    program = program,
+                    stream = stream)
+            cep.getAll()
         }
     }
 }

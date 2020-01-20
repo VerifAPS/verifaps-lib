@@ -88,12 +88,12 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
 
     fun visit(ctx: TestTableLanguageParser.Var_modifierContext): VariableModifier {
         val assert = ctx.ASSERT().isNotEmpty()
-        val assume = ctx.ASSUM().isNotEmpty()
+        val assume = ctx.ASSUME().isNotEmpty()
         val next = ctx.NEXT().isNotEmpty()
         val input = ctx.INPUT().isNotEmpty()
         val output = ctx.OUTPUT().isNotEmpty()
         val type = when {
-            (assert || input) && !(output || assert) -> ColumnCategory.ASSUME
+            (assume || input) && !(output || assert) -> ColumnCategory.ASSUME
             !(assume || input) && (output || assert) -> ColumnCategory.ASSERT
             else -> throw RuntimeException("Modifier clash in line ${Position.start(ctx.start)}.")
         }

@@ -9,7 +9,7 @@ relational table T(P, Q) {
         }
 
         row check {
-            0|>c: =1::c+1
+            0|>c: =1::c
             1|>c: -
         }
     }

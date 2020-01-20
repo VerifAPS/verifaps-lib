@@ -43,7 +43,7 @@ signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem
 ;
 
 var_modifier:
-  (STATE | INPUT | OUTPUT | NEXT | ASSUM | ASSERT)+
+  (STATE | INPUT | OUTPUT | NEXT | ASSUME | ASSERT)+
 ;
 
 column:

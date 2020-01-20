@@ -16,14 +16,13 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
 import edu.kit.iti.formal.automation.testtables.rtt.RTTCodeAugmentation
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
+import edu.kit.iti.formal.automation.testtables.viz.CounterExampleTablePrinter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.util.currentDebugLevel
-import edu.kit.iti.formal.util.fail
-import edu.kit.iti.formal.util.info
-import edu.kit.iti.formal.util.warn
+import edu.kit.iti.formal.util.*
 import java.io.File
 import java.util.*
+import kotlin.error
 import kotlin.system.exitProcess
 
 object RetetaApp {
@@ -162,6 +161,13 @@ class Reteta : CliktCommand(
                     }
                     is NuXMVOutput.Cex -> {
                         info("Not verified. Counter example available.")
+                        File(outputFolder, "counterexample.txt").bufferedWriter().use {
+                            CounterExampleTablePrinter(tt.automaton, table, b.counterExample, CodeWriter(it)).print()
+                        }
+                        /*else info("Use `--cexout' to print a cex analysation.")
+                            if (runAnalyzer) runCexAnalysation(b, tt)
+                            else info("Use `--row-map' to print possible row mappings.")
+                             */
                         exitProcess(67)
                     }
                     is NuXMVOutput.Error -> {

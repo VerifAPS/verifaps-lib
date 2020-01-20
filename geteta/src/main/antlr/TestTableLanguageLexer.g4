@@ -72,7 +72,7 @@ T : 'TRUE' | 'true';
 F : 'FALSE' | 'false';
 COLUMN : 'column' | 'COLUMN';
 NEXT : 'next';
-ASSUM : 'ASSUME' | 'assume';
+ASSUME : 'ASSUME' | 'assume';
 ASSERT : 'ASSERT' | 'assert';
 
 FQ_VARIABLE : (DIGIT+|IDENTIFIER)? ('|>'|'·'|'::') IDENTIFIER?;
