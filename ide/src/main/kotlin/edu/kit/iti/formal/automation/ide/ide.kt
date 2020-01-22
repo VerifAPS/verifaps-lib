@@ -296,6 +296,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         Runtime.getRuntime().addShutdownHook(Thread {
             globalPort.save("STARTUP")
             globalPort.write(configurationPaths.layoutFile.toFile())
+            appConfiguration.write(configurationPaths.configuration)
         })
 
         publishMessage("Welcome!")

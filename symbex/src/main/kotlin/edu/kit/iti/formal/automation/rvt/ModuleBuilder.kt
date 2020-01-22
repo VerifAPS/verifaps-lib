@@ -36,6 +36,7 @@ import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.meta
 import java.util.*
+import kotlin.collections.HashMap
 
 public val SVariable.info: SmvVariableInfo
     get() {
@@ -57,12 +58,58 @@ public var SVariable.isOutput: Boolean
 
 data class SmvVariableInfo(var isInput: Boolean = false, var isOutput: Boolean = false)
 
+class DefinitionReducer(private val module: SMVModule) {
+    private val definitionsForSurvival = ArrayList<SAssignment>(module.definitions.size)
+    private val substitutions = HashMap<SVariable, SVariable>()
+    fun identifiedTrivialDefinitions(): Unit {
+        module.definitions.forEach { assign ->
+            val (k, v) = assign
+            if (v is SVariable) {
+                substitutions[k] = v
+            } else {
+                definitionsForSurvival.add(assign)
+            }
+        }
+    }
+
+    fun findFixpoints() {
+        var change: Boolean
+        do {
+            change = false
+            val newSubs = HashMap<SVariable, SVariable>(substitutions.size)
+            for ((from, to) in substitutions) {
+                if (to in substitutions) {
+                    newSubs[from] = substitutions[to]!!
+                    change = true
+                } else {
+                    newSubs[from] = to
+                }
+            }
+            substitutions.clear()
+            substitutions.putAll(newSubs)
+        } while (change)
+    }
+
+    fun substitute() {
+        identifiedTrivialDefinitions()
+        findFixpoints()
+        module.accept(ExpressionReplacer(substitutions))
+        println("test")
+        module.definitions.clear()
+        module.definitions.addAll(definitionsForSurvival)
+        println("test")
+    }
+}
+
 /**
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
 class ModuleBuilder(val program: PouExecutable,
-                    val finalState: SymbolicState) : Runnable {
+                    finalState: SymbolicState,
+                    val reduceDefinitions: Boolean = true) : Runnable {
+    val state = finalState//.unfolded()
+
 
     val module = SMVModule(program.name)
     //val vardeps: VariableDependency = VariableDependency(finalState)
@@ -85,7 +132,7 @@ class ModuleBuilder(val program: PouExecutable,
         //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
 
         // Using this workaround instead
-        val stateVariables = finalState.keys
+        val stateVariables = state.keys
                 .filter { (name) ->
                     inputVars.stream().noneMatch { v2 -> v2.name == name }
                 }
@@ -97,9 +144,14 @@ class ModuleBuilder(val program: PouExecutable,
             }
         }
 
-        insertDefinitions(finalState.getAllDefinitions())
+        insertDefinitions(state.getAllDefinitions())
         insertVariables(stateVariables)
         insertInputVariables(inputVars)
+
+        if (reduceDefinitions) {
+            val dr = DefinitionReducer(module)
+            dr.substitute()
+        }
     }
 
     private fun insertDefinitions(definitions: Map<SVariable, SMVExpr>) {
@@ -107,7 +159,7 @@ class ModuleBuilder(val program: PouExecutable,
     }
 
     private fun addDefinition(k: SVariable, v: SMVExpr) =
-            module.definitions.add(SAssignment(k,v))
+            module.definitions.add(SAssignment(k, v))
 
     private fun insertInputVariables(decls: List<VariableDeclaration>) {
         decls.map { this.typeTranslator.translate(it) }
@@ -144,7 +196,7 @@ class ModuleBuilder(val program: PouExecutable,
     }
 
     private fun addNextAssignment(s: SVariable) {
-        val e = finalState[s]
+        val e = state[s]
         val a = SAssignment(s, e!!)
         module.nextAssignments.add(a)
     }

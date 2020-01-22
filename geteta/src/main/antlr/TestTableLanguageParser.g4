@@ -71,7 +71,7 @@ controlCommands: {relational}? (controlCommand osem?)+;
 controlCommand:
     PAUSE COLON (runs+=intOrId (COMMA runs+=intOrId)*) #controlPause
   | PLAY COLON (runs+=intOrId (COMMA runs+=intOrId)*)  #controlPlay
-  | BACKWARD LPAREN intOrId RPAREN COLON (runs+=intOrId)* #controlBackward
+  | BACKWARD LPAREN target=intOrId RPAREN COLON (runs+=intOrId)* #controlBackward
 ;
 
 time :

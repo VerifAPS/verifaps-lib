@@ -179,6 +179,10 @@ sealed class NuXMVOutput {
 /**
  *
  */
+//FIXME ERROR in nuxmv not detected
+//file exp_restart/restart/modules.smv: multiple declaration of identifier: Crane
+//aborting 'source ic3.xmv'
+//
 fun parseXmlOutput(text: String): NuXMVOutput {
     val lines = text.split('\n')
     val errorLinePredicate = { it: String ->
@@ -188,6 +192,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
                 || it.contains("TYPE ERROR")
                 || it.contains("undefined")
                 || it.contains("too few actual parameters")
+                || it.contains("aborting")
     }
 
     if (errorLinePredicate(text)) {

@@ -99,6 +99,11 @@ class TestTableLanguageSupport(lookup: Lookup) : BaseLanguageSupport() {
         }
     override val isCodeFoldingEnabled: Boolean
         get() = true
+
+    override fun configure(textArea: RSyntaxTextArea) {
+        textArea.paintTabLines = true
+        textArea.tabsEmulated = true
+    }
 }
 
 class TTOverviewTransformer(val editor: CodeEditor) {
@@ -218,7 +223,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
                         it.offendingSymbol?.text?.length ?: -1))
             }
         } catch (e: NullPointerException) {
-
+        } catch (e: IllegalStateException) {
         }
         return res
     }

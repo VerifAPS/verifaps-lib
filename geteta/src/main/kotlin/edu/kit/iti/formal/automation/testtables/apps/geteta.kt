@@ -91,7 +91,8 @@ class GetetaApp : CliktCommand(
     val showAutomaton by option("--show-automaton").flag(default = false)
 
     val verificationTechnique by option("-v", "--technique",
-            help = "verification technique").convert { VerificationTechnique.valueOf(it) }.default(VerificationTechnique.IC3)
+            help = "verification technique").convert { VerificationTechnique.valueOf(it) }
+            .default(VerificationTechnique.IC3)
 
     override fun run() {
         val gtts = table.flatMap {
@@ -105,7 +106,7 @@ class GetetaApp : CliktCommand(
 
         //
         info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWLP(library, listOf(program))[0]
+        val code = IEC61131Facade.readProgramsWLP(library, listOf(program)).first()
                 ?: throw IllegalStateException("No program given in $program")
 
         // override mode

@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.ide.FontAwesomeRegular
 import edu.kit.iti.formal.automation.ide.FontAwesomeSolid
 import edu.kit.iti.formal.automation.ide.FontIcon
 import edu.kit.iti.formal.util.info
+import java.io.File
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
@@ -96,6 +97,12 @@ abstract class Configuration(val properties: Properties = Properties(),
             properties.load(it)
         }
     }
+
+    fun write(configuration: Path) {
+        configuration.bufferedWriter().use {
+            properties.store(it, "automatically saved, do not change.")
+        }
+    }
 }
 
 object ApplicationConfiguration : Configuration() {
@@ -104,6 +111,7 @@ object ApplicationConfiguration : Configuration() {
     var windowHeight by integer(400)
     var windowWidth by integer(600)
     var maximized by boolean(false)
+    var lastNavigatorPath by string(File(".").absolutePath)
 }
 
 object UserConfiguration : Configuration() {

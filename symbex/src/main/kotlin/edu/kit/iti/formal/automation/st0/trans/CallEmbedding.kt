@@ -155,12 +155,15 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
     }
 
     fun getBody(prefix: String, state: TransformationState): StatementList {
-        val statements = bodyCache.computeIfAbsent(state) {
-            val istate = TransformationState(it.scope, it.stBody.clone(), SFCImplementation())
+        if (state !in bodyCache) {
+            val istate = TransformationState(
+                    state.scope, state.stBody.clone(), SFCImplementation())
             val s = EMBEDDING_BODY_PIPELINE.transform(istate)
-            s.stBody
+            bodyCache[state] = s.stBody
         }
-        return VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
+        val statements = bodyCache[state]!!
+        val renamed =  VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
+        return renamed
     }
 
     override fun visit(invocation: InvocationStatement): Statement {

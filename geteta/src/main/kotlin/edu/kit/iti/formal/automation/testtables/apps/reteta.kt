@@ -99,20 +99,22 @@ class Reteta : CliktCommand(
         gtts.forEach { table ->
             val chapterMarks = table.chapterMarksForProgramRuns
             val augmentedPrograms = programs.mapIndexed { idx, exec ->
-                val rttPipeline = RTTCodeAugmentation(chapterMarks[idx]!!)
+                val rttPipeline = RTTCodeAugmentation(false, chapterMarks[idx]!!)
                 val s = rttPipeline.transform(TransformationState(exec))
                 val p = ProgramDeclaration(exec.name, s.scope, s.stBody)
 
                 if (printAugmentedPrograms) {
                     File(outputFolder).mkdirs()
-                    val out = File(outputFolder, "${exec.name}.st")
+                    val out = File(outputFolder, "${exec.name}_${idx}.st")
                     out.bufferedWriter().use {
                         IEC61131Facade.printTo(it, p)
                     }
                     info("Write augmented program into $out.")
                 }
 
-                SymbExFacade.evaluateProgram(p, disableSimplify)
+                SymbExFacade.evaluateProgram(p, true)?.also {
+                    it.name = "${it.name}_${idx}" // rename module, otherwise clash on self-compositions
+                }
             }
 
             if (!table.options.relational) {

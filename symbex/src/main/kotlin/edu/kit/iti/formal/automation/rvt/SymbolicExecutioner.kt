@@ -360,6 +360,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     fun assign(vd: VariableDeclaration, value: SMVExpr) {
         val s = lift(vd)
         val cnt = assignmentCounter.incrementAndGet()
+
         vd.startPosition.run {
             lineNumberMap[cnt] = vd.toHuman() to this
         }

@@ -75,6 +75,8 @@ class IEC61131SyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             NAMESPACE,
             END_STEP,
             STEP,
+            TYPE,
+            END_TYPE,
             STRUCT, END_STRUCT,
             CONFIGURATION, END_CONFIGURATION,
             ACTION, END_ACTION)

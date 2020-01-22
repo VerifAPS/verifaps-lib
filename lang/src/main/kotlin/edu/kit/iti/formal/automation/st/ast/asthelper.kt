@@ -11,6 +11,8 @@ import java.util.*
  * @version 1 (20.06.19)
  */
 
+
+
 //Helpers
 fun <T : Expression> Iterable<T>.disjunction() = reduce { a: Expression, b: Expression -> a or b }
 

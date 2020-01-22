@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.rtt
 
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.Statements
@@ -21,8 +22,15 @@ fun resetVariableTT(row: String, run: String) = "${run}${resetVariableP(row)}"
  * @author Alexander Weigl
  * @version 1 (04.08.18)
  */
-class RTTCodeAugmentation(chapterMarks: Set<String>) : MultiCodeTransformation(
-        AddStuttering(), AddSetAndReset(chapterMarks))
+class RTTCodeAugmentation(skipSt0: Boolean, chapterMarks: Set<String>) : MultiCodeTransformation() {
+    init {
+        transformations += AddStuttering()
+        if (!skipSt0) {
+            transformations += SymbExFacade.getDefaultSimplifier()
+        }
+        transformations += AddSetAndReset(chapterMarks)
+    }
+}
 
 private class AddSetAndReset(val chapterMarks: Set<String>) : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState {
@@ -45,7 +53,12 @@ private class AddSetAndReset(val chapterMarks: Set<String>) : CodeTransformation
 
             stateVariables.forEach {
                 //create a copy of this variable
-                val storage = it.copy(name = "${it.name}_${row}")
+                val storage = VariableDeclaration("${row}___${it.name}", it.type, it.typeDeclaration)
+                        .also { new ->
+                            new.dataType = it.dataType
+                            //new.init = it.init
+                            new.initValue = it.initValue
+                        }
                 state.scope.add(storage)
 
                 setBody += storage.name assignTo it.name

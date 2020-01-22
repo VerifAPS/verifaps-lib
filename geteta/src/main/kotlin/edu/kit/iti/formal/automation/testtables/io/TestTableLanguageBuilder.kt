@@ -261,9 +261,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
     }
 
     override fun visitControlBackward(ctx: TestTableLanguageParser.ControlBackwardContext): TableNode {
-        val target = rowId(ctx.intOrId)
+        val target = rowId(ctx.target)
         ctx.runs.forEach { it ->
-            val run = it.text.toInt()
+            val run = getProgramRun(it)
             val backward = ControlCommand.Backward(run, target)
             val conflict = currentRow.controlCommands
                     .filterIsInstance<ControlCommand.Backward>()

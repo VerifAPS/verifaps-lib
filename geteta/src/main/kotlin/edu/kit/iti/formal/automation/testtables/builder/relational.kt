@@ -60,8 +60,8 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
                     tableRow.inputExpr[setVariableTT(tableRow.id, runName)] = //TODO how to distinguish from the other inputs? run is needed
                             if (isJumpTarget) SLiteral.TRUE else SLiteral.FALSE
 
-                    if (tableRow.duration.isOneStep) {
-                        fail("The table row ${tableRow.id} in table ${model.testTable.name} is addressed by a backward-jump, " +
+                    if (isJumpTarget&&  !tableRow.duration.isOneStep) {
+                        fail("The table row `${tableRow.id}? in table `${model.testTable.name}` is addressed by a backward-jump, " +
                                 "but does not have the required of duration [1,1]. Please split up the row manually. ")
                     }
                 }

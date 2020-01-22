@@ -291,7 +291,7 @@ data class Scope(val variables: VariableScope = VariableScope())
 
 
     fun isGlobalVariable(variable: SymbolicReference): Boolean {
-        return topLevel.resolveVariable(variable) === resolveVariable(variable)
+        return resolveVariable(variable) != null && topLevel.resolveVariable(variable) === resolveVariable(variable)
     }
 
     override fun clone(): Scope {
