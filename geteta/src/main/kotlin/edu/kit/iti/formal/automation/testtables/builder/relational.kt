@@ -6,9 +6,12 @@ import edu.kit.iti.formal.automation.testtables.model.ColumnCategory
 import edu.kit.iti.formal.automation.testtables.model.ControlCommand
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.automation.testtables.model.chapterMarksForProgramRuns
-import edu.kit.iti.formal.automation.testtables.rtt.*
+import edu.kit.iti.formal.automation.testtables.rtt.pauseVariableP
+import edu.kit.iti.formal.automation.testtables.rtt.resetVariableP
+import edu.kit.iti.formal.automation.testtables.rtt.setVariableP
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SLiteral
+import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.fail
 
 /**
@@ -39,45 +42,47 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
     override fun transform() {
         val cmarks = model.testTable.chapterMarksForProgramRuns
         //add input variables set and reset to the table signature
+        val setVariables = HashMap<Pair<Int, String>, SVariable>()
+        val resetVariables = HashMap<Pair<Int, String>, SVariable>()
+
         cmarks.forEach { (run, tableRows) ->
             tableRows.forEach { row ->
-                model.testTable.programVariables +=
-                        ProgramVariable(setVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
-                                ColumnCategory.ASSUME, programRun = run)
-                model.testTable.programVariables +=
-                        ProgramVariable(resetVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
-                                ColumnCategory.ASSUME, programRun = run)
+                val set = ProgramVariable(setVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
+                        ColumnCategory.ASSUME, programRun = run)
+                val reset = ProgramVariable(resetVariableP(row), AnyBit.BOOL, SMVTypes.BOOLEAN,
+                        ColumnCategory.ASSUME, programRun = run)
+                resetVariables[run to row] = reset.internalVariable(model.testTable.programRuns)
+                setVariables[run to row] = set.internalVariable(model.testTable.programRuns)
+                model.testTable.programVariables += set
+                model.testTable.programVariables += reset
             }
         }
 
         val rows = model.testTable.region.flat()
         //translate backward(n)
         for (tableRow in rows) {
-            for ((run, targets) in cmarks) {
-                val runName = model.testTable.programRuns[run]
-                for (target in targets) {
-                    val isJumpTarget = tableRow.id == target
-                    tableRow.inputExpr[setVariableTT(tableRow.id, runName)] = //TODO how to distinguish from the other inputs? run is needed
-                            if (isJumpTarget) SLiteral.TRUE else SLiteral.FALSE
+            for (entry in setVariables) {
+                val (run, row) = entry.key
+                val set = entry.value
+                val isJumpTarget = tableRow.id == row
+                tableRow.inputExpr[set.name] =
+                        set.equal(if (isJumpTarget) SLiteral.TRUE else SLiteral.FALSE)
 
-                    if (isJumpTarget&&  !tableRow.duration.isOneStep) {
-                        fail("The table row `${tableRow.id}? in table `${model.testTable.name}` is addressed by a backward-jump, " +
-                                "but does not have the required of duration [1,1]. Please split up the row manually. ")
-                    }
+                if (isJumpTarget && !tableRow.duration.isOneStep) {
+                    fail("The table row `${tableRow.id}? in table `${model.testTable.name}` is addressed by a backward-jump, " +
+                            "but does not have the required of duration [1,1]. Please split up the row manually. ")
                 }
             }
 
             val backwardCommands =
                     tableRow.controlCommands.filterIsInstance<ControlCommand.Backward>()
 
-            for ((run, targets) in cmarks) {
-                val runName = model.testTable.programRuns[run]
-                for (target in targets) {
-                    val resetActivated = null != backwardCommands.find {
-                        it.affectedProgramRun == run && it.jumpToRow == target
-                    }
-                    tableRow.inputExpr[resetVariableTT(target, runName)] = if (resetActivated) SLiteral.TRUE else SLiteral.FALSE
+            for ((k, reset) in resetVariables) {
+                val (run, row) = k
+                val resetActivated = null != backwardCommands.find {
+                    it.affectedProgramRun == run && it.jumpToRow == row
                 }
+                tableRow.inputExpr[reset.name] = if (resetActivated) SLiteral.TRUE else SLiteral.FALSE
             }
         }
     }
