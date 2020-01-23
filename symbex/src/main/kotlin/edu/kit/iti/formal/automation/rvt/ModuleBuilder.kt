@@ -94,10 +94,8 @@ class DefinitionReducer(private val module: SMVModule) {
         identifiedTrivialDefinitions()
         findFixpoints()
         module.accept(ExpressionReplacer(substitutions))
-        println("test")
         module.definitions.clear()
         module.definitions.addAll(definitionsForSurvival)
-        println("test")
     }
 }
 
