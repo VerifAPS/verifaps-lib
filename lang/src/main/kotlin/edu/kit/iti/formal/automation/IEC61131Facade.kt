@@ -56,7 +56,7 @@ object IEC61131Facade {
 
     fun statements(input: CharStream): StatementList {
         val parser = getParser(input)
-        val stmts = parser.statement_list().accept(IECParseTreeToAST()) as StatementList
+        val stmts = parser.statement_list_eof().stBody().accept(IECParseTreeToAST()) as StatementList
         parser.errorReporter.throwException()
         return stmts
     }

@@ -98,7 +98,7 @@ object CellExpressionTest {
             "[-61+2, -61]" to "-0sd16_61 + 0sd16_2 <= Q & Q <= -0sd16_61",
             "0|>a" to "_0\$a = Q",
             "|>a" to "_1\$a = Q",
-            "0\$a + |>a" to "_0\$a + _1\$a",
+            "0::a + |>a" to "_0\$a + _1\$a",
             "·" to "_1\$Q = Q"
     )
 }

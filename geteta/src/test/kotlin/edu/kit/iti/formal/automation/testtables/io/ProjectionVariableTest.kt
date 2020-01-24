@@ -24,13 +24,11 @@ class ProjectionVariableTest : TableTester() {
         checkDefinition(b, "A_out_Sum", "0sd16_0 = Sum_0");
         checkDefinition(b,  "A_out_Equal", "TRUE");
 
-
         checkDefinition(b, "Equal_0", "code\$x");
         checkDefinition(b, "Equal_1", "code\$y");
         checkDefinition(b, "B_out_Equal", "Equal_0 = Equal_1");
 
         checkDefinition(b, "C_out_Equal", "Equal_0 <= Equal_1");
-
 
         println(b.tableModule.repr())
     }

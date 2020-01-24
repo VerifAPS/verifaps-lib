@@ -700,6 +700,8 @@ invocation
 	)? RPAREN
 ;
 
+statement_list_eof: stBody EOF;
+
 statement_list
 :
 	(statement)*

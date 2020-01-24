@@ -18,7 +18,7 @@ import java.util.*
  * Created by weigl on 09.12.16.
  */
 class TblLanguageToSmv(private val columnVariable: SVariable,
-                       private val columnProgramRun: Int?,
+                       private val columnProgramRun: Int = 0,
                        private val context: ParseContext) : TestTableLanguageParserBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
@@ -169,13 +169,13 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
             val parts = fqVariable.text.split("|>", "·", "::", limit = 2)
             val name = if (parts[1].isEmpty()) columnVariable.name else parts[1]
             val runNum =
-                    if (parts[0].isEmpty()) 1 - columnProgramRun!!
+                    if (parts[0].isEmpty()) 1 - columnProgramRun
                     else parts[0].toIntOrNull() ?: context.programRuns.indexOf(parts[0])
             require(runNum >= 0)
             return runNum to name
         }
         if (identifier != null) {
-            return columnProgramRun!! to identifier.text
+            return columnProgramRun to identifier.text
         }
         fail("")
     }

@@ -7,24 +7,24 @@ VAR
     r04_01 : boolean;
 -- end of VAR
 DEFINE
-    r02_out_o := TRUE;
-    r02_out := r02_out_o;
-    r02_in_i := TRUE;
-    r02_in := r02_in_i;
+    r02_out_code$o := TRUE;
+    r02_out := r02_out_code$o;
+    r02_in_code$i := TRUE;
+    r02_in := r02_in_code$i;
     r02_progress := r02_fwd & !(r03_in | r04_in);
     r02_fail := r02_in & !r02_out;
     r02_fwd := r02_in & r02_out;
-    r03_out_o := 0sd16_1 = code$o;
-    r03_out := r03_out_o;
-    r03_in_i := 0sd16_1 = code$i;
-    r03_in := r03_in_i;
+    r03_out_code$o := 0sd16_1 = code$o;
+    r03_out := r03_out_code$o;
+    r03_in_code$i := 0sd16_1 = code$i;
+    r03_in := r03_in_code$i;
     r03_progress := r03_fwd & !r04_in;
     r03_fail := r03_in & !r03_out;
     r03_fwd := r03_in & r03_out;
-    r04_out_o := 0sd16_2 = code$o;
-    r04_out := r04_out_o;
-    r04_in_i := 0sd16_2 = code$i;
-    r04_in := r04_in_i;
+    r04_out_code$o := 0sd16_2 = code$o;
+    r04_out := r04_out_code$o;
+    r04_in_code$i := 0sd16_2 = code$i;
+    r04_in := r04_in_code$i;
     r04_progress := r04_fwd & !FALSE;
     r04_fail := r04_in & !r04_out;
     r04_fwd := r04_in & r04_out;

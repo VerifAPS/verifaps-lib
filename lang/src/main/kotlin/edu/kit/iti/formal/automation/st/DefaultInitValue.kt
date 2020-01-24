@@ -24,10 +24,7 @@ package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.*
-import edu.kit.iti.formal.automation.st.ast.ArrayInitialization
-import edu.kit.iti.formal.automation.st.ast.IdentifierInitializer
-import edu.kit.iti.formal.automation.st.ast.Literal
-import edu.kit.iti.formal.automation.st.ast.StructureInitialization
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -40,8 +37,7 @@ object DefaultInitValue : InitValueTranslator {
     override fun getInit(type: AnyDt): Value<*, *> = type.accept(InitValueVisitor)
 
     object InitValueVisitor : DataTypeVisitorNN<Value<*, *>> {
-        override fun defaultVisit(obj: Any): Value<*, *>
-                = throw IllegalArgumentException("unsupported data type: $obj")
+        override fun defaultVisit(obj: Any): Value<*, *> = throw IllegalArgumentException("unsupported data type: $obj")
 
 
         override fun visit(reference: ReferenceDt): Value<*, *> = VNULL
@@ -132,12 +128,15 @@ object DefaultInitValue : InitValueTranslator {
 }
 
 object EvaluateInitialization : AstVisitor<Value<*, *>>() {
-    override fun defaultVisit(obj: Any) : Value<*,*> {
+    override fun defaultVisit(obj: Any): Value<*, *> {
         throw java.lang.IllegalArgumentException("${javaClass.name} not implemented for ${obj.javaClass.name}.")
     }
+
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }
-        val type = ArrayType(v[0].dataType, listOf())
+        val type = ArrayType(v[0].dataType, listOf(Range(
+                IntegerLit(INT, 0.toBigInteger()),
+                IntegerLit(INT, v.size.toBigInteger()))))
         return VArray(type, MultiDimArrayValue(type, v.first(), v))
     }
 

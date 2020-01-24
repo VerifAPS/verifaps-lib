@@ -265,7 +265,7 @@ object GetetaFacade {
 
     fun exprToSmv(expr: TestTableLanguageParser.ExprContext, parseContext: ParseContext): SMVExpr {
         val dummy = SVariable("dummy", SMVTypes.BOOLEAN)
-        val visitor = TblLanguageToSmv(dummy, null, parseContext)
+        val visitor = TblLanguageToSmv(dummy, 0, parseContext)
         return expr.accept(visitor)
     }
 

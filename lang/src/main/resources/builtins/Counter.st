@@ -42,4 +42,3 @@ Function_Block F_TRIG
     Q := NOT CLK AND NOT M;
     M := NOT CLK;
 End_Function_Block
-Builder

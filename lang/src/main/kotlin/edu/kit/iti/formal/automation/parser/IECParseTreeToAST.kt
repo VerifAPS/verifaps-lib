@@ -102,12 +102,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitPragma(ctx: IEC61131Parser.PragmaContext): Any {
-        val rawParameters = HashMap<String,String>()
-        var position : Int = 0;
+        val rawParameters = HashMap<String, String>()
+        var position: Int = 0;
         ctx.pragma_arg().forEach {
             val value = it.value.text.trim('\'', '"')
-            if(it.ASSIGN()==null)
-                rawParameters["#"+(position++)] = value
+            if (it.ASSIGN() == null)
+                rawParameters["#" + (position++)] = value
             else
                 rawParameters[it.arg.text.trim('"', '\'')] = value
         }
@@ -174,7 +174,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = StringLit(
                 if (ctx.STRING_LITERAL() != null) IECString.STRING
                 else IECString.WSTRING,
-                ctx.text)
+                if (ctx.WSTRING_LITERAL() != null) ctx.text.trim('"')
+                else ctx.text.trim('\''))
         ast.ruleContext = ctx
         return ast
     }
@@ -984,12 +985,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitStBody(ctx: IEC61131Parser.StBodyContext): Any {
         val statements = StatementList()
-        if(ctx.startlbl!=null)
-            statements.add(ctx.startlbl.accept() )
+        if (ctx.startlbl != null)
+            statements.add(ctx.startlbl.accept())
         statements.addAll(ctx.startstmts.accept());
 
-        for(i in 0 until ctx.lbls.size) {
-            statements.add(ctx.lbls[i].accept() )
+        for (i in 0 until ctx.lbls.size) {
+            statements.add(ctx.lbls[i].accept())
             statements.addAll(ctx.stmts[i].accept())
         }
         return statements
