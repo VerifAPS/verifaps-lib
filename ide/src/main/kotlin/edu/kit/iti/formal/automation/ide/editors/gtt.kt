@@ -158,7 +158,8 @@ class TTOverviewTransformer(val editor: CodeEditor) {
         override fun visitOpts(ctx: TestTableLanguageParser.OptsContext): OverviewStructureNode {
             val root = OverviewStructureNode(StructureData("Options", editor, ROOT_ICON))
             ctx.kv().forEach {
-                val n = OverviewStructureNode(StructureData(it.key.text, editor, ROOT_ICON, Position.start(it.key)))
+                val n = OverviewStructureNode(
+                        StructureData(it.key.text, editor, ROOT_ICON, Position.start(it.key.start)))
                 root.add(n)
             }
             return root
