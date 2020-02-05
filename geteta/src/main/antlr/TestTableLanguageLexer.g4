@@ -18,6 +18,7 @@ public boolean relational = false;
 }
 
 
+DOT:'.';
 SEMICOLON:';';
 OMEGA:'omega';
 GVAR:'gvar';

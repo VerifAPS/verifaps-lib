@@ -1,3 +1,4 @@
 table Inv {
-
+  var input i : INT
+  var output o : INT
 }

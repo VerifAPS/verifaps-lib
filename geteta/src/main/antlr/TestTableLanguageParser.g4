@@ -37,7 +37,8 @@ tableHeader:
 ;
 
 opts: OPTIONS LBRACE (kv)*  RBRACE;
-kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
+kv: key=option_key (EQUALS|COLON) (constant|variable) osem;
+option_key: (intOrId (DOT intOrId)*);
 
 signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem
 ;
