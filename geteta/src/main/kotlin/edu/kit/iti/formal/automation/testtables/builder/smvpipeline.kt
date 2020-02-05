@@ -295,7 +295,8 @@ class WeakConformance : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         val invar =
                 model.stateError implies
-                        model.rowStates.map { s -> model.getVariable(s) }.disjunction()
+                        model.rowStates.map { s -> model.getVariable(s) }
+                                .disjunction(SLiteral.FALSE)
                                 .or(model.stateSentinel)
         model.tableModule.invariantSpecs.add(invar)
     }
