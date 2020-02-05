@@ -600,7 +600,8 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
 
 
     override fun traverse(variableDeclaration: VariableDeclaration) {
-        variableDeclaration.typeDeclaration = variableDeclaration.typeDeclaration!!.accept(visitor) as TypeDeclaration
+        variableDeclaration.typeDeclaration =
+                variableDeclaration.typeDeclaration?.accept(visitor) as TypeDeclaration?
     }
 
 

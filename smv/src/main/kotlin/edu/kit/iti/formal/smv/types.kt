@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.CodeWriter
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
@@ -111,7 +112,7 @@ object SMVTypes {
 }
 
 data class EnumType(var values: List<String>) : SMVType {
-    override fun format(value: Any): String = value.toString()
+    override fun format(value: Any): String = SMVPrinter.quoted(value.toString())
     override fun read(str: String): String = str
     override fun repr(): String = toString()
 
@@ -125,7 +126,7 @@ data class EnumType(var values: List<String>) : SMVType {
     override fun toString(): String {
         return if (values.isEmpty()) "{}"
         else
-            "{" + values.reduce { a, b -> "$a, $b" } + "}"
+            values.joinToString(", ", "{", "}") { format(it) }
     }
 }
 
@@ -143,7 +144,7 @@ data class ModuleType(
 
     override fun toString(): String {
         val stream = StringWriter()
-        val printer = SMVPrinter(PrintWriter(stream))
+        val printer = SMVPrinter(CodeWriter(stream))
         return String.format("${moduleName}(%s)",
                 if (parameters.size > 0) {
                     parameters.joinToString(", ") { it.repr() }

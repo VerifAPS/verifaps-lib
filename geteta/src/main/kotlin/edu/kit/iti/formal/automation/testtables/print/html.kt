@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.print
 
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
@@ -105,7 +105,7 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
         val c =
                 if (cell.inBetween) "in-between"
                 else ""
-        stream.print("""<td class="cell ${v.name} ${v.dataType} ${v.logicType} ${v.io} $c">$content</td>
+        stream.print("""<td class="cell ${v.name} ${v.dataType} ${v.logicType} ${v.category} $c">$content</td>
         """)
     }
 
@@ -142,14 +142,14 @@ class HTMLTablePrinter(gtt: GeneralizedTestTable, stream: CodeWriter,
                 is Duration.Omega -> options.omegaRepetition
                 is Duration.ClosedInterval -> {
                     (if (d.lower == d.upper) "${d.lower}"
-                    else "[${d.lower},${d.upper}]") + (if (d.pflag) options.progressFlag else "")
+                    else "[${d.lower},${d.upper}]") + d.modifier.repr()
                 }
                 is Duration.OpenInterval ->
-                    String.format("${options.mathGreaterEquals}%s", d.lower) + (if (d.pflag) options.progressFlag else "")
+                    String.format("${options.mathGreaterEquals}%s", d.lower) + d.modifier.repr()
             }
 }
 
-class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageBaseVisitor<String>() {
+class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageParserBaseVisitor<String>() {
     override fun visitCell(ctx: TestTableLanguageParser.CellContext) = ctx.chunk().joinToString(",") { it.accept(this) }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext?): String = options.dontCare

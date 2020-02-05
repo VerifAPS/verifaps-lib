@@ -1,12 +1,11 @@
 package edu.kit.iti.formal.automation.blocks
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.values.FALSE
-import edu.kit.iti.formal.automation.st.ast.BooleanLit
-import edu.kit.iti.formal.automation.st.ast.StatementList
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.automation.st.ast.assignTo
+import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.smv.ast.SCaseExpression
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
@@ -18,8 +17,7 @@ fun BlockProgram.ssa() {
     ensureErrorFlag()
     prepareSSA()
     if (hasLoop()) {
-
-        //unrollLoops()
+        throw IllegalStateException("You should remove all loops before you call ssa(). see unrollLoops()")
     } else {
         ssaTopsort()
     }
@@ -27,8 +25,12 @@ fun BlockProgram.ssa() {
 
 private fun BlockProgram.prepareSSA() {
     this.blocks.forEach {
-        val sstate = SymbExFacade.evaluateStatements(it.statements, scope)
-        it.localMutationMap = sstate.toMap()
+        symbex.push()
+        val program = ProgramDeclaration(scope=scope, stBody = it.statements)
+        IEC61131Facade.resolveDataTypes(PouElements.singleton(program))
+        program.accept(symbex)
+        val sstate = symbex.pop()
+        it.localMutationMap = sstate
     }
 }
 
@@ -41,11 +43,11 @@ private fun BlockProgram.ensureErrorFlag() {
     }
 }
 
-fun BlockProgram.unrollLoops() {
+fun BlockProgram.unrollLoops(k: Int = 1) {
     while (true) {
         val loop = findCycle()
         if (loop != null)
-            unrollLoop(loop, 1)//TODO make configurable
+            unrollLoop(loop, k)
         else
             break
     }
@@ -72,7 +74,8 @@ fun BlockProgram.unrollLoop(loop: List<Block>, k: Int) {
         val replacement = loop.zip(copy).toMap()
         edges.forEach { (from, to) ->
             when {
-                from == loopEnd && to == loopStart -> { /* skip */ }
+                from == loopEnd && to == loopStart -> { /* skip */
+                }
                 from in loop && to in loop -> {
                     val newFrom = replacement[from]!!
                     val newTo = replacement[to]!!
@@ -127,7 +130,6 @@ private fun BlockProgram.ssaTopsort() {
 
         //1. Update execution condition.
         //2. Update state
-
         if (incoming.isEmpty()) { //No incoming edge. The terms stands for itself.
             it.ssaExecutionCondition = SymbExFacade.evaluateExpression(it.executionCondition, scope)
             it.ssaMutation = HashMap(it.localMutationMap)

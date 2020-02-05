@@ -63,7 +63,9 @@ object LoadHelp {
         if (dirURL!!.protocol.equals("jar")) {
             /* A JAR path */
             //strip out only the JAR file
-            val jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
+            var jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
+            if(jarPath.startsWith("/C:"))
+                jarPath = jarPath.substring(1)
             val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
             val dir = fs.getPath(path)
             return Files.list(dir).collect(Collectors.toList())
@@ -92,7 +94,9 @@ object LoadHelp {
         if (dirURL!!.protocol.equals("jar")) {
             /* A JAR path */
             //strip out only the JAR file
-            val jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
+            var jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
+            if(jarPath.startsWith("/C:"))
+                jarPath = jarPath.substring(1)
             val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
             val dir = fs.getPath(path)
             return dir

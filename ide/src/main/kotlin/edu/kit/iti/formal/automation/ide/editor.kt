@@ -8,7 +8,6 @@ import edu.kit.iti.formal.automation.ide.editors.IECLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.SmvLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.TestTableLanguageSupport
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
-import me.tomassetti.kanvas.AntlrTokenMaker
 import me.tomassetti.kanvas.LanguageSupport
 import me.tomassetti.kanvas.NoneLanguageSupport
 import org.fife.rsta.ui.CollapsibleSectionPanel
@@ -99,9 +98,9 @@ class EditorFactoryImpl(val lookup: Lookup,
 
     override fun getLanguage(it: File): LanguageSupport? {
         for (language in languageSupports) {
-            if (it.extension in language.extension) {
-                return language
-            }
+            for (ext in language.extension)
+                if (it.toString().endsWith(ext))
+                    return language
         }
         return null
     }
@@ -120,6 +119,7 @@ class EditorFactoryImpl(val lookup: Lookup,
             ""
         }
         codeEditor.dirty = false
+        codeEditor.textArea.foldManager.reparse()
         return codeEditor
     }
 
@@ -179,7 +179,7 @@ class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
         if (old != new) {
             textArea.clearParsers()
             textArea.syntaxEditingStyle = new.mimeType
-            (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(new.antlrLexerFactory))
+            (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMakerFactory(new.antlrLexerFactory))
             textArea.syntaxScheme = new.syntaxScheme
             textArea.addParser(new.createParser(this, lookup))
             textArea.isCodeFoldingEnabled = new.isCodeFoldingEnabled
@@ -228,7 +228,7 @@ class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
     init {
         textFont = lookup.get<Colors>().defaultFont
         contentPane.layout = BorderLayout()
-        (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMaker(languageSupport.antlrLexerFactory))
+        (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMakerFactory(languageSupport.antlrLexerFactory))
         textArea.syntaxScheme = languageSupport.syntaxScheme
         textArea.isCodeFoldingEnabled = true
         textArea.currentLineHighlightColor = colors.HIGHTLIGHT_LINE
@@ -267,8 +267,14 @@ class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
         })
 */
         //val provider = createCompletionProvider(languageSupport, context, { cachedRoot })
-        //val ac = AutoCompletion(provider)
-        //ac.install(textArea)
+        /*val provider = object : DefaultCompletionProvider() {
+            override fun getCompletionByInputText(inputText: String?): MutableList<Completion> {
+                println(inputText)
+                return super.getCompletionByInputText(inputText)
+            }
+        }
+        val ac = AutoCompletion(provider)
+        ac.install(textArea)*/
         contentPane.layout = BorderLayout()
         titleText = "EMPTY"
         isCloseable = true
@@ -311,7 +317,7 @@ class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
 }
 
 fun Action.activateKeystroke(comp: JComponent) {
-    (getValue(Action.ACCELERATOR_KEY)as? KeyStroke)?.also { activateKeystroke(comp, it) }
+    (getValue(Action.ACCELERATOR_KEY) as? KeyStroke)?.also { activateKeystroke(comp, it) }
 }
 
 fun Action.activateKeystroke(comp: JComponent, ks: KeyStroke) {

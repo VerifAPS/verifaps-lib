@@ -63,7 +63,7 @@ jobs:
 
 #      - run: gradle --continue --build-cache check
       - run: |
-          gradle --continue --build-cache --parallel check jacocoTestReport sonarqube \
+          gradle --continue --build-cache check jacocoTestReport sonarqube \
                  -Dsonar.projectKey=VerifAPS_verifaps-lib\
                  -Dsonar.branch.name=${CIRCLE_BRANCH}\
                  -Dsonar.organization=verifaps \

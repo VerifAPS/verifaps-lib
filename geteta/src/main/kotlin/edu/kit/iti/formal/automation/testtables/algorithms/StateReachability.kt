@@ -53,6 +53,7 @@ class StateReachability(root: Region) {
         endSentinel.duration = Duration.ClosedInterval(1, 1)
         flatList = ArrayList(root.flat())
         flatList.add(endSentinel)
+        flatList.add(startSentinel)
 
         val startSet = hashSetOf(startSentinel)
         val endRows = initTable(startSet, root)

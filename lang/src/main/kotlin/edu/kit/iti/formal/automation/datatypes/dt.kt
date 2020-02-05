@@ -8,6 +8,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.math.ceil
 import kotlin.math.ln
@@ -205,20 +206,13 @@ class ArrayType(name: String, val fieldType: AnyDt,
 
     override fun repr(obj: Any): String {
         val ary = obj as MultiDimArrayValue
-        return ary.data.joinToString(",") { fieldType.repr(it.value) }
+        return ary.internalData().joinToString(",") { fieldType.repr(it) }
     }
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     fun allIndices() =
-            ranges.map { IntRange(it.startValue, it.stopValue) }
-                    .fold(listOf(listOf())) { acc: List<List<Int>>, range: IntRange ->
-                        acc.flatMap { l ->
-                            range.map { r ->
-                                l + r
-                            }
-                        }
-                    }
+            ranges.map { it.toIntRange() }.expand()
 
     fun dimSize(d: Int): Int = ranges[d].stopValue
 
@@ -231,6 +225,36 @@ class ArrayType(name: String, val fieldType: AnyDt,
         else
             name
     }
+}
+
+/**
+ * Super highly complicated code, do not touch.
+ */
+fun List<IntRange>.expand(): Array<IntArray> {
+    val span = this.map { it.last - it.first + 1 }
+    val amount = span.reduce { a, b -> a * b }
+
+    val factorRight = IntArray(size) { 0 }
+    factorRight[size - 1] = 1
+    for (i in (size - 2) downTo 0)
+        factorRight[i] = factorRight[i + 1] * span[i + 1]
+
+    val arrays = Array(amount) { IntArray(this.size) { -1 } }
+
+    forEachIndexed { arrayPos, idxRange ->
+        val factor = factorRight[arrayPos]
+        val r = factor
+        val outer = amount / span[arrayPos] / r
+        var apos = 0
+        repeat(outer) {
+            idxRange.forEach { idx ->
+                repeat(r) {
+                    arrays[apos++][arrayPos] = idx
+                }
+            }
+        }
+    }
+    return arrays
 }
 
 /**

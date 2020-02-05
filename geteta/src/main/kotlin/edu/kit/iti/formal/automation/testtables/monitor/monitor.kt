@@ -21,17 +21,5 @@ data class Monitor(
         var types: String = "",
         var preamble: String = "",
         var postamble: String = "",
-        var initAtStart: Boolean = true
+        var static: Boolean = true
 )
-
-object MonitorFacade {
-    val generators = listOf(
-            CppMonitorGenerator, CMonitorGenerator,
-            MonitorGenerationEsterel, MonitorGenerationST
-    )
-
-    fun generateCombinedCpp(name: String, args: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): String {
-        val m = CppCombinedMonitorGeneration.generate(name, args);
-        return m.preamble + m.body + m.postamble;
-    }
-}

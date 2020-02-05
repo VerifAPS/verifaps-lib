@@ -38,29 +38,7 @@ import java.lang.reflect.Method
  * Created by weigla on 09.06.2014.*/
 object Utils {
     fun findProgram(tles: PouElements): ProgramDeclaration? {
-        for (t in tles)
-            if (t is ProgramDeclaration)
-                return t
-        return null
-    }
-
-    fun parseStructuredText(input: String, rule: String): ParseTree? {
-        return parseStructuredText(ANTLRInputStream(input), rule)
-    }
-
-    fun parseStructuredText(stream: ANTLRInputStream, rule: String): ParseTree? {
-        try {
-            val stl = IEC61131Lexer(stream)
-            val cts = CommonTokenStream(stl)
-            val stp = IEC61131Parser(cts)
-            val clazz = stp.javaClass
-            var method: Method? = null
-            method = clazz.getMethod(rule)
-            return method!!.invoke(stp) as ParseTree
-        } catch (e: Exception) {
-            return null
-        }
-
+        return tles.asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
     }
 
     fun compareTokens(tokens: List<Token>, expected: Array<String>, lexer: Lexer) {

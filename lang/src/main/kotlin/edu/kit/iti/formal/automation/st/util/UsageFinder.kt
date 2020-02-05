@@ -22,13 +22,14 @@ package edu.kit.iti.formal.automation.st.util
  * #L%
  */
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.AssignmentStatement
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.util.info
 import java.util.*
 
 /**
@@ -91,18 +92,18 @@ class UsageFinder : AstVisitor<Unit>() {
             val onlyRead = fuv.readReference.toHashSet()
             onlyRead.removeAll(fuv.writtenReferences)
 
-            Console.writeln("Remove unused ${unusedS.size} variables:")
-            unusedS.forEach { Console.writeln("\t$it") }
+            info("Remove unused ${unusedS.size} variables:")
+            unusedS.forEach { info("\t$it") }
             simplified.scope.variables.removeAllByName(unusedS)
 
             val onlyWrittenS = onlyWritten.map { it.identifier }
             val onlyReadS = onlyRead.map { it.identifier }
 
-            Console.writeln("Promote only written variables to outputs (${onlyWritten.size}):")
-            onlyWrittenS.forEach { Console.writeln("\t$it") }
+            info("Promote only written variables to outputs (${onlyWritten.size}):")
+            onlyWrittenS.forEach { info("\t$it") }
 
-            Console.writeln("Promote only read variables to inputs (${onlyRead.size}):")
-            onlyReadS.forEach { Console.writeln("\t$it") }
+            info("Promote only read variables to inputs (${onlyRead.size}):")
+            onlyReadS.forEach { info("\t$it") }
 
             simplified.scope.variables.forEach {
                 if (it.name in onlyReadS)

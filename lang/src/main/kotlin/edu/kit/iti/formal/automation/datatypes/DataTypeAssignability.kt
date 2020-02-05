@@ -11,6 +11,13 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
 
     override fun defaultVisit(obj: Any): Boolean = false
 
+    override fun visit(enumerateType: EnumerateType): Boolean {
+        if(enumerateType.name == expected.name) {
+            return true
+        }
+        return false
+    }
+
     override fun visit(anyBit: AnyBit): Boolean =
             when (expected) {
                 is AnyBit -> expected.bitLength >= AnyBit.BOOL.bitLength

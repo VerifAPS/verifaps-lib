@@ -49,11 +49,8 @@ class FacadeTest {
                 SVariable.create("c").asBool())
         //System.out.println(state);
         Assertions.assertNotEquals(null, state)
-        Assertions.assertEquals(
-                "case \n" +
-                        "a : b; TRUE : c; \n" +
-                        "esac",
-                state.repr())
+        Assertions.assertEquals("case a : b; TRUE : c; esac".cleanWhitespace(),
+                state.repr().cleanWhitespace())
     }
 
     @Test
@@ -66,4 +63,20 @@ class FacadeTest {
         //System.out.println(state);
         //Assertions.assertEquals();
     }
+
+    @Test
+    fun testExecute() {
+        val resource = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/symbextest.st")
+        val (toplevels, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
+        val p = toplevels[2] as ProgramDeclaration
+        try {
+            val ttp = SymbExFacade.execute(p)
+            for (i in 1..9) {
+                println(ttp.get(i))
+            }
+        }catch (e : IOException) {
+            Assumptions.assumeTrue(e.message?.startsWith("Cannot run program") ?: false)
+        }
+    }
 }
+

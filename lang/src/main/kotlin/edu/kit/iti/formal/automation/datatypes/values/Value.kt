@@ -66,7 +66,7 @@ sealed class Value<T : AnyDt, S : Any>(
 class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
     constructor(dt: AnyInt, v: Long) : this(dt, BigInteger.valueOf(v))
 
-    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo IntegerLit(dataType, value as BigInteger))
+    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo IntegerLit(dataType, value))
 }
 
 class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>)
@@ -140,10 +140,12 @@ class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(d
 class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v) {
     override fun assignTo(ref: SymbolicReference): StatementList? {
         val seq = StatementList()
-        val avalue = value as MultiDimArrayValue
+        val avalue = value
         dataType.allIndices().forEach {
-            val svalue = avalue.get(it)
-            svalue.assignTo(ref[it])?.also { seq.addAll(it) }
+            val svalue = avalue[it] as Value<*, *>
+            svalue.assignTo(ref[it])?.also {
+                seq.addAll(it)
+            }
         }
         return seq
     }

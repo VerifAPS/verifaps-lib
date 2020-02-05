@@ -86,4 +86,17 @@ open class CodeWriter(var stream: Writer = StringWriter())
         printf(tail)
         return this
     }
+
+    operator fun CharSequence.unaryPlus(): CharSequence {
+        this@CodeWriter.append(this@unaryPlus)
+        return this@unaryPlus
+    }
+
+    companion object{
+        fun with(fn : CodeWriter.() -> Unit) : String {
+            val cw = CodeWriter()
+            fn(cw)
+            return cw.stream.toString()
+        }
+    }
 }

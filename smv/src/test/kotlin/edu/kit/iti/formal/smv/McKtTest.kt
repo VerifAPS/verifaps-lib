@@ -36,7 +36,7 @@ class McKtTest {
         when (out) {
             is NuXMVOutput.Error -> assert(false) { "no errors expected" }
             is NuXMVOutput.Verified -> assert(false) { "ce expteced" }
-            is NuXMVOutput.NotVerified -> println(out.counterExample)
+            is NuXMVOutput.Cex -> println(out.counterExample)
         }
     }
 }

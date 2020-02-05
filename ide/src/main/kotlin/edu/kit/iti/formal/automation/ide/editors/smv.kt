@@ -1,11 +1,11 @@
 package edu.kit.iti.formal.automation.ide.editors
 
+import edu.kit.iti.formal.automation.ide.AntlrLexerFactory
 import edu.kit.iti.formal.automation.ide.CodeEditor
 import edu.kit.iti.formal.automation.ide.Colors
 import edu.kit.iti.formal.automation.ide.Lookup
 import edu.kit.iti.formal.smv.parser.SMVLexer
 import edu.kit.iti.formal.smv.parser.SMVLexer.*
-import me.tomassetti.kanvas.AntlrLexerFactory
 import me.tomassetti.kanvas.BaseLanguageSupport
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer

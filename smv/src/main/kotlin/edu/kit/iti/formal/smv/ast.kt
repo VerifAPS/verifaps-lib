@@ -3,7 +3,9 @@ package edu.kit.iti.formal.smv.ast
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.util.HasMetadata
 import edu.kit.iti.formal.util.HasMetadataImpl
+import edu.kit.iti.formal.util.meta
 import org.antlr.v4.runtime.Token
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -26,10 +28,15 @@ interface SOperator {
  * @author Alexander Weigl
  * @version 1 (09.04.18)
  */
-sealed class SMVAst : HasMetadata by HasMetadataImpl() {
+sealed class SMVAst : HasMetadata {
     fun repr(): String = SMVPrinter.toString(this)
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
     abstract fun clone(): SMVAst
+
+    private val metadata by lazy{ HasMetadataImpl()}
+    override fun <T> getMetadata(clazz: Class<T>): T? = metadata.getMetadata(clazz)
+    override fun <T : Any> setMetadata(clazz: Class<T>, obj: T) = metadata.setMetadata(clazz, obj)
+    override fun getAllMetadata(): Collection<Any> = metadata.getAllMetadata()
 }
 
 data class SAssignment(
@@ -48,10 +55,26 @@ data class SAssignment(
     override fun clone() = copy()
 }
 
-data class SBinaryExpression(var left: SMVExpr,
+data class SBinaryExpression(private var _left: SMVExpr,
                              var operator: SBinaryOperator,
-                             var right: SMVExpr)
+                             private var _right: SMVExpr)
     : SMVExpr() {
+
+    var left : SMVExpr
+        get() = _left
+        set(value) {
+            if(value === this) throw IllegalArgumentException()
+            _left = value
+        }
+
+    var right : SMVExpr
+        get() = _right
+        set(value) {
+            if(value === this) throw IllegalArgumentException()
+            _right = value
+        }
+
+
 
     override val dataType: SMVType?
         get() = SMVTypes.infer(left.dataType!!, right.dataType!!)
@@ -270,41 +293,23 @@ abstract class SMVExpr : SMVAst() {
     abstract val dataType: SMVType?
 
     //region builder methods
-    fun eventually(): SQuantified {
-        return SQuantified(STemporalOperator.F, this)
-    }
+    fun eventually(): SQuantified = SQuantified(STemporalOperator.F, this)
 
-    fun globally(): SQuantified {
-        return SQuantified(STemporalOperator.G, this)
-    }
+    fun globally(): SQuantified = SQuantified(STemporalOperator.G, this)
 
-    operator fun next(): SQuantified {
-        return SQuantified(STemporalOperator.X, this)
-    }
+    operator fun next(): SQuantified = SQuantified(STemporalOperator.X, this)
 
-    fun since(): SQuantified {
-        return SQuantified(STemporalOperator.S, this)
-    }
+    fun since(): SQuantified = SQuantified(STemporalOperator.S, this)
 
-    fun once(): SQuantified {
-        return SQuantified(STemporalOperator.O, this)
-    }
+    fun once(): SQuantified = SQuantified(STemporalOperator.O, this)
 
-    fun until(other: SMVExpr): SQuantified {
-        return SQuantified(STemporalOperator.U, this, other)
-    }
+    fun until(other: SMVExpr): SQuantified = SQuantified(STemporalOperator.U, this, other)
 
-    infix fun equal(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.EQUAL, e)
-    }
+    infix fun equal(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.EQUAL, e)
 
-    infix fun and(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.AND, e)
-    }
+    infix fun and(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.AND, e)
 
-    infix fun or(e: SMVExpr): SBinaryExpression {
-        return op(SBinaryOperator.OR, e)
-    }
+    infix fun or(e: SMVExpr): SBinaryExpression = op(SBinaryOperator.OR, e)
 
     fun op(o: SBinaryOperator, e: SMVExpr): SBinaryExpression {
         val product = SBinaryExpression(this, o, e)
@@ -313,17 +318,25 @@ abstract class SMVExpr : SMVAst() {
         return product
     }
 
-    operator fun not(): SUnaryExpression {
-        return SUnaryExpression(SUnaryOperator.NEGATE, this)
-    }
+    operator fun plus(e: SMVExpr) = op(SBinaryOperator.PLUS, e)
+    operator fun div(e: SMVExpr) = op(SBinaryOperator.DIV, e)
+    operator fun minus(e: SMVExpr) = op(SBinaryOperator.MINUS, e)
+    operator fun times(e: SMVExpr) = op(SBinaryOperator.MUL, e)
 
-    fun minus(): SUnaryExpression {
-        return SUnaryExpression(SUnaryOperator.MINUS, this)
-    }
+    infix fun le(e: SMVExpr) = op(SBinaryOperator.LESS_EQUAL, e)
+    infix fun lt(e: SMVExpr) = op(SBinaryOperator.LESS_THAN, e)
+    infix fun ge(e: SMVExpr) = op(SBinaryOperator.GREATER_EQUAL, e)
+    infix fun gt(e: SMVExpr) = op(SBinaryOperator.GREATER_THAN, e)
+    infix fun eq(e: SMVExpr) = op(SBinaryOperator.EQUAL, e)
+    infix fun neq(e: SMVExpr) = op(SBinaryOperator.NOT_EQUAL, e)
 
-    infix fun implies(e: SMVExpr): SMVExpr {
-        return op(SBinaryOperator.IMPL, e)
-    }
+
+
+    operator fun not(): SUnaryExpression = SUnaryExpression(SUnaryOperator.NEGATE, this)
+
+    fun negate(): SUnaryExpression = SUnaryExpression(SUnaryOperator.MINUS, this)
+
+    infix fun implies(e: SMVExpr): SMVExpr = op(SBinaryOperator.IMPL, e)
 
     /**
      * prefiexed and expression

@@ -6,10 +6,6 @@ group 'edu.kit.iti.formal.automation'
 
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation 'com.github.ajalt:clikt:2.1.0'
     compile group: 'org.graphstream', name: 'gs-core', version: '1.3'

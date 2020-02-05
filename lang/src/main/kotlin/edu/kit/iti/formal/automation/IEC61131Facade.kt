@@ -15,10 +15,12 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.warn
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
+import java.util.*
 
 /**
  * IEC61131Facade class.
@@ -54,7 +56,7 @@ object IEC61131Facade {
 
     fun statements(input: CharStream): StatementList {
         val parser = getParser(input)
-        val stmts = parser.statement_list().accept(IECParseTreeToAST()) as StatementList
+        val stmts = parser.statement_list_eof().stBody().accept(IECParseTreeToAST()) as StatementList
         parser.errorReporter.throwException()
         return stmts
     }
@@ -112,14 +114,14 @@ object IEC61131Facade {
     fun resolveDataTypes(elements: PouElements, scope: Scope = Scope.defaultScope()): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
-        val oo = ResolveOO(scope)
+        //val oo = ResolveOO(scope)
         //val rr = ResolveReferences(scope)
         elements.accept(EnsureFunctionReturnValue)
         elements.accept(fdt)
         elements.accept(rdt)
         elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
-        elements.accept(oo)
+        //elements.accept(oo)
         //elements.accept(rr)
         return scope
     }
@@ -137,8 +139,9 @@ object IEC61131Facade {
     }
 
     fun fileResolve(input: List<CharStream>, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
-        val p = PouElements()
-        input.forEach { p.addAll(file(it)) }
+        val seq = LinkedList<PouElement>()
+        input.parallelStream().forEach { synchronized(seq) { seq.addAll(file(it)) } }
+        val p = PouElements(seq)
         if (builtins)
             p.addAll(BuiltinLoader.loadDefault())
         resolveDataTypes(p)
@@ -156,31 +159,60 @@ object IEC61131Facade {
     /**
      *
      */
-    fun readProgramsWithLibrary(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
-            readProgramsWithLibrary(libraryElements, programs, Utils::findProgram)
-
-
-    /**
-     *
-     */
-    fun readProgramsWithLibrary(libraryElements: List<File>, programs: List<File>, select: String): List<PouExecutable?> =
-            readProgramsWithLibrary(libraryElements, programs) { seq ->
-                seq.find { it.name == select } as? PouExecutable
-            }
-
-    /**
-     *
-     */
-    fun readProgramsWithLibrary(libraryElements: List<File>,
-                                programs: List<File>,
-                                selector: (PouElements) -> PouExecutable?)
+    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>)
             : List<PouExecutable?> {
-        return programs.map {
+        val selectors = names.map { name ->
+            { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
+        }
+        return readProgramsWLS(libraryElements, programs, selectors)
+    }
+
+    /**
+     * Read programs with support for common libraries and a selection either by name or PROGRAM_DECLARATION
+     */
+    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>)
+            : List<PouExecutable?> {
+        val p = programs.map {
+            if ('@' in it) {
+                val a = it.split('@', limit = 2)
+                a[0] to a[1]
+            } else {
+                null to it
+            }
+        }
+        val pfiles = p.map { (_, a) -> File(a) }
+        val selectors = p.map { (name, _) ->
+            if (name == null)
+                { elements: PouElements -> Utils.findProgram(elements) }
+            else
+                { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
+        }
+        return readProgramsWLS(libraryElements, pfiles, selectors)
+    }
+
+
+    /**
+     *
+     */
+    fun readProgramsWLS(libraryElements: List<File>,
+                        programs: List<File>,
+                        selectors: List<(PouElements) -> PouExecutable?>)
+            : List<PouExecutable?> {
+        return programs.zip(selectors).map { (it, selector) ->
             val (elements, error) = filefr(libraryElements + it)
-            error.forEach { Console.warn(it.toHuman()) }
+            error.forEach { warn(it.toHuman()) }
             selector(elements)
         }
     }
+
+
+    /**
+     *
+     */
+    fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
+            readProgramsWLS(libraryElements, programs,
+                    programs.map { _ -> Utils::findProgram })
+
 
     /**
      *

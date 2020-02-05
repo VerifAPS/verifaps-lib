@@ -389,7 +389,7 @@ private val Variable.ctype: String
 class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
     override fun defaultVisit(top: SMVAst): String = "/*$top not supported*/"
     val variableReplacement = HashMap<String, String>()
-    val rewritingFunction = { n: String -> n }
+    var rewritingFunction = { n: String -> n }
     override fun visit(v: SVariable): String {
         val n = variableReplacement[v.name] ?: v.name
         return rewritingFunction(n)

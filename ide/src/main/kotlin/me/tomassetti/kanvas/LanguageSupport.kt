@@ -1,5 +1,6 @@
 package me.tomassetti.kanvas
 
+import edu.kit.iti.formal.automation.ide.AntlrLexerFactory
 import edu.kit.iti.formal.automation.ide.CodeEditor
 import edu.kit.iti.formal.automation.ide.Lookup
 import me.tomassetti.antlr.None
@@ -10,8 +11,6 @@ import org.fife.ui.rsyntaxtextarea.Style
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme
 import org.fife.ui.rsyntaxtextarea.parser.Parser
 import java.awt.Color
-
-//data class ParserData(val ruleNames: Array<String>, val vocabulary: Vocabulary, val atn: ATN)
 
 interface LanguageSupport {
     fun createParser(textArea: CodeEditor, lookup: Lookup): Parser? = null

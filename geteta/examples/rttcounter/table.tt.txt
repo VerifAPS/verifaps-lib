@@ -1,16 +1,15 @@
-relational table T {
-   var output c of 0 1 : INT
+relational table T(P, Q) { 
+   var output {P,Q} c : INT
 
     group omega  {
-        row 1 {
-            pause 1
+        row stutter {
+            \pause: 1
             0|>c: -
             1|>c: -
         }
 
-        row 1 {
-            pause 1;
-            0|>c: =1$c
+        row check {
+            0|>c: =1::c
             1|>c: -
         }
     }

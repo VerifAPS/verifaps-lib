@@ -15,7 +15,7 @@ table MinMaxTbl {
             row >=1 { mode: Learn; learn: true;  I: [min,max]; Q: [min,max]; W: false }
         }
         /*
-        group >=1 {
+        group >=1 { 
             row >= 0 { mode: Active; learn: -; I: [min,max]; Q: [min,max]; W: false }
 
             row [10, 10] { mode: Active; learn: -; I: >max; Q: <=max; W: false  }
@@ -31,4 +31,10 @@ table MinMaxTbl {
             row >=1      { mode: Active; learn: -; I: [min,max]; Q: [min,max]; W: false }
        }*/
     }
+}
+
+table Abc {
+	var input mode: ENUM
+	group{ 
+	}
 }

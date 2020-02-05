@@ -35,48 +35,22 @@ fun splitUpByLabel(list: StatementList): BlockProgram {
 }
 
 /**
- * Write a block diagram into a dot-file
+ *  Second step, break up blocks if they contain a goto statement
  */
-fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
-    append("digraph G {\n")
-
-    fun String.escape() = replace("#","_")
-
-    blocks.blocks.forEach {
-        val map = if (it.ssaMutation.isNotEmpty()) it.ssaMutation else it.localMutationMap
-        val ssa = map.toList().joinToString("\\n") { (v, e) ->
-            "$v = $e"
-        }
-        val label = listOf(
-                it.label,
-                IEC61131Facade.print(it.executionCondition),
-                IEC61131Facade.print(it.statements).replace("\n", "\\n"),
-                ssa).joinToString(" | ")
-
-        append("${it.label.escape()} [label=\"{$label}\",shape=\"record\"];\n")
-    }
-
-    blocks.edges.forEach { (a, b) ->
-        append("${a.label.escape()} -> ${b.label.escape()} [];\n")
-    }
-
-    append("}")
-
-    toString()
-}
-
 fun splitGotoBlocks(blocks: BlockProgram) {
     val gotoBlocks = blocks.blocks.filter { it.containsGoto }
     gotoBlocks.forEach {
         val split = splitGoto(it)
         patch(blocks, it, split)
     }
-
     redrawGotoEdges(blocks)
     truncateUnreachableBlocks(blocks)
     removeEmptyBlocks(blocks)
 }
 
+/**
+ * Remove blocks, that are not reachable from the given start block.
+ */
 fun truncateUnreachableBlocks(blocks: BlockProgram, start: Block = blocks.startBlock) {
     val allBlocks = blocks.blocks.toMutableSet()
     val reached = HashSet<Block>()
@@ -97,6 +71,9 @@ fun truncateUnreachableBlocks(blocks: BlockProgram, start: Block = blocks.startB
     }
 }
 
+/**
+ * Patch the given block program by replacing a block [substituted] with the given [substitute].
+ */
 fun patch(into: BlockProgram, substituted: Block, substitute: BlockProgram) {
     val outgoing = into.outgoingEdges(substituted).toList()
     //val incoming = into.incomingEdges(substituted)
@@ -123,7 +100,9 @@ fun patch(into: BlockProgram, substituted: Block, substitute: BlockProgram) {
     }
 }
 
-
+/**
+ * Return a block program, that results from the split up by goto statements.
+ */
 fun splitGoto(it: Block): BlockProgram {
     val bp = it.statements.accept(GotoSplitter())
     return bp
@@ -165,7 +144,6 @@ fun redrawGotoEdges(bp: BlockProgram) {
         }
     }
 }
-
 
 /**
  *
@@ -240,4 +218,35 @@ class GotoSplitter : AstVisitor<BlockProgram>() {
         return bp
     }
 
+}
+
+/**
+ * Write a block diagram into a dot-file
+ */
+fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
+    append("digraph G {\n")
+
+    fun String.escape() = replace("#", "_")
+
+    blocks.blocks.forEach {
+        val map = if (it.ssaMutation.isNotEmpty()) it.ssaMutation else it.localMutationMap
+        val ssa = map.toList().joinToString("\\n") { (v, e) ->
+            "$v = $e"
+        }
+        val label = listOf(
+                it.label,
+                IEC61131Facade.print(it.executionCondition),
+                IEC61131Facade.print(it.statements).replace("\n", "\\n"),
+                ssa).joinToString(" | ")
+
+        append("${it.label.escape()} [label=\"{$label}\",shape=\"record\"];\n")
+    }
+
+    blocks.edges.forEach { (a, b) ->
+        append("${a.label.escape()} -> ${b.label.escape()} [];\n")
+    }
+
+    append("}")
+
+    toString()
 }

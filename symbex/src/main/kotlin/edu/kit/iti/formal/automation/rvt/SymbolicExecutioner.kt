@@ -1,20 +1,32 @@
 package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.exceptions.*
+import edu.kit.iti.formal.automation.analysis.toHuman
+import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException
+import edu.kit.iti.formal.automation.exceptions.UnknownDatatype
+import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
+import edu.kit.iti.formal.automation.il.IlSymbex
 import edu.kit.iti.formal.automation.operators.Operators
+import edu.kit.iti.formal.automation.rvt.pragma.SmvBody
 import edu.kit.iti.formal.automation.rvt.translators.*
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
+import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.ast.Invoked.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
+
+typealias LineMap = HashMap<Int, Pair<String, Position>>
 
 /**
  * Created by weigl on 26.11.16.
+ * 2019-08-11 weigl: use definition for common sub expressions (<var>_<linenumer> value of <variable> in linenumber)
+ *                   <var> refers to the last <variable>
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
@@ -66,7 +78,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return if (varCache.containsKey(vd.identifier))
             varCache[vd.identifier]!!
         else {
-            val v = peek().keys.find { name->
+            val v = peek().keys.find { name ->
                 vd.identifier == name.name
             }
             if (v != null) {
@@ -91,7 +103,8 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }
 
     override fun visit(symbolicReference: SymbolicReference): SMVExpr {
-        return peek()[lift(symbolicReference)]!!
+        return peek()[lift(symbolicReference)]
+                ?: throw IllegalStateException("Could not resolve access to '${symbolicReference.toHuman()}'.")
         /* Enum already be resoled
         if (symbolicReference.dataType is EnumerateType && (symbolicReference.dataType as EnumerateType)
                         .allowedValues.contains(symbolicReference.identifier))
@@ -103,34 +116,41 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     //endregion
 
+    //region visitors
     override fun visit(literal: Literal): SLiteral {
         return this.valueTranslator.translate(literal)
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable)
-    override fun visit(programDeclaration: ProgramDeclaration): SCaseExpression? = visit(programDeclaration as PouExecutable)
-    fun visit(programDeclaration: PouExecutable): SCaseExpression? {
-        scope = programDeclaration.scope
+    override fun visit(programDeclaration: ProgramDeclaration) = visit(programDeclaration as PouExecutable)
+    fun visit(exec: PouExecutable): SMVExpr? {
+        exec.findAttributePragma("smv_body")?.let {
+            val smvBody = SmvBody(it)
+            //TODO do not execute body use value of smvBody instead
+            //TODO allow introduction of new smv input variables
+        }
+
+        scope = exec.scope
 
         push(SymbolicState())
 
         // initialize root state
-        for (vd in scope!!) {
+        for (vd in scope) {
             val s = lift(vd)
-            peek()[s] = s
+            assign(vd, s)
         }
 
         globalState = SymbolicState()
-        for (variable in scope!!.filterByFlags(VariableDeclaration.GLOBAL))
+        for (variable in scope.filterByFlags(VariableDeclaration.GLOBAL))
             globalState[lift(variable)] = peek()[lift(variable)]!!
 
-        programDeclaration.stBody!!.accept(this)
+        exec.stBody!!.accept(this)
         return null
     }
 
     override fun visit(assign: AssignmentStatement): SMVExpr? {
-        val s = peek()
-        s[lift(assign.location as SymbolicReference)] = assign.expression.accept(this)!!
+        val expr = assign.expression.accept(this)!!
+        assign(assign.location, expr)
         return null
     }
 
@@ -150,34 +170,50 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }*/
 
     override fun visit(invocation: Invocation): SMVExpr? {
-        val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
+        //val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
+        val inv = when (val i = invocation.invoked) {
+            is Action -> i.action
+            is Program -> i.program
+            is FunctionBlock -> i.fb
+            is Invoked.Function -> i.function
+            is Method -> i.method
+            null -> throw IllegalStateException("Can not invoke a not resolved function: $invocation")
+        }
+        val returnType = when (val i = invocation.invoked) {
+            is Invoked.Function -> i.function.returnType
+            is Method -> i.method.returnType
+            else -> throw IllegalStateException("$invocation does not have a return type.")
+        }
+        val stBody = (inv as? HasStBody)?.stBody
+        val ilBody = (inv as? HasIlBody)?.ilBody
+        val scope = (inv as? HasScope)?.scope!!
+        val fName = (inv as Identifiable).name
+
 
         //initialize data structure
         val calleeState = SymbolicState(globalState)
         val callerState = peek()
 
         //region register function name as output variable
-        try {
-            fd.scope.getVariable(fd.name)
-        } catch (e: VariableNotDefinedException) {
-            val vd = VariableDeclaration(fd.name, VariableDeclaration.OUTPUT, fd.returnType.obj!!)
-            vd.initValue = initValueTranslator.getInit(fd.returnType.obj!!)
-            fd.scope.add(vd)
+        if (scope.hasVariable(fName)) {
+            val vd = VariableDeclaration(fName, VariableDeclaration.OUTPUT, returnType.obj!!)
+            vd.initValue = initValueTranslator.getInit(returnType.obj!!)
+            scope.add(vd)
         }
         //endregion
 
         //region local variables (declaration and initialization)
-        for (vd in fd.scope.variables) {
+        for (vd in scope.variables) {
             //if (!calleeState.containsKey(vd.getName())) {
             val expr = this.valueTranslator.translate(vd.initValue!!)
-            calleeState[lift(vd)] = expr
+            calleeState.assign(lift(vd), assignmentCounter.incrementAndGet(), expr) //TODO maintain map?
             //}
         }
         //endregion
 
         //region transfer variables
         val parameters = invocation.parameters
-        val inputVars = fd.scope.filterByFlags(
+        val inputVars = scope.filterByFlags(
                 VariableDeclaration.INPUT or VariableDeclaration.INOUT)
 
         if (parameters.size > inputVars.size) {
@@ -192,34 +228,45 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
                 continue
             if (parameter.name == null)
             // name from definition, in order of declaration, expression from caller site
-                calleeState[lift(inputVars[i])] = parameter.expression.accept(this)!!
+                calleeState.assign(lift(inputVars[i]),
+                        assignmentCounter.incrementAndGet(),
+                        parameter.expression.accept(this)!!)
             else {
                 val o = inputVars.stream().filter { iv -> iv.name == parameter.name }.findAny()
                 if (o.isPresent) {
                     val e = parameter.expression.accept(this)!!
-                    calleeState[lift(o.get())] = e!!
+                    calleeState[lift(o.get())] = e
                 }
             }
         }
 
-        for (outputVar in fd.scope.filterByFlags(VariableDeclaration.OUTPUT))
-            calleeState[lift(outputVar)] = this.valueTranslator.translate(
-                    this.initValueTranslator.getInit(outputVar.dataType!!))
+        for (outputVar in scope.filterByFlags(VariableDeclaration.OUTPUT))
+            calleeState.assign(lift(outputVar), assignmentCounter.incrementAndGet(),
+                    this.valueTranslator.translate(
+                            this.initValueTranslator.getInit(outputVar.dataType!!)))
 
-        push(calleeState)
         //endregion
 
-        // execution of body
-        fd.stBody?.accept(this)
+        //region execution of body
+        val returnState =
+                if (stBody != null) {
+                    push(calleeState)
+                    stBody.accept(this)
+                    pop()
+                } else if (ilBody != null) {
+                    val ilsymbex = IlSymbex(ilBody, scope = scope, state = calleeState)
+                    ilsymbex.call()
+                } else {
+                    throw IllegalStateException("No executable body found for $fName")
+                }
 
-        val returnState = pop()
         // Update output variables
         val outputParameters = invocation.outputParameters
-        val outputVars = fd.scope.filterByFlags(
+        val outputVars = scope.filterByFlags(
                 VariableDeclaration.OUTPUT, VariableDeclaration.INOUT)
 
         for (parameter in outputParameters) {
-            val o = outputVars.find { it.name == parameter.name }
+            val o = outputVars.find { fName == parameter.name }
             val expr = parameter.expression
             if (o != null && parameter.expression is SymbolicReference) {
                 val symVar = lift(expr as SymbolicReference)
@@ -227,12 +274,17 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             }
             // TODO handle parameter.getExpression() instanceof Literal, etc.
         }
+        //endregion
 
-        //fd.getReturnType() != null
-        return calleeState[fd.name]
+        /*val value = calleeState[fName] // store, because of destroying change in next lines
+        calleeState.map.forEach { (t, u) ->
+            // do not leak internal variables to the outside
+            val variable = SVariable("${getRandomLabel()}_${t.name}", t.dataType!!);
+            callerState.map[variable] = u
+        }*/
+        val unfolded = calleeState.unfolded()
+        return unfolded.entries.find { (a, b) -> a.name == fName }?.value
     }
-
-//endregion
 
     override fun visit(statement: IfStatement): SCaseExpression? {
         val branchStates = SymbolicBranches()
@@ -248,7 +300,9 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         statement.elseBranch.accept(this)
         branchStates.addBranch(SLiteral.TRUE, pop())
 
-        peek().putAll(branchStates.asCompressed())
+        val cur = peek()
+        val combined = branchStates.asCompressed(statement.endPosition)
+        cur.map.putAll(combined.map)
         return null
     }
 
@@ -261,9 +315,11 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
             branchStates.addBranch(condition, pop())
         }
         push()
-        caseStatement.elseCase!!.accept(this)
+        caseStatement.elseCase.accept(this)
         branchStates.addBranch(SLiteral.TRUE, pop())
-        peek().putAll(branchStates.asCompressed())
+        val cur = peek()
+        val combined = branchStates.asCompressed(caseStatement.endPosition)
+        cur.map.putAll(combined.map)
         return null
     }
 
@@ -287,7 +343,6 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         return be.accept(this)!!
     }
 
-
     override fun visit(e: CaseCondition.Enumeration): SMVExpr {
         val be = BinaryExpression(caseExpression!!, Operators.EQUALS, e.start)
         return be.accept(this)!!
@@ -296,4 +351,56 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     //ignore
     override fun visit(commentStatement: CommentStatement) = null
+    //endregion
+
+
+    val lineNumberMap = LineMap()
+    val assignmentCounter = AtomicInteger(-1)
+
+    fun assign(vd: VariableDeclaration, value: SMVExpr) {
+        val s = lift(vd)
+        val cnt = assignmentCounter.incrementAndGet()
+
+        vd.startPosition.run {
+            lineNumberMap[cnt] = vd.toHuman() to this
+        }
+        peek().assign(s, cnt, value)
+    }
+
+    fun assign(ref: SymbolicReference, value: SMVExpr) {
+        val s = lift(ref)
+        val cnt = assignmentCounter.incrementAndGet()
+        ref.startPosition?.run {
+            lineNumberMap[cnt] = ref.toHuman() to this
+        }
+        peek().assign(s, cnt, value)
+    }
+
+    fun SymbolicBranches.asCompressed(pos: Position): SymbolicState {
+        val sb = SymbolicState()
+        variables.forEach { (t, u) ->
+            val sv = SymbolicVariable(t)
+            val cnt = assignmentCounter.incrementAndGet()
+            lineNumberMap[cnt] = t.name to pos
+            sv.push(u.compress(), "$ASSIGN_SEPARATOR$cnt")
+            defines[t]?.let { sv.values.putAll(it) }
+            sb.map[t] = sv
+        }
+        return sb
+    }
+}
+
+class SymbolicBranches {
+    val variables: HashMap<SVariable, SCaseExpression> = HashMap()
+    val defines = HashMap<SVariable, HashMap<SVariable, SMVExpr>>()
+
+    fun addBranch(condition: SMVExpr, state: SymbolicState) {
+        for ((key, value) in state.map) {
+            getVariable(key).add(condition, if (state.useDefinitions) value.current else value.value!!)
+            getDefines(key).putAll(value.values)
+        }
+    }
+
+    fun getVariable(key: SVariable): SCaseExpression = variables.computeIfAbsent(key) { SCaseExpression() }
+    fun getDefines(key: SVariable): HashMap<SVariable, SMVExpr> = defines.computeIfAbsent(key) { HashMap() }
 }

@@ -25,6 +25,8 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
+import edu.kit.iti.formal.automation.parser.IEC61131Parser
+import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
@@ -33,13 +35,15 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.smv.VariableReplacer
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.findProgram
+import java.io.File
 import java.io.StringWriter
-import java.util.*
+import java.math.BigInteger
+import kotlin.math.ceil
+import kotlin.math.log2
 
 /**
  * @author Alexander Weigl
@@ -47,24 +51,20 @@ import java.util.*
  */
 object SymbExFacade {
     fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr {
-        return evaluateFunction(decl, Arrays.asList(*args))
+        return evaluateFunction(decl, listOf(*args))
     }
 
     fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
         val se = SymbolicExecutioner()
-        val state = SymbolicState()
-        // <name>(i1,i2,i2,...)
-        val fc = Invocation()
-        fc.calleeName = decl.name
-        var i = 0
-        for (vd in decl.scope
-                .filterByFlags(VariableDeclaration.INPUT)) {
-            fc.parameters.add(InvocationParameter(SymbolicReference(vd.name)))
-            state[se.lift(vd)] = ts[i++]
+        //<name>(i1,i2,i2,...)
+        for ((i, vd) in decl.scope
+                .filterByFlags(VariableDeclaration.INPUT).withIndex()) {
+            se.assign(vd, ts[i])
         }
-        se.push(state)
-        se.scope.topLevel.registerFunction(decl)
-        return fc.accept(se) as SMVExpr
+        se.visit(decl as PouExecutable)
+        val uf = se.peek().unfolded()
+        val v = uf.entries.find { (k, _) -> k.name == decl.name }!!.value
+        return v
     }
 
     fun getDefaultSimplifier(): SimplifierPipelineST0 =
@@ -84,8 +84,7 @@ object SymbExFacade {
     fun simplify(elements: PouElements): PouElements {
         val stSimplifier = getDefaultSimplifier()
         val p = PouElements()
-        elements.filter { it is PouExecutable }
-                .map { it as PouExecutable }
+        elements.filterIsInstance<PouExecutable>()
                 .map(stSimplifier::transform)
                 .forEach { p.add(it) }
         return p
@@ -125,9 +124,10 @@ object SymbExFacade {
      * }
      */
 
+    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule = evaluateProgramWithLineMap(exec, skipSimplify).second
 
     @JvmOverloads
-    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule {
+    fun evaluateProgramWithLineMap(exec: PouExecutable, skipSimplify: Boolean = false): Pair<LineMap, SMVModule> {
         val elements = exec.scope.getVisiblePous()
         IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
         val a = if (skipSimplify) exec else simplify(exec)
@@ -137,7 +137,11 @@ object SymbExFacade {
 
         val moduleBuilder = ModuleBuilder(exec, se.peek())
         moduleBuilder.run()
-        return moduleBuilder.module
+        /*//debug
+        for (entry in se.lineNumberMap) {
+            System.out.format("%05d: %s %s\n", entry.key, entry.value.first, entry.value.second)
+        }*/
+        return se.lineNumberMap to moduleBuilder.module
     }
 
     @JvmOverloads
@@ -166,7 +170,11 @@ object SymbExFacade {
         return exc.accept(symbex) as SMVExpr
     }
 
-    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, exc: Expression, scope: Scope) = evaluateExpression(SymbolicState(ssa), exc, scope)
+    fun evaluateExpression(ssa: Map<SVariable, SMVExpr>, exc: Expression, scope: Scope): SMVExpr {
+        val ss = SymbolicState()
+        ssa.forEach { (t, u) -> ss[t] = u }
+        return evaluateExpression(ss, exc, scope)
+    }
 
 
     fun evaluateExpression(expr: Expression, scope: Scope): SMVExpr {
@@ -191,6 +199,51 @@ object SymbExFacade {
             generateRunnableStub(cout, pous)
         }
         return out.toString()
+    }
+
+    @JvmStatic
+    fun execute(program: PouExecutable,
+                skipSimplify: Boolean = false,
+                cycles: Int = 10): VisualizeTrace {
+        val (lineMap, mod) = evaluateProgramWithLineMap(program, skipSimplify)
+
+        mod.name = "main"
+        mod.moduleParameters.forEach { mod.inputVars.add(it) }
+        mod.moduleParameters.clear()
+
+        val counter = createCounterModule(cycles)
+        mod.stateVars.add(SVariable("__counter__", ModuleType(counter.name, listOf())))
+        val tmpFile = File.createTempFile("run_", ".smv")
+        tmpFile.bufferedWriter().use {
+            val p = SMVPrinter(CodeWriter(it))
+            mod.accept(p)
+            counter.accept(p)
+        }
+        val commandFile = File("cmd.xmv")
+        writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
+        val p = NuXMVProcess(tmpFile, commandFile)
+        findProgram("nuXmv")?.let {
+            p.executablePath = it.absolutePath
+        }
+        //use BMC because of the complete trace
+        //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
+        val output = p.call()
+        if (output is NuXMVOutput.Cex) {
+            val cex = output.counterExample
+            return VisualizeTrace(cex, lineMap, program, CodeWriter())
+        }
+        throw java.lang.IllegalStateException("no counter example!")
+    }
+
+    private fun createCounterModule(k: Int): SMVModule {
+        val m = SMVModule("counter$k")
+        val dt = SMVWordType(false, ceil(log2(k.toDouble())).toInt())
+        val cnt = SVariable("cnt", dt)
+        m.stateVars.add(cnt)
+        m.initAssignments.add(SAssignment(cnt, SWordLiteral(k.toBigInteger(), dt)))
+        m.nextAssignments.add(SAssignment(cnt, cnt - SWordLiteral(BigInteger.ONE, dt)))
+        m.invariantSpecs.add(cnt gt SWordLiteral(BigInteger.ZERO, dt))
+        return m
     }
 }
 

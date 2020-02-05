@@ -4,7 +4,6 @@ import edu.kit.iti.formal.automation.analysis.ReportCategory
 import edu.kit.iti.formal.automation.analysis.ReportLevel
 import edu.kit.iti.formal.automation.analysis.ReporterMessage
 import edu.kit.iti.formal.automation.st.ast.Position
-import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

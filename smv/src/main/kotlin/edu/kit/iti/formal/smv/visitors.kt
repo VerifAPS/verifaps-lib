@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
-import java.lang.IllegalStateException
 
 /**
  *
@@ -141,7 +140,19 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
         return ce
     }
 
-    override fun visit(smvModule: SMVModule) = smvModule
+    override fun visit(smvModule: SMVModule): SMVModule {
+        smvModule.initAssignments = smvModule.initAssignments.visitAll()
+        smvModule.nextAssignments = smvModule.nextAssignments.visitAll()
+        smvModule.definitions = smvModule.definitions.visitAll()
+        smvModule.ltlSpec = smvModule.ltlSpec.visitAll()
+        smvModule.ctlSpec = smvModule.ctlSpec.visitAll()
+        smvModule.frozenVars = smvModule.frozenVars.visitAll()
+        smvModule.stateVars = smvModule.stateVars.visitAll()
+        smvModule.inputVars = smvModule.inputVars.visitAll()
+        smvModule.invariants = smvModule.invariants.visitAll()
+        smvModule.moduleParameters = smvModule.moduleParameters.visitAll()
+        return smvModule
+    }
 
     override fun visit(func: SFunction): SMVExpr {
         return func
@@ -153,14 +164,13 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
                 .toMutableList()
         return quantified
     }
+
+    private fun <E : SMVAst> List<E>.visitAll(): MutableList<E> =
+            map { it.accept(this@SMVAstMutableVisitor) as E }.toMutableList()
 }
 
-class VariableReplacer(val map : Map<SVariable, SMVExpr>) : SMVAstMutableVisitor() {
+class VariableReplacer(val map: Map<SVariable, SMVExpr>) : SMVAstMutableVisitor() {
     override fun visit(v: SVariable): SMVExpr {
         return map.getOrDefault(v, v)
-    }
-
-    override fun visit(ce: SCaseExpression): SMVExpr {
-        return super.visit(ce)
     }
 }

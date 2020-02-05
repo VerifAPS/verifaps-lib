@@ -3,7 +3,6 @@ package edu.kit.iti.formal.smv
 import mu.KLogging
 import org.jdom2.input.SAXBuilder
 import java.io.File
-import java.io.IOException
 import java.io.StringReader
 import java.util.concurrent.Callable
 
@@ -20,8 +19,8 @@ enum class NuXMVInvariantsCommand(vararg val commands: String) {
             "build_model", "check_ltlspec", "quit"),
     INVAR("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
             "build_model", "check_invar", "quit"),
-    BMC("read_model", "fKlatten_hierarchy", "show_vars", "encode_variables",
-            "build_boolean_model", "check_invar_bmc -a een-sorrensen", "quit")
+    BMC("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
+            "build_boolean_model", "bmc_setup", "check_invar_bmc -a een-sorensson", "quit")
 }
 
 /**
@@ -72,8 +71,7 @@ class ProcessRunner(val commandLine: Array<String>,
  *
  * @author Alexander Weigl
  */
-class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
-    var commands: Array<String> = arrayOf("quit")
+class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMVOutput> {
     var executablePath = "nuXmv"
     var workingDirectory = moduleFile.parentFile
     var outputFile = File(workingDirectory, "nuxmv.log")
@@ -87,7 +85,6 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
             logger.info(commands.joinToString(" "))
             logger.info("Working Directory: {}", workingDirectory)
             logger.info("Result in {}", outputFile)
-            val commandFile = createIC3CommandFile()
             val pr = ProcessRunner(commands,
                     commandFile,
                     workingDirectory,
@@ -101,20 +98,20 @@ class NuXMVProcess(var moduleFile: File) : Callable<NuXMVOutput> {
         return NuXMVOutput.Error()
     }
 
-    @Throws(IOException::class)
-    private fun createIC3CommandFile(): File {
-        workingDirectory.mkdirs()
-        val f = File(workingDirectory, COMMAND_FILE)
-        f.bufferedWriter().use { fw ->
-            (PREAMBLE + commands + POSTAMBLE).forEach { fw.write(it + "\n") }
-        }
-        return f
-    }
-
     companion object : KLogging() {
-        val COMMAND_FILE = "commands.xmv"
     }
 }
+
+val COMMAND_FILE = "commands.xmv"
+//val commandFile = writeNuxmvCommandFile(commands, File(workingDirectory, NuXMVProcess.COMMAND_FILE))
+
+fun writeNuxmvCommandFile(commands: Array<String>, f: File): File {
+    f.bufferedWriter().use { fw ->
+        (PREAMBLE + commands + POSTAMBLE).forEach { fw.write(it + "\n") }
+    }
+    return f
+}
+
 
 /**
  *
@@ -176,12 +173,16 @@ data class CounterExample(
 sealed class NuXMVOutput {
     object Verified : NuXMVOutput()
     class Error(val errors: List<String> = arrayListOf()) : NuXMVOutput()
-    class NotVerified(val counterExample: CounterExample) : NuXMVOutput()
+    class Cex(val counterExample: CounterExample) : NuXMVOutput()
 }
 
 /**
  *
  */
+//FIXME ERROR in nuxmv not detected
+//file exp_restart/restart/modules.smv: multiple declaration of identifier: Crane
+//aborting 'source ic3.xmv'
+//
 fun parseXmlOutput(text: String): NuXMVOutput {
     val lines = text.split('\n')
     val errorLinePredicate = { it: String ->
@@ -191,6 +192,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
                 || it.contains("TYPE ERROR")
                 || it.contains("undefined")
                 || it.contains("too few actual parameters")
+                || it.contains("aborting")
     }
 
     if (errorLinePredicate(text)) {
@@ -205,7 +207,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
         val closing = lines.lastIndexOf("</counter-example>")
         val xml = lines.slice(idxCex..closing)
                 .joinToString("\n")
-        return NuXMVOutput.NotVerified(CounterExample.load(xml))
+        return NuXMVOutput.Cex(CounterExample.load(xml))
     }
     return NuXMVOutput.Verified
 }

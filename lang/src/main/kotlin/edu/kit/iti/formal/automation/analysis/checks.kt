@@ -380,8 +380,29 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
         if (method.isAbstract && !method.stBody.isEmpty()) {
             reporter.report(method, "Abstract method has a body.", ReportCategory.METHOD_HAS_BODY)
         }
-
     }
+    /*override fun visit(method: MethodDeclaration) {
+        method.parent = get()
+        //search for overrides
+        if (method.isOverride) {
+            val sm = getSuperMethods()
+            for ((where, cand) in sm) {
+                if (method sameSignature cand) {
+                    method.overrides = where to cand
+                    break
+                }
+            }
+        }
+    }
+
+    private fun getSuperMethods(): List<Pair<HasMethods, MethodDeclaration>> {
+        return when {
+            clazz != null -> clazz!!.declaredMethods + clazz!!.definedMethods
+            interfaze != null -> interfaze!!.definedMethods
+            functionBlock != null -> TODO()
+            else -> listOf()
+        }
+    }*/
 }
 
 enum class ReportCategory {

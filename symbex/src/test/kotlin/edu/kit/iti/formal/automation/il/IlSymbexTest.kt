@@ -4,6 +4,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.CodeWriter
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
@@ -42,8 +43,9 @@ class IlSymbexTest {
         val symbex = IlSymbex(ilBody, 10, scope)
         val state = symbex.call()
         println(state)
-        val A = state["A"]
-        val B = state["B"]
+        val unfolded = state.unfolded()
+        val A = unfolded[SVariable("A")]
+        val B = unfolded[SVariable("B")]
         Assertions.assertEquals(A, B)
     }
 

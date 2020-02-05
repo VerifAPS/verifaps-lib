@@ -1,0 +1,40 @@
+MODULE table(code$i, code$o)
+VAR
+    __ERROR__ : boolean;
+    __SENTINEL__ : boolean;
+    r02_01 : boolean;
+    r03_01 : boolean;
+-- end of VAR
+DEFINE
+    r02_out_code$o := 0sd16_1 = code$o;
+    r02_out := r02_out_code$o;
+    r02_in_code$i := 0sd16_1 = code$i;
+    r02_in := r02_in_code$i;
+    r02_progress := r02_fwd & !r03_in;
+    r02_fail := r02_in & !r02_out;
+    r02_fwd := r02_in & r02_out;
+    r03_out_code$o := 0sd16_2 = code$o;
+    r03_out := r03_out_code$o;
+    r03_in_code$i := 0sd16_2 = code$i;
+    r03_in := r03_in_code$i;
+    r03_progress := r03_fwd & !FALSE;
+    r03_fail := r03_in & !r03_out;
+    r03_fwd := r03_in & r03_out;
+    r03_01_accept := r03_01 & r03_fwd;
+    r03_01_fail := r03_01 & r03_fail;
+    r03_01_acceptp := r03_01_accept & !r03_progress;
+    r02_01_accept := r02_01 & r02_fwd;
+    r02_01_fail := r02_01 & r02_fail;
+    r02_01_acceptp := r02_01_accept & !r02_progress;
+
+INVARSPEC
+    __ERROR__ -> r03_01 | r02_01 | __SENTINEL__
+
+INIT
+    !r03_01 & r02_01 & !__ERROR__ & !__SENTINEL__;
+ASSIGN
+    next(__ERROR__) := r02_01_fail | r03_01_fail;
+    next(__SENTINEL__) := r03_01_accept | __SENTINEL__;
+    next(r02_01) := FALSE;
+    next(r03_01) := r02_01_acceptp;
+-- end of module table

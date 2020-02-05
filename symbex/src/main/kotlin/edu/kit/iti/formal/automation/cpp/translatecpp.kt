@@ -10,6 +10,10 @@ import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.smv.EnumType
+import edu.kit.iti.formal.smv.SMVType
+import edu.kit.iti.formal.smv.SMVTypes
+import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
 import java.io.Writer
@@ -82,6 +86,27 @@ object TranslateToCppFacade {
         Operators.XOR -> "^"
         Operators.MOD -> "%"
         else -> op.symbol
+    }
+
+    fun translate(dataType: SMVType?): String {
+        return when (dataType) {
+            null -> "/* datatype is null */"
+            is SMVTypes.INT -> "int"
+            is SMVTypes.FLOAT -> "float"
+            is SMVTypes.BOOLEAN -> "bool"
+            is SMVWordType -> {
+                (if (dataType.signed) "" else "u") +
+                        when {
+                            dataType.width >= 64 -> "long"
+                            dataType.width >= 32 -> "int"
+                            dataType.width >= 16 -> "short"
+                            dataType.width >= 8 -> "byte"
+                            else -> "int"
+                        }
+            }
+            is EnumType -> "int"
+            else -> "/* datatype: $dataType is not supported */"
+        }
     }
 }
 

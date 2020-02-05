@@ -12,12 +12,11 @@ import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
 import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.smv.*
-import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.info
+
 import java.io.File
-import java.io.PrintWriter
 import java.math.BigInteger
 
 /**
@@ -28,17 +27,20 @@ import java.math.BigInteger
 object KastelDemonstrator {
     val FOLDER = File("/home/weigl/Documents/Kastel/Industry4.0/Demonstrator2018")
     val INPUT_FILE = File(FOLDER, "VerificationSubject.st")
+    val INPUT_FIX_FILE = File(FOLDER, "VerificationSubjectFix.st")
 
     @JvmStatic
     fun main(args: Array<String>) {
-        Console.configureLoggingConsole()
-
         SINT.bitLength = 10; INT.bitLength = 10; DINT.bitLength = 10;LINT.bitLength = 10
         USINT.bitLength = 10; UINT.bitLength = 10;UDINT.bitLength = 10; ULINT.bitLength = 10
+        runInfoPipeline(INPUT_FILE, prefix="if_%d.smv")
+        runInfoPipeline(INPUT_FIX_FILE, prefix="fix_%d.smv")
+    }
 
-        val (pous, errors) = IEC61131Facade.fileResolve(INPUT_FILE)
+    fun runInfoPipeline(input: File, prefix: String) {
+        val (pous, errors) = IEC61131Facade.fileResolve(input)
         errors.forEach {
-            Console.info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
+            info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
         }
 
         val program = Utils.findProgram(pous)!!
@@ -74,7 +76,7 @@ object KastelDemonstrator {
         simpFile.bufferedWriter().use {
             IEC61131Facade.printTo(it, simplified, true)
         }
-        Console.writeln("File $simpFile written")
+        info("File $simpFile written")
 
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
@@ -85,7 +87,7 @@ object KastelDemonstrator {
                     //,"MoveVelAxis1\$InVelocity"
                     //,"ReadActVelAxis1\$Velocity"
             )// v.endsWith("Velocity")
-            Console.info(String.format("%35s %s", v, (if (b) "high" else "low")))
+            info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b
         }
 
@@ -94,14 +96,16 @@ object KastelDemonstrator {
             val imb = PrivacyModelBuilder(module, isHigh, historyLength)
             imb.run()
 
-            val smvFile = File(FOLDER, "noif_${imb.historyLength}.smv")
+            val smvFile = File(FOLDER, String.format(prefix, imb.historyLength))
             smvFile.bufferedWriter().use {
-                imb.product.forEach { m -> m.accept(SMVPrinter(PrintWriter(it))) }
+                imb.product.forEach { m -> m.accept(SMVPrinter(CodeWriter(it))) }
             }
-            Console.writeln("File $smvFile written")
+            info("File $smvFile written")
         }
     }
 }
+
+
 
 object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
     override fun transform(stBody: StatementList): StatementList = stBody.accept(this) as StatementList
@@ -145,7 +149,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
         instantiateCode(FIRST_RUN)
         instantiateCode(SECOND_RUN)
 
-        //Console.info("State: ${code.stateVars.map { it.name }}")
+        //info("State: ${code.stateVars.map { it.name }}")
 
         //equal starting state
         main.initExpr.add(
@@ -159,14 +163,16 @@ class PrivacyModelBuilder(private val code: SMVModule,
         // high variables
         val highVar = code.inputVars.filter { isHigh(it.name) }
 
-        //Console.info("lowVar: ${lowVar.map { it.name }}")
-        //Console.info("highVar: ${highVar.map { it.name }}")
+        //info("lowVar: ${lowVar.map { it.name }}")
+        //info("highVar: ${highVar.map { it.name }}")
 
 
-        fun conjunction(v: List<SVariable>) =
-                if (v.isEmpty()) SLiteral.TRUE
-                else v.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                        .conjunction()
+        fun conjunction(v: List<SVariable>): SMVExpr {
+            if (v.isEmpty()) return SLiteral.TRUE
+
+            val equalities = v.map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+            return equalities.conjunction()
+        }
 
         val lowEqual = conjunction(lowVar)
         val highEqual = conjunction(highVar)
@@ -191,7 +197,8 @@ class PrivacyModelBuilder(private val code: SMVModule,
         main.stateVars.add(historyLowEq)
 
 
-        val lowOutput = code.definitions.map { it.target } + code.stateVars
+        //TODO too many output variables.
+        val lowOutput = /*code.definitions.map { it.target } +*/ code.stateVars
         val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
         val premise = (history + strongEqualInVar + alwaysLowEqual)
                 .reduce { acc: SMVExpr, sVariable: SMVExpr ->

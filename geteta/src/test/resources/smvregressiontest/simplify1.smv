@@ -1,0 +1,112 @@
+MODULE table(code$i, code$o)
+VAR
+    __ERROR__ : boolean;
+    __SENTINEL__ : boolean;
+    a_01 : boolean;
+    b_01 : boolean;
+    c_01 : boolean;
+    d_01 : boolean;
+    e_01 : boolean;
+    f_01 : boolean;
+    g_01 : boolean;
+    h_01 : boolean;
+-- end of VAR
+DEFINE
+    a_out_code$o := TRUE;
+    a_out := a_out_code$o;
+    a_in_code$i := TRUE;
+    a_in := a_in_code$i;
+    a_progress := a_fwd & !FALSE;
+    a_fail := a_in & !a_out;
+    a_fwd := a_in & a_out;
+    b_out_code$o := TRUE;
+    b_out := b_out_code$o;
+    b_in_code$i := TRUE;
+    b_in := b_in_code$i;
+    b_progress := b_fwd & !FALSE;
+    b_fail := b_in & !b_out;
+    b_fwd := b_in & b_out;
+    c_out_code$o := TRUE;
+    c_out := c_out_code$o;
+    c_in_code$i := TRUE;
+    c_in := c_in_code$i;
+    c_progress := c_fwd & !FALSE;
+    c_fail := c_in & !c_out;
+    c_fwd := c_in & c_out;
+    d_out_code$o := TRUE;
+    d_out := d_out_code$o;
+    d_in_code$i := TRUE;
+    d_in := d_in_code$i;
+    d_progress := d_fwd & !FALSE;
+    d_fail := d_in & !d_out;
+    d_fwd := d_in & d_out;
+    e_out_code$o := TRUE;
+    e_out := e_out_code$o;
+    e_in_code$i := TRUE;
+    e_in := e_in_code$i;
+    e_progress := e_fwd & !FALSE;
+    e_fail := e_in & !e_out;
+    e_fwd := e_in & e_out;
+    f_out_code$o := TRUE;
+    f_out := f_out_code$o;
+    f_in_code$i := TRUE;
+    f_in := f_in_code$i;
+    f_progress := f_fwd & !FALSE;
+    f_fail := f_in & !f_out;
+    f_fwd := f_in & f_out;
+    g_out_code$o := TRUE;
+    g_out := g_out_code$o;
+    g_in_code$i := TRUE;
+    g_in := g_in_code$i;
+    g_progress := g_fwd & !FALSE;
+    g_fail := g_in & !g_out;
+    g_fwd := g_in & g_out;
+    h_out_code$o := TRUE;
+    h_out := h_out_code$o;
+    h_in_code$i := TRUE;
+    h_in := h_in_code$i;
+    h_progress := h_fwd & !FALSE;
+    h_fail := h_in & !h_out;
+    h_fwd := h_in & h_out;
+    a_01_accept := a_01 & a_fwd;
+    a_01_fail := a_01 & a_fail;
+    a_01_acceptp := a_01_accept & !a_progress;
+    b_01_accept := b_01 & b_fwd;
+    b_01_fail := b_01 & b_fail;
+    b_01_acceptp := b_01_accept & !b_progress;
+    c_01_accept := c_01 & c_fwd;
+    c_01_fail := c_01 & c_fail;
+    c_01_acceptp := c_01_accept & !c_progress;
+    d_01_accept := d_01 & d_fwd;
+    d_01_fail := d_01 & d_fail;
+    d_01_acceptp := d_01_accept & !d_progress;
+    e_01_accept := e_01 & e_fwd;
+    e_01_fail := e_01 & e_fail;
+    e_01_acceptp := e_01_accept & !e_progress;
+    f_01_accept := f_01 & f_fwd;
+    f_01_fail := f_01 & f_fail;
+    f_01_acceptp := f_01_accept & !f_progress;
+    g_01_accept := g_01 & g_fwd;
+    g_01_fail := g_01 & g_fail;
+    g_01_acceptp := g_01_accept & !g_progress;
+    h_01_accept := h_01 & h_fwd;
+    h_01_fail := h_01 & h_fail;
+    h_01_acceptp := h_01_accept & !h_progress;
+
+INVARSPEC
+    __ERROR__ -> a_01 | b_01 | c_01 | d_01 | e_01 | f_01 | g_01 | h_01 | __SENTINEL__
+
+INIT
+    a_01 & !b_01 & !c_01 & !d_01 & !e_01 & !f_01 & !g_01 & !h_01 & !__ERROR__ & !__SENTINEL__;
+ASSIGN
+    next(__ERROR__) := a_01_fail | b_01_fail | c_01_fail | d_01_fail | e_01_fail | f_01_fail | g_01_fail | h_01_fail;
+    next(__SENTINEL__) := h_01_accept | __SENTINEL__;
+    next(a_01) := FALSE;
+    next(b_01) := a_01_accept;
+    next(c_01) := b_01_accept;
+    next(d_01) := c_01_accept | d_01_accept;
+    next(e_01) := FALSE;
+    next(f_01) := e_01_accept;
+    next(g_01) := f_01_accept;
+    next(h_01) := g_01_accept;
+-- end of module table

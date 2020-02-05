@@ -1,18 +1,18 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.convert
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.multiple
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
+
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
-import edu.kit.iti.formal.automation.testtables.monitor.CMonitorGenerator
-import edu.kit.iti.formal.automation.testtables.monitor.CppCombinedMonitorGeneration
-import edu.kit.iti.formal.automation.testtables.monitor.CppMonitorGenerator
-import edu.kit.iti.formal.automation.testtables.monitor.MonitorGenerationST
+import edu.kit.iti.formal.automation.testtables.monitor.*
+import edu.kit.iti.formal.automation.testtables.monitor.Monitor
+import edu.kit.iti.formal.util.info
+import java.io.File
 
 /**
  *
@@ -30,45 +30,76 @@ enum class CodeOutput {
 
 class MonitorApp : CliktCommand(name = "ttmonitor",
         help = "Construction of monitors from test tables for Runtime Verification") {
-    val table by option("--table", "-t", help = "table file", metavar = "FILE")
-            .file(exists = true, readable = true).multiple(required = true)
+    val table by argument(help = "table file", name = "FILE")
+            .file(exists = true, readable = true)
+            .multiple(required = true)
+
+    val output by option("--output", "-o", help = "destination to write output files")
+            .file()
+            .default(File("output.cpp"))
+
+    val filter by option("--monitor", "-m", help = "manually select the gtts").multiple()
+
+    val writeHeader by option("--write-header", help = "Write the 'monitor.h' header file.")
+            .flag("--dont-write-header", default = false)
 
     val format by option("--format", "-f", help = "code format, possible values: " +
             CodeOutput.values().joinToString(",") { it.name })
             .convert { CodeOutput.valueOf(it.toUpperCase()) }
             .default(CodeOutput.CPP)
 
+    val disableCombinedMonitor by option("--disable-combined").flag("--combined")
+
     override fun run() {
-        val gtts = table.map {
-            GetetaFacade.readTable(it).also {
-                it.ensureProgramRuns()
-                it.generateSmvExpression()
+        info("Files: $table")
+        info("Filter: $filter")
+
+        if (writeHeader && format == CodeOutput.CPP) {
+            output.absoluteFile.parentFile.mkdirs()
+            for ((a, b) in CPP_RESOURCES) {
+                info("Write resource file $a.")
+                File(output.absoluteFile.parentFile, a).bufferedWriter().use { it.write(b) }
             }
         }
-        val pairs
-                = gtts.map { it to GetetaFacade.constructTable(it).automaton }
+
+        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
+            it.ensureProgramRuns()
+            it.generateSmvExpression()
+            it
+        }.filter { filter.isEmpty() || it.name in filter }
+        info("Tables: ${gtts.joinToString { it.name }}")
+
+
+        val pairs = gtts.map { it to GetetaFacade.constructTable(it).automaton }
 
         val output =
-                if (table.size == 1) {
-                    val (gtt, automaton) = pairs.first()
-                    when (format) {
-                        CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
-                        CodeOutput.ESTEREL -> TODO()
-                        CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
-                        CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton)
+                if (gtts.size == 1 || disableCombinedMonitor) {
+                    val monitor = Monitor()
+                    for ((gtt, automaton) in pairs) {
+                        val m = when (format) {
+                            CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
+                            CodeOutput.ESTEREL -> TODO()
+                            CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
+                            CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton)
+                        }
+                        monitor.preamble = m.preamble
+                        monitor.types += m.types
+                        monitor.body += m.body
+                        monitor.postamble = m.postamble
                     }
+                    monitor
                 } else {
                     when (format) {
-                        CodeOutput.STRCUTURED_TEXT -> TODO()
-                        CodeOutput.ESTEREL -> TODO()
-                        CodeOutput.C -> CppCombinedMonitorGeneration.generate("mcombined", pairs)
-                        CodeOutput.CPP -> TODO()
+                        CodeOutput.CPP -> CppCombinedMonitorGeneration.generate("mcombined", pairs)
+                        else -> TODO()
                     }
                 }
-        println(output.preamble)
-        println(output.types)
-        println(output.body)
-        println(output.postamble)
+        this.output.bufferedWriter().use {
+            it.write(output.preamble)
+            it.write(output.types)
+            it.write(output.body)
+            it.write(output.postamble)
+        }
     }
 }
 

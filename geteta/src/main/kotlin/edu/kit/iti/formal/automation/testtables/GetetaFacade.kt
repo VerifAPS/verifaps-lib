@@ -1,48 +1,39 @@
 package edu.kit.iti.formal.automation.testtables
 
 
-import edu.kit.iti.formal.automation.Console
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
-import edu.kit.iti.formal.automation.testtables.algorithms.BinaryModelGluer
-import edu.kit.iti.formal.automation.testtables.algorithms.DelayModuleBuilder
+import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
 import edu.kit.iti.formal.automation.testtables.builder.SmvConstructionPipeline
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.io.*
+import edu.kit.iti.formal.automation.testtables.io.TblLanguageToSmv
+import edu.kit.iti.formal.automation.testtables.io.TestTableLanguageBuilder
+import edu.kit.iti.formal.automation.testtables.io.TimeParser
 import edu.kit.iti.formal.automation.testtables.model.*
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
 import edu.kit.iti.formal.automation.testtables.print.DSLTablePrinter
 import edu.kit.iti.formal.automation.testtables.viz.CounterExampleAnalyzer
 import edu.kit.iti.formal.automation.testtables.viz.Mapping
 import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.debug
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
-import java.io.PrintWriter
 import java.io.StringWriter
-import javax.xml.bind.JAXBException
 
 object GetetaFacade {
-    @JvmStatic
-    @Throws(JAXBException::class)
-    fun parseTableXML(filename: String): GeneralizedTestTable {
-        val tr = TableReader(File(filename))
-        tr.run()
-        return tr.product
-    }
-
-
     fun createParser(input: CharStream): TestTableLanguageParser {
         val lexer = TestTableLanguageLexer(input)
         val parser = TestTableLanguageParser(CommonTokenStream(lexer))
@@ -58,36 +49,76 @@ object GetetaFacade {
 
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
-    fun parseCell(cell: String, enableRelational: Boolean = true): TestTableLanguageParser.CellContext =
-            createParser(cell).also { it.relational = true }.cell()!!
+    fun parseCell(cell: String, enableRelational: Boolean = true) =
+            createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
 
-    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational),
-            column, programRun, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
 
     fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
                   programRun: Int, vars: ParseContext): SMVExpr {
         val ev = TblLanguageToSmv(column, programRun, vars)
         val expr = cell.accept(ev)
-        Console.debug("parsed: %s to %s", cell, expr)
+        debug("parsed: ${cell.text} to $expr")
         return expr
+    }
+
+    fun exprToSMV(u: TestTableLanguageParser.CellContext,
+                  pv: ProjectionVariable, vc: ParseContext): SMVExpr {
+        require(pv.arity != 0) { "Arity of column function is zero. Column ${pv.name}" }
+
+        if (pv.arity > 1) {
+            return when (u.chunk().first()) {
+                is TestTableLanguageParser.CvariableContext -> {
+                    val varName = u.chunk(0).text
+                    val fd = vc.getFunction(varName)
+                    return if (fd != null) {
+                        check(fd.arity == pv.arity) {
+                            "Arity mismatch in implicit function call $varName in column ${pv.name} "
+                        }
+                        fd.call(pv.argumentDefinitions)
+                    } else
+                        throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+                }
+                is TestTableLanguageParser.CdontcareContext -> SLiteral.TRUE
+                else -> throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+            }
+        } else {
+            return exprToSMV(u, pv.argumentDefinitions.first(), 0, vc)
+        }
     }
 
     fun parseDuration(duration: String): Duration {
         if (duration == "wait")//old attributes
-            return Duration.OpenInterval(0, true)
+            return Duration.OpenInterval(0)
         val parser = createParser(duration)
         val p = parser.time()
         return p.accept(TimeParser())
     }
 
     @Deprecated("use external/internalVariable")
-    fun asSMVVariable(column: edu.kit.iti.formal.automation.testtables.model.Variable): SVariable {
+    fun asSMVVariable(column: Variable): SVariable {
         return SVariable(column.name, getSMVDataType(column.dataType))
     }
 
     private fun getSMVDataType(dataType: AnyDt): SMVType {
         return DefaultTypeTranslator.INSTANCE.translate(dataType)
                 ?: error("Data type $dataType is not supported by DataTypeTranslator")
+    }
+
+    val DEFAULT_COMPARISON_FUNCTIONS: Map<String, SmvFunctionDefinition> by lazy {
+        val map = HashMap<String, SmvFunctionDefinition>()
+        map["leq"] = getSmvFunction("x <= y", "x", "y")
+        map["geq"] = getSmvFunction("x >= y", "x", "y")
+        map["eq"] = getSmvFunction("x = y", "x", "y")
+        map["neq"] = getSmvFunction("x != y", "x", "y")
+        map["gt"] = getSmvFunction("x > y", "x", "y")
+        map["lt"] = getSmvFunction("x < y", "x", "y")
+        map
+    }
+
+    private fun getSmvFunction(body: String, vararg args: String): SmvFunctionDefinition {
+        val sargs = args.map { SVariable(it) }
+        return SmvFunctionDefinition(SMVFacade.expr(body), sargs)
     }
 
     val DEFAULT_PROGRAM_RUN_NAME = { it: Int -> "_$it$" }
@@ -98,36 +129,29 @@ object GetetaFacade {
     fun parseTableDSL(input: File) = parseTableDSL(CharStreams.fromFileName(input.absolutePath))
 
     @JvmStatic
-    fun parseTableDSL(input: CharStream): GeneralizedTestTable {
+    fun parseTableDSL(input: CharStream): List<GeneralizedTestTable> {
         val parser = createParser(input)
         return parseTableDSL(parser.file())
     }
 
     @JvmStatic
-    fun parseTableDSL(ctx:TestTableLanguageParser.FileContext): GeneralizedTestTable {
+    fun parseTableDSL(ctx: TestTableLanguageParser.FileContext): List<GeneralizedTestTable> {
         val ttlb = TestTableLanguageBuilder()
         ctx.accept(ttlb)
-        return ttlb.testTables[0]
+        return ttlb.testTables
     }
 
     fun exprsToSMV(vc: ParseContext,
-                   constraints: Map<ProgramVariable, TestTableLanguageParser.CellContext>)
+                   constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>)
             : Map<String, SMVExpr> = constraints.map { (t, u) ->
-        t.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+        if (t is ProgramVariable) {
+            val n = t.internalVariable(vc.programRuns)//"${vc.programRuns[t.programRun]}${t.name}"
+            n.name to exprToSMV (u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
+        } else {
+            t.name to exprToSMV(u, t as ProjectionVariable, vc)
+        }
     }.toMap()
 
-    fun delay(ref: SReference): DelayModuleBuilder {
-        return DelayModuleBuilder(ref.variable,
-                ref.cycles)
-    }
-
-
-    fun glue(modTable: SMVModule, tableType: SMVType,
-             modCode: List<SMVModule>, programRunNames: List<String>, options: TableOptions): SMVModule {
-        val mg = BinaryModelGluer(options, modTable, tableType, modCode, programRunNames)
-        mg.run()
-        return mg.product
-    }
 
     /*
     fun runNuXMV(folder: String, technique: VerificationTechnique, vararg modules: SMVModule): NuXMVOutput {
@@ -145,18 +169,26 @@ object GetetaFacade {
     fun runNuXMV(nuXmvPath: String, folder: String,
                  modules: List<SMVModule>,
                  vt: VerificationTechnique): NuXMVOutput {
+        val adapter = createNuXMVProcess(folder, modules, nuXmvPath, vt)
+        return adapter.call()
+    }
+
+    fun createNuXMVProcess(folder: String, modules: List<SMVModule>,
+                           nuXmvPath: String, vt: VerificationTechnique): NuXMVProcess {
         val outputFolder = File(folder)
         outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
         moduleFile.bufferedWriter().use { w ->
-            val p = SMVPrinter(PrintWriter(w))
+            val p = SMVPrinter(CodeWriter(w))
             modules.forEach { it.accept(p) }
         }
-        val adapter = NuXMVProcess(moduleFile)
+        val commandFile = File(folder, COMMAND_FILE)
+        writeNuxmvCommandFile(vt.commands, commandFile)
+
+        val adapter = NuXMVProcess(moduleFile, commandFile)
         adapter.executablePath = nuXmvPath
         adapter.workingDirectory = outputFolder
-        adapter.commands = vt.commands
-        return adapter.call()
+        return adapter
     }
 
     fun createSuperEnum(scopes: List<Scope>): EnumType {
@@ -197,27 +229,22 @@ object GetetaFacade {
         return s.toString()
     }
 
-    /**
-     * Read XML or DSL format.
-     */
-    fun readTable(file: File): GeneralizedTestTable {
-        return if (file.name.endsWith("xml"))
-            parseTableXML(file.absolutePath)
-        else
-            parseTableDSL(file)
+    fun readTables(file: File): List<GeneralizedTestTable> {
+        return parseTableDSL(file)
     }
 
     fun constructTable(table: GeneralizedTestTable) =
             AutomatonBuilderPipeline(table).transform()
 
     fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) =
-            SmvConstructionPipeline(constructTable(table), superEnum).transform()
+            constructSMV(constructTable(table), superEnum)
 
     fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
             SmvConstructionPipeline(automaton, superEnum).transform()
 
     fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
-        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample)
+        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample,
+                "_${testTable.name}")
         analyzer.run()
         return analyzer.rowMapping
     }
@@ -227,6 +254,19 @@ object GetetaFacade {
         val p = DSLTablePrinter(CodeWriter(stream))
         p.print(gtt)
         return stream.toString()
+    }
+
+    fun functionToSmv(fd: FunctionDeclaration): SmvFunctionDefinition {
+        val parameters = fd.scope.variables.filter { it.isInput }
+                .map { DefaultTypeTranslator.INSTANCE.translate(it) }
+        val body = SymbExFacade.evaluateFunction(fd, parameters)
+        return SmvFunctionDefinition(body, parameters)
+    }
+
+    fun exprToSmv(expr: TestTableLanguageParser.ExprContext, parseContext: ParseContext): SMVExpr {
+        val dummy = SVariable("dummy", SMVTypes.BOOLEAN)
+        val visitor = TblLanguageToSmv(dummy, 0, parseContext)
+        return expr.accept(visitor)
     }
 
 

@@ -24,7 +24,9 @@ interface Messager {
 }
 
 interface JumpService {
-    fun jumpTo(editor: CodeEditor, position: Position)
+    fun jumpTo(editor: CodeEditor, position: Position? = null)
+    fun selectInEditor(name: String, start: Int, stop: Int?)
+    fun changeInEditor(editorName: String, start: Int, stop: Int, newText: String)
 }
 
 interface FileOpen {
@@ -101,9 +103,11 @@ object Colors {
 
     val control = style { foreground = violet }
 
-    val structural = style { foreground = violet }
+    val structural = style { foreground = orange }
 
     val identifier = style { foreground = red }
+
+    val operators: Style = style { foreground = magenta }
 
     val literal = style { foreground = green }
 
@@ -275,5 +279,6 @@ class Lookup() {
         getListeners(name).forEach { it() }
         getListeners(ALL::class.java).forEach { it() }
     }
+
     private class ALL
 }

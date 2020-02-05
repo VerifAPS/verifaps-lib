@@ -1,4 +1,4 @@
-// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_22.xml on Fri Jul 26 21:42:31 CEST 2019
+// Extracted from file:/home/weigl/work/verifaps-lib/lang/../share/xPPU/PLCOpenXML_Scenario_22.xml on Wed Feb 05 17:44:50 CET 2020
 
 TYPE
     RFID_ByteArray : STRUCT

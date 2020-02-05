@@ -1,7 +1,11 @@
 #!/bin/bash
 
-BIN=`pwd`/ide/build/install/ide/bin/
-TESTS=`pwd`/share/integration-tests/
+BIN=$(pwd)/ide/build/install/ide/bin/
+TESTS=$(pwd)/share/integration-tests
+
+gettests() {
+  set | grep -E "$1.* \(\)" | cut -d' ' -f1 | xargs
+}
 
 if [ ! -d $BIN ]; then
     BIN=$(readlink -f ../ide/build/install/ide/bin/)
@@ -21,17 +25,15 @@ fi
 
 export NUXMV=nuXmv
 export PATH=$PATH:$BIN
-BATS=$(readlink -f $TESTS/../bats-core-1.1.0/bin/bats)
 
 echo "**Environment:**"
 echo '```'
 echo BIN=$BIN
 echo TESTS=$TESTS
+echo "    $(ls $TESTS/*)"
 echo '```'
 
 ROOT=$(readlink -f $TESTS/../..)
-LOG_FILE=""
-rm $LOG_FILE
 
 function runTest() {
   err=0

@@ -53,13 +53,22 @@ interface HasScope {
     var scope: Scope
 }
 
+interface HasPragma {
+    val pragmas: MutableList<Pragma>
+    fun findAttributePragma(name: String) = findPragma<Pragma.Attribute>().find { it.name == name }
+}
+
+inline fun <reified T> HasPragma.findPragma() = pragmas.filterIsInstance<T>()
+
 
 //region Declaration and Toplevel
-abstract class PouElement : Top(), Identifiable, Comparable<PouElement> {
+abstract class PouElement : Top(), Identifiable, HasPragma, Comparable<PouElement> {
     var comment: String = ""
     override fun compareTo(other: PouElement): Int {
         return name.compareTo(other.name)
     }
+
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
 data class PouElements(val elements: MutableList<PouElement> = arrayListOf())
@@ -172,94 +181,12 @@ data class ClassDeclaration(
         override val interfaces: RefList<InterfaceDeclaration> = RefList(),
         override val methods: MutableList<MethodDeclaration> = arrayListOf(),
         val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>()) :
-        HasInterfaces,
-        HasScope, HasMethods, PouElement(), Classifier {
+        HasInterfaces, HasScope, HasMethods, PouElement(), Classifier {
+
 
     override fun clone() = copy()
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
-
-
-val InterfaceDeclaration.definedMethods: List<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in allInterfaces) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-infix fun MethodDeclaration.sameSignature(other: MethodDeclaration): Boolean {
-    if (name != other.name)
-        return false
-
-    val input1 = scope.variables.filter { it.isInput }
-    val input2 = scope.variables.filter { it.isInput }
-
-    for (v1 in input1) {
-        val v2 = input2.find { it.name == v1.name } ?: return false
-        if (v2.dataType != v1.dataType) return false
-    }
-
-    for (v2 in input2) {
-        val v1 = input2.find { it.name == v2.name } ?: return false
-        if (v2.dataType != v1.dataType) return false
-    }
-    return true
-}
-
-val ClassDeclaration.declaredMethods: Collection<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in allInterfaces) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-val ClassDeclaration.definedMethods: Collection<Pair<HasMethods, MethodDeclaration>>
-    get() {
-        val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
-        for (iface in parents) {
-            for (it in iface.methods)
-                seq.add(iface to it)
-        }
-        return seq
-    }
-
-val ClassDeclaration.parents: List<ClassDeclaration>
-    get() {
-        var c = parent.obj
-        val seq = arrayListOf<ClassDeclaration>()
-        while (c != null) {
-            seq.add(c)
-            c = parent.obj;
-            if (c in seq) break
-        }
-        return seq
-    }
-
-val ClassDeclaration.allInterfaces: List<InterfaceDeclaration>
-    get() {
-        val seq = arrayListOf<InterfaceDeclaration>()
-        interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
-        parents.forEach { c ->
-            c.interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
-        }
-        return seq
-    }
-
-val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
-    get() {
-        val seq = arrayListOf<InterfaceDeclaration>()
-        interfaces.forEach {
-            it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) }
-        }
-        return seq
-    }
-
 
 interface HasInterfaces : Identifiable {
     val interfaces: RefList<InterfaceDeclaration>
@@ -451,8 +378,9 @@ object EMPTY_EXPRESSION : Expression() {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this);
 }
 
-abstract class Statement : Top() {
+abstract class Statement : Top(), HasPragma {
     abstract override fun clone(): Statement
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
 
@@ -596,7 +524,7 @@ data class ForStatement(
         var variable: String = ANONYM,
         var start: Expression = EMPTY_EXPRESSION,
         var stop: Expression = EMPTY_EXPRESSION,
-        var step: Expression? = EMPTY_EXPRESSION,
+        var step: Expression? = null,
         var statements: StatementList = StatementList()) : Statement() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -677,7 +605,7 @@ data class IfStatement(
 
 data class InvocationStatement(
         var callee: SymbolicReference = SymbolicReference(),
-        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement() {
+        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement(), HasPragma {
     var invoked: Invoked? = null
 
 
@@ -687,6 +615,7 @@ data class InvocationStatement(
     val outputParameters: List<InvocationParameter>
         get() = parameters.filter { it.isOutput }
 
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 
     constructor(fnName: String, vararg expr: Expression)
             : this(SymbolicReference(fnName), expr.map { InvocationParameter(it) }.toMutableList())
@@ -1424,6 +1353,7 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
     constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
+    constructor(value: Int) : this(INT, value.toBigInteger())
 
     override fun dataType(localScope: Scope) = dataType.checkAndresolveDt(localScope, INT)
 
@@ -1781,13 +1711,15 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
 data class Position(
         val lineNumber: Int = -1,
         val charInLine: Int = -1,
-        val offset: Int = -1) : Cloneable {
+        val offset: Int = -1,
+        val file: String = "") : Cloneable {
 
     companion object {
         fun start(token: Token?) =
                 Position(token?.line ?: -1,
                         token?.charPositionInLine ?: -1,
-                        token?.startIndex ?: -1)
+                        token?.startIndex ?: -1,
+                        token?.tokenSource?.sourceName ?: "")
 
         fun end(token: Token?): Position {
             return if (token == null) Position()
@@ -1796,10 +1728,9 @@ data class Position(
                 val newlines = text.count { it == '\n' }
                 Position(token.line + newlines,
                         text.length - Math.max(0, text.lastIndexOf('\n')),
-                        token.stopIndex)
+                        token.stopIndex, token?.tokenSource.sourceName ?: "")
             }
         }
-
     }
 
     override fun clone() = copy()
@@ -1814,6 +1745,7 @@ abstract class Reference : Initialization() {
 }
 
 class VariableBuilder(val scope: VariableScope) {
+    var pragma: List<Pragma>? = null
     private val stack = Stack<Int>()
     private var initialization: Initialization? = null
     private var identifiers: MutableList<Token> = arrayListOf()
@@ -1910,6 +1842,7 @@ class VariableBuilder(val scope: VariableScope) {
     fun create(): VariableBuilder {
         for (id in identifiers) {
             val vd = VariableDeclaration(id.text.trim('`'), peek(), type!!)
+            pragma?.run { forEach { vd.pragmas += it.clone() } }
             vd.token = id
             this.scope.add(vd)
         }
@@ -1940,7 +1873,11 @@ class VariableBuilder(val scope: VariableScope) {
 data class VariableDeclaration(
         override var name: String = ANONYM,
         var type: Int = 0
-) : Top(), Comparable<VariableDeclaration>, Identifiable {
+) : Top(), Comparable<VariableDeclaration>, Identifiable, HasPragma {
+
+    override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
+
+
     var typeDeclaration: TypeDeclaration? = null
     /**
      * determined by the typeDeclaration
@@ -2119,7 +2056,7 @@ data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
     val startValue: Int
         get() = start.value.intValueExact()
     val stopValue: Int
-        get() = start.value.intValueExact()
+        get() = stop.value.intValueExact()
 
     override fun clone() = Range(start.clone(), stop.clone())
     fun toIntRange(): IntRange = startValue..stopValue

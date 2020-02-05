@@ -5,22 +5,27 @@ import edu.kit.iti.formal.automation.ide.tools.*
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.ast.Position
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import me.tomassetti.kanvas.AntlrLexerFactory
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import me.tomassetti.kanvas.BaseLanguageSupport
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.Token
 import org.fife.io.DocumentReader
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.Style
 import org.fife.ui.rsyntaxtextarea.SyntaxScheme
+import org.fife.ui.rsyntaxtextarea.folding.Fold
+import org.fife.ui.rsyntaxtextarea.folding.FoldParser
+import org.fife.ui.rsyntaxtextarea.folding.FoldType
 import org.fife.ui.rsyntaxtextarea.parser.AbstractParser
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult
+import java.util.*
 import javax.swing.Icon
 
 /**
@@ -47,6 +52,9 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             TestTableLanguageLexer.INPUT,
             TestTableLanguageLexer.OUTPUT,
             TestTableLanguageLexer.VAR,
+            TestTableLanguageLexer.BACKWARD,
+            TestTableLanguageLexer.PLAY,
+            TestTableLanguageLexer.PAUSE,
             TestTableLanguageLexer.STATE
     )
     private val SEPS = setOf(
@@ -70,6 +78,7 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             in STRUCTURAL_KEYWORDS -> Colors.structural
             //in CONTROL_KEYWORDS -> colors.control
             in LITERALS -> Colors.literal
+            TestTableLanguageLexer.FQ_VARIABLE -> Colors.identifier
             IDENTIFIER -> Colors.identifier
             TestTableLanguageLexer.COMMENT -> Colors.comment
             TestTableLanguageLexer.LINE_COMMENT -> Colors.comment
@@ -79,16 +88,22 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
 }
 
 class TestTableLanguageSupport(lookup: Lookup) : BaseLanguageSupport() {
-    override fun createParser(textArea: CodeEditor, lookup: Lookup)
-        = TTParser(textArea, lookup)
+    override fun createParser(textArea: CodeEditor, lookup: Lookup) = TTParser(textArea, lookup)
     override val mimeType: String = "text/gtt"
-    override val extension: Collection<String> = setOf("gtt", ".tt.txt")
+    override val extension: Collection<String> = setOf("gtt", ".tt.txt", ".tt")
     override val syntaxScheme: SyntaxScheme = TestTableSyntaxScheme(lookup)
     override val antlrLexerFactory: AntlrLexerFactory
         get() = object : AntlrLexerFactory {
             override fun create(code: String): Lexer =
                     TestTableLanguageLexer(CharStreams.fromString(code))
         }
+    override val isCodeFoldingEnabled: Boolean
+        get() = true
+
+    override fun configure(textArea: RSyntaxTextArea) {
+        textArea.paintTabLines = true
+        textArea.tabsEmulated = true
+    }
 }
 
 class TTOverviewTransformer(val editor: CodeEditor) {
@@ -116,7 +131,7 @@ class TTOverviewTransformer(val editor: CodeEditor) {
         return gtt.accept(visitor)!!
     }
 
-    inner class Visitor : TestTableLanguageBaseVisitor<OverviewStructureNode?>() {
+    inner class Visitor : TestTableLanguageParserBaseVisitor<OverviewStructureNode?>() {
         override fun visitFile(ctx: TestTableLanguageParser.FileContext): OverviewStructureNode {
             val root = OverviewStructureNode(StructureData(editor.titleText.trim('*'), editor, ROOT_ICON))
             ctx.table().mapAndAddTo(root)
@@ -124,7 +139,14 @@ class TTOverviewTransformer(val editor: CodeEditor) {
         }
 
         override fun visitTable(ctx: TestTableLanguageParser.TableContext): OverviewStructureNode? {
-            val root = OverviewStructureNode(StructureData(ctx.IDENTIFIER().text, editor, ROOT_ICON))
+            val name =
+                    when (val header = ctx.tableHeader()) {
+                        is TestTableLanguageParser.TableHeaderFunctionalContext -> header.name.text
+                        is TestTableLanguageParser.TableHeaderRelationalContext -> header.name.text
+                        else -> ""
+                    }
+
+            val root = OverviewStructureNode(StructureData(name, editor, ROOT_ICON))
             ctx.freeVariable().mapAndAddTo(root)
             ctx.signature().mapAndUnpackTo(root)
             ctx.opts()?.accept(this)?.also { root.add(it) }
@@ -136,7 +158,8 @@ class TTOverviewTransformer(val editor: CodeEditor) {
         override fun visitOpts(ctx: TestTableLanguageParser.OptsContext): OverviewStructureNode {
             val root = OverviewStructureNode(StructureData("Options", editor, ROOT_ICON))
             ctx.kv().forEach {
-                val n = OverviewStructureNode(StructureData(it.key.text, editor, ROOT_ICON, Position.start(it.key)))
+                val n = OverviewStructureNode(
+                        StructureData(it.key.text, editor, ROOT_ICON, Position.start(it.key.start)))
                 root.add(n)
             }
             return root
@@ -149,7 +172,8 @@ class TTOverviewTransformer(val editor: CodeEditor) {
 
         override fun visitSignature(ctx: TestTableLanguageParser.SignatureContext): OverviewStructureNode {
             val root = OverviewStructureNode(StructureData(""))
-            ctx.variableDefinition().forEach {
+            //TODO Handle remaining variable cases for relational tables
+            ctx.variableDefinition().variableAliasDefinitionSimple().forEach {
                 root.add(OverviewStructureNode(StructureData(it.text + " : " + ctx.dt.text,
                         editor, null, Position.start(it.start))))
             }
@@ -175,7 +199,6 @@ class TTOverviewTransformer(val editor: CodeEditor) {
 }
 
 class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() {
-    //val timer = Timer(500) { _ -> EVENT_BUS.post(EventGetetaUpdate(textArea.text)) }
     val problemList by lookup.with<ProblemList>()
     val outlineService by lookup.with<OutlineService>()
     val previewService by lookup.with<GetetaPreviewService>()
@@ -183,14 +206,15 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
 
     override fun parse(doc: RSyntaxDocument?, style: String?): ParseResult {
         val res = DefaultParseResult(this)
-        val parser = GetetaFacade.createParser(CharStreams.fromReader(DocumentReader(doc)))
+        val parser = GetetaFacade.createParser(CharStreams.fromReader(DocumentReader(doc), textArea.titleText))
         //parser.errorReporter.isPrint = true
         try {
             val ctx = parser.file()
-            val gtt =  GetetaFacade.parseTableDSL(ctx)
+            val gtt = GetetaFacade.parseTableDSL(ctx)
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
             previewService.render(gtt)
+            previewService.select(findCurrentTableByCursor(ctx, textArea.textArea.caretPosition))
             outlineService.show(node)
             problemList.set(textArea, listOf())
         } catch (e: SyntaxErrorReporter.ParserException) {
@@ -199,7 +223,71 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
                         it.line, it.offendingSymbol?.startIndex ?: -1,
                         it.offendingSymbol?.text?.length ?: -1))
             }
+        } catch (e: NullPointerException) {
+        } catch (e: IllegalStateException) {
         }
         return res
     }
+
+    private fun findCurrentTableByCursor(ctx: TestTableLanguageParser.FileContext, caretPosition: Int): String {
+        val ctx = ctx.table().find { it: ParserRuleContext -> caretPosition in it.start.startIndex..it.stop.stopIndex }
+        return when (val th = ctx?.tableHeader()) {
+            is TestTableLanguageParser.TableHeaderFunctionalContext -> th.name.text
+            is TestTableLanguageParser.TableHeaderRelationalContext -> th.name.text
+            else -> ""
+        }
+    }
+}
+
+class TTFolderParser() : FoldParser {
+    override fun getFolds(textArea: RSyntaxTextArea): MutableList<Fold>? {
+        val lexer = TestTableLanguageLexer(CharStreams.fromString(textArea.text))
+        val folds = arrayListOf<Fold>()
+        val stack = Stack<Fold>()
+        val stackLine = Stack<Int>()
+        var token: Token = lexer.nextToken()
+        var inComment = false
+        do {
+            var type = FoldType.CODE
+            var close = false
+            var open = false
+            if (inComment) {
+                if (token.type == TestTableLanguageLexer.COMMENT &&
+                        token.text == "*/") {
+                    close = true
+                    inComment = false
+                }
+            }
+            if (!inComment && token.type == TestTableLanguageLexer.COMMENT && token.text == "/*") {
+                open = true; inComment = true; type = FoldType.COMMENT
+            }
+            if (token.type == TestTableLanguageLexer.RBRACE) close = true
+            if (token.type == TestTableLanguageLexer.LBRACE) open = true
+
+            if (close) {
+                try {
+                    val last = stack.pop()
+                    val lastLine = stackLine.pop()
+                    last.endOffset = token.stopIndex
+                    if (token.line != lastLine)
+                        folds += last
+                } catch (e: EmptyStackException) {
+
+                }
+            }
+            if (open) {
+                val new = try {
+                    val last = stack.peek()
+                    last.createChild(type, token.startIndex)
+                } catch (e: EmptyStackException) {
+                    Fold(type, textArea, token.startIndex)
+                }
+                stack.push(new)
+                stackLine.push(token.line)
+            }
+            token = lexer.nextToken()
+        } while (token.type != Token.EOF)
+        return folds
+    }
+
 }

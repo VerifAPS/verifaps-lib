@@ -13,7 +13,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 start
 :
-	(library_element_declaration)*
+	(library_element_declaration)* EOF
 ;
 
 namespace_declaration
@@ -23,14 +23,24 @@ namespace_declaration
 
 namespace_elements
 :
-      data_type_declaration
-	| function_declaration
-    | class_declaration
-    | interface_declaration
-	| function_block_declaration
-	//not allowed | program_declaration
-	| namespace_declaration
+  pragma*
+  ( data_type_declaration
+  | function_declaration
+  | class_declaration
+  | interface_declaration
+  | function_block_declaration
+  | namespace_declaration
+  )
 ;
+
+pragma:
+    LBRACE type=IDENTIFIER
+    (pragma_arg (COMMA pragma_arg)*)?
+    RBRACE
+;
+
+pragma_arg: (arg=string ASSIGN)? value=string;
+
 
 full_qualified_identifier
 :
@@ -44,20 +54,22 @@ using_directive
 
 library_element_declaration
 :
-	  data_type_declaration
-	| function_declaration
-  | class_declaration
-  | interface_declaration
-	| function_block_declaration
-	| program_declaration
-	| global_variable_list_declaration
-  | namespace_declaration
+    pragma*
+    (  data_type_declaration
+    | function_declaration
+    | class_declaration
+    | interface_declaration
+    | function_block_declaration
+    | program_declaration
+    | global_variable_list_declaration
+    | namespace_declaration
+    )
 //	| configuration_declaration
 ;
 
 constant
 :
-    integer
+      integer
 	| real
 	| string
 	| time
@@ -196,7 +208,6 @@ type_declaration
 	  ( R_EDGE
 	  | F_EDGE
 	  )?
-	| enumerated_specification
 	)
 	( ASSIGN i=initializations)?
 ;
@@ -310,7 +321,8 @@ function_declaration
 	FUNCTION identifier=name COLON
 	( returnET=elementary_type_name	| returnID=IDENTIFIER)
 	var_decls
-	funcBody END_FUNCTION
+	funcBody
+	END_FUNCTION
 ;
 
 var_decls
@@ -320,6 +332,7 @@ var_decls
 
 var_decl
 :
+    pragma*
     variable_keyword
     var_decl_inner
     END_VAR
@@ -376,7 +389,12 @@ body :
       sfc
     | IL_CODE ilBody /*| ladder_diagram | fb_diagram | instruction_list |*/
     | fbBody
-    | statement_list
+    | stBody
+;
+
+label_statement: id=IDENTIFIER COLON;
+stBody:
+  startlbl=label_statement? startstmts=statement_list (lbls+=label_statement stmts+=statement_list)*
 ;
 
 fbBody: FBD_CODE;
@@ -425,7 +443,8 @@ program_declaration
 	PROGRAM identifier=IDENTIFIER
 	var_decls
 	action*
-	body END_PROGRAM
+	body
+	END_PROGRAM
 ;
 
 global_variable_list_declaration
@@ -681,6 +700,8 @@ invocation
 	)? RPAREN
 ;
 
+statement_list_eof: stBody EOF;
+
 statement_list
 :
 	(statement)*
@@ -688,25 +709,22 @@ statement_list
 
 statement
 :
-  	  label_statement
-	| assignment_statement SEMICOLON
+    pragma*
+  	( assignment_statement SEMICOLON
    	| invocation_statement SEMICOLON
   	| return_statement SEMICOLON
   	| jump_statement SEMICOLON
-	| if_statement
+	  | if_statement
     | case_statement
     | for_statement
     | while_statement
     | repeat_statement
     | exit_statement SEMICOLON
+    )
 ;
 
 jump_statement
 : JMP id=IDENTIFIER
-;
-
-label_statement
-: id=IDENTIFIER COLON
 ;
 
 assignment_statement
@@ -781,6 +799,7 @@ if_statement
 	(ELSE elselist = statement_list)?
 	END_IF SEMICOLON?
 ;
+
 
 case_statement
 :

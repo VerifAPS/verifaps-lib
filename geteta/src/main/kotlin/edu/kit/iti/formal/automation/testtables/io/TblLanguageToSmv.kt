@@ -2,22 +2,24 @@ package edu.kit.iti.formal.automation.testtables.io
 
 
 import edu.kit.iti.formal.automation.testtables.exception.IllegalExpressionException
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.smv.ast.*
+import edu.kit.iti.formal.util.fail
+import org.antlr.v4.runtime.tree.TerminalNode
 import java.util.*
 
 /**
  * Created by weigl on 09.12.16.
  */
 class TblLanguageToSmv(private val columnVariable: SVariable,
-                       private val columnProgramRun: Int?,
-                       private val context: ParseContext) : TestTableLanguageBaseVisitor<SMVExpr>() {
+                       private val columnProgramRun: Int = 0,
+                       private val context: ParseContext) : TestTableLanguageParserBaseVisitor<SMVExpr>() {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): SMVExpr {
         return ctx.chunk().map { it.accept(this) }
@@ -51,7 +53,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
                 return SIntegerLiteral(value)
             } else {
                 val dtWord = (columnVariable.dataType as? SMVWordType?)
-                return SWordLiteral(value, dtWord?: SMVTypes.signed(16))
+                return SWordLiteral(value, dtWord ?: SMVTypes.signed(16))
             }
         }
     }
@@ -157,19 +159,29 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
         return SEnumLiteral(ctx.text)
     }*/
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
-        val programRun = when {
-            ctx.RV_SEPARATOR() == null -> columnProgramRun
-            ctx.INTEGER() != null -> ctx.INTEGER().text.toInt()
-            else -> columnProgramRun?.let { 1 - it } // other run
+
+    private fun resolveName(identifier: TerminalNode?, fqVariable: TerminalNode?): Pair<Int, String> {
+        if (fqVariable != null) {
+            require(context.relational) {
+                "Full-qualified variable used in non-relational test table."
+            }
+
+            val parts = fqVariable.text.split("|>", "·", "::", limit = 2)
+            val name = if (parts[1].isEmpty()) columnVariable.name else parts[1]
+            val runNum =
+                    if (parts[0].isEmpty()) 1 - columnProgramRun
+                    else parts[0].toIntOrNull() ?: context.programRuns.indexOf(parts[0])
+            require(runNum >= 0)
+            return runNum to name
         }
+        if (identifier != null) {
+            return columnProgramRun to identifier.text
+        }
+        fail("")
+    }
 
-        val varText =
-                if (ctx.RV_SEPARATOR() != null && ctx.IDENTIFIER() == null)
-                    columnVariable.name
-                else
-                    ctx.IDENTIFIER().text
-
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): SMVExpr {
+        val (programRun, varText) = resolveName(ctx.IDENTIFIER(), ctx.FQ_VARIABLE())
         val isReference = ctx.RBRACKET() != null
 
         return if (varText in context) {
@@ -185,6 +197,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
             SEnumLiteral(varText.toUpperCase())
         }
     }
+
 
     override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): SMVExpr {
         return SBinaryExpression(ctx.left.accept(this), SBinaryOperator.AND, ctx.right.accept(this))

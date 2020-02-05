@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
@@ -40,26 +41,32 @@ class PrinterApp : CliktCommand() {
             .flag(default = true)
 
     val file by argument(help = "test table")
-            .file(exists = true, readable = true)
+            .file(exists = true, readable = true).multiple()
 
     override fun run() {
-        val gtt = GetetaFacade.readTable(file)
+        val gtts = file.flatMap { GetetaFacade.readTables(it) }.map {
+            it.ensureProgramRuns()
+            it.generateSmvExpression()
+            it
+        }
 
         val o = output
         val stream = o?.let { o.bufferedWriter() } ?: OutputStreamWriter(System.out)
         val sink = CodeWriter(stream)
 
-        val printer =
-                when (format) {
-                    Format.LATEX -> LatexTablePrinter(gtt, sink)
-                    Format.HTML -> HTMLTablePrinter(gtt, sink)
-                    Format.TEXT -> TextTablePrinter(gtt, sink)
-                }
+        gtts.forEach { gtt ->
+            val printer =
+                    when (format) {
+                        Format.LATEX -> LatexTablePrinter(gtt, sink)
+                        Format.HTML -> HTMLTablePrinter(gtt, sink)
+                        Format.TEXT -> TextTablePrinter(gtt, sink)
+                    }
 
-        if (standalone) printer.printPreamble()
-        printer.print()
-        if (standalone) printer.printPostamble()
-        stream.flush()
+            if (standalone) printer.printPreamble()
+            printer.print()
+            if (standalone) printer.printPostamble()
+            stream.flush()
+        }
     }
 }
 

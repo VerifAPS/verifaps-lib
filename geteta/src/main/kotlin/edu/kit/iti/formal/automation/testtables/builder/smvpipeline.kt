@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.Duration
+import edu.kit.iti.formal.automation.testtables.model.DurationModifier
+import edu.kit.iti.formal.automation.testtables.model.ProjectionVariable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
@@ -17,6 +20,7 @@ import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
+import edu.kit.iti.formal.util.warn
 
 
 class SmvConstructionPipeline(
@@ -29,11 +33,16 @@ class SmvConstructionPipeline(
     init {
         model.testTable.ensureProgramRuns()
 
-        if (model.testTable.options.relational)
-            transformers.add(PauseAdder)
         transformers.add(GenerateSmvExpression)
+
+        if (model.testTable.options.relational) {
+            transformers.add(PlayPauseToAssumption)
+            transformers.add(BackwardToAssumption)
+        }
+
         transformers.add(RegisterDefines)
         transformers.add(DefineStateVariables)
+        transformers.add(DefineProjectionVariables)
         transformers.add(InitialStates)
         transformers.add(DefineTransitions)
         transformers.add(NameSetterTransformer())
@@ -55,6 +64,24 @@ class SmvConstructionPipeline(
     fun transform(): SMVConstructionModel {
         transformers.forEach { a -> a.transform(model) }
         return model
+    }
+}
+
+object DefineProjectionVariables : SmvConstructionTransformer {
+    override fun transform(model: SMVConstructionModel) {
+        model.testTable.programVariables
+                .filterIsInstance<ProjectionVariable>()
+                .forEach {
+                    val zip = it.argumentDefinitions.zip(it.constraint)
+                    for ((v, expr) in zip) {
+                        translate(model, v, expr)
+                    }
+                }
+    }
+
+    private fun translate(model: SMVConstructionModel, variable: SVariable, expr: TestTableLanguageParser.ExprContext) {
+        val smvExpr = GetetaFacade.exprToSmv(expr, model.testTable.parseContext)
+        model.tableModule.definitions.add(SAssignment(variable, smvExpr))
     }
 }
 
@@ -160,11 +187,7 @@ object RegisterDefines : SmvConstructionTransformer {
 }
 
 internal val Duration.pflag: Boolean
-    get() = when (this) {
-        is Duration.Omega -> false
-        is Duration.OpenInterval -> this.pflag
-        is Duration.ClosedInterval -> this.pflag
-    }
+    get() = this.modifier == DurationModifier.PFLAG_I || this.modifier == DurationModifier.PFLAG_IO
 
 /**
  * Triggers the generation of the SMV expression with in the Rows.
@@ -185,7 +208,7 @@ class NameSetterTransformer : SmvConstructionTransformer {
         val mt = model.tableModule
         val gtt = model.testTable
         if (gtt.name.isEmpty()) {
-            Console.warn("No table name given. Aborting")
+            warn("No table name given. Aborting")
         } else {
             gtt.name = "table"
         }
@@ -204,13 +227,14 @@ class ModuleParameterTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.testTable.programVariables.forEach {
             model.tableModule.moduleParameters.add(
-                    model.variableContext.getSMVVariable(it))
+                    it.internalVariable(model.variableContext.programRuns))
         }
 
         model.ttType = ModuleType(model.tableModule.name,
                 model.testTable.programVariables.map {
-                    val a = it.externalVariable(model.variableContext.programRuns)
-                    if (it.isOutput) a.inNext() else a
+                    val a = it.externalVariable(model.variableContext.programRuns,
+                            "_${model.testTable.name}")
+                    if (it.isAssertion) a.inNext() else a
                 }
         )
     }
@@ -271,7 +295,8 @@ class WeakConformance : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         val invar =
                 model.stateError implies
-                        model.rowStates.map { s -> model.getVariable(s) }.disjunction()
+                        model.rowStates.map { s -> model.getVariable(s) }
+                                .disjunction(SLiteral.FALSE)
                                 .or(model.stateSentinel)
         model.tableModule.invariantSpecs.add(invar)
     }

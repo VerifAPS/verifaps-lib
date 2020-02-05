@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.automation.blocks
 
+import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.BooleanLit
-import edu.kit.iti.formal.automation.st.ast.Expression
-import edu.kit.iti.formal.automation.st.ast.JumpStatement
-import edu.kit.iti.formal.automation.st.ast.StatementList
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
@@ -18,6 +17,9 @@ data class BlockProgram(
         val blocks: MutableList<Block> = arrayListOf(),
         val edges: MutableList<Pair<Block, Block>> = arrayListOf(),
         val scope: Scope = Scope()) {
+
+    val symbex = SymbolicExecutioner(scope)
+
     fun addAll(subbp: BlockProgram) {
         blocks.addAll(subbp.blocks)
         edges.addAll(subbp.edges)
@@ -111,7 +113,7 @@ data class Block(var label: String = getRandomLabel(),
 
     lateinit var ssaExecutionCondition: SMVExpr
     var ssaMutation: Map<SVariable, SMVExpr> = hashMapOf()
-    var localMutationMap: Map<SVariable, SMVExpr> = hashMapOf()
+    var localMutationMap: SymbolicState = SymbolicState()
 
     val gotoLabel: String?
         get() = if (statements.isNotEmpty()) (statements.last() as? JumpStatement)?.target else null
@@ -133,7 +135,7 @@ data class Block(var label: String = getRandomLabel(),
         val b = Block(label, executionCondition.clone(), statements.clone())
         //b.ssaExecutionCondition = ssaExecutionCondition.clone()
         //b.ssaMutation = HashMap(ssaMutation)
-        b.localMutationMap = HashMap(localMutationMap)
+        b.localMutationMap = SymbolicState(localMutationMap)
         return b
     }
 }

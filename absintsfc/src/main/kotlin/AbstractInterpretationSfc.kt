@@ -1,4 +1,4 @@
-import edu.kit.iti.formal.automation.Console
+
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.scope.Scope
@@ -6,6 +6,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.smv.SMVAstScanner
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.info
 import java.awt.Color
 import java.io.PrintWriter
 import java.util.*
@@ -26,19 +27,19 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
 
     override fun run() {
         var change: Boolean
-        Console.info("Mark all variables as equals")
+        info("Mark all variables as equals")
         var iter = 1
         markAllVariablesAsEquals()
         do {
-            Console.info("$iter Iteration")
+            info("$iter Iteration")
             val update = sfcDiff.states.values.map {
                 val c = updateState(it)
                 if (c)
-                    Console.info("Next iteration will happen: ${it.name} changed!")
+                    info("Next iteration will happen: ${it.name} changed!")
                 c
             }
             change = update.any { it }
-            Console.info("Change is $change.")
+            info("Change is $change.")
             iter++
         } while (change)
 
@@ -86,7 +87,7 @@ class AbstractInterpretationSfc(val sfcDiff: DifferenceSfc, val leftScope: Scope
             val old = it.abstractVariable[v]!!
             it.abstractVariable[v] = new
             if (new != old) {
-                Console.info("Value changed in ${it.name} for $v.")
+                info("Value changed in ${it.name} for $v.")
             }
         }
 
@@ -190,7 +191,7 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         se.push(SymbolicState())
         for (vd in scope) {
             val s = se.lift(vd)
-            se.peek()[s] = s
+            se.assign(vd, s)
         }
         return se
     }
