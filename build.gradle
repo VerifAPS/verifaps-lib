@@ -72,7 +72,7 @@ dokka {
 allprojects {
     apply plugin: 'idea'
     group = 'edu.kit.iti.formal.automation'
-    version "0.10.0"
+    version "0.11.0"
 
     idea {
         module {
@@ -97,7 +97,6 @@ allprojects {
         }
     }
 }
-
 
 subprojects {
     apply plugin: 'maven-publish'
@@ -310,4 +309,3 @@ task testReport(type: TestReport) {
     // Include the results from the `test` task in all subprojects
     reportOn subprojects*.test
 }
-
