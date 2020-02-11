@@ -77,7 +77,7 @@ data class SBinaryExpression(private var _left: SMVExpr,
 
 
     override val dataType: SMVType?
-        get() = SMVTypes.infer(left.dataType!!, right.dataType!!)
+        get() = SMVTypes.infer(operator, left.dataType!!, right.dataType!!)
 
     override fun inModule(module: String): SBinaryExpression {
         return SBinaryExpression(left.inModule(module),

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
-import java.io.PrintWriter
 import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -93,6 +92,27 @@ object SMVTypes {
     @JvmStatic
     fun infer(list: List<SMVType>): SMVType? {
         return if (list.stream().allMatch { a -> a == list[0] }) list[0] else null
+    }
+
+
+    @JvmStatic
+    fun infer(op: SBinaryOperator, a: SMVType, b: SMVType): SMVType? {
+        return when (op) {
+            SBinaryOperator.AND -> BOOLEAN
+            SBinaryOperator.OR -> BOOLEAN
+            SBinaryOperator.LESS_THAN -> BOOLEAN
+            SBinaryOperator.LESS_EQUAL -> BOOLEAN
+            SBinaryOperator.GREATER_THAN -> BOOLEAN
+            SBinaryOperator.GREATER_EQUAL -> BOOLEAN
+            SBinaryOperator.XOR -> BOOLEAN
+            SBinaryOperator.XNOR -> BOOLEAN
+            SBinaryOperator.EQUAL -> BOOLEAN
+            SBinaryOperator.IMPL -> BOOLEAN
+            SBinaryOperator.EQUIV -> BOOLEAN
+            SBinaryOperator.NOT_EQUAL -> BOOLEAN
+            SBinaryOperator.WORD_CONCAT -> TODO()
+            else -> infer(a, b)
+        }
     }
 
     @JvmStatic

@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 private val SymbolicState.definitions: Map<String, String>
-    get() = map.flatMap { (_, b) ->
+    get() = definitions.flatMap { (_, b) ->
         b.values.map { (a, b) -> a.name to b.repr() }
     }.toMap()
 

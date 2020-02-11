@@ -55,9 +55,6 @@ object Geteta {
 class GetetaApp : CliktCommand(
         epilog = "Geteta -- Tooling for Generalized Test Tables.",
         name = "geteta.sh") {
-    //val xmlModeOutput by option("-x", help = "enable XML mode")
-    //        .flag(default = false)
-
     val disableSimplify by option("--no-simplify", help = "disable")
             .flag("--simplify", default = false)
 

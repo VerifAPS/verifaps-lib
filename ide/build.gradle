@@ -69,6 +69,7 @@ def mainClasses = [
         , 'check'            : "edu.kit.iti.formal.automation.Check"
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
+        , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
 ]
 
 

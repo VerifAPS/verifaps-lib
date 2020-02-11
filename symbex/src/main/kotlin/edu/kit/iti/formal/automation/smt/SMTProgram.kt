@@ -29,6 +29,7 @@ class SMTProgram(
         var stateDataTypes: MutableMap<String, SExpr> = HashMap(),
         var initPredicates: MutableMap<String, SExpr> = TreeMap(),
         var nextPredicates: MutableMap<String, SExpr> = TreeMap(),
+        var nextDefines: MutableMap<String, SExpr> = TreeMap(),
         var initFuncName: String = "init",
         var nextFuncName: String = "next") {
 
@@ -56,7 +57,6 @@ class SMTProgram(
 
     val nextFunction: SExpr
         get() {
-
             val s = createSortSExpr(STATE_NAME, this.stateDataTypes)
             val i = createSortSExpr(STATE_NAME, this.inputDataTypes)
             val t = createSortSExpr(NEW_STATE_NAME, this.stateDataTypes)
@@ -65,18 +65,21 @@ class SMTProgram(
             return func
         }
 
-    protected val nextBody: SExpr
+    val nextBody: SExpr
         get() {
             val body = SList()
             body.add(SSymbol("and"))
-            this.nextPredicates.forEach { name, pred ->
+            this.nextPredicates.forEach { (name, pred) ->
                 val eq = SList()
                 eq.add(SSymbol("="))
                 eq.add(SSymbol(NEW_STATE_NAME + name))
                 eq.add(pred)
                 body.add(eq)
             }
-            return body
+
+            return nextDefines.entries.toList().foldRight(body) { (k, v), acc ->
+                SList("let", SList(SList(k, v) as SExpr), acc)
+            }
         }
 
     /**
@@ -128,10 +131,10 @@ class SMTProgram(
     /**
      * @return
      */
-    fun getStepDefinition(withInput: Boolean, suffix: String): String {
+    fun getStepDefinition(withInput: Boolean, prefix: String = "", suffix: String = ""): String {
         val sb = StringBuilder()
-        val init = getDefineInputTypes("", suffix)
-        val next = getDefineStateTypes("", suffix)
+        val init = getDefineInputTypes(prefix, suffix)
+        val next = getDefineStateTypes(prefix, suffix)
 
         val vars = if (withInput) (init + next) else next
 

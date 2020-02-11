@@ -87,7 +87,6 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
 
             bvsOperators[SBinaryOperator.MUL] = "bvmul"
             bvsOperators[SBinaryOperator.PLUS] = "bvadd"
-            bvsOperators[SBinaryOperator.MUL] = "bvmull"
             bvsOperators[SBinaryOperator.DIV] = "bvsdiv"
             bvsOperators[SBinaryOperator.XOR] = "bvxor"
             bvsOperators[SBinaryOperator.XNOR] = "bvxnor"
