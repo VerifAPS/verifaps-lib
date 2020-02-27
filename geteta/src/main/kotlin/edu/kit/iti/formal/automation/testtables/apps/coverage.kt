@@ -23,7 +23,6 @@ import java.io.File
  * @author Alexander Weigl
  * @version 1 (2/11/20)
  */
-
 object Coverage {
     @JvmStatic
     fun main(args: Array<String>) {
