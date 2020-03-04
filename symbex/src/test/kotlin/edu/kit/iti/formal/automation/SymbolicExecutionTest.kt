@@ -25,6 +25,7 @@ package edu.kit.iti.formal.automation
 import com.google.common.truth.Truth.assertThat
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.rvt.SymbolicState
+import edu.kit.iti.formal.automation.rvt.SymbolicVariable
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -32,6 +33,11 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+
+private val Map<SVariable, SymbolicVariable>.stringified: Map<String, String>
+    get() = asSequence()
+            .map { (a, b) -> a.name to b.value.toString() }
+            .toMap()
 
 private val SymbolicState.definitions: Map<String, String>
     get() = definitions.flatMap { (_, b) ->
@@ -103,7 +109,7 @@ class SymbolicExecutionTest {
                     IF a = 2 THEN  b := 2; 
                     ELSE b := 1; c:=2; END_IF;"""
         val state = executeStatements(statements)
-        val defs = state.definitions
+        val defs = state.definitions.stringified
         val states = state.stringifed
 
         defs.forEach { (t, u) -> println("$t = $u") }
