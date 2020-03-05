@@ -297,7 +297,7 @@ object GetetaFacade {
                 automaton.rowStates[row] = states
             }
             a.transitions.forEach { t ->
-                val trans = t.copy(
+                val trans = t.copy( //rewrite the sentinel and error transitions
                         from = when (t.from) {
                             a.stateError -> automaton.stateError
                             a.stateSentinel -> automaton.stateSentinel
@@ -312,14 +312,27 @@ object GetetaFacade {
             }
         }
 
+        //remove transition, which goes to the sentinel with \pass, if there is a goto-pass command
+        automaton.rowStates.filter { (a, _) ->
+            a.gotos.any { it.kind == GotoTransition.Kind.PASS }
+        }.forEach { (_, u) ->
+            // _ ovewrites pass, so remove all transition from any state in u going to the sentinel
+            automaton.transitions.removeIf { it.from in u && it.to == automaton.stateSentinel }
+        }
+
+        fun findTarget(gt: GotoTransition) =
+            when {
+                gt.tableName=="eog" -> automaton.stateSentinel
+                gt.tableName=="err" -> automaton.stateError
+                else -> jumpMap[gt.tableName to gt.rowId]
+            } ?: error("Could not find the table row ${gt.rowId} in table ${gt.tableName}.")
+
+
         //add goto commands into the table
         for (it in tables) {
             for ((row, states) in it.automaton.rowStates) {
                 for (goto in row.gotos) {
-                    val target = jumpMap[goto.tableName to goto.rowId]
-                            ?: error("Could not find the table row ${goto.rowId} in table ${goto.tableName}.")
-
-
+                    val target = findTarget(goto)
                     for (s in states) {
                         if (s.optional) {
                             val type = when (goto.kind) {
@@ -337,9 +350,7 @@ object GetetaFacade {
                 }
             }
         }
-
-
-
+        
         return automaton
     }
 

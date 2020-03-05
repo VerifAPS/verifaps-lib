@@ -4,7 +4,7 @@ table A {
 
     group gA {
         row a { \goto: \fail(B,a); I: 2; O:3 }
-        row b { \goto: \miss(C,a); I: <0; O: >0}
+        row b { \goto: \miss(C,a), \pass(B,a); I: <0; O: >0}
     }
 }
 
