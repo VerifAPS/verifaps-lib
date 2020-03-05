@@ -126,7 +126,8 @@ class Reteta : CliktCommand(
 
             if (drawAutomaton) {
                 info("Automaton drawing requested. This may took a while.")
-                val ad = AutomatonDrawer(File(outputFolder, "${table.name}.dot"), table, tt.automaton)
+                val ad = AutomatonDrawer(File(outputFolder, "${table.name}.dot"),
+                        listOf(table.region), tt.automaton)
                 ad.runDot = true
                 ad.show = showAutomaton
                 ad.run()

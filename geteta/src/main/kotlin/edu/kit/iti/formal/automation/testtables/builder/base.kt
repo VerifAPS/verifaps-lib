@@ -60,6 +60,9 @@ class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransforme
     fun getStateVariable(ss: RowState) =
             SVariable(ss.name, SMVTypes.BOOLEAN)
 
+    fun getMiss(ss: RowState): SVariable =
+            SVariable(ss.miss, SMVTypes.BOOLEAN)
+
     fun getAccept(ss: RowState): SVariable =
             SVariable(ss.fwd, SMVTypes.BOOLEAN)
 
@@ -75,15 +78,15 @@ class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransforme
                 is RowState -> getStateVariable(to)
             }
 
+
     lateinit var variableContext: ParseContext
     val testTable: GeneralizedTestTable = state.testTable
-    val stateReachability: StateReachability = state.stateReachability
     val automaton = state.automaton
 
     val tableModule = SMVModule("...")
-    val helperModules: MutableList<SMVModule> = LinkedList<SMVModule>()
+    val helperModules: MutableList<SMVModule> = LinkedList()
 
-    val sentinelState = stateReachability.endSentinel
+    val sentinelState = automaton.stateSentinel
     val stateError = SVariable(automaton.stateError.name, SMVTypes.BOOLEAN)
     var stateSentinel = SVariable(automaton.stateSentinel.name, SMVTypes.BOOLEAN)
     var ttType: ModuleType? = null

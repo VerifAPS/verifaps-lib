@@ -242,6 +242,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
             TransitionType.FAIL ->
                 "__assumption && !__assertion"
             TransitionType.TRUE -> "true"
+            TransitionType.MISS -> "! __assumption"
         }
 
         cw.nl().cblock("if($condition) {", "}") {

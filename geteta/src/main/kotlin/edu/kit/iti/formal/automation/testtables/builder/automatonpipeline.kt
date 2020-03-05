@@ -15,6 +15,7 @@ class AutomatonBuilderPipeline(
     init {
         steps = listOf(
                 RowGroupExpander(),
+                GotoRewriter(),
                 InitialAutomataCreator(),
                 if (table.options.mode == Mode.CONCRETE_TABLE)
                     AutomatonConcretizerTransformation()
@@ -32,6 +33,7 @@ class AutomatonBuilderPipeline(
         return init
     }
 }
+
 
 val Duration.minimum: Int
     get() = when (this) {
@@ -51,6 +53,20 @@ val Duration.maximum: Int
 val stateNameError = "__ERROR__"
 val stateNameSentinel = "__SENTINEL__"
 
+/**
+ * This pipeline populates gotos from regions to rows.
+ * It also disables
+ */
+class GotoRewriter : AbstractTransformer<AutomataTransformerState>() {
+    override fun transform() {
+        rewriteGotos(model.testTable.region)
+    }
+
+    fun rewriteGotos(region: Region) {
+
+    }
+
+}
 
 /**
  * If the gtt contains a row group with a minimum amount of iteration, we expand it under maintaining
@@ -92,27 +108,30 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
         fun expand(r: Region): Region {
             val duration = r.duration
             val dmodifier = duration.modifier
-            if (duration == Duration.Omega || !duration.isRepeatable
-                    || duration.minimum == 0) {
+            if (duration == Duration.Omega || !duration.isRepeatable /*|| duration.minimum == 0*/) {
                 return r
             }
             val seq = ArrayList<TableNode>(r.children.size)
             val m = duration.maximum
             for (iter in 1..m) {
-                val t = Region(r.id + "_${iter}")
+                val t = Region("${r.id}_${iter}")
 
                 t.duration = when {
                     (iter == m && duration is Duration.OpenInterval) ->
                         Duration.OpenInterval(0, dmodifier)
                     (duration is Duration.ClosedInterval && duration.minimum < iter && iter <= duration.maximum) ->
-                        Duration.ClosedInterval(0,1, dmodifier)
+                        Duration.ClosedInterval(0, 1, dmodifier)
                     else ->
                         Duration.ClosedInterval(1, 1, dmodifier)
                 }
 
-                r.children.forEach {
-                    t.children.add(it.clone().also { it.id = "${t.id}_${it.id}" })
-                }
+                //TODO decide whether to copy/disable the goto commands
+
+                t.children = r.children.map {
+                    val clone = it.clone()
+                    clone.id = "${t.id}_${it.id}"
+                    clone
+                }.toMutableList()
                 seq.add(t)
             }
             val new = Region(r.id, seq)

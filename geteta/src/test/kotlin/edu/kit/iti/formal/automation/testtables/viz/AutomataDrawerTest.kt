@@ -22,7 +22,7 @@ class AutomataDrawerTest {
         val tt = GetetaFacade.readTables(File(file)).first()
         val pip = AutomatonBuilderPipeline(tt)
         val auto = pip.transform()
-        val ad = AutomatonDrawer(File("tmp.dot"), tt, auto.automaton)
+        val ad = AutomatonDrawer(File("tmp.dot"), listOf(tt.region), auto.automaton)
         ad.runDot = true
         ad.show = true
         ad.run()

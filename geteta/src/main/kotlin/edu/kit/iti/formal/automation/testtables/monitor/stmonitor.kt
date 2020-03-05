@@ -173,13 +173,14 @@ object MonitorGenerationST : MonitorGeneration {
                         val fromName = SymbolicReference(t.from.name)
                         when (t.type) {
                             TransitionType.ACCEPT ->
-                                SymbolicReference(from!!.row.defInput.name) and fromName
+                                SymbolicReference(from!!.row.defForward.name) and fromName
                             TransitionType.ACCEPT_PROGRESS ->
                                 SymbolicReference(from!!.row.defProgress.name) and fromName
                             TransitionType.FAIL ->
                                 SymbolicReference(from!!.row.defFailed.name) and fromName
                             TransitionType.TRUE ->
                                 fromName
+                            TransitionType.MISS -> SymbolicReference(from!!.row.defInput.name).not() and fromName
                         }
                     }?.reduce { a, b -> a or b }
                             ?: BooleanLit.LFALSE

@@ -42,7 +42,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     override fun visitTable(ctx: TestTableLanguageParser.TableContext) {
         current = GeneralizedTestTable()
         testTables += current
-        ctx.tableHeader().accept(this)
+        //ctx.tableHeader().accept(this)
         visitChildren(ctx)
     }
 
@@ -229,7 +229,23 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
         if (gtt.options.relational) {
             ctx.controlCommands()?.accept(this)
         }
+
+        if (ctx.goto_().isNotEmpty()) {
+            currentRow.gotos = ctx.goto_().asSequence()
+                    .flatMap { it.trans.asSequence() }
+                    .map { visitGotoTransition(it) }
+                    .toMutableList()
+        }
         return currentRow
+    }
+
+    private fun visitGotoTransition(ctx: TestTableLanguageParser.GotoTransContext): GotoTransition {
+        return GotoTransition(ctx.tblId.text, rowId(ctx.rowId),
+                when {
+                    ctx.MISS() != null -> GotoTransition.Kind.MISS
+                    ctx.FAIL() != null -> GotoTransition.Kind.FAIL
+                    else -> GotoTransition.Kind.PASS
+                })
     }
 
     override fun visitControlPause(ctx: TestTableLanguageParser.ControlPauseContext): TableNode {

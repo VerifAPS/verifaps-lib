@@ -133,6 +133,7 @@ object DefineTransitions : AbstractTransformer<SMVConstructionModel>() {
                         TransitionType.ACCEPT_PROGRESS -> model.getAcceptProgress(t.from as RowState)
                         TransitionType.FAIL -> model.getFail(t.from as RowState)
                         TransitionType.TRUE -> model.getVariable(it)
+                        TransitionType.MISS -> model.getMiss(t.from as RowState)
                     }
                 }?.disjunction() ?: SLiteral.FALSE
         model.tableModule.nextAssignments.add(
@@ -158,7 +159,7 @@ object RegisterDefines : SmvConstructionTransformer {
         // progress indicator
         val progress = if (s.duration.pflag) {
             s.outgoing
-                    .filter { it != model.sentinelState }
+                    //TODO filter the sentinel out: .filter { it != model.sentinelState }
                     .map { it.defInput }
                     .disjunction()
         } else SLiteral.FALSE
@@ -208,8 +209,7 @@ class NameSetterTransformer : SmvConstructionTransformer {
         val mt = model.tableModule
         val gtt = model.testTable
         if (gtt.name.isEmpty()) {
-            warn("No table name given. Aborting")
-        } else {
+            warn("No table name given. Using default name `table'.")
             gtt.name = "table"
         }
         mt.name = gtt.name

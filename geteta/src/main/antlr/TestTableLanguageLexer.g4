@@ -76,6 +76,11 @@ NEXT : 'next';
 ASSUME : 'ASSUME' | 'assume';
 ASSERT : 'ASSERT' | 'assert';
 
+GOTO:'\\goto';
+MISS:'\\miss';
+FAIL:'\\fail';
+PASS:'\\pass';
+
 FQ_VARIABLE : (DIGIT+|IDENTIFIER)? ('|>'|'·'|'::') IDENTIFIER?;
 IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
 
