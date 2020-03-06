@@ -181,7 +181,6 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
 class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageParserBaseVisitor<TableNode>() {
     var currentId = 0
 
-
     private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
         val idx = gtt.programRuns.indexOf(it.id.text)
         if (idx < 0) error("Program run unknown ${it.id.text}")
@@ -190,6 +189,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
 
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
+        if (ctx.goto_().isNotEmpty()) {
+            info("Handling of goto commands in regions currently not supported")
+        }
         val id = ctx.id?.text ?: "g" + (ctx.idi?.text?.toInt() ?: ++currentId)
         val r = Region(id)
         if (ctx.time() != null)

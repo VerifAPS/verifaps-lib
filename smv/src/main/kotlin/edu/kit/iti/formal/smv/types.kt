@@ -31,7 +31,8 @@ data class SMVWordType(
         val re = Pattern.compile("(?<sign>-)?0(?<t>s|u)d(?<w>\\d+)_(?<v>\\d+)")
         val m = re.matcher(str)
         if (m.matches()) {
-            TODO("further implement maybe call parser?")
+            val word = SMVFacade.parseWordLiteral(str)
+            return word.value
         }
         return BigInteger.ZERO
     }
@@ -51,7 +52,7 @@ data class SMVWordType(
                         width,
                         value.abs().toString())
             is Long -> format(BigInteger.valueOf(value))
-            else -> TODO("not implemented for ${value.javaClass}")
+            else -> error("not implemented for ${value.javaClass}")
         }
     }
 }
@@ -60,30 +61,22 @@ object SMVTypes {
     val GENERIC_ENUM = EnumType(listOf())
 
     object INT : SMVType {
-        override fun valueOf(str: String): SLiteral {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
+        override fun valueOf(str: String): SLiteral = SIntegerLiteral(BigInteger(str))
         override fun format(value: Any): String = value.toString()
         override fun read(str: String): Any = BigInteger(str)
         override fun repr(): String = "int"
     }
 
     object FLOAT : SMVType {
-        override fun valueOf(str: String): SLiteral {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
+        override fun valueOf(str: String): SLiteral = SFloatLiteral(BigDecimal(str))
         override fun format(value: Any) = value.toString()
         override fun read(str: String) = BigDecimal(str)
         override fun repr(): String = "real"
     }
 
     object BOOLEAN : SMVType {
-        override fun valueOf(str: String): SLiteral {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
-
+        override fun valueOf(str: String)
+                = if(str.equals("true", true) ) SLiteral.TRUE else SLiteral.FALSE
         override fun format(value: Any): String = value.toString().toUpperCase()
         override fun read(str: String): Any = str.equals("TRUE", true)
         override fun repr(): String = "boolean"
@@ -150,13 +143,11 @@ data class EnumType(var values: List<String>) : SMVType {
     }
 }
 
-data class ModuleType(
-        val moduleName: String
-        , val parameters: List<SMVExpr>
+data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>
 ) : SMVType {
-    override fun format(value: Any): String = TODO("not implemented")
-    override fun read(str: String): Any = TODO("not implemented")
-    override fun valueOf(str: String): SLiteral = TODO()
+    override fun format(value: Any): String = error("not implemented")
+    override fun read(str: String): Any = error("not implemented")
+    override fun valueOf(str: String): SLiteral = error("not implemented")
     override fun repr(): String = toString()
 
     constructor(name: String, vararg variables: SVariable) :

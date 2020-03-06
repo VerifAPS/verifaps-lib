@@ -44,7 +44,6 @@ fun evaluateProgramWithAbstraction(exec: PouExecutable, abstractedInvocation: Li
 
     val moduleBuilder = ModuleBuilder(exec, se.peek())
     moduleBuilder.run()
-    //TODO
     return moduleBuilder.module
 }
 

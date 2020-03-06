@@ -173,7 +173,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     }
 
     private fun visitBitAccess(func: SFunction) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun visit(quantified: SQuantified) {

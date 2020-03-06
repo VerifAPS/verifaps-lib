@@ -133,7 +133,7 @@ object SMVFacade {
         return m.matches()
     }
 
-    fun parseWordLiteral(text: String): SMVExpr {
+    fun parseWordLiteral(text: String): SWordLiteral {
         val m = PATTERN_WORD_LITERAL.matcher(text)
         if (m.matches()) {
             val signed = m.group(1) == "s"

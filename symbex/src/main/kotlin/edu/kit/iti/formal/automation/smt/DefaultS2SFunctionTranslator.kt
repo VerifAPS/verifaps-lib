@@ -68,7 +68,8 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
         }
     }
 
-    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr = TODO("translation of various functions")
+    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr
+            = TODO("translation of various functions")
 
     companion object {
         internal var logicalOperators: MutableMap<SBinaryOperator, String> = HashMap()

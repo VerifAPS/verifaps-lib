@@ -95,7 +95,6 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
             //ref.dataType = et
             /*if (ref.sub != null) {
                 val second = (ref.sub as SymbolicReference).identifier
-                // TODO...?
             }*/
         } catch (e: ClassCastException) {
 

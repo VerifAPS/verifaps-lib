@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
+import edu.kit.iti.formal.util.info
 import kotlin.collections.set
 
 class AutomatonBuilderPipeline(
