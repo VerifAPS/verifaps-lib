@@ -1,4 +1,4 @@
-MODULE table(code$i, code$o)
+MODULE detwait1(code$i, code$o)
 VAR
     __ERROR__ : boolean;
     __SENTINEL__ : boolean;
@@ -37,4 +37,4 @@ ASSIGN
     next(__SENTINEL__) := r03_01_accept | __SENTINEL__;
     next(r02_01) := FALSE;
     next(r03_01) := r02_01_acceptp;
--- end of module table
+-- end of module detwait1

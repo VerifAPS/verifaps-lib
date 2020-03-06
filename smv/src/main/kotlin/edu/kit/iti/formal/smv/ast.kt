@@ -429,7 +429,7 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
         return name
     }*/
 
-    override fun clone() = copy()
+    override fun clone() = copy().also { it.dataType = dataType }
 
     override fun inModule(module: String): SVariable {
         return SVariable.create("$module.$name").with(dataType)

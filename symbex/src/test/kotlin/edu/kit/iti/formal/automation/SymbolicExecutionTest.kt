@@ -35,9 +35,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 private val Map<SVariable, SymbolicVariable>.stringified: Map<String, String>
-    get() = asSequence()
-            .map { (a, b) -> a.name to b.value.toString() }
-            .toMap()
+    get() =
+        asSequence()
+                .flatMap { (a, b) ->
+                    b.values.entries.asSequence().map { (a, b) -> a.repr() to b.repr() }
+                }
+                .toMap()
 
 private val SymbolicState.definitions: Map<String, String>
     get() = definitions.flatMap { (_, b) ->
@@ -66,7 +69,7 @@ class SymbolicExecutionTest {
                 "c := a+c;" +
                 "b := 2*a+c;"
         val state = executeStatements(statments)
-        val defs = state.definitions
+        val defs = state.definitions.stringified
         val states = state.stringifed
 
         assertThat(defs).run {
@@ -188,7 +191,7 @@ class SymbolicExecutionTest {
          END_CASE
         """.trimIndent()
         val state = executeStatements(list)
-        val defs = state.definitions
+        val defs = state.definitions.stringified
         val states = state.stringifed
         //defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
         //states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
@@ -263,7 +266,7 @@ class SymbolicExecutionTest {
     fun simpleAssignmentTest() {
         val statements = "a := 2;\na := 3;\na:= 4;\nb := a + 1;\nb := a + 1;\nb := b + 1;"
         val state = executeStatements(statements)
-        val definitions = state.definitions
+        val definitions = state.definitions.stringified
 
         assertThat(definitions).run {
             containsEntry("a$00000", "a")

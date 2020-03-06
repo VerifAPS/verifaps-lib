@@ -40,7 +40,7 @@ data class SymbolicVariable(val variable: SVariable) {
         get() = values[current]
 
     fun push(value: SMVExpr, postfix: String) {
-        current = variable.copy(name = variable.name + postfix)
+        current = SVariable(variable.name + postfix, variable.dataType!!)
         values[current] = value
     }
 

@@ -108,7 +108,9 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
         fun expand(r: Region): Region {
             val duration = r.duration
             val dmodifier = duration.modifier
-            if (duration == Duration.Omega || !duration.isRepeatable /*|| duration.minimum == 0*/) {
+
+            if (duration == Duration.Omega || !duration.isRepeatable
+                    || duration.minimum == 0/*TODO check if maximum==1 maybe required*/) {
                 return r
             }
             val seq = ArrayList<TableNode>(r.children.size)
