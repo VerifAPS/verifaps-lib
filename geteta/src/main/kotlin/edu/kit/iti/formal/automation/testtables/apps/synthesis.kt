@@ -217,11 +217,21 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     
                     struct output_type {
                         ${indentLines(generateStructMembers(outputs), 24)}
+                        
+                        // for testing purposes - in C++20, we'll be able to simply use a defaulted spaceship operator
+                        bool operator==(const output_type& other) const {
+                            return ${generateOutputEqualityComparison()};
+                        }
                     };
     
                     struct result {
                         bool in_spec;
                         output_type output;
+                        
+                        // for testing purposes - in C++20, we'll be able to simply use a defaulted spaceship operator
+                        bool operator==(const result& other) const {
+                            return in_spec == other.in_spec && output == other.output;
+                        }
                     };
     
                     result next(const input_type& input);
@@ -331,6 +341,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     private fun generateStructMembers(vars: Map<String, SMVType>): Iterable<String> =
             vars.map { (name, type) ->
                 "${generateCppDataType(type)} ${variableNames.getValue(name)};"
+            }
+
+    private fun generateOutputEqualityComparison() =
+            if (outputs.keys.isEmpty()) "true" else {
+                outputs.keys.map { variableNames.getValue(it) }.joinToString(" && ") { "$it == other.$it" }
             }
 
     private fun generateStateChecks(): Iterable<String> =
