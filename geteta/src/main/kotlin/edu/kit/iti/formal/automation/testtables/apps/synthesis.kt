@@ -109,6 +109,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
         // check a few preconditions (not everything is checked here, exceptions might be thrown later during synthesis)
         if (tables.any { it.constraintVariables.isNotEmpty() }) {
+            //TODO weigl: Hint; you can use error(...) {...}, or require(...) {...}
             throw IllegalArgumentException("Global variables are currently unsupported")
         }
         if (tables.any { it.functions.isNotEmpty() }) {
@@ -461,7 +462,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             16 -> if (type.signed) CppType.INT16 else CppType.UINT16
             32 -> if (type.signed) CppType.INT32 else CppType.UINT32
             64 -> if (type.signed) CppType.INT64 else CppType.UINT64
-            else -> throw IllegalStateException("Unexpected integer width")
+            else -> throw IllegalStateException("Unexpected integer width") //TODO weigl: error(...)
         }
         else -> throw IllegalArgumentException("Data types other than bool and int are currently unsupported")
     }
@@ -486,7 +487,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         final override fun visit(a: SAssignment): Set<T> = a.target.accept(this) + a.expr.accept(this)
 
         final override fun visit(ce: SCaseExpression): Set<T> =
-                ce.cases.fold(setOf()) { set, case -> set + case.condition.accept(this) + case.then.accept(this) }
+                ce.cases.fold(setOf()) { set, case ->
+                    set + case.condition.accept(this) + case.then.accept(this) }
     }
 
 
@@ -534,6 +536,7 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
                 omegaExpressionsToCpp(expressions, variables.keys.map { variableNameMap.getValue(it) })
             }.dropLastWhile { it.isWhitespace() }.lines().map { "$it;" }
 
+    //TODO weigl: Why not as a member function for CppType?
     private fun cppToOmegaType(cppType: CppType): String {
         return when (cppType) {
             CppType.BOOL -> ":bool"

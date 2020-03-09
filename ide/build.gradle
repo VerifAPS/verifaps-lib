@@ -62,7 +62,7 @@ def mainClasses = [
         , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
         , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
         , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
-        , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
+        , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthesis'
         , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
         , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
         , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
