@@ -91,9 +91,9 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     }
 
     // accumulated over all tables (SVariable::name -> type)
-    private val inputs = mutableMapOf<String, SMVType>()
-    private val outputs = mutableMapOf<String, SMVType>()
-    private val referenceVariables = mutableMapOf<String, SMVType>() // inputs and outputs referenced in references
+    private val inputs = linkedMapOf<String, SMVType>()
+    private val outputs = linkedMapOf<String, SMVType>()
+    private val referenceVariables = linkedMapOf<String, SMVType>() // inputs and outputs referenced in references
     private val references = mutableMapOf<String, SMVType>() // the concrete references to historical values
     private var maxLookBack = 0
     // maps SVariable names to names for temporary variables
@@ -128,13 +128,17 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             val variables = table.programVariables.map { it.name to it }.toMap()
 
             table.parseContext.let { context ->
-                val historyVariables = mutableSetOf<SVariable>()
+                val historyVariables = mutableSetOf<String>()
                 context.refs.forEach { (sVariable, lookBack) ->
-                    historyVariables += sVariable
+                    historyVariables += sVariable.name
                     maxLookBack = max(maxLookBack, -lookBack)
                 }
-                context.vars.forEach { (variable, sVariable) ->
-                    val sVariableName = sVariable.name
+                // don't iterate over context.vars directly to preserve original declaration order
+                table.programVariables.forEach programVariables@{ variable ->
+                    val sVariableName = context.vars.getValue(variable).name
+
+                    if (variableNames.containsKey(sVariableName)) return@programVariables
+                    variableNames[sVariableName] = variable.name
 
                     if (inputVariables.contains(variable)) {
                         inputs[sVariableName] = variable.logicType
@@ -144,9 +148,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                         translator.variableReplacement[sVariableName] = "output.${variable.name}"
                     }
 
-                    variableNames[sVariableName] = variable.name
-
-                    if (historyVariables.contains(sVariable)) {
+                    if (historyVariables.contains(sVariableName)) {
                         referenceVariables[sVariableName] = variable.logicType
                     }
                 }
@@ -159,16 +161,17 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 acc + expressions.fold(setOf<Pair<String, MatchResult>>()) { innerAcc, expr ->
                     innerAcc + expr.accept(referenceExtractor)
                 }
-            }.forEach { (sVariableName, match) ->
+            }.forEach references@{ (sVariableName, match) ->
                 val (variableName, lookBehind) = match.destructured
+                if (references.containsKey(sVariableName)) return@references
                 references[sVariableName] = variables.getValue(variableName).logicType
-                translator.variableReplacement[sVariableName] =
-                        "var_history.get_value(${lookBehind}).${variableName}"
+                translator.variableReplacement[sVariableName] = "var_history.get_value(${lookBehind}).${variableName}"
                 variableNames[sVariableName] = "__history_${variableName}_${lookBehind}"
             }
 
             val automaton = GetetaFacade.constructTable(table).automaton
             automata.add(automaton)
+            // loop over table.region.flat() instead of automaton.rowStates to preserve declaration order
             states.add(table.region.flat().fold(listOf()) { acc, row -> acc + automaton.rowStates.getValue(row) })
             unrolledRowOffsets += unrolledRowCount
             unrolledRowCount += automaton.rowStates.size
