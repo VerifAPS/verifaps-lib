@@ -1,0 +1,23 @@
+table rs_ff {
+    var input r : BOOL
+    var input s : BOOL
+    var output q : BOOL
+
+    group omega {
+        row default [0,1] {
+            r: FALSE
+            s: FALSE
+            q: =q[-1]
+        }
+        row set [0,1] {
+            r: FALSE
+            s: TRUE
+            q: TRUE
+        }
+        row unset [0,1] {
+            r: TRUE
+            s: FALSE
+            q: FALSE
+        }
+    }
+}
