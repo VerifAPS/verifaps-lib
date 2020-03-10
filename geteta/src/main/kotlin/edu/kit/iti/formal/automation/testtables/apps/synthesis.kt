@@ -22,6 +22,7 @@ import edu.kit.iti.formal.smv.SMVWordType
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.debug
 import edu.kit.iti.formal.util.error
+import edu.kit.iti.formal.util.fail
 import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
@@ -50,7 +51,7 @@ class SynthesisApp : CliktCommand(
             .file(exists = true, folderOkay = false, readable = true)
             .multiple(required = true)
 
-    private val outputFolder by option("-o", "--output", help = "Output directory")
+    private val outputFolder by option("-o", "--output-dir", help = "Output directory")
             .file(exists = true, fileOkay = false, writable = true)
             .default(Paths.get("").toAbsolutePath().toFile())
 
@@ -113,12 +114,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // check a few preconditions (not everything is checked here, exceptions might be thrown later during synthesis)
-        if (tables.any { it.constraintVariables.isNotEmpty() }) {
-            //TODO weigl: Hint; you can use error(...) {...}, or require(...) {...}
-            throw IllegalArgumentException("Global variables are currently unsupported")
+        require (tables.none { it.constraintVariables.isNotEmpty() }) {
+            "Global variables are currently unsupported"
         }
-        if (tables.any { it.functions.isNotEmpty() }) {
-            throw IllegalArgumentException("Functions are currently unsupported")
+        require (tables.none { it.functions.isNotEmpty() }) {
+            "Functions are currently unsupported"
         }
 
         // extract context information
@@ -360,8 +360,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
                     val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
-                    if (inputCheckExpr.contains("output.")) {
-                        throw IllegalArgumentException("Referring to output variables in assumptions is unsupported")
+                    require (!inputCheckExpr.contains("output.")) {
+                        "Referring to output variables in assumptions is unsupported"
                     }
                     acc + "if (state[${index}] and not (${inputCheckExpr})) {" +
                             "    state[${index}] = false;" +
@@ -406,8 +406,9 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             acc + deps.filter { (_, isOutput) -> isOutput }
                     .map { (outputVariable, _) -> Pair(variableDependencies.keys.indexOf(outputVariable), i) }
         }
-        val sortedOutputs = topologicalSort(variableDependencies.keys.toList(), outputDependencies)
-                ?: throw IllegalArgumentException("Circular output dependencies are unsupported")
+        val sortedOutputs = requireNotNull(topologicalSort(variableDependencies.keys.toList(), outputDependencies)) {
+            "Circular output dependencies are unsupported"
+        }
 
         // generate bitset declarations for each output variable
         val outputDeclarations = sortedOutputs.map { variableName ->
@@ -468,7 +469,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             16 -> if (type.signed) CppType.INT16 else CppType.UINT16
             32 -> if (type.signed) CppType.INT32 else CppType.UINT32
             64 -> if (type.signed) CppType.INT64 else CppType.UINT64
-            else -> throw IllegalStateException("Unexpected integer width") //TODO weigl: error(...)
+            else -> fail("Unexpected integer width")
         }
         else -> throw IllegalArgumentException("Data types other than bool and int are currently unsupported")
     }
@@ -592,7 +593,7 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
         }
 
         if (exitCode != 0) {
-            throw IllegalStateException("Synthesis via omega failed (formula: ${formula})")
+            fail("Synthesis via omega failed (formula: ${formula})")
         }
 
         return outputFile.bufferedReader().use { reader ->
