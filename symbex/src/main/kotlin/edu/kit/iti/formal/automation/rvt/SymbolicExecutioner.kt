@@ -2,7 +2,6 @@ package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.analysis.toHuman
-import edu.kit.iti.formal.automation.exceptions.FunctionInvocationArgumentNumberException
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype
 import edu.kit.iti.formal.automation.exceptions.UnknownVariableException
 import edu.kit.iti.formal.automation.il.IlSymbex
@@ -231,17 +230,15 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         val inputVars = scope.filterByFlags(
                 VariableDeclaration.INPUT or VariableDeclaration.INOUT)
 
-        if (parameters.size > inputVars.size) {
-            //System.err.println(fd.getFunctionName());
-            //inputVars.stream().map(VariableDeclaration::getName).forEach(System.err::println);
-            throw FunctionInvocationArgumentNumberException()
+        require(parameters.size == inputVars.size) {
+            "Inappropriate number of parameters. ${parameters.size} given, but ${inputVars.size} expected."
         }
 
         for (i in parameters.indices) {
             val parameter = parameters[i]
             if (parameter.isOutput) {
+                continue
             }
-            continue
             if (parameter.name == null) {
                 // name from definition, in order of declaration, expression from caller site
                 calleeState.assign(lift(inputVars[i]),
@@ -402,7 +399,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     fun assign(ref: SymbolicReference, value: SMVExpr) {
         val s = lift(ref)
         val cnt = assignmentCounter.incrementAndGet()
-        ref.startPosition?.run {
+        ref.startPosition.run {
             lineNumberMap[cnt] = ref.toHuman() to this
         }
         peek().assign(s, cnt, value)

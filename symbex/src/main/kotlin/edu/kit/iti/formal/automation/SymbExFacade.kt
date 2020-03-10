@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
-import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
@@ -222,9 +221,14 @@ object SymbExFacade {
         val commandFile = File("cmd.xmv")
         writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
         val p = NuXMVProcess(tmpFile, commandFile)
-        findProgram("nuXmv")?.let {
-            p.executablePath = it.absolutePath
-        }
+        val nuXmv = findProgram("nuXmv")
+        if (nuXmv != null)
+            p.executablePath = nuXmv.absolutePath
+        else
+            System.getenv("NUXMV")?.let {
+                p.executablePath = System.getenv("NUXMV")
+            }
+
         //use BMC because of the complete trace
         //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()
