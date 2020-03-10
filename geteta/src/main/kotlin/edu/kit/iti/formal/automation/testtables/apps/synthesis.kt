@@ -7,6 +7,9 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.grammar.IteLanguageBaseVisitor
+import edu.kit.iti.formal.automation.testtables.grammar.IteLanguageLexer
+import edu.kit.iti.formal.automation.testtables.grammar.IteLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
@@ -20,6 +23,8 @@ import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.debug
 import edu.kit.iti.formal.util.error
 import edu.kit.iti.formal.util.info
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.nio.file.Paths
 import kotlin.math.max
@@ -264,8 +269,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             #include <limits>
             #include <type_traits>
             
-            #define ite(cond, then, else) (cond) ? (then) : (else)
-            
             namespace {
                 template<typename T, typename = std::enable_if_t<std::is_integral_v<T>>>
                 struct bit_size {
@@ -379,7 +382,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 }
             }
 
-    // TODO: special case simple expressions (?)
+    // TODO: don't use omega for simple assignments -> just pass rhs to the C translator
     // TODO: support "one BDD per whole row", "one BDD per state combination" and "big BDD" modes
     //       prerequisite for the second one: we need a way to signal unsatisfiability and a fallback mechanism
     //                                        based on row priority
@@ -525,67 +528,41 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
 
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
                    variableNameMap: Map<String, String>): List<String> =
-            // TODO: detect and handle common sub-expressions
             callOmega(
                     formula.accept(SmvToOmegaTranslator(variableNameMap)),
                     resultVariables.map { variableNameMap.getValue(it) },
                     variables.map { (variable, type) ->
                         "${variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
                     }
-            ).let { expressions ->
-                omegaExpressionsToCpp(expressions, variables.keys.map { variableNameMap.getValue(it) })
-            }.dropLastWhile { it.isWhitespace() }.lines().map { "$it;" }
+            ).let { outputs ->
+                val translator = IteToCppTranslator(variables.mapKeys { (k, _) -> variableNameMap.getValue(k) })
+                val assignments = outputs.map { expression ->
+                    "${omegaExpressionToCpp(expression, translator)};"
+                }
+                translator.getCachedExpressions() + assignments
+            }
 
-    //TODO weigl: Why not as a member function for CppType?
-    private fun cppToOmegaType(cppType: CppType): String {
-        return when (cppType) {
-            CppType.BOOL -> ":bool"
-            CppType.INT8 -> "[${Byte.MIN_VALUE},${Byte.MAX_VALUE}]"
-            CppType.INT16 -> "[${Short.MIN_VALUE},${Short.MAX_VALUE}]"
-            CppType.INT32 -> "[${Int.MIN_VALUE},${Int.MAX_VALUE}]"
-            CppType.INT64 -> "[${Long.MIN_VALUE},${Long.MAX_VALUE}]"
-            // Kotlin's unsigned types are currently experimental, so avoid using their constants here
-            CppType.UINT8 -> "[0,${Byte.MAX_VALUE.toShort() * 2 + 1}]"
-            CppType.UINT16 -> "[0,${Short.MAX_VALUE.toInt() * 2 + 1}]"
-            CppType.UINT32 -> "[0,${Int.MAX_VALUE.toLong() * 2 + 1}]"
-            CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
-        }
+    private fun cppToOmegaType(cppType: CppType): String = when (cppType) {
+        CppType.BOOL -> ":bool"
+        CppType.INT8 -> "[${Byte.MIN_VALUE},${Byte.MAX_VALUE}]"
+        CppType.INT16 -> "[${Short.MIN_VALUE},${Short.MAX_VALUE}]"
+        CppType.INT32 -> "[${Int.MIN_VALUE},${Int.MAX_VALUE}]"
+        CppType.INT64 -> "[${Long.MIN_VALUE},${Long.MAX_VALUE}]"
+        // Kotlin's unsigned types are currently experimental, so avoid using their constants here
+        CppType.UINT8 -> "[0,${Byte.MAX_VALUE.toShort() * 2 + 1}]"
+        CppType.UINT16 -> "[0,${Short.MAX_VALUE.toInt() * 2 + 1}]"
+        CppType.UINT32 -> "[0,${Int.MAX_VALUE.toLong() * 2 + 1}]"
+        CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
     }
 
-    companion object { // see also formula_to_ite.py (prefix/suffix expression are also defined there)
-        //language=regexp
-        private const val TOKEN_PREFIX = """([(,\s]|^)""" // space, start of line, comma or opening parens
-        //language=regexp
-        private const val TOKEN_SUFFIX = """([),\s]|$)""" // space, end of line, comma or closing parens
-        private val ITE_BOOL_LITERAL_REGEX =
-                // capturing groups: possible prefixes, literal, possible suffixes
-                Regex("""$TOKEN_PREFIX(TRUE|FALSE)$TOKEN_SUFFIX""")
-
-        private fun iteVariableRegex(variableNames: Iterable<String>): Regex =
-                // capturing groups: possible prefixes, variable name, accessed bit, possible suffixes
-                Regex("""$TOKEN_PREFIX(${variableNames.joinToString("|")})(?:_([0-9]+))?$TOKEN_SUFFIX""")
-    }
-
-    private fun omegaExpressionsToCpp(omegaExpression: String, variableNames: Iterable<String>): String =
-            omegaExpression
-                    .replace("~", "not")
-                    .replace(ITE_BOOL_LITERAL_REGEX) { match ->
-                        val (prefix, literal, suffix) = match.destructured
-                        "${prefix}${literal.toLowerCase()}${suffix}"
-                    }
-                    .replace(iteVariableRegex(variableNames)) { match ->
-                        val (prefix, variable, bit, suffix) = match.destructured
-                        // if no bit was specified, it's a bool -> access bit 0 of the bitset
-                        "${prefix}${variable}[${if (bit.isNotEmpty()) bit else "0"}]${suffix}"
-                    }
-
-    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>): String {
+    private fun callOmega(formula: String, resultVariables: List<String>, definitions: List<String>): Iterable<String> {
         val arguments = listOf(pythonExecutable, "-") + resultVariables.fold(listOf<String>()) { acc, resultVariable ->
             acc + "--result" + resultVariable
-        } + formula + variableDefinitions
+        } + formula + definitions
+        val outputFile = createTempFile()
         val process = ProcessBuilder(arguments)
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectOutput(outputFile)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
 
@@ -615,12 +592,14 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
             throw IllegalStateException("Synthesis via omega failed (formula: ${formula})")
         }
 
-        process.inputStream.use { stdout ->
-            return stdout.bufferedReader().use { reader ->
-                reader.readText()
-            }
+        return outputFile.bufferedReader().use { reader ->
+            reader.readLines().dropLastWhile { it.isEmpty() }
         }
     }
+
+    private fun omegaExpressionToCpp(omegaExpression: String, translator: IteToCppTranslator): String =
+            IteLanguageParser(CommonTokenStream(IteLanguageLexer(CharStreams.fromString(omegaExpression))))
+                    .assignment().accept(translator)
 
 
     /**
@@ -690,6 +669,36 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
         override fun visit(ce: SCaseExpression): String = ce.cases.fold(StringBuilder()) { sb, case ->
             sb.append("ite(${case.condition.accept(this)},${case.then.accept(this)},")
         }.append(")".repeat(ce.cases.size)).toString()
+    }
+
+    class IteToCppTranslator(private val variableContext: Map<String, CppType>) : IteLanguageBaseVisitor<String>() {
+        private val iteExprCache = linkedMapOf<String, String>() // preserving insertion order is crucial
+
+        fun getCachedExpressions(): List<String> =
+                iteExprCache.map { (expr, varName) -> "bool $varName = $expr;" }
+
+        override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String =
+                "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
+
+        override fun visitExpr(ctx: IteLanguageParser.ExprContext): String =
+                ctx.iteExpr()?.accept(this)
+                        ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
+                        ?: ctx.identifier()?.accept(this)
+                        ?: ctx.BOOLEAN()?.text?.toLowerCase()
+                        ?: ctx.INTEGER()!!.text
+
+        override fun visitIteExpr(ctx: IteLanguageParser.IteExprContext): String =
+                iteExprCache.getOrPut(
+                        "(${ctx.expr(0).accept(this)}) ? (${ctx.expr(1).accept(this)}) : ${ctx.expr(2).accept(this)}",
+                        { "__tmp_${iteExprCache.size}" }
+                )
+
+        override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String =
+                if (variableContext.containsKey(ctx.text) && variableContext[ctx.text] == CppType.BOOL) {
+                    "${ctx.text}[0]"
+                } else { // identifier must refer to a specific bit
+                    "${ctx.text.substringBeforeLast('_')}[${ctx.text.substringAfterLast('_')}]"
+                }
     }
 }
 
