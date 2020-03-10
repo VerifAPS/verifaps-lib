@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
+import java.util.regex.Pattern
 
 class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     val sort = true
@@ -229,7 +230,18 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
                 "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
                 "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
 
-        fun quoted(name: String) = if (name in RESERVED_KEYWORDS) "\"$name\"" else name
+        private val regex by lazy {
+            val rk = RESERVED_KEYWORDS.joinToString("|", "(", ")")
+            "(?<![a-zA-Z\$_])($rk)(?![a-zA-Z\$_])".toRegex()
+        }
+
+
+        fun quoted(name: String) :String {
+            return regex.replace(name) {
+                "\"${it.value}\""
+            }
+            //if (name in RESERVED_KEYWORDS) "\"$name\"" else name
+        }
 
         @JvmStatic
         fun toString(m: SMVAst): String {

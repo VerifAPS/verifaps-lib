@@ -189,6 +189,9 @@ fun parseXmlOutput(text: String): NuXMVOutput {
                 || it.contains("undefined")
                 || it.contains("too few actual parameters")
                 || it.contains("aborting")
+                || it.contains("multiple declaration of identifier")
+
+
     }
 
     if (errorLinePredicate(text)) {

@@ -38,7 +38,7 @@ class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap())
  * 2019-08-11 weigl: use definition for common sub expressions (<var>_<linenumer> value of <variable> in linenumber)
  *                   <var> refers to the last <variable>
  * 2020-02-11 weigl: add branch conditions to line map
- *
+ * 2020-03-10 weigl: add branch conditions for cases
  */
 open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
@@ -178,11 +178,6 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         }
         return null
     }
-
-    /*Unsupported should already rolled out by ST0 Transformation
-    override fun visit(fbc: InvocationStatement): SMVExpr {
-        return visit(fbc.invocation)!!
-    }*/
 
     override fun visit(invocation: Invocation): SMVExpr? {
         //val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
@@ -331,7 +326,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }
 
     private fun assignIBC(ifLine: Position, branchLine: Position, condition: SMVExpr) {
-        val identifier = String.format("if_%03d_%03d_", ifLine.lineNumber,
+        val identifier = String.format("bc_%03d_%03d_", ifLine.lineNumber,
                 max(0, branchLine.lineNumber))
         val key = SVariable(identifier, SMVTypes.BOOLEAN)
         peek().auxiliaryDefinitions[key] = condition
@@ -340,15 +335,23 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
     override fun visit(caseStatement: CaseStatement): SMVExpr? {
         val branchStates = SymbolicBranches()
+        var branchCondition: SMVExpr = SLiteral.TRUE
         for (gs in caseStatement.cases) {
             val condition = buildCondition(caseStatement.expression, gs)
+            assignIBC(caseStatement.startPosition, gs.startPosition, branchCondition and condition);
+            branchCondition = branchCondition and condition.not()
             push()
             gs.statements.accept(this)
             branchStates.addBranch(condition, pop())
         }
-        push()
-        caseStatement.elseCase.accept(this)
-        branchStates.addBranch(SLiteral.TRUE, pop())
+
+        if (caseStatement.elseCase.isNotEmpty()) {
+            assignIBC(caseStatement.startPosition, caseStatement.elseCase.startPosition,
+                    branchCondition)
+            push()
+            caseStatement.elseCase.accept(this)
+            branchStates.addBranch(SLiteral.TRUE, pop())
+        }
         val cur = peek()
         val combined = branchStates.asCompressed(caseStatement.endPosition)
         cur.definitions.putAll(combined.definitions)

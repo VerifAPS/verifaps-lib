@@ -87,7 +87,7 @@ class CounterExamplePrinterWithProgram(
         val stream: CodeWriter = CodeWriter()) {
 
     val vt = VisualizeTrace(cex, lineMap, program, stream).also { vt ->
-        vt.programVariableToSVar = { "code$.${it.name}" }
+        vt.programVariableToSVar = { "code$.${it}" }
     }
 
     fun getAll() {

@@ -168,9 +168,7 @@ open class StructuredTextPrinter
 
     }
 
-
     override fun visit(caseStatement: CaseStatement) {
-
         sb.nl().printf("CASE ")
         caseStatement.expression.accept(this)
         sb.printf(" OF ").increaseIndent()
