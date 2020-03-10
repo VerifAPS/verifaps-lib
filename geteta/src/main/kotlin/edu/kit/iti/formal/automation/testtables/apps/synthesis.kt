@@ -25,6 +25,14 @@ import java.nio.file.Paths
 import kotlin.math.max
 
 /**
+ * Checks if a SMVExpr is a value assignment to a SVariable.
+ */
+private fun SMVExpr.isSingleAssignment(): Boolean =
+        (this as? SBinaryExpression)?.let {
+            (it.right is SVariable || it.left is SVariable) && it.operator == SBinaryOperator.EQUAL
+        } ?: false
+
+/**
  * @author Moritz Baumann
  * @version 1 (2/23/20)
  */
@@ -410,8 +418,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // generate ITE expression for each output variable in the right order
-        val outputCalculations = sortedOutputs.fold(listOf<String>()) { acc, resultVariable ->
-            acc + synthesizer.synthesize(
+        val outputCalculations = sortedOutputs.flatMap { resultVariable ->
+            synthesizer.synthesize(
                     outputExpr.getValue(resultVariable),
                     listOf(resultVariable),
                     (variableDependencies.getValue(resultVariable) + Pair(resultVariable, false)).map { (v, _) ->
@@ -512,7 +520,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 }
 
 
-class ExpressionSynthesizer(omegaVenv: File? = null) {
+class ExpressionSynthesizer(omegaVenv: File? = null,
+                            val allowDirectEqualityHandling : Boolean = true) {
     private val pythonExecutable: String = omegaVenv?.let { virtualEnv ->
         if (virtualEnv.resolve("bin/python").exists()) {
             // UNIX-like OS
@@ -523,18 +532,25 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
         }
     } ?: "python"
 
-    fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
-                   variableNameMap: Map<String, String>): List<String> =
-            // TODO: detect and handle common sub-expressions
-            callOmega(
-                    formula.accept(SmvToOmegaTranslator(variableNameMap)),
-                    resultVariables.map { variableNameMap.getValue(it) },
-                    variables.map { (variable, type) ->
-                        "${variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
-                    }
-            ).let { expressions ->
-                omegaExpressionsToCpp(expressions, variables.keys.map { variableNameMap.getValue(it) })
-            }.dropLastWhile { it.isWhitespace() }.lines().map { "$it;" }
+    fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>,
+                   variables: Map<String, CppType>,
+                   variableNameMap: Map<String, String>): List<String> {
+
+        if(allowDirectEqualityHandling && formula.isSingleAssignment()) {
+            TODO("handle special case: assignment")
+        }
+
+        // TODO: detect and handle common sub-expressions
+        val expressions = callOmega(
+                formula.accept(SmvToOmegaTranslator(variableNameMap)),
+                resultVariables.map { variableNameMap.getValue(it) },
+                variables.map { (variable, type) ->
+                    "${variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
+                })
+        //val exprs = expressions
+        val cpp = omegaExpressionsToCpp(expressions, variables.keys.map { variableNameMap.getValue(it) })
+        return cpp.dropLastWhile { it.isWhitespace() }.lines().map { "$it;" }
+    }
 
     //TODO weigl: Why not as a member function for CppType?
     private fun cppToOmegaType(cppType: CppType): String {
@@ -580,7 +596,8 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
                     }
 
     private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>): String {
-        val arguments = listOf(pythonExecutable, "-") + resultVariables.fold(listOf<String>()) { acc, resultVariable ->
+        val arguments = listOf(pythonExecutable, "-") +
+                resultVariables.fold(listOf<String>()) { acc, resultVariable ->
             acc + "--result" + resultVariable
         } + formula + variableDefinitions
         val process = ProcessBuilder(arguments)
