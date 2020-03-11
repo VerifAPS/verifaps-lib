@@ -225,7 +225,7 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - build-dist
+      - build-dist:
           requires:
             - build
       - test:
