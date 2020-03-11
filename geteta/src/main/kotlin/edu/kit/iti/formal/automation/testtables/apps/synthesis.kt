@@ -806,7 +806,7 @@ enum class CppType(private val cppName: String) {
  */
 private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? =
         (this as? SBinaryExpression)?.takeIf { operator == SBinaryOperator.EQUAL }?.run {
-            left.takeIf { right is SVariable } ?: right.takeIf { left is SVariable }
+            right.takeIf { left is SVariable } ?: left.takeIf { right is SVariable }
         }
 
 
