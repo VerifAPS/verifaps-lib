@@ -217,6 +217,13 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     std::array<T, N> array;
                     size_type front_pos = 0;
                 };
+                
+                template <typename T>
+                class history<T, 0> {
+                public:
+                    void add_value(const T& value) {}
+                };
+                
             
                 class synthesized {
                 public:
