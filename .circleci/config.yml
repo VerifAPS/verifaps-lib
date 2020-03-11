@@ -121,7 +121,7 @@ jobs:
 
 
 
-  ttsynth-tests:
+  ttsynth-test:
     docker:
       - image: wadoon/verifaps-test:latest
     working_directory: ~/repo
@@ -159,6 +159,7 @@ jobs:
             gradle test --info
 
 
+
   deploy:
     docker:
       - image: wadoon/verifaps-test:latest
@@ -179,6 +180,7 @@ jobs:
             go get github.com/tcnksm/ghr
             VERSION=$(share/gitflow-version.sh)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+
 
 
 
