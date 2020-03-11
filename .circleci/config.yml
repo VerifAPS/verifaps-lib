@@ -18,9 +18,9 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
 
-      - run: gradle dependencies
-      - run: gradle classes
-      - run: gradle testClasses
+      - run: ./gradlew dependencies
+      - run: ./gradlew classes
+      - run: ./gradlew testClasses
 
       - persist_to_workspace:
           root: ~/repo
@@ -61,9 +61,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-#      - run: gradle --continue --build-cache check
+#      - run: ./gradlew --continue --build-cache check
       - run: |
-          gradle --continue --build-cache check jacocoTestReport sonarqube \
+          ./gradlew --continue --build-cache check jacocoTestReport sonarqube \
                  -Dsonar.projectKey=VerifAPS_verifaps-lib\
                  -Dsonar.branch.name=${CIRCLE_BRANCH}\
                  -Dsonar.organization=verifaps \
@@ -108,7 +108,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: gradle --build-cache :exec:installDist :exec:assembleDist
+      - run: ./gradlew --build-cache :exec:installDist :exec:assembleDist
       
       - store_artifacts:
           path: ide/build/distributions/
@@ -133,7 +133,7 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
-      - run: gradle --build-cache :exec:installDist :exec:assembleDist
+      - run: ./gradlew --build-cache :exec:installDist :exec:assembleDist
       - run:
           name: "Publish Release on GitHub"
           command: |
