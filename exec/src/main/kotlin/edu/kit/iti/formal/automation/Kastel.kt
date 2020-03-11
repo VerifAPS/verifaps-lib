@@ -11,6 +11,7 @@ import edu.kit.iti.formal.automation.st0.trans.CodeTransformation
 import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -43,7 +44,7 @@ object KastelDemonstrator {
             info("${it.sourceName}:${it.startLine} :: ${it.message} (${it.category}) ")
         }
 
-        val program = Utils.findProgram(pous)!!
+        val program = findProgram(pous)!!
 
         //Custom program transformation
         AssignmentDScratch.transform(
