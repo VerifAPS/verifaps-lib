@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 Passes the input formula to the BDD library "omega" and returns ITE cascades for the result variables.
 """

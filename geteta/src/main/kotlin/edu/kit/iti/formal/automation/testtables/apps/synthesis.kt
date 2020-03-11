@@ -55,11 +55,11 @@ class SynthesisApp : CliktCommand(
             .file(exists = true, fileOkay = false, writable = true)
             .default(Paths.get("").toAbsolutePath().toFile())
 
-    private val omegaVenv by option("--omega-venv", help = "Path to virtualenv with omega", envvar = "OMEGA_VENV")
-            .file(exists = true, fileOkay = false)
+    private val pythonExecutable by option("--python", help = "Path to python with omega",
+            envvar = "PYTHON").default("python")
 
     override fun run() {
-        val expressionSynthesizer = ExpressionSynthesizer(omegaVenv)
+        val expressionSynthesizer = ExpressionSynthesizer(pythonExecutable)
 
         tableFiles.forEach { tableFile ->
             val programName = tableFile.name.split('.')[0]
@@ -519,8 +519,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 }
 
 
-class ExpressionSynthesizer(omegaVenv: File? = null) {
-    private val pythonExecutable: String = omegaVenv?.let { virtualEnv ->
+class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
+    /*private val pythonExecutable: String = omegaVenv?.let { virtualEnv ->
         if (virtualEnv.resolve("bin/python").exists()) {
             // UNIX-like OS
             virtualEnv.resolve("bin/python").absolutePath
@@ -528,7 +528,7 @@ class ExpressionSynthesizer(omegaVenv: File? = null) {
             // Windows
             virtualEnv.resolve("Scripts/python.exe").absolutePath
         }
-    } ?: "python"
+    } ?: "python"*/
 
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
                    variableNameMap: Map<String, String>): List<String> =
