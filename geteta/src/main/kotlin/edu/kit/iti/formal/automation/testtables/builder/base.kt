@@ -33,6 +33,8 @@ import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.conjunction
 import java.util.*
+import kotlin.collections.HashMap
+import kotlin.math.exp
 
 interface Transformer<T : Any> {
     fun transform(model: T)
@@ -44,8 +46,32 @@ interface Transformer<T : Any> {
  * @version 1 (07.03.18)
  */
 class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransformerState) {
+    lateinit var variableContext: ParseContext
+    val testTable: GeneralizedTestTable = state.testTable
+    val automaton = state.automaton
+
+    val tableModule = SMVModule("...")
+    val helperModules: MutableList<SMVModule> = LinkedList()
+
+    val sentinelState = automaton.stateSentinel
+    val stateError = SVariable(automaton.stateError.name, SMVTypes.BOOLEAN)
+    var stateSentinel = SVariable(automaton.stateSentinel.name, SMVTypes.BOOLEAN)
+    var ttType: ModuleType? = null
+    val rowStates: List<RowState>
+        get() = automaton.rowStates.values.flatMap { it }
+
+    val definitions = HashMap<String, SMVExpr>()
+
     fun define(v: SVariable, expr: SMVExpr) {
-        tableModule.definitions.add(SAssignment(v, expr))
+        if (v.name in definitions) {
+            require(expr == definitions[v.name]) {
+                "Collision of definitions for variable ${v.repr()}. " +
+                        "Previous assigned to ${definitions[v.name]?.repr()}, newly assigned to ${expr.repr()}."
+            }
+        } else {
+            definitions[v.name]= expr
+            tableModule.definitions.add(SAssignment(v, expr))
+        }
     }
 
     fun define(variable: SVariable, expr: MutableMap<String, SMVExpr>) {
@@ -79,19 +105,6 @@ class SMVConstructionModel(val superEnumType: SMVType, state: AutomataTransforme
             }
 
 
-    lateinit var variableContext: ParseContext
-    val testTable: GeneralizedTestTable = state.testTable
-    val automaton = state.automaton
-
-    val tableModule = SMVModule("...")
-    val helperModules: MutableList<SMVModule> = LinkedList()
-
-    val sentinelState = automaton.stateSentinel
-    val stateError = SVariable(automaton.stateError.name, SMVTypes.BOOLEAN)
-    var stateSentinel = SVariable(automaton.stateSentinel.name, SMVTypes.BOOLEAN)
-    var ttType: ModuleType? = null
-    val rowStates: List<RowState>
-        get() = automaton.rowStates.values.flatMap { it }
 }
 
 typealias SmvConstructionTransformer = Transformer<SMVConstructionModel>
