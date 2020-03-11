@@ -13,6 +13,7 @@ dependencies {
     compile project(':modularization')
     compile project(':aps-rvt')
     compile project(':run')
+    compile project(':ide')
 
     compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.8'
     implementation 'com.github.ajalt:clikt:2.1.0'
@@ -37,6 +38,7 @@ def mainClasses = [
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
         , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
+        , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
 ]
 
 launch4j {

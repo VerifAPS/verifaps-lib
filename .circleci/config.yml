@@ -108,7 +108,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: gradle --build-cache :ide:installDist :ide:assembleDist
+      - run: gradle --build-cache :exec:installDist :exec:assembleDist
       
       - store_artifacts:
           path: ide/build/distributions/
@@ -133,7 +133,7 @@ jobs:
             - gradle-repo-v1-{{ .Branch }}-{{ checksum "build.gradle" }}
             - gradle-repo-v1-{{ .Branch }}-
             - gradle-repo-v1-
-      - run: gradle --build-cache :ide:installDist :ide:assembleDist
+      - run: gradle --build-cache :exec:installDist :exec:assembleDist
       - run:
           name: "Publish Release on GitHub"
           command: |
