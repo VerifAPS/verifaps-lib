@@ -1,12 +1,9 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
-import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.rvt.ExpressionReplacer
 import edu.kit.iti.formal.automation.smt.*
@@ -33,22 +30,23 @@ object Coverage {
 class CoverageApp : CliktCommand(
         epilog = "ttcov -- Program Coverage with Test Tables.",
         name = "ttcov") {
-    val disableSimplify by option("--no-simplify", help = "disable")
-            .flag("--simplify", default = false)
 
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
-            .file(exists = true, readable = true)
-            .required()
+    val common by CommonArguments()
 
-    val outputFolder by option("-o", "--output", help = "Output directory")
+    val tableArguments by TableArguments()
+    val runSmt by option().flag()
+    val outputFile by option("-o", "--output", help = "Output directory")
 
-    val library by option("-L", "--library", help = "library files").file().multiple()
-    val program by option("-P", "--program", "-c", help = "program files").file(exists = true, readable = true).required()
+    val programOptions by ProgramOptions()
+    val library = programOptions.library
+    val program =programOptions.program
+    val disableSimplify = programOptions.disableSimplify
 
     override fun run() {
-        val gtts = readTable()
-        val code = IEC61131Facade.readProgramsWLP(library, listOf(program)).first()
-                ?: throw IllegalStateException("No program given in $program")
+        common()
+
+        val gtts = tableArguments.readTables()
+        val code = programOptions.readProgram()
         val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
         info("Program evaluation")
 
@@ -75,7 +73,7 @@ class CoverageApp : CliktCommand(
             }
             var renamer = ExpressionReplacer(varRename)
 
-            File(outputFolder, "${gtt.name}.smt2").bufferedWriter().use { out ->
+            File(outputFile, "${gtt.name}.smt2").bufferedWriter().use { out ->
                 out.write(";;Preamble\n${program.preamble}\n;;--\n")
                 out.write(program.getStepDefinition(true, "old"))
                 out.newLine()
@@ -101,15 +99,6 @@ class CoverageApp : CliktCommand(
                 }
             }
         }
-    }
-
-    private fun readTable() = table.let {
-        info("Use table file ${it.absolutePath}")
-        GetetaFacade.readTables(it)
-    }.map {
-        it.ensureProgramRuns()
-        it.generateSmvExpression()
-        it.simplify()
     }
 }
 

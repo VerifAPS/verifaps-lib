@@ -24,22 +24,20 @@ package edu.kit.iti.formal.automation.visitors
 
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
-import edu.kit.iti.formal.automation.parser.IEC61131Parser
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.ast.PouElements
-import org.antlr.v4.runtime.ANTLRInputStream
-import org.antlr.v4.runtime.CommonTokenStream
+import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
-import org.antlr.v4.runtime.tree.ParseTree
-import java.lang.reflect.Method
+
+
+fun findProgram(tles: PouElements): ProgramDeclaration? = tles.findFirstProgram()
+fun PouElements.findFirstProgram(): ProgramDeclaration? = asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
+fun selectByName(name: String) = { elements: PouElements -> elements.find { it.name == name } as? PouExecutable? }
 
 /**
  * Created by weigla on 09.06.2014.*/
 object Utils {
-    fun findProgram(tles: PouElements): ProgramDeclaration? {
-        return tles.asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
-    }
 
     fun compareTokens(tokens: List<Token>, expected: Array<String>, lexer: Lexer) {
         try {

@@ -19,12 +19,12 @@
  */
 package edu.kit.iti.formal.automation.testtables.apps
 
-
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.jferard.fastods.tool.FastOds
-
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.rvt.LineMap
@@ -41,10 +41,7 @@ import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
 import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
-import edu.kit.iti.formal.util.CodeWriter
-import edu.kit.iti.formal.util.findProgram
-import edu.kit.iti.formal.util.info
-import edu.kit.iti.formal.util.warn
+import edu.kit.iti.formal.util.*
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -58,65 +55,28 @@ object Geteta {
 class GetetaApp : CliktCommand(
         epilog = "Geteta -- Tooling for Generalized Test Tables.",
         name = "geteta.sh") {
-    val disableSimplify by option("--no-simplify", help = "disable")
-            .flag("--simplify", default = false)
 
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
-            .file(exists = true, readable = true)
-            .multiple(required = true)
+    val programOptions by ProgramOptions()
+    val tableOptions by TableArguments()
+    val outputFolder by outputFolder()
+    val dryRun by dryRun()
+    val nuxmv by nuxmv()
 
-    val outputFolder by option("-o", "--output", help = "Output directory")
+    val cexAnalysation by CexAnalysationArguments()
 
-    val library by option("-L", "--library", help = "library files").file().multiple()
-    val program by option("-P", "--program", "-c", help = "program files").file(exists = true, readable = true).required()
+    val tableWhitelist = tableOptions.tableWhitelist
 
-    val enableMesh by option("--meshed").flag("-M", default = false)
-
-    val nuxmv by option("--nuxmv",
-            help = "Path to nuXmv binary. You can also set the environment variable \$NUXMV",
-            envvar = "NUXMV")
-            .default("nuXmv")
+    val automataOptions by AutomataOptions()
 
     val mode by option("-m", "--mode", help = "Verification Mode")
             .convert { Mode.valueOf(it) }
 
-    val runAnalyzer by option("--row-map", help = "print out a row mapping")
-            .flag("--no-row-map", default = false)
-
-    val odsExport by option("--ods", help = "generate ods counterexample file").file()
-    val odsOpen by option("--ods-open").flag()
-
-    val cexPrinter by option("--cexout", help = "prints an analysation of the counter example and the program")
-            .flag()
-
-    val tableWhitelist by option("--select-table", metavar = "TABLE_NAME",
-            help = "specify tables which should be considered")
-            .multiple()
-
-    val drawAutomaton by option("--debug-automaton").flag(default = false)
-    val showAutomaton by option("--show-automaton").flag(default = false)
-
-    val verificationTechnique by option("-v", "--technique",
-            help = "verification technique").convert { VerificationTechnique.valueOf(it) }
-            .default(VerificationTechnique.IC3)
-
-    val invokeModelChecker by option("--model-check", help = "the model checker is invoked when set [default:true]")
-            .flag("--dont-model-check", default = true)
-
     override fun run() {
-        val gtts = table.flatMap {
-            info("Use table file ${it.absolutePath}")
-            GetetaFacade.readTables(it)
-        }.map {
-            it.ensureProgramRuns()
-            it.generateSmvExpression()
-            it.simplify()
-        }.filterByName(tableWhitelist)
+        val gtts = tableOptions.readTables()
 
         //
-        info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWLP(library, listOf(program)).first()
-                ?: throw IllegalStateException("No program given in $program")
+        info("Parse program ${programOptions.program.absolutePath} with libraries ${programOptions.library}")
+        val code = programOptions.readProgram()
 
         // override mode
         if (mode != null)
@@ -126,7 +86,8 @@ class GetetaApp : CliktCommand(
             info("Mode is ${it.options.mode} for table ${it.name}")
         }
 
-        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code,
+                programOptions.disableSimplify)
         info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
@@ -135,7 +96,7 @@ class GetetaApp : CliktCommand(
         val tt = gtts.map { gtt -> GetetaFacade.constructSMV(gtt, superEnumType) }
         info("SMV for table constructed")
 
-        if (drawAutomaton) {
+        if (automataOptions.drawAutomaton) {
             info("Automaton drawing requested. This may took a while.")
             gtts.zip(tt).forEach { (gtt, tt) ->
                 drawAutomaton(gtt, tt)
@@ -145,7 +106,7 @@ class GetetaApp : CliktCommand(
         }
 
         val modules =
-                if (enableMesh) {
+                if (tableOptions.enableMesh) {
                     warn("mesh gtt support is experimental and not well-tested or completely implemented!!!")
                     warn("YOU HAVE BEEN WARNED.")
                     val tableJoiner = GetetaFacade.meshTables(tt)
@@ -153,7 +114,7 @@ class GetetaApp : CliktCommand(
                     val smv = GetetaFacade.constructSMV(
                             AutomataTransformerState(dummyGtt, tableJoiner), superEnumType)
 
-                    if (drawAutomaton) {
+                    if (automataOptions.drawAutomaton) {
                         info("Automaton drawing requested. Drawing the meshed automaton.")
                         drawAutomaton(tt.map { it.testTable }, tableJoiner)
                     }
@@ -181,16 +142,15 @@ class GetetaApp : CliktCommand(
                     m
                 }
 
-        if (invokeModelChecker) {
-            val folder = File(this.table.first().parent,
-                    this.table.first().nameWithoutExtension).absolutePath
+        if (dryRun) {
+            val t = this.tableOptions.table.first()
+            val folder = File(t.parent, t.nameWithoutExtension).absolutePath
             val verificationTechnique = gtts.first().options.verificationTechnique
             info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
             val nuxmv = findProgram(nuxmv)
             if (nuxmv == null) {
                 error("Could not find ${this.nuxmv}.")
                 exitProcess(1)
-                return
             }
 
             val b = GetetaFacade.runNuXMV(
@@ -213,9 +173,9 @@ class GetetaApp : CliktCommand(
                     }
 
             if (b is NuXMVOutput.Cex) {
-                if (cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
+                if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
                 else info("Use `--cexout' to print a cex analysation.")
-                if (runAnalyzer) runCexAnalysation(b, tt)
+                if (cexAnalysation.runAnalyzer) runCexAnalysation(b, tt)
                 else info("Use `--row-map' to print possible row mappings.")
             }
             info("STATUS: $status")
@@ -230,9 +190,9 @@ class GetetaApp : CliktCommand(
         val ad = AutomatonDrawer(File(outputFolder, "${gtt.first().name}.dot"),
                 gtt.map { it.region }, tt)
         ad.runDot = true
-        ad.show = showAutomaton
+        ad.show = automataOptions.showAutomaton
         ad.run()
-        if (showAutomaton)
+        if (automataOptions.showAutomaton)
             info("Image viewer should open now")
     }
 
@@ -241,9 +201,9 @@ class GetetaApp : CliktCommand(
         val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
                 listOf(gtt.region), tt.automaton)
         ad.runDot = true
-        ad.show = showAutomaton
+        ad.show = automataOptions.showAutomaton
         ad.run()
-        if (showAutomaton)
+        if (automataOptions.showAutomaton)
             info("Image viewer should open now")
     }
 
@@ -263,25 +223,25 @@ class GetetaApp : CliktCommand(
 
         when {
             mappings.isEmpty() -> warn("no row mapping found!")
-            odsExport == null -> info("Use `--ods <table.ods>' to generate a counterexample tables.")
-            odsExport != null -> {
+            cexAnalysation.odsExport == null -> info("Use `--ods <table.ods>' to generate a counterexample tables.")
+            cexAnalysation.odsExport != null -> {
                 val w = ODSCounterExampleWriter(result.counterExample)
                 tt.zip(mappings).forEach { (t, m) ->
                     w.addTestTable(t, m)
                 }
                 w.run()
-                w.writer.saveAs(odsExport)
-                FastOds.openFile(odsExport)
+                w.writer.saveAs(cexAnalysation.odsExport)
+                FastOds.openFile(cexAnalysation.odsExport)
             }
         }
     }
 }
 
-private fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
-    if(tableWhitelist.isNotEmpty())
-        this.filter { it.name in tableWhitelist }
-    else
-        this
+internal fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
+        if (tableWhitelist.isNotEmpty())
+            this.filter { it.name in tableWhitelist }
+        else
+            this
 
 
 fun useCounterExamplePrinter(
@@ -302,4 +262,3 @@ fun useCounterExamplePrinter(
         }
     }
 }
-

@@ -2,70 +2,16 @@ import java.text.SimpleDateFormat
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.3.70" apply false
-    //id "com.github.hierynomus.license" version "0.14.0" apply false
-    id "org.jetbrains.dokka" version "0.9.18"
+    id "org.jetbrains.dokka" version "0.10.1"
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "org.sonarqube" version "2.7.1"
-    id "com.github.ben-manes.versions" version "0.21.0"
+    id "org.sonarqube" version "2.8"
+    id "com.github.ben-manes.versions" version "0.28.0"
 }
 
 dokka {
-    // List of files with module and package documentation
-    // http://kotlinlang.org/docs/reference/kotlin-doc.html#module-and-package-documentation
-
-    includes = ['README.md']
-
     outputFormat = "html"
     outputDirectory = "$buildDir/dokka"
-
-    // List of files with module and package documentation
-    // http://kotlinlang.org/docs/reference/kotlin-doc.html#module-and-package-documentation
-    samples = []
-
-    // These tasks will be used to determine source directories and classpath
-    kotlinTasks {
-        //defaultKotlinTasks() + subprojects*.compileKotlin
-        project(":smv-model").compileKotlin
-    }
-
-    sourceDirs = files('smv-model/src/main/kotlin') +              \
-                       files("iec61131lang/src/main/kotlin") +     \
-                       files("iec-symbex/src/main/kotlin") +       \
-                       files("iec-run/src/main/kotlin") +          \
-                       files("iec-xml/src/main/kotlin") +          \
-                       files("flycheck/src/main/kotlin") +         \
-                       files("casestudies/src/main/kotlin") +      \
-                       files("iec-modularization/src/main/kotlin")
-
-    // Use default or set to custom path to cache directory
-    // to enable package-list caching
-    // When set to default, caches stored in $USER_HOME/.cache/dokka
     cacheRoot = 'default'
-
-    // Use to include or exclude non public members.
-    includeNonPublic = true
-
-    // Do not output deprecated members. Applies globally, can be overridden by packageOptions
-    skipDeprecated = false
-
-    // Emit warnings about not documented members. Applies globally, also can be overridden by packageOptions
-    reportUndocumented = false
-
-    skipEmptyPackages = false // Do not create index pages for empty packages
-
-    impliedPlatforms = ["JVM"] // See platforms section of documentation
-
-    jdkVersion = 11
-
-    // No default documentation link to kotlin-stdlib
-    noStdlibLink = false
-
-
-    linkMapping {
-        dir = "src/main/kotlin"
-        url = "https://github.com/Verifaps/verifaps-lib/tree/master/"
-        suffix = "#L"
-    }
 }
 
 
@@ -108,7 +54,7 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'jacoco'
 
-    ext.kotlin_version = '1.3.61'
+    ext.kotlin_version = '1.3.70'
 
     sourceCompatibility = 11
     targetCompatibility = 11
@@ -169,16 +115,16 @@ subprojects {
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        compile group: 'org.jetbrains', name: 'annotations', version: '17.0.0'
+        compile group: 'org.jetbrains', name: 'annotations', version: '19.0.0'
         compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
         compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
-        compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.5'
+        compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.8'
 
-        testCompile 'com.google.truth:truth:1.0'
+        testCompile 'com.google.truth:truth:1.0.1'
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.1'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.1'
-        testCompile 'org.junit.jupiter:junit-jupiter-params:5.5.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+        testCompile 'org.junit.jupiter:junit-jupiter-params:5.6.0'
 
         testCompile project(':utils-test')
 

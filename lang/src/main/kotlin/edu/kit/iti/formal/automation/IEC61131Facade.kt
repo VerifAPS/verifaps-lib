@@ -12,8 +12,7 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.TranslationSfcToStOld
 import edu.kit.iti.formal.automation.st.TranslationSfcToStPipeline
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.Utils
-import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.automation.visitors.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
 import org.antlr.v4.runtime.*
@@ -180,12 +179,11 @@ object IEC61131Facade {
                 null to it
             }
         }
+        val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
         val pfiles = p.map { (_, a) -> File(a) }
         val selectors = p.map { (name, _) ->
-            if (name == null)
-                { elements: PouElements -> Utils.findProgram(elements) }
-            else
-                { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
+            if (name == null) selectorByType
+            else selectByName(name)
         }
         return readProgramsWLS(libraryElements, pfiles, selectors)
     }
@@ -211,8 +209,7 @@ object IEC61131Facade {
      */
     fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
             readProgramsWLS(libraryElements, programs,
-                    programs.map { _ -> Utils::findProgram })
-
+                    programs.map { _ -> ::findProgram })
 
     /**
      *
@@ -256,7 +253,6 @@ object IEC61131Facade {
     fun translateSfc(elements: PouElements) {
         elements.forEach { it.accept(TranslateSfcToSt) }
     }
-
 
     fun translateFbd(elements: PouElements) {
         elements.forEach { it.accept(TranslateFbdToSt) }
