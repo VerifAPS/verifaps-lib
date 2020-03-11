@@ -161,7 +161,7 @@ namespace {
             SCOPED_TRACE("Iteration "s + std::to_string(iteration + 1));
             auto result = automaton.next(input);
             ASSERT_EQ(result.in_spec, expected_outputs.at(iteration).in_spec);
-            ASSERT_EQ(result.output.b, result.output.b);
+            ASSERT_EQ(result.output.b, expected_outputs.at(iteration).output.b);
             // FIXME: the result for c we're getting from omega currently isn't correct
 //            ASSERT_GT(result.output.c, result.output.b);
 //            ASSERT_GT(result.output.d, result.output.b);
