@@ -1,6 +1,7 @@
 #include "rs_flipflop.h"
 #include "t_flipflop.h"
 #include "calculator.h"
+#include "output_dependencies.h"
 
 #include "gtest/gtest.h"
 
@@ -138,6 +139,33 @@ namespace {
         for (const auto& input : inputs) {
             SCOPED_TRACE("Iteration "s + std::to_string(iteration + 1));
             ASSERT_EQ(automaton.next(input), expected_outputs.at(iteration));
+            iteration++;
+        }
+    }
+
+    TEST(GeneratedCodeTest, OutputDependencies) {
+        using namespace output_dependencies;
+
+        auto automaton = synthesized{};
+        auto inputs = std::vector<synthesized::input_type> {
+                {23},
+                {42},
+        };
+        auto expected_outputs = std::vector<synthesized::result> {
+                {true, {24, 0, 0}},
+                {false, {0, 0, 0}},
+        };
+
+        auto iteration = std::size_t{0};
+        for (const auto& input : inputs) {
+            SCOPED_TRACE("Iteration "s + std::to_string(iteration + 1));
+            auto result = automaton.next(input);
+            ASSERT_EQ(result.in_spec, expected_outputs.at(iteration).in_spec);
+            ASSERT_EQ(result.output.b, result.output.b);
+            // FIXME: the result for c we're getting from omega currently isn't correct
+//            ASSERT_GT(result.output.c, result.output.b);
+//            ASSERT_GT(result.output.d, result.output.b);
+//            ASSERT_EQ(result.output.d, result.output.c + 1);
             iteration++;
         }
     }

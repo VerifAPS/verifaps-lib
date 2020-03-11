@@ -8,10 +8,6 @@ repositories {
     }
 }
 
-tasks.withType(LinkExecutable) {
-    linkerArgs.add('-lpthread')
-}
-
 tasks.withType(CppCompile).configureEach {
     compilerArgs.addAll toolChain.map { toolChain ->
         if (toolChain instanceof Gcc || toolChain instanceof Clang) {
@@ -25,6 +21,12 @@ tasks.withType(CppCompile).configureEach {
         } else {
             return []
         }
+    }
+}
+
+tasks.withType(LinkExecutable) {
+    if (toolChain instanceof Gcc || toolChain instanceof Clang) {
+        linkerArgs.add('-lpthread')
     }
 }
 

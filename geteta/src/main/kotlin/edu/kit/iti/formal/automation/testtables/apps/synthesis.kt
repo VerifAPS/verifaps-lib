@@ -4,7 +4,9 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.defaultLazy
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.IteLanguageBaseVisitor
@@ -53,12 +55,26 @@ class SynthesisApp : CliktCommand(
 
     private val outputFolder by option("-o", "--output-dir", help = "Output directory")
             .file(exists = true, fileOkay = false, writable = true)
-            .default(Paths.get("").toAbsolutePath().toFile())
+            .defaultLazy { Paths.get("").toAbsolutePath().toFile() }
 
     private val pythonExecutable by option("--python", help = "Path to python with omega",
             envvar = "PYTHON").default("python")
 
+    private val optimizations by option("-O", "--optimization-level", help = "Optimization level")
+            .choice(enumValues<OptimizationLevel>().associateBy { it.ordinal.toString() } )
+            .default(OptimizationLevel.SIMPLE)
+
+    private val outputFunctionStrategy by option("--row-selection-strategy",
+            help = "Strategy for choosing output function when multiple rows are active")
+            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.toLowerCase() } )
+            .default(OutputFunctionStrategy.ASSUME_ORTHOGONAL)
+
     override fun run() {
+        // TODO: implement rest, set default to CHOOSE_FIRST
+        require(outputFunctionStrategy == OutputFunctionStrategy.ASSUME_ORTHOGONAL) {
+            "Only the strategy --assume-orthogonal is currently implemented"
+        }
+
         val expressionSynthesizer = ExpressionSynthesizer(pythonExecutable)
 
         tableFiles.forEach { tableFile ->
@@ -67,7 +83,9 @@ class SynthesisApp : CliktCommand(
             val moduleFile = File(outputFolder, "${programName}.cpp")
 
             info("Parsing DSL file: ${tableFile.absolutePath}")
-            val synthesizer = ProgramSynthesizer(programName, tableFile, expressionSynthesizer)
+            val synthesizer = ProgramSynthesizer(
+                    programName, tableFile, outputFunctionStrategy, optimizations, expressionSynthesizer
+            )
 
             info("Generating header file: ${headerFile.absolutePath}")
             headerFile.writeText(synthesizer.generateHeader())
@@ -78,14 +96,57 @@ class SynthesisApp : CliktCommand(
     }
 }
 
+
+enum class OptimizationLevel(val optimizeAssignments: Boolean) {
+    NONE(false),
+    SIMPLE(true);
+}
+
+
+/**
+ * Strategy for computing the output function in nondeterministic cases.
+ */
+enum class OutputFunctionStrategy {
+    /**
+     * Always choose the output function of the first active row of each table.
+     */
+    CHOOSE_FIRST,
+    /**
+     * Always choose the output function of the last active row of each table.
+     */
+    CHOOSE_LAST,
+    /**
+     * Always choose the output function of a random active row of each table.
+     */
+    CHOOSE_RANDOM,
+    /**
+     * Assume all output functions of all rows in all tables that can be active at the same time are orthogonal (set
+     * different outputs) and execute them all in order.
+     */
+    ASSUME_ORTHOGONAL,
+    /**
+     * Combine as many output functions as possible. When conflicts are detected, prefer satisfying earlier rows.
+     */
+    COMBINE_PREFER_FIRST,
+    /**
+     * Combine as many output functions as possible. When conflicts are detected, prefer satisfying later rows.
+     */
+    COMBINE_PREFER_LAST;
+}
+
+
 class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
+                         private val strategy: OutputFunctionStrategy,
+                         private val optimizations: OptimizationLevel,
                          private val synthesizer: ExpressionSynthesizer) {
-    constructor(name: String, tableDslFile: File, synthesizer: ExpressionSynthesizer) :
-            this(name, GetetaFacade.readTables(tableDslFile), synthesizer)
+    constructor(name: String, tableDslFile: File, strategy: OutputFunctionStrategy, optimizations: OptimizationLevel,
+                synthesizer: ExpressionSynthesizer) :
+            this(name, GetetaFacade.readTables(tableDslFile), strategy, optimizations, synthesizer)
 
     @Suppress("Unused") // meant for unit tests
-    constructor(name: String, tableDsl: String, synthesizer: ExpressionSynthesizer) :
-            this(name, GetetaFacade.parseTableDSL(tableDsl), synthesizer)
+    constructor(name: String, tableDsl: String, strategy: OutputFunctionStrategy, optimizations: OptimizationLevel,
+                synthesizer: ExpressionSynthesizer) :
+            this(name, GetetaFacade.parseTableDSL(tableDsl), strategy, optimizations, synthesizer)
 
     companion object {
         private val HISTORY_VAR_REGEX = Regex("""^code\$(.+)__history._\$([0-9]+)$""")
@@ -97,7 +158,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     private val referenceVariables = linkedMapOf<String, SMVType>() // inputs and outputs referenced in references
     private val references = mutableMapOf<String, SMVType>() // the concrete references to historical values
     private var maxLookBack = 0
-    // maps SVariable names to names for temporary variables
+    // maps SVariable names to names for temporary variables / struct member names
     private val variableNames = mutableMapOf<String, String>()
     private val translator = SmvToCTranslator()
     // indexed by table
@@ -392,20 +453,38 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 }
             }
 
-    // TODO: don't use omega for simple assignments -> just pass rhs to the C translator
     // TODO: support "one BDD per whole row", "one BDD per state combination" and "big BDD" modes
     //       prerequisite for the second one: we need a way to signal unsatisfiability and a fallback mechanism
     //                                        based on row priority
     //       third one: encode automaton state into formula, generate 1 huge ITE cascade for all GTTs and variables
-    private fun generateOutputFunctions(outputExpr: Map<String, SMVExpr>): List<String> {
-        // figure out all other variables we need for each output variable
-        val variableDependencies = outputExpr.mapValues { (name, expr) ->
+    private fun generateOutputFunctions(outputExpressions: Map<String, SMVExpr>): List<String> {
+        // figure out synthesis method and dependencies for each result variable
+        val needsConversionToBitmap = outputExpressions.mapValues { (_, expr) ->
+            !optimizations.optimizeAssignments || expr.getSingleAssignmentExpr() == null
+        }
+        val variableDependencies = outputExpressions.mapValues { (name, expr) ->
             expr.accept(OutputExpressionDependencyVisitor(outputs.keys, name))
         }
+        val bitmapDependencies = variableDependencies.filterKeys { needsConversionToBitmap.getValue(it) }
 
-        // convert all input/history variables we need for any expression to bitmaps
-        val conversions = variableDependencies.values.flatten().filter { (_, isOutput) -> !isOutput }.map { (v, _) ->
-            "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
+
+        // all input/history variables we need for at least one bitmap expression need to be converted once
+        val conversions = bitmapDependencies.values.flatten().toSet()
+                .filter { (_, isOutput) -> !isOutput }
+                .map { (v, _) ->
+                    "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
+                }
+        // non-bitmap output variables need to be converted before their first usage in a bitmap expression
+        val outputConversions = mutableMapOf<String, List<String>>()
+        val convertedOutputs = mutableSetOf<String>()
+        bitmapDependencies.forEach { (variable, dependencies) ->
+            val outputDependencies = dependencies.filter { (_, isOutput) -> isOutput }.map { (dep, _) -> dep }.toSet()
+            val newConversions = (outputDependencies - convertedOutputs)
+                    .filter { !needsConversionToBitmap.getValue(it) }
+            outputConversions[variable] = newConversions.map { v ->
+                "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
+            }
+            convertedOutputs.addAll(newConversions)
         }
 
         // figure out dependencies between the different outputs and sort topologically
@@ -417,32 +496,31 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             "Circular output dependencies are unsupported"
         }
 
-        // generate bitset declarations for each output variable
-        val outputDeclarations = sortedOutputs.map { variableName ->
-            val name = variableNames.getValue(variableName)
-            "auto $name = std::bitset<bit_size_v<decltype(output.${name})>>();"
-        }
-
         // generate ITE expression for each output variable in the right order
-        val outputCalculations = sortedOutputs.fold(listOf<String>()) { acc, resultVariable ->
-            acc + synthesizer.synthesize(
-                    outputExpr.getValue(resultVariable),
-                    listOf(resultVariable),
-                    (variableDependencies.getValue(resultVariable) + Pair(resultVariable, false)).map { (v, _) ->
-                        v to generateCppDataType(
-                                inputs[v] ?: outputs[v] ?: references.getValue(v)
-                        )
-                    }.toMap(),
-                    variableNames
-            )
+        val outputCalculations = sortedOutputs.flatMap { resultVariable ->
+            val expr = outputExpressions.getValue(resultVariable)
+            val name = variableNames.getValue(resultVariable)
+            if (!needsConversionToBitmap.getValue(resultVariable)) {
+                listOf("output.$name = ${expr.getSingleAssignmentExpr()!!.accept(translator)};")
+            } else {
+                val variables = variableDependencies.getValue(resultVariable) + Pair(resultVariable, false)
+                outputConversions.getValue(resultVariable) +
+                        "auto $name = std::bitset<bit_size_v<decltype(output.$name)>>();" +
+                        synthesizer.synthesize(
+                                expr,
+                                listOf(resultVariable),
+                                variables.map { (v, _) ->
+                                    v to generateCppDataType(
+                                            inputs[v] ?: outputs[v] ?: references.getValue(v)
+                                    )
+                                }.toMap(),
+                                variableNames
+                        ) +
+                        "from_bitset(${name}, output.$name);"
+            }
         }
 
-        // convert output variable bitsets to results
-        val outputAssignments = sortedOutputs.map { varName ->
-            "from_bitset(${variableNames.getValue(varName)}, ${translator.variableReplacement.getValue(varName)});"
-        }
-
-        return conversions + outputDeclarations + outputCalculations + outputAssignments
+        return conversions + outputCalculations
     }
 
     private fun generateStateProgression(): Iterable<String> =
@@ -527,15 +605,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
 
 class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
-    /*private val pythonExecutable: String = omegaVenv?.let { virtualEnv ->
-        if (virtualEnv.resolve("bin/python").exists()) {
-            // UNIX-like OS
-            virtualEnv.resolve("bin/python").absolutePath
-        } else {
-            // Windows
-            virtualEnv.resolve("Scripts/python.exe").absolutePath
-        }
-    } ?: "python"*/
 
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
                    variableNameMap: Map<String, String>): List<String> =
@@ -730,6 +799,17 @@ enum class CppType(private val cppName: String) {
 
     override fun toString(): String = cppName
 }
+
+
+/**
+ * Checks if a SMVExpr is a value assignment to a SVariable and returns the corresponding expression.
+ */
+private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? =
+        (this as? SBinaryExpression)?.run {
+            if (operator == SBinaryOperator.EQUAL) {
+                if (left is SVariable) right else if (right is SVariable) left else null
+            } else null
+        }
 
 
 /**

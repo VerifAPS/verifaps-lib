@@ -2,7 +2,7 @@
   <configuration default="false" name="Synthesis" type="JetRunConfigurationType" factoryName="Kotlin">
     <module name="verifaps.geteta.main" />
     <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="files/rs_flipflop.tt.txt files/t_flipflop.tt.txt files/calculator.tt.txt -o generated" />
+    <option name="PROGRAM_PARAMETERS" value="files/rs_flipflop.tt.txt files/t_flipflop.tt.txt files/calculator.tt.txt files/output_dependencies.tt.txt -o generated" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PASS_PARENT_ENVS" value="true" />

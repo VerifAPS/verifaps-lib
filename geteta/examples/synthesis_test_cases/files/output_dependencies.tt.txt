@@ -1,0 +1,15 @@
+table test_case {
+    var input a : SINT
+    var output b : SINT
+    var output c : SINT
+    var output d : SINT
+
+    group {
+        row test_correct_code_generation {
+            a: -
+            b: = a + 1
+            c: > b + a
+            d: = c + 1
+        }
+    }
+}
