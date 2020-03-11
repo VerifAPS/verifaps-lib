@@ -54,7 +54,7 @@ jobs:
           at: ~/repo
 
       - run: gradle --build-cache :ide:installDist :ide:assembleDist
-        -
+
       - persist_to_workspace:
           root: ~/repo
           paths:
@@ -170,7 +170,7 @@ jobs:
       - run:
           name: "Versions"
           command: |
-            g++ -version
+            g++ --version
             javac -version
             z3 -version
             echo $(echo "quit" | nuXmv -int | head -n 1)
