@@ -8,11 +8,18 @@ repositories {
     }
 }
 
+tasks.withType(LinkExecutable) {
+    linkerArgs.add('-lpthread')
+}
+
 tasks.withType(CppCompile).configureEach {
     compilerArgs.addAll toolChain.map { toolChain ->
-        if (toolChain in [ Gcc, Clang ]) {
-            return ['-std=c++17', '-O0']
-        } else if (toolChain in VisualCpp) {
+        if (toolChain instanceof Gcc || toolChain instanceof Clang) {
+            return ['-std=c++17', '-O0', "-lpthread"
+                    //'-Werror', '-fexceptions', '-fasynchronous-unwind-tables',
+                    //'-fpic', '-fpie', '-fstack-clash-protection', '-fstack-protector-strong', '-pipe', '-Wall',
+            ]
+        } else if (toolChain instanceof VisualCpp) {
             // set a few options that enforce strict standards compliance while we're at it
             return ['/std:c++17', '/Od', '/permissive-', '/Zc:__cplusplus', '/Zc:externConstexpr', '/Zc:inline', '/Zc:throwingNew']
         } else {
