@@ -226,7 +226,8 @@ workflows:
     jobs:
       - build
       - build-dist
-        reuquires: build
+        reuquires:
+          - build
       - test:
           requires:
             - build
