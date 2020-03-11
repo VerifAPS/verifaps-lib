@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.util.error
 import java.util.*
 
@@ -28,7 +29,7 @@ typealias CallSiteMapping = List<Pair<CallSite, CallSite>>
 class ModularProgram(val filename: String) {
     val elements: PouElements by lazy { readProgramsOrError(filename) }
     val entry: ProgramDeclaration by lazy {
-        Utils.findProgram(elements)
+        elements.findFirstProgram()
                 ?: throw IllegalStateException("Could not find any PROGRAM in $filename")
     }
 

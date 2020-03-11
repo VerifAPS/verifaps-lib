@@ -25,8 +25,7 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.jferard.fastods.tool.FastOds
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -75,7 +74,7 @@ class GetetaApp : CliktCommand(
         val gtts = tableOptions.readTables()
 
         //
-        info("Parse program ${programOptions.program.absolutePath} with libraries ${programOptions.library}")
+        info("Parse program ${programOptions.program.first()} with libraries ${programOptions.library}")
         val code = programOptions.readProgram()
 
         // override mode

@@ -4,6 +4,8 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import edu.kit.iti.formal.automation.CommonArguments
+import edu.kit.iti.formal.automation.ProgramOptions
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.rvt.ExpressionReplacer
 import edu.kit.iti.formal.automation.smt.*

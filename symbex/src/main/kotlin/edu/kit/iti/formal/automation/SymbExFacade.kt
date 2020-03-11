@@ -34,6 +34,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -146,7 +147,7 @@ object SymbExFacade {
     @JvmOverloads
     fun evaluateProgram(elements: PouElements, skipSimplify: Boolean = false): SMVModule {
         val a = if (skipSimplify) elements else simplify(elements)
-        return evaluateProgram(Utils.findProgram(a)
+        return evaluateProgram(a.findFirstProgram()
                 ?: throw IllegalStateException("Could not find any program in the given set of POUs"), skipSimplify)
     }
 
