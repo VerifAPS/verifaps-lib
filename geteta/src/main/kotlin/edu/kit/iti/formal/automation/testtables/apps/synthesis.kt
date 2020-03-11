@@ -233,7 +233,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             val automaton = GetetaFacade.constructTable(table).automaton
             automata.add(automaton)
             // loop over table.region.flat() instead of automaton.rowStates to preserve declaration order
-            states.add(table.region.flat().fold(listOf()) { acc, row -> acc + automaton.rowStates.getValue(row) })
+            states.add(table.region.flat().flatMap { row -> automaton.rowStates.getValue(row) })
             unrolledRowOffsets += unrolledRowCount
             unrolledRowCount += automaton.rowStates.size
         }
@@ -636,9 +636,9 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
     }
 
     private fun callOmega(formula: String, resultVariables: List<String>, definitions: List<String>): Iterable<String> {
-        val arguments = listOf(pythonExecutable, "-") + resultVariables.fold(listOf<String>()) { acc, resultVariable ->
-            acc + "--result" + resultVariable
-        } + formula + definitions
+        val arguments = listOf(pythonExecutable, "-") +
+                resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
+                formula + definitions
         val outputFile = createTempFile()
         val process = ProcessBuilder(arguments)
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
@@ -805,10 +805,8 @@ enum class CppType(private val cppName: String) {
  * Checks if a SMVExpr is a value assignment to a SVariable and returns the corresponding expression.
  */
 private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? =
-        (this as? SBinaryExpression)?.run {
-            if (operator == SBinaryOperator.EQUAL) {
-                if (left is SVariable) right else if (right is SVariable) left else null
-            } else null
+        (this as? SBinaryExpression)?.takeIf { operator == SBinaryOperator.EQUAL }?.run {
+            left.takeIf { right is SVariable } ?: right.takeIf { left is SVariable }
         }
 
 
