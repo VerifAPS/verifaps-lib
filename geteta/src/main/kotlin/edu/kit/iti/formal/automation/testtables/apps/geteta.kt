@@ -89,6 +89,10 @@ class GetetaApp : CliktCommand(
     val cexPrinter by option("--cexout", help = "prints an analysation of the counter example and the program")
             .flag()
 
+    val tableWhitelist by option("--select-table", metavar = "TABLE_NAME",
+            help = "specify tables which should be considered")
+            .multiple()
+
     val drawAutomaton by option("--debug-automaton").flag(default = false)
     val showAutomaton by option("--show-automaton").flag(default = false)
 
@@ -107,7 +111,7 @@ class GetetaApp : CliktCommand(
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it.simplify()
-        }
+        }.filterByName(tableWhitelist)
 
         //
         info("Parse program ${program.absolutePath} with libraries ${library}")
@@ -272,6 +276,13 @@ class GetetaApp : CliktCommand(
         }
     }
 }
+
+private fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
+    if(tableWhitelist.isNotEmpty())
+        this.filter { it.name in tableWhitelist }
+    else
+        this
+
 
 fun useCounterExamplePrinter(
         outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
