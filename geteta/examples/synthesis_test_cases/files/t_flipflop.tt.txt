@@ -1,0 +1,15 @@
+table t_ff {
+    var input t : BOOL
+    var output q : BOOL
+
+    group omega {
+        row default [0,1] {
+            t: FALSE
+            q: =q[-1]
+        }
+        row toggle [0,1] {
+            t: TRUE
+            q: =!q[-1]
+        }
+    }
+}

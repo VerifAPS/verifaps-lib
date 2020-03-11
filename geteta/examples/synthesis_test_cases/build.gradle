@@ -1,0 +1,30 @@
+plugins {
+    id 'cpp-unit-test'
+}
+
+repositories {
+    maven {
+        url = 'https://repo.gradle.org/gradle/libs-snapshots-local/'
+    }
+}
+
+tasks.withType(CppCompile).configureEach {
+    compilerArgs.addAll toolChain.map { toolChain ->
+        if (toolChain in [ Gcc, Clang ]) {
+            return ['-std=c++17', '-O0']
+        } else if (toolChain in VisualCpp) {
+            // set a few options that enforce strict standards compliance while we're at it
+            return ['/std:c++17', '/Od', '/permissive-', '/Zc:__cplusplus', '/Zc:externConstexpr', '/Zc:inline', '/Zc:throwingNew']
+        } else {
+            return []
+        }
+    }
+}
+
+unitTest {
+    dependencies {
+        implementation "org.gradle.cpp-samples:googletest:1.9.0-gr4-SNAPSHOT"
+    }
+    privateHeaders.from project.layout.projectDirectory.dir("generated")
+    source.from project.layout.projectDirectory.dir("generated"), project.layout.projectDirectory.dir("src")
+}

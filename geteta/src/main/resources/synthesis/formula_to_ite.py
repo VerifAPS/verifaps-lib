@@ -13,9 +13,9 @@ def _fix_remove_extra_signed_int_bits(functions: Dict[str, str], automaton_vars:
     # input variables seems to be a sign extension, we replace its usage in other functions with the actual sign bit.
     from math import log2
 
-    def replace_variable(formula: str, name: str, replacement: str) -> str:
+    def replace_variable(target_formula: str, name: str, replacement: str) -> str:
         import re
-        return re.sub(rf"([(,\s]|^){name}([),\s]|$)", rf"\1{replacement}\2", formula)
+        return re.sub(rf"([(,\s]|^){name}([),\s]|$)", rf"\1{replacement}\2", target_formula)
 
     for automaton_var in automaton_vars:
         if automaton_var['type'] == 'int' and automaton_var['signed']:

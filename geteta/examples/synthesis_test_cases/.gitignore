@@ -1,0 +1,4 @@
+.gradle/
+.idea/
+generated/*.h
+generated/*.cpp
