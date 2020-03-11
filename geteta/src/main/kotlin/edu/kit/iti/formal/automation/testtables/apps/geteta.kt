@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.testtables.apps
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.convert
-import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.jferard.fastods.tool.FastOds
 import edu.kit.iti.formal.automation.*
@@ -33,7 +32,6 @@ import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
@@ -141,23 +139,23 @@ class GetetaApp : CliktCommand(
                     m
                 }
 
+        val t = this.tableOptions.table.first()
+        val folder = File(t.parent, t.nameWithoutExtension).absolutePath
+        val verificationTechnique = gtts.first().options.verificationTechnique
+        info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
+        val nuxmv = findProgram(nuxmv)
+
+        val process =
+                GetetaFacade.createNuXMVProcess(folder, modules, nuxmv?.absolutePath ?: "n/a",
+                        verificationTechnique)
+
         if (dryRun) {
-            val t = this.tableOptions.table.first()
-            val folder = File(t.parent, t.nameWithoutExtension).absolutePath
-            val verificationTechnique = gtts.first().options.verificationTechnique
-            info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
-            val nuxmv = findProgram(nuxmv)
             if (nuxmv == null) {
                 error("Could not find ${this.nuxmv}.")
                 exitProcess(1)
             }
 
-            val b = GetetaFacade.runNuXMV(
-                    nuxmv.absolutePath,
-                    folder,
-                    modules,
-                    verificationTechnique)
-
+            val b = process.call()
             val status =
                     when (b) {
                         NuXMVOutput.Verified -> "verified"
