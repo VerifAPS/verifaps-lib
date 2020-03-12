@@ -247,7 +247,7 @@ object SMVToStVisitor : SMVAstVisitor<Expression> {
     override fun visit(v: SVariable): Expression = SymbolicReference(v.name.removePrefix("code\$"))
     override fun visit(be: SBinaryExpression): Expression = BinaryExpression(be.left.accept(this), operator(be.operator), be.right.accept(this))
 
-    private fun operator(operator: SBinaryOperator): BinaryOperator =
+    fun operator(operator: SBinaryOperator): BinaryOperator =
             when (operator) {
                 SBinaryOperator.PLUS -> Operators.ADD
                 SBinaryOperator.MINUS -> Operators.SUB
@@ -275,7 +275,7 @@ object SMVToStVisitor : SMVAstVisitor<Expression> {
         return UnaryExpression(operator(ue.operator), ue.expr.accept(this))
     }
 
-    private fun operator(operator: SUnaryOperator): UnaryOperator =
+    fun operator(operator: SUnaryOperator): UnaryOperator =
             when (operator) {
                 SUnaryOperator.NEGATE -> Operators.NOT
                 SUnaryOperator.MINUS -> Operators.MINUS
