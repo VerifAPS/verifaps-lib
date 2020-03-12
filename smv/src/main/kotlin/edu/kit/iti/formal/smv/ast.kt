@@ -77,7 +77,7 @@ data class SBinaryExpression(private var _left: SMVExpr,
 
 
     override val dataType: SMVType?
-        get() = SMVTypes.infer(left.dataType!!, right.dataType!!)
+        get() = SMVTypes.infer(operator, left.dataType!!, right.dataType!!)
 
     override fun inModule(module: String): SBinaryExpression {
         return SBinaryExpression(left.inModule(module),
@@ -429,7 +429,7 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
         return name
     }*/
 
-    override fun clone() = copy()
+    override fun clone() = copy().also { it.dataType = dataType }
 
     override fun inModule(module: String): SVariable {
         return SVariable.create("$module.$name").with(dataType)

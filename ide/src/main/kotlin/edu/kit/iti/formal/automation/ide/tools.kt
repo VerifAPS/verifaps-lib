@@ -11,6 +11,7 @@ import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findProgram
 import net.miginfocom.layout.CC
 import net.miginfocom.swing.MigLayout
 import org.antlr.v4.runtime.CharStreams
@@ -72,7 +73,7 @@ class RunnerWindow(val lookup: Lookup, val stEditor: CodeEditor) : ToolPane("run
         try {
             elements = IEC61131Facade.file(CharStreams.fromString(stEditor.code))
             IEC61131Facade.resolveDataTypes(elements)
-            val program = Utils.findProgram(elements)
+            val program = findProgram(elements)
             if (program != null) {
                 inputVars = program.scope.variables
                         .filter { it.isInput }

@@ -1,0 +1,87 @@
+plugins {
+    id("application")
+    id "edu.sc.seis.launch4j" version "2.4.6"
+}
+
+mainClassName = "empty"
+
+description = 'Case Studies and Executables of VerifAPS'
+
+dependencies {
+    compile project(':symbex')
+    compile project(':geteta')
+    compile project(':modularization')
+    compile project(':aps-rvt')
+    compile project(':run')
+    compile project(':ide')
+
+    compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.8'
+    implementation 'com.github.ajalt:clikt:2.1.0'
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.3.70'
+}
+
+
+def mainClasses = [
+        "modularization"     : "edu.kit.iti.formal.automation.modularization.ModApp"
+        , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
+        , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
+        , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
+        , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
+        , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
+        , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
+        , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
+        , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
+        , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
+        , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
+        , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
+        , 'check'            : "edu.kit.iti.formal.automation.Check"
+        , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
+        , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
+        , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
+        , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
+]
+
+launch4j {
+    copyConfigurable = project.copySpec { exclude('**') }
+    // do not copy anything to lib/
+}
+
+mainClasses.each { a, b ->
+    def t = task("createStart$a", type: CreateStartScripts) {
+        group = "start-script"
+        applicationName = a
+        classpath = startScripts.classpath
+        outputDir = startScripts.outputDir
+        mainClassName = b
+        /*startScripts.classpath.files.each {
+            c -> println(c)
+        }*/
+    }
+    applicationDistribution.from(t) { into("bin") }
+    t.dependsOn startScripts
+
+
+    def exe = task("createExe$a", type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+        group "start-script"
+        copyConfigurable = [] // do not copy anything to lib/
+        productName = a
+        mainClassName = b
+        outfile = "${a}.exe"
+        headerType = "console"
+        dontWrapJar = true
+        jar = ""
+        chdir = ".."
+        classpath = startScripts.classpath.collect { "lib/" + it.getName() }
+        println(classpath)
+    }
+    applicationDistribution.from(exe) { into("bin") exclude("lib/") }
+    exe.dependsOn startScripts
+}
+
+applicationDistribution.into("bin") {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+/*    from(createScriptKastelDemonstrator)
+    from(createScriptSc12f)
+    from(createScriptSc11_rev)*/
+    fileMode = 0755
+}

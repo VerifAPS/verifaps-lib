@@ -37,7 +37,8 @@ tableHeader:
 ;
 
 opts: OPTIONS LBRACE (kv)*  RBRACE;
-kv: key=IDENTIFIER (EQUALS|COLON) (constant|variable) osem;
+kv: key=option_key (EQUALS|COLON) (constant|variable) osem;
+option_key: (intOrId (DOT intOrId)*);
 
 signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem
 ;
@@ -63,9 +64,9 @@ variableDefinition :
 
 osem : SEMICOLON?;
 
-group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE (group|row)* RBRACE;
+group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE goto_* (group|row)* RBRACE;
 intOrId: id=IDENTIFIER | idi=i;
-row : ROW intOrId? time? LBRACE (controlCommands)? (kc osem)* RBRACE;
+row : ROW intOrId? time? LBRACE goto_* (controlCommands)? (kc osem)* RBRACE;
 kc: (FQ_VARIABLE|IDENTIFIER) COLON value=cell;
 controlCommands: {relational}? (controlCommand osem?)+;
 controlCommand:
@@ -73,6 +74,11 @@ controlCommand:
   | PLAY COLON (runs+=intOrId (COMMA runs+=intOrId)*)  #controlPlay
   | BACKWARD LPAREN target=intOrId RPAREN COLON (runs+=intOrId)* #controlBackward
 ;
+
+goto_:
+    /*row {  \goto: \pass(A, r02); abc: 1;} */
+    GOTO COLON trans+=gotoTrans (COMMA trans+=gotoTrans)* osem;
+gotoTrans: (PASS|MISS|FAIL) LPAREN tblId=IDENTIFIER COMMA rowId=intOrId RPAREN;
 
 time :
       MINUS (duration_flags)? #timeDontCare

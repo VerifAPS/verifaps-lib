@@ -15,13 +15,14 @@ import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 
 object ExecutionFacade {
     fun execute(pous: PouElements): State =
             createExecutionContext(pous).executeCycle()
 
     fun createExecutionContext(pous: PouElements): IECExecutorContext {
-        val program = Utils.findProgram(pous)
+        val program = pous.findFirstProgram()
         return when (program) {
             null -> throw IllegalArgumentException()
             else -> {

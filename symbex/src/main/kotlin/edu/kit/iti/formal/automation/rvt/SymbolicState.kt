@@ -27,6 +27,7 @@ import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 const val ASSIGN_SEPARATOR: String = "\$"
 
@@ -39,7 +40,7 @@ data class SymbolicVariable(val variable: SVariable) {
         get() = values[current]
 
     fun push(value: SMVExpr, postfix: String) {
-        current = variable.copy(name = variable.name + postfix)
+        current = SVariable(variable.name + postfix, variable.dataType!!)
         values[current] = value
     }
 
@@ -54,10 +55,12 @@ data class SymbolicVariable(val variable: SVariable) {
 /**
  * Created by weigl on 27.11.16.
  */
-data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap())
+data class SymbolicState(val definitions: HashMap<SVariable, SymbolicVariable> = HashMap())
     : MutableMap<SVariable, SMVExpr> {
+    val auxiliaryDefinitions: HashMap<SVariable, SMVExpr> = HashMap()
+
     constructor(m: SymbolicState) : this() {
-        m.map.forEach { (v, u) -> map[v] = u.clone() }
+        m.definitions.forEach { (v, u) -> definitions[v] = u.clone() }
     }
 
     operator fun get(x: String) = this[getKey(x)]
@@ -66,26 +69,26 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
     var useDefinitions: Boolean = true
 
     override val size: Int
-        get() = map.size
+        get() = definitions.size
 
     fun getCurrentValues(): Sequence<SMVExpr> =
-            map.values.asSequence().map { it.value!! }
+            definitions.values.asSequence().map { it.value!! }
 
-    override fun containsKey(key: SVariable): Boolean = key in map
+    override fun containsKey(key: SVariable): Boolean = key in definitions
     override fun containsValue(value: SMVExpr): Boolean =
             getCurrentValues().any { it == value }
 
     override fun get(key: SVariable): SMVExpr? =
-            map[key]?.let {
+            definitions[key]?.let {
                 if (useDefinitions) it.current
                 else it.value
             }
 
 
-    override fun isEmpty(): Boolean = map.isEmpty()
+    override fun isEmpty(): Boolean = definitions.isEmpty()
 
     override val entries: MutableSet<MutableMap.MutableEntry<SVariable, SMVExpr>>
-        get() = map.entries.map { (a, b) ->
+        get() = definitions.entries.map { (a, b) ->
             object : MutableMap.MutableEntry<SVariable, SMVExpr> {
                 override val key: SVariable
                     get() = a
@@ -99,17 +102,17 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
         }.toMutableSet()
 
     override val keys: MutableSet<SVariable>
-        get() = map.keys
+        get() = definitions.keys
 
     override val values: MutableCollection<SMVExpr>
         get() = getCurrentValues().toMutableList()
 
-    override fun clear() = map.clear()
+    override fun clear() = definitions.clear()
 
     override fun put(key: SVariable, value: SMVExpr): SMVExpr? = throw IllegalArgumentException("Use assign(...) instead")
 
     fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
-        val s = map[key] ?: SymbolicVariable(key).also { map[key] = it }
+        val s = definitions[key] ?: SymbolicVariable(key).also { definitions[key] = it }
         val postfix = String.format("%s%05d", ASSIGN_SEPARATOR, assignCounter)
         s.push(v, postfix)
     }
@@ -119,7 +122,7 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
     }
 
     override fun remove(key: SVariable): SMVExpr? {
-        val ss = map.remove(key)
+        val ss = definitions.remove(key)
         return ss?.value
     }
 
@@ -135,7 +138,7 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
      * Get an representation of this state without any use of definitions.
      */
     fun unfolded(): Map<SVariable, SMVExpr> {
-        var m = map.map { (a, b) -> a to b.value!! }.toMap()
+        var m = definitions.map { (a, b) -> a to b.value!! }.toMap()
         val defs = getAllDefinitions()
         val r = ExpressionReplacer(defs)
         while (true) {
@@ -150,9 +153,13 @@ data class SymbolicState(val map: HashMap<SVariable, SymbolicVariable> = HashMap
     }
 
     fun getAllDefinitions() =
-            map.flatMap { (_, b) -> b.values.entries }
+            definitions.flatMap { (_, b) -> b.values.entries }
                     .map { (a, b) -> a to b }
-                    .toMap()
+                    .toMap() + auxiliaryDefinitions
+
+    /*private val auxVariables = HashSet<SVariable>()
+    fun markAsAuxiliary(key: SVariable) = auxVariables.add(key)
+    fun isAuxiliary(key: SVariable) = key in auxVariables*/
 }
 
 class ExpressionReplacer(private val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {

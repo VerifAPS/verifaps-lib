@@ -417,6 +417,8 @@ fun Duration.isOptional(time: Int): Boolean =
 
 
 sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1)) {
+    var gotos: MutableList<GotoTransition> = arrayListOf()
+
     abstract fun count(): Int
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
@@ -436,6 +438,14 @@ data class Region(override var id: String,
         visitor(this)
         children.forEach { it.visit(visitor) }
     }
+}
+
+data class GotoTransition(
+        var tableName: String,
+        var rowId: String,
+        var kind : Kind = Kind.PASS
+) {
+    enum class Kind {PASS, MISS, FAIL}
 }
 
 data class TableRow(override var id: String) : TableNode(id) {
@@ -541,7 +551,7 @@ data class TableRow(override var id: String) : TableNode(id) {
         return inputExpr[name] ?: outputExpr[name]
     }
 
-    override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
+    override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id; it.gotos = gotos.toMutableList() }
     override fun visit(visitor: (TableNode) -> Unit) = visitor(this)
 }
 

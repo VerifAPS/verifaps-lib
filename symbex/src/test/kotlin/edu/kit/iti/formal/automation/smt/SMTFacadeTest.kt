@@ -25,9 +25,7 @@ package edu.kit.iti.formal.automation.smt
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import org.antlr.v4.runtime.CharStreams
-import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
-
 import java.io.FileInputStream
 import java.io.IOException
 
@@ -48,8 +46,8 @@ class SMTFacadeTest {
         val module = SymbExFacade.evaluateProgram(symplifiedCode)
         val program = SMTFacade.translate(module)
         println(program.preamble)
-        println(program.getStepDefinition(true, "_0"))
-        println(program.getStepDefinition(false, "_1"))
+        println(program.getStepDefinition(true, "", "_0"))
+        println(program.getStepDefinition(false, "", "_1"))
         println(program.getAssertInit("_0"))
         println(program.getAssertNext("_0", "_1"))
     }

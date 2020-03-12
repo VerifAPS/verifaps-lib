@@ -1,20 +1,23 @@
 package edu.kit.iti.formal.automation.testtables.viz
 
-import com.github.jferard.fastods.*
+import com.github.jferard.fastods.OdsFactory
+import com.github.jferard.fastods.Table
+import com.github.jferard.fastods.TableCell
+import com.github.jferard.fastods.attribute.BorderStyle
+import com.github.jferard.fastods.attribute.CellAlign
+import com.github.jferard.fastods.attribute.SimpleColor
+import com.github.jferard.fastods.attribute.SimpleLength
 import com.github.jferard.fastods.datastyle.DataStyle
 import com.github.jferard.fastods.datastyle.createFloatStyleBuilder
-import com.github.jferard.fastods.style.BorderAttribute
 import com.github.jferard.fastods.style.TableCellStyle
-import com.github.jferard.fastods.util.SimpleLength
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyInt
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.*
-import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.smv.CounterExample
 import edu.kit.iti.formal.smv.EnumType
 import edu.kit.iti.formal.smv.SMVAstDefaultVisitorNN
@@ -165,7 +168,7 @@ class ODSCounterExampleWriter constructor(
             }
             output.forEach {
                 val v = counterExample[index,
-                        it.externalVariable(gtt.programRuns,"_${gtt.name}").name]
+                        it.externalVariable(gtt.programRuns, "_${gtt.name}").name]
                 cell.setStyle(tableStyle.styleOutputValue)
                 cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
                 cell.setStringValue(v)
@@ -745,21 +748,17 @@ object DefaultTableStyle : TableStyle {
             .parentCellStyle(styleValues).build()
 
     override var styleCategoryHeader = TableCellStyle.builder("category_header")
-            .backgroundColor(SColor("ff00ff"))
+            .backgroundColor { "ff00ff" }
             .fontWeightBold()
-            .textAlign(TableCellStyle.Align.CENTER)
-            .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderAttribute.Style.SOLID)
+            .textAlign(CellAlign.CENTER)
+            .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
             .build()
 
-    class SColor(val s: String) : Color {
-        override fun hexValue() = s
-    }
-
     var styleVariableHeader = TableCellStyle.builder("variable_header")
-            .backgroundColor(SColor("cccccc"))
+            .backgroundColor(SimpleColor.GRAY48)
             .fontWeightBold()
-            .textAlign(TableCellStyle.Align.CENTER)
-            .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderAttribute.Style.SOLID)
+            .textAlign(CellAlign.CENTER)
+            .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
             .build()
 
     override val styleInputVariableHeader: TableCellStyle = TableCellStyle.builder("variable_input_header")

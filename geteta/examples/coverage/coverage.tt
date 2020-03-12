@@ -1,0 +1,10 @@
+table covtest {
+  var input i : INT
+  var output o : INT
+
+  group {
+    row { i: >10; o: -}
+    row { i: -; o: <10}
+    row { i: -; o: -11}
+  }
+}

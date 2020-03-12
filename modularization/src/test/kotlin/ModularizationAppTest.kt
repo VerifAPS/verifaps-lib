@@ -1,6 +1,7 @@
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.modularization.CallSiteFinder
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findProgram
 import org.antlr.v4.runtime.CharStreams
  import org.junit.jupiter.api.Test
 
@@ -13,7 +14,7 @@ class ModularizationAppTest {
         val (p, e) =
                 IEC61131Facade.fileResolve(CharStreams.fromStream(
                         javaClass.getResourceAsStream(p)))
-        val cfs = CallSiteFinder(Utils.findProgram(p)!!, p)
+        val cfs = CallSiteFinder(findProgram(p)!!, p)
         cfs.run()
         cfs.callSites.forEach {
             println(it.repr())

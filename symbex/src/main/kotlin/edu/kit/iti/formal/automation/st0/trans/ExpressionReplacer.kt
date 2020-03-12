@@ -34,7 +34,7 @@ import java.util.HashMap
 class ExpressionReplacer(var statements: StatementList) : AstVisitor<Any>() {
     var replacements: MutableMap<Expression, Expression> = HashMap()
 
-    override fun defaultVisit(obj: Any) = TODO()
+    override fun defaultVisit(obj: Any) = error("not implemented for $obj")
 
 
     override fun visit(symbolicReference: SymbolicReference): Any {

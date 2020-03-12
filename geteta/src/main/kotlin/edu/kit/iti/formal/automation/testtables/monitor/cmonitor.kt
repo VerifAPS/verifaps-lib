@@ -296,7 +296,8 @@ $asciiTable
             val fromName = t.from.name
             when (t.type) {
                 TransitionType.ACCEPT ->
-                    from!!.row.defInput.name + " && " + fromName
+                    from!!.row.defForward.name + " && " + fromName
+                TransitionType.MISS -> "! " + from!!.row.defInput
                 TransitionType.ACCEPT_PROGRESS ->
                     from!!.row.defProgress.name + " && " + fromName
                 TransitionType.FAIL ->

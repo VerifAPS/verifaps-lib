@@ -25,7 +25,6 @@ package edu.kit.iti.formal.automation
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
-import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
@@ -35,6 +34,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -147,7 +147,7 @@ object SymbExFacade {
     @JvmOverloads
     fun evaluateProgram(elements: PouElements, skipSimplify: Boolean = false): SMVModule {
         val a = if (skipSimplify) elements else simplify(elements)
-        return evaluateProgram(Utils.findProgram(a)
+        return evaluateProgram(a.findFirstProgram()
                 ?: throw IllegalStateException("Could not find any program in the given set of POUs"), skipSimplify)
     }
 
@@ -222,9 +222,14 @@ object SymbExFacade {
         val commandFile = File("cmd.xmv")
         writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
         val p = NuXMVProcess(tmpFile, commandFile)
-        findProgram("nuXmv")?.let {
-            p.executablePath = it.absolutePath
-        }
+        val nuXmv = findProgram("nuXmv")
+        if (nuXmv != null)
+            p.executablePath = nuXmv.absolutePath
+        else
+            System.getenv("NUXMV")?.let {
+                p.executablePath = System.getenv("NUXMV")
+            }
+
         //use BMC because of the complete trace
         //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()

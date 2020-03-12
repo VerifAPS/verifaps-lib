@@ -5,6 +5,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findProgram
 import org.antlr.v4.runtime.CharStreams
 import org.jdom2.JDOMException
 import java.io.File
@@ -54,7 +55,7 @@ object SC11_rev {
 
         val stles = SymbExFacade.simplify(tles)
         // we need to trick with the input/output variables
-        Utils.findProgram(tles)?.scope?.forEach {
+        findProgram(tles)?.scope?.forEach {
             if (it.name.startsWith("Actuator_"))
                 it.type = it.type or VariableDeclaration.OUTPUT
             if (it.name.startsWith("Sensor_"))

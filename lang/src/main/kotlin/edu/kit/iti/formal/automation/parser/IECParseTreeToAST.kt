@@ -858,9 +858,11 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = IfStatement()
         ast.ruleContext = ctx
         for (i in ctx.cond.indices) {
-            ast.addGuardedCommand(
-                    ctx.cond[i].accept(this) as Expression,
-                    ctx.thenlist[i].accept(this) as StatementList)
+            val c = ctx.cond[i].accept(this) as Expression
+            val b = ctx.thenlist[i].accept(this) as StatementList
+            val gs = GuardedStatement(c,b)
+            gs.ruleContext = ctx.cond[i]
+            ast.addGuardedCommand(gs)
         }
         if (ctx.ELSE() != null) {
             ast.elseBranch = ctx.elselist.accept(this) as StatementList
