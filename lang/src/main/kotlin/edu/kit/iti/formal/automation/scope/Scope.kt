@@ -201,7 +201,7 @@ data class Scope(val variables: VariableScope = VariableScope())
             val edt = dt.getDataType(this)
             dt.allowedValues
                     .map { it.text!! }
-                    .forEach { allowedEnumValues[it] = edt }
+                    .forEach { allowedEnumValues[it.toUpperCase()] = edt }
         }
     }
 
@@ -341,6 +341,14 @@ data class Scope(val variables: VariableScope = VariableScope())
             value.toUpperCase().let {
                 this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
             }
+
+    /**
+     * Construct a complete map of values to EnumerationType
+     */
+    fun enumValuesToType(): Map<String, EnumerateType> {
+        val p = parent?.enumValuesToType() ?: mapOf()
+        return p + allowedEnumValues
+    }
 
 
     //region call resolver

@@ -23,8 +23,10 @@ val EMBEDDING_PIPELINE = MultiCodeTransformation(arrayListOf(
         FBRemoveInstance()
 ))
 
-
-const val SCOPE_SEPARATOR = "$"
+/**
+ * Seperator between identifier.
+ */
+var SCOPE_SEPARATOR = "$"
 
 class CallEmbedding : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState = EMBEDDING_PIPELINE.transform(state)
@@ -137,7 +139,7 @@ class FBAssignments : CodeTransformation {
             val s = scope.resolveVariable(symbolicReference)
             val dt = s?.dataType
             if (s != null && dt is FunctionBlockDataType && symbolicReference.hasSub()) {
-                return SymbolicReference(symbolicReference.toPath().joinToString("$"))
+                return SymbolicReference(symbolicReference.toPath().joinToString(SCOPE_SEPARATOR))
             }
             return super.visit(symbolicReference)
         }

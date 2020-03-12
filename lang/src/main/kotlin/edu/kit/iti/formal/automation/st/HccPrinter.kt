@@ -299,7 +299,8 @@ open class HccPrinter
         sb.printf(when (literal) {
             is IntegerLit ->  print(literal.dataType.obj?.name, literal.value.abs())
             is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
-            is EnumLit -> print(literal.dataType.obj?.name, literal.value)
+            //TODO maybe print the integer value
+            is EnumLit -> ("${literal.dataType.obj?.name}__${literal.value}")
             is ToDLit -> {
                 val (h, m, s, ms) = literal.value
                 print(literal.dataType().name, "$h:$m:$s.$ms")

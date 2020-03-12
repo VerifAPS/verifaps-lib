@@ -2,7 +2,10 @@ package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
 import edu.kit.iti.formal.automation.SymbExFacade.simplify
-import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
@@ -10,6 +13,7 @@ import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.SpecialComment
 import edu.kit.iti.formal.automation.st.Statements.ifthen
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade.constructTable
 import edu.kit.iti.formal.automation.testtables.GetetaFacade.readTables
@@ -19,6 +23,8 @@ import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
 import edu.kit.iti.formal.automation.testtables.monitor.SMVToStVisitor
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.smt.SmtEnumType
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -31,7 +37,15 @@ data class Miter(
         val body: StatementList,
         val functions: List<FunctionDeclaration>) {}
 
-class GttMiterConstruction(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton) {
+/**
+ * Maps the value of a enum to its type.
+ */
+typealias EnumValueTable = Map<String, EnumerateType>
+
+class GttMiterConstruction(val gtt: GeneralizedTestTable,
+                           val automaton: TestTableAutomaton,
+                           val enumValues: EnumValueTable,
+                           val parentScope: Scope = Scope()) {
     private var transitions = automaton.transitions.groupBy { it.to }
 
     private fun createNext(state: AutomatonState): Expression {
@@ -53,6 +67,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable, val automaton: TestTab
                                 stateVar and inputExpr and outputExpr
                             TransitionType.FAIL ->
                                 stateVar and inputExpr and outputExpr.not()
+                            TransitionType.MISS -> stateVar and inputExpr.not()
                             TransitionType.TRUE -> stateVar
                         }
                     }
@@ -64,7 +79,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable, val automaton: TestTab
         val automaton = constructTable(gtt).automaton
 
         //Scope
-        val fbScope = Scope()
+        val fbScope = Scope(parentScope)
 
         gtt.programVariables.forEach { pv ->
             val vd = VariableDeclaration(pv.name, VariableDeclaration.INPUT, pv.dataType)
@@ -173,7 +188,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable, val automaton: TestTab
         return Miter(scope, init, body, funcs)
     }
 
-    private fun SMVAst.translateToSt(): Expression = this.accept(ExpressionConversion)
+    private fun SMVAst.translateToSt(): Expression = this.accept(ExpressionConversion(enumValues))
 }
 
 class ProgMiterConstruction(val pous: PouElements) {
@@ -258,7 +273,7 @@ class ProgMiterConstruction(val pous: PouElements) {
             "program", scope, stBody, sfcBody, ilBody, fbBody, actions)
 }
 
-object ExpressionConversion : SMVAstVisitor<Expression> {
+class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expression> {
     override fun visit(top: SMVAst): Expression {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -274,7 +289,12 @@ object ExpressionConversion : SMVAstVisitor<Expression> {
         return when (l.dataType) {
             is SMVTypes.BOOLEAN -> BooleanLit(l.value == true)
             is SMVWordType -> IntegerLit(INT, l.value.toString().toBigInteger())
-            else -> EMPTY_EXPRESSION //TODO wrong
+            is EnumType -> {
+                val et = enumValues[l.value.toString().toUpperCase()]
+                        ?: error("No enum defined which contains ${l.value}. Defined values: ${enumValues.keys}")
+                EnumLit(et, l.value.toString())
+            }
+            else -> error("Literals of type '${l.javaClass} are not supported")
         }
     }
 
@@ -381,42 +401,50 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 
 
 fun main() = run {
-
+    SCOPE_SEPARATOR = "__"
     //choose gtt
-//    val gttCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.tt.txt")
-    val gttConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram_broken.gtt")
-    val gttMinMax = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax.gtt")
-//    val gttMinMax_broken = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax_Broken.gtt")
-//    val gttLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.tt")
+    run("geteta/examples/MinMax/MinMax.st",
+            "geteta/examples/MinMax/MinMax.gtt")
 
+    // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
+    // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
+    // val stLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.st")
+    // val gttCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.tt.txt")
+    // val gttConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram_broken.gtt")
+    // val gttMinMax_broken = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax_Broken.gtt")
+    // val gttLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.tt")
+}
 
-    val gtt = readTables(gttMinMax).first()
+fun run(program: String, table: String) {
+    //region read table
+    val gtt = readTables(File(table)).first()
     gtt.programRuns = listOf("")
     gtt.generateSmvExpression()
-
     val gttAsAutomaton = constructTable(gtt).automaton
-    val mc = GttMiterConstruction(gtt, gttAsAutomaton)
+    //endregion
 
-    val miter = mc.constructMiter()
+    //region read program
+    val progs = fileResolve(File(program)).first
+    //endprogram
 
     /* PrintWriter(System.out).use { out ->
          val fb = FunctionBlockDeclaration(name = "miter", scope = miter.scope, stBody = miter.statements)
          IEC61131Facade.printTo(out, fb)
      }*/
+    val enum = progs.findFirstProgram()?.scope?.enumValuesToType() ?: mapOf()
+    val mc = GttMiterConstruction(gtt, gttAsAutomaton, enum)
+    val miter = mc.constructMiter()
+    val productProgram = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
 
+    PrintWriter(System.out).use { out ->
+        //            IEC61131Facade.printTo(out, simplify(combi), true)
+        val hccprinter = HccPrinter(CodeWriter(out))
+        hccprinter.isPrintComments = true
+        productProgram.accept(hccprinter)
 
-    //choose st
-//    val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
-//    val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
-    val stMinMax = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax.st")
-//    val stLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.st")
+    }
 
-
-
-    val progs = fileResolve(stMinMax).first
-    val combi = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
-
-    //Sandbox------------------------------
+    //region Sandbox------------------------------
 
 //        val body = StatementList()
 //        val cc: CaseCondition = CaseCondition.IntegerCondition(IntegerLit(INT, 1.toString().toBigInteger()))
@@ -452,16 +480,5 @@ fun main() = run {
 //        val pd = ProgramDeclaration(name = "testingStuff", scope = scope, stBody = body)
 
 
-    //Sandbox_end-------------------------------
-
-    PrintWriter(System.out).use { out ->
-        //            IEC61131Facade.printTo(out, simplify(combi), true)
-
-
-        val hccprinter = HccPrinter(CodeWriter(out))
-        hccprinter.isPrintComments = true
-        combi.accept(hccprinter)
-
-    }
-
+    //endregion Sandbox_end-------------------------------
 }

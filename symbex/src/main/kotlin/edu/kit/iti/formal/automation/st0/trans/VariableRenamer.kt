@@ -22,10 +22,9 @@ package edu.kit.iti.formal.automation.st0.trans
  * #L%
  */
 
-import edu.kit.iti.formal.automation.st.ast.Expression
-import edu.kit.iti.formal.automation.st.ast.StatementList
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference
+import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
+import edu.kit.iti.formal.automation.st.util.setAll
 
 /**
  * @author Alexander Weigl (26.06.2014)
@@ -35,6 +34,15 @@ class VariableRenamer(
         private val statements: StatementList?,
         private val newName: (String) -> String)
     : AstMutableVisitor() {
+
+    override fun visit(invocation: Invocation): Expression {
+        //invocation.callee = invocation.callee.accept(this) as SymbolicReference
+        invocation.parameters.setAll(
+                invocation.parameters
+                        .map { p -> p.accept(this) as InvocationParameter }
+        )
+        return invocation
+    }
 
     override fun visit(symbolicReference: SymbolicReference): Expression {
         if (!isGlobal(symbolicReference)) {
