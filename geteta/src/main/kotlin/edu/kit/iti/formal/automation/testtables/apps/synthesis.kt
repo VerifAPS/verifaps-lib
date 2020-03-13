@@ -512,25 +512,26 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             if (!needsConversionToBitmap.getValue(resultVariable)) {
                 listOf("output.$name = ${expr.getSingleAssignmentExpr()!!.accept(translator)};")
             } else {
-                val variables = variableDependencies.getValue(resultVariable) + Pair(resultVariable, false)
+                val variables = variableDependencies.getValue(resultVariable).map { (v, _) -> v } + resultVariable
                 outputConversions.getValue(resultVariable) +
                         "auto $name = std::bitset<bit_size_v<decltype(output.$name)>>();" +
-                        synthesizer.synthesize(
-                                expr,
-                                listOf(resultVariable),
-                                variables.map { (v, _) ->
-                                    v to generateCppDataType(
-                                            inputs[v] ?: outputs[v] ?: references.getValue(v)
-                                    )
-                                }.toMap(),
-                                context
-                        ) +
+                        generateAssignments(expr, listOf(resultVariable), variables, context) +
                         "from_bitset(${name}, output.$name);"
             }
         }
 
         return conversions + outputCalculations
     }
+
+    private fun generateAssignments(expr: SMVExpr, resultVariables: Iterable<String>, variables: Iterable<String>,
+                                    context: ExpressionSynthesizer.CppContext): Iterable<String> =
+            synthesizer.synthesize(
+                    expr,
+                    resultVariables,
+                    variables.map { it to generateCppDataType(inputs[it] ?: outputs[it] ?: references.getValue(it)) }
+                            .toMap(),
+                    context
+            ) ?: throw IllegalArgumentException("Unsatisfiable formula: ${expr.repr()}")
 
     private fun generateStateProgression(): Iterable<String> =
             states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
@@ -618,17 +619,19 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
     companion object {
         const val TEMPORARY_VARIABLE_PREFIX = "__tmp"
+        private const val SYNTHESIS_SCRIPT_RESOURCE_PATH = "/synthesis/formula_to_ite.py"
+        private const val SYNTHESIS_SCRIPT_UNSAT_MARKER = "<unsatisfiable>"
     }
 
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
-                   context: CppContext): List<String> =
+                   context: CppContext): List<String>? =
             callOmega(
                     formula.accept(SmvToOmegaTranslator(context.variableNameMap)),
                     resultVariables.map { context.variableNameMap.getValue(it) },
                     variables.map { (variable, type) ->
                         "${context.variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
                     }
-            ).let { assignments -> context.translateIteAssignments(assignments, variables) }
+            )?.let { assignments -> context.translateIteAssignments(assignments, variables) }
 
     inner class CppContext(val variableNameMap: Map<String, String>) {
         private var temporaryVariableCounter = 0
@@ -661,10 +664,11 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
     }
 
-    private fun callOmega(formula: String, resultVariables: List<String>, definitions: List<String>): Iterable<String> {
+    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>)
+            : Iterable<String>? {
         val arguments = listOf(pythonExecutable, "-") +
                 resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
-                formula + definitions
+                formula + variableDefinitions
         val outputFile = createTempFile()
         val process = ProcessBuilder(arguments)
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
@@ -673,7 +677,7 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
                 .start()
 
         process.outputStream.use { stdin ->
-            javaClass.getResourceAsStream("/synthesis/formula_to_ite.py").use { script ->
+            javaClass.getResourceAsStream(SYNTHESIS_SCRIPT_RESOURCE_PATH).use { script ->
                 script.transferTo(stdin)
             }
         }
@@ -695,12 +699,13 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         }
 
         if (exitCode != 0) {
+            if (exitCode == 1 && outputFile.readText().startsWith(SYNTHESIS_SCRIPT_UNSAT_MARKER)) {
+                return null
+            }
             fail("Synthesis via omega failed (formula: ${formula})")
         }
 
-        return outputFile.bufferedReader().use { reader ->
-            reader.readLines().dropLastWhile { it.isEmpty() }
-        }
+        return outputFile.readLines().dropLastWhile { it.isEmpty() }
     }
 
 

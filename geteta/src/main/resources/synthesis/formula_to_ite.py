@@ -4,7 +4,7 @@
 Passes the input formula to the BDD library "omega" and returns ITE cascades for the result variables.
 """
 
-from typing import Dict, Iterable, List, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 def _fix_remove_extra_signed_int_bits(functions: Dict[str, str], automaton_vars: List[Dict]):
@@ -34,14 +34,16 @@ def _fix_remove_extra_signed_int_bits(functions: Dict[str, str], automaton_vars:
                         functions[key] = replace_variable(formula, extra_bit, sign_bit)
 
 
-def formula_to_ite_cascades(formula: str, result_vars: Iterable[str], var_defs: Iterable[str]) -> Dict[str, str]:
+def formula_to_ite_cascades(formula: str, result_vars: Iterable[str], var_defs: Iterable[str]) \
+        -> Optional[Dict[str, str]]:
     """
     Builds ITE cascades for calculating the given result variables from the other variables using the given formula.
 
     :param formula: Formula in the format expected by omega
     :param result_vars: Names of the variables to calculate
     :param var_defs: Definitions of all variables in the formula in the format var:bool or int_var[min,max]
-    :return: (output_bit, ite_formula) pairs for all bits of the given result variables
+    :return: (output_bit, ite_formula) pairs for all bits of the given result variables, except variables that can take
+             any value, or None if the formula is unsatisfiable
     """
     from omega.symbolic.functions import make_functions
     from omega.symbolic.temporal import Automaton
@@ -74,6 +76,8 @@ def formula_to_ite_cascades(formula: str, result_vars: Iterable[str], var_defs: 
 
     functions = make_functions(relation, extract_bits, automaton.bdd)
     result = {value: result['function'].bdd.to_expr(result['function']) for (value, result) in functions.items()}
+    if len(result) != len(extract_bits) and relation.bdd.to_expr(relation) == 'FALSE':
+        return  # unsatisfiable formula
     _fix_remove_extra_signed_int_bits(result, automaton.vars.values())
     return result
 
@@ -109,16 +113,21 @@ def parse_arguments(arguments: Sequence[str]) -> Tuple[str, List[str], List[str]
     return arguments.formula, arguments.result, arguments.variables
 
 
-def main() -> None:
-    import sys
-    arguments = parse_arguments(sys.argv[1:])
+def main(arguments: Sequence[str]) -> int:
+    arguments = parse_arguments(arguments)
     ite_cascades = formula_to_ite_cascades(arguments[0], arguments[1], arguments[2])
-    for bit in sorted(ite_cascades):
-        print(f"{bit} = {ite_cascades[bit]}")
+    if ite_cascades is None:
+        print('<unsatisfiable>')
+        return 1
+    else:
+        for bit in sorted(ite_cascades):
+            print(f"{bit} = {ite_cascades[bit]}")
+        return 0
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    exit(main(sys.argv[1:]))
 
 
 # Unit tests
@@ -166,3 +175,6 @@ def test_ite_calculation():
 
     dont_care_test = formula_to_ite_cascades('TRUE', ['x'], ['x[0,7]'])
     assert len(dont_care_test) == 0
+
+    unsatisfiable_test = formula_to_ite_cascades('x <=> ~x', ['x'], ['x:bool'])
+    assert unsatisfiable_test is None
