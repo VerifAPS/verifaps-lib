@@ -35,6 +35,7 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
+import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterJson
 import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
@@ -171,6 +172,7 @@ class GetetaApp : CliktCommand(
 
             if (b is NuXMVOutput.Cex) {
                 if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
+                if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
                 else info("Use `--cexout' to print a cex analysation.")
                 if (cexAnalysation.runAnalyzer) runCexAnalysation(b, tt)
                 else info("Use `--row-map' to print possible row mappings.")
@@ -179,6 +181,18 @@ class GetetaApp : CliktCommand(
             exitProcess(errorLevel)
         } else {
             info("Model checker skipped due to `--dont-model-check` flag.")
+        }
+    }
+
+    private fun useCounterExamplePrinterJson(outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
+        for (model in tt) {
+            val file = File(outputFolder, "cex_${model.testTable.name}.json")
+            info("Writing JSON counter example to $file")
+            val cep = CounterExamplePrinterJson(
+                    automaton = model.automaton,
+                    testTable = model.testTable,
+                    cex = result.counterExample)
+            file.writeText(cep.call())
         }
     }
 

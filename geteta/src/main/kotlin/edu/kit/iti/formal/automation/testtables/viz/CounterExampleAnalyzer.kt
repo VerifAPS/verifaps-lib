@@ -37,6 +37,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.times
 import java.util.*
+import java.util.concurrent.Callable
 
 data class Mapping(private val state2Row: MutableList<Pair<Int, String>> = arrayListOf()) {
     constructor(sz: Int) : this(ArrayList(sz))
@@ -77,6 +78,76 @@ private data class SearchNode(
 val OKMARK = '\u2714' // ✔
 val ERRMARK = '\u2717' // ✘
 val QMARK = '\u2753' // ❓
+
+class CounterExamplePrinterJson(
+        val automaton: TestTableAutomaton,
+        val testTable: GeneralizedTestTable,
+        val cex: CounterExample) : Callable<String> {
+
+    override fun call(): String =
+            (0 until cex.stateSize - 1).joinToString(", ", "[", "]") {
+                getTableVars(it)
+            }
+
+    val tableRows = testTable.region.flat()
+    val prfx = "_${testTable.name}."
+
+    private fun getTableVars(k: Int) =
+            tableRows.joinToString(", ", "[", "]") { row ->
+                val activateStates = isRowActive(k, row)
+                val rowActive = activateStates.isNotEmpty()
+                val assumption = prfx + row.defInput.name
+                val assertion = prfx + row.defOutput.name
+                val fwd = prfx + row.defForward.name
+                val failed = prfx + row.defFailed.name
+
+                val times = activateStates.joinToString(", ") { it.toString() }
+
+                appendJSONObject(
+                        "rowId" to "\"${row.id}\"",
+                        "active" to rowActive,
+                        "assumption" to boolForHuman(k, assumption),
+                        "assertion" to boolForHuman(k, assertion),
+                        "accept" to boolForHuman(k, fwd),
+                        "fail" to boolForHuman(k, failed),
+                        "time" to times.toString(),
+                        "cells" to getFields(row, k)
+                )
+            }
+
+    private fun getFields(row: TableRow, k: Int): Any? {
+        fun name(v: SVariable, k: String) = "${prfx}${v.name}_$k"
+        fun names(v: SVariable, ks: Iterable<String>) = ks.asSequence().map { it to name(v, it) }
+        val defines = names(row.defInput, row.inputExpr.keys) + names(row.defOutput, row.outputExpr.keys)
+        return defines.joinToString(", ", "{", "}") { (cell, def) ->
+            "\"$cell\": ${boolForHuman(k, def)}"
+        }
+    }
+
+    private fun boolForHuman(k: Int, n: String): String? {
+        val v = cex[k, n]
+        return when (v) {
+            "TRUE" -> "true"
+            "FALSE" -> "true"
+            else -> "\"undefined\""
+        }
+    }
+
+    private fun isRowActive(k: Int, it: TableRow): List<Int> {
+        return automaton.getStates(it)
+                ?.filter { rs ->
+                    cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
+                }
+                ?.map { it.time }
+                ?: listOf()
+    }
+
+}
+
+private fun appendJSONObject(vararg pairs: Pair<String, Any?>) =
+        pairs.joinToString(", ", "{", "}") { (k, v) ->
+            "\"$k\": $v"
+        }
 
 class CounterExamplePrinterWithProgram(
         val automaton: TestTableAutomaton,

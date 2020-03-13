@@ -467,6 +467,7 @@ data class TableRow(override var id: String) : TableNode(id) {
     val defForward = SVariable("${id}_fwd", SMVTypes.BOOLEAN)
     val defFailed = SVariable("${id}_fail", SMVTypes.BOOLEAN)
     val defInput = SVariable("${id}_in", SMVTypes.BOOLEAN)
+    val defMiss = SVariable("${id}_miss", SMVTypes.BOOLEAN)
 
     /**
      * The predicate that allows keeping in this state.

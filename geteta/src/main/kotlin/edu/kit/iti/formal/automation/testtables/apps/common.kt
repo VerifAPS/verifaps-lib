@@ -18,6 +18,8 @@ import kotlin.system.exitProcess
 
 
 class CexAnalysationArguments() : OptionGroup() {
+    val cexJson by option("--cexjson", help = "exports an analysation of the counter example in json").flag()
+
     val runAnalyzer by option("--row-map", help = "print out a row mapping")
             .flag("--no-row-map", default = false)
 
