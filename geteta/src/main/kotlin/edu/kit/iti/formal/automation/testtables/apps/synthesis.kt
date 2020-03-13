@@ -61,12 +61,12 @@ class SynthesisApp : CliktCommand(
             envvar = "PYTHON").default("python")
 
     private val optimizations by option("-O", "--optimization-level", help = "Optimization level")
-            .choice(enumValues<OptimizationLevel>().associateBy { it.ordinal.toString() } )
+            .choice(enumValues<OptimizationLevel>().associateBy { it.ordinal.toString() })
             .default(OptimizationLevel.SIMPLE)
 
     private val outputFunctionStrategy by option("--row-selection-strategy",
             help = "Strategy for choosing output function when multiple rows are active")
-            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.toLowerCase() } )
+            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.toLowerCase() })
             .default(OutputFunctionStrategy.ASSUME_ORTHOGONAL)
 
     override fun run() {
@@ -175,14 +175,17 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // check a few preconditions (not everything is checked here, exceptions might be thrown later during synthesis)
-        require (tables.none { it.constraintVariables.isNotEmpty() }) {
+        require(tables.none { it.constraintVariables.isNotEmpty() }) {
             "Global variables are currently unsupported"
         }
-        require (tables.none { it.functions.isNotEmpty() }) {
+        require(tables.none { it.functions.isNotEmpty() }) {
             "Functions are currently unsupported"
         }
-        require (tables.none { table -> table.programVariables.any { variable ->
-            variable.name.startsWith(ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX) } }) {
+        require(tables.none { table ->
+            table.programVariables.any { variable ->
+                variable.name.startsWith(ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX)
+            }
+        }) {
             "Variable names must not start with the prefix ${ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX}, which " +
                     "is reserved for temporary variables"
         }
@@ -433,7 +436,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
                     val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
-                    require (!inputCheckExpr.contains("output.")) {
+                    require(!inputCheckExpr.contains("output.")) {
                         "Referring to output variables in assumptions is unsupported"
                     }
                     acc + "if (state[${index}] and not (${inputCheckExpr})) {" +
@@ -586,7 +589,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
         final override fun visit(ce: SCaseExpression): Set<T> =
                 ce.cases.fold(setOf()) { set, case ->
-                    set + case.condition.accept(this) + case.then.accept(this) }
+                    set + case.condition.accept(this) + case.then.accept(this)
+                }
     }
 
 
@@ -626,7 +630,7 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
                     }
             ).let { assignments -> context.translateIteAssignments(assignments, variables) }
 
-    inner class CppContext (val variableNameMap: Map<String, String>) {
+    inner class CppContext(val variableNameMap: Map<String, String>) {
         private var temporaryVariableCounter = 0
 
         fun translateIteAssignments(iteAssignments: Iterable<String>, variables: Map<String, CppType>): List<String> {
