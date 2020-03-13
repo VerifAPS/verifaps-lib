@@ -3,6 +3,7 @@ table output_dependency_test_case {
     var output b : SINT
     var output c : SINT
     var output d : SINT
+    var output e : SINT
 
     group {
         row test_correct_code_generation_and_inequalities {
@@ -10,6 +11,7 @@ table output_dependency_test_case {
             b: = a + 1
             c: > b + a
             d: = c + 1
+            e: < -b - (a + 2)
         }
     }
 }

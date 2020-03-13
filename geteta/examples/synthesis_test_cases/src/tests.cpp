@@ -152,8 +152,8 @@ namespace {
                 {42},
         };
         auto expected_outputs = std::vector<synthesized::result> {
-                {true, {63, 126, 127}},
-                {false, {0, 0, 0}},
+                {true, {63, 126, 127, -128}},
+                {false, {0, 0, 0, 0}},
         };
 
         auto iteration = std::size_t{0};

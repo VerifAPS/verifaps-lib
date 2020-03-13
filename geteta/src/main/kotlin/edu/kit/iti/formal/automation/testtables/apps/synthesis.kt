@@ -181,6 +181,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         require (tables.none { it.functions.isNotEmpty() }) {
             "Functions are currently unsupported"
         }
+        require (tables.none { table -> table.programVariables.any { variable ->
+            variable.name.startsWith(ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX) } }) {
+            "Variable names must not start with the prefix ${ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX}, which " +
+                    "is reserved for temporary variables"
+        }
 
         // extract context information
         var unrolledRowCount = 0
@@ -497,6 +502,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // generate ITE expression for each output variable in the right order
+        val context = synthesizer.CppContext(variableNames)
         val outputCalculations = sortedOutputs.flatMap { resultVariable ->
             val expr = outputExpressions.getValue(resultVariable)
             val name = variableNames.getValue(resultVariable)
@@ -514,7 +520,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                                             inputs[v] ?: outputs[v] ?: references.getValue(v)
                                     )
                                 }.toMap(),
-                                variableNames
+                                context
                         ) +
                         "from_bitset(${name}, output.$name);"
             }
@@ -606,21 +612,37 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
 class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
+    companion object {
+        const val TEMPORARY_VARIABLE_PREFIX = "__tmp"
+    }
+
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
-                   variableNameMap: Map<String, String>): List<String> =
+                   context: CppContext): List<String> =
             callOmega(
-                    formula.accept(SmvToOmegaTranslator(variableNameMap)),
-                    resultVariables.map { variableNameMap.getValue(it) },
+                    formula.accept(SmvToOmegaTranslator(context.variableNameMap)),
+                    resultVariables.map { context.variableNameMap.getValue(it) },
                     variables.map { (variable, type) ->
-                        "${variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
+                        "${context.variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
                     }
-            ).let { outputs ->
-                val translator = IteToCppTranslator(variables.mapKeys { (k, _) -> variableNameMap.getValue(k) })
-                val assignments = outputs.map { expression ->
-                    "${omegaExpressionToCpp(expression, translator)};"
-                }
-                translator.getCachedExpressions() + assignments
+            ).let { assignments -> context.translateIteAssignments(assignments, variables) }
+
+    inner class CppContext (val variableNameMap: Map<String, String>) {
+        private var temporaryVariableCounter = 0
+
+        fun translateIteAssignments(iteAssignments: Iterable<String>, variables: Map<String, CppType>): List<String> {
+            val translator = IteToCppTranslator(
+                    variables.mapKeys { (k, _) -> variableNameMap.getValue(k) },
+                    TEMPORARY_VARIABLE_PREFIX, temporaryVariableCounter
+            )
+            val assignments = iteAssignments.map { expression ->
+                val parser = IteLanguageParser(CommonTokenStream(IteLanguageLexer(CharStreams.fromString(expression))))
+                "${parser.assignment().accept(translator)};"
             }
+            val temporaries = translator.getVariableDeclarations()
+            temporaryVariableCounter += temporaries.size
+            return temporaries + assignments
+        }
+    }
 
     private fun cppToOmegaType(cppType: CppType): String = when (cppType) {
         CppType.BOOL -> ":bool"
@@ -677,15 +699,12 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         }
     }
 
-    private fun omegaExpressionToCpp(omegaExpression: String, translator: IteToCppTranslator): String =
-            IteLanguageParser(CommonTokenStream(IteLanguageLexer(CharStreams.fromString(omegaExpression))))
-                    .assignment().accept(translator)
-
 
     /**
      * Translates SMV expressions to expressions the omega library understands
      */
-    class SmvToOmegaTranslator(private val variableNameMap: Map<String, String>) : SMVAstDefaultVisitorNN<String>() {
+    private class SmvToOmegaTranslator(private val variableNameMap: Map<String, String>) :
+            SMVAstDefaultVisitorNN<String>() {
         override fun defaultVisit(top: SMVAst): String = throw IllegalArgumentException("unsupported expression $top")
 
         override fun visit(v: SVariable): String = variableNameMap.getValue(v.name)
@@ -751,10 +770,12 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         }.append(")".repeat(ce.cases.size)).toString()
     }
 
-    class IteToCppTranslator(private val variableContext: Map<String, CppType>) : IteLanguageBaseVisitor<String>() {
+    private class IteToCppTranslator(private val variableContext: Map<String, CppType>,
+                                     private val cacheVarPrefix: String, private val initialCacheVarSuffix: Int) :
+            IteLanguageBaseVisitor<String>() {
         private val iteExprCache = linkedMapOf<String, String>() // preserving insertion order is crucial
 
-        fun getCachedExpressions(): List<String> =
+        fun getVariableDeclarations(): List<String> =
                 iteExprCache.map { (expr, varName) -> "bool $varName = $expr;" }
 
         override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String =
@@ -770,7 +791,7 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         override fun visitIteExpr(ctx: IteLanguageParser.IteExprContext): String =
                 iteExprCache.getOrPut(
                         "(${ctx.expr(0).accept(this)}) ? (${ctx.expr(1).accept(this)}) : ${ctx.expr(2).accept(this)}",
-                        { "__tmp_${iteExprCache.size}" }
+                        { "${cacheVarPrefix}_${initialCacheVarSuffix + iteExprCache.size}" }
                 )
 
         override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String =
