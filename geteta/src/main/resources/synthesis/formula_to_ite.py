@@ -58,17 +58,21 @@ def formula_to_ite_cascades(formula: str, result_vars: Iterable[str], var_defs: 
             automaton_vars[var_name] = int(var_min), int(var_max)
     automaton.declare_variables(**automaton_vars)
 
-    relation = automaton.to_bdd(formula)
-
-    extract_vars = []
+    domain_restrictions = ''  # see _fix_remove_extra_signed_int_bits for why this is needed
+    # collect the bits we need to extract
+    extract_bits = []
     for result_variable in result_vars:
         automaton_result_var = automaton.vars[result_variable]
-        if automaton_result_var['type'] == "bool":
-            extract_vars.append(result_variable)
+        if automaton_result_var['type'] == 'bool':
+            extract_bits.append(result_variable)
         else:
-            extract_vars += automaton_result_var['bitnames']
+            domain = automaton_result_var['dom']
+            domain_restrictions += f" & {result_variable} >= {domain[0]} & {result_variable} <= {domain[1]}"
+            extract_bits += automaton_result_var['bitnames']
 
-    functions = make_functions(relation, extract_vars, automaton.bdd)
+    relation = automaton.to_bdd(formula + domain_restrictions)
+
+    functions = make_functions(relation, extract_bits, automaton.bdd)
     result = {value: result['function'].bdd.to_expr(result['function']) for (value, result) in functions.items()}
     _fix_remove_extra_signed_int_bits(result, automaton.vars.values())
     return result
@@ -141,15 +145,24 @@ def test_argument_parsing(capsys):
 
 
 def test_ite_calculation():
-    bool_test = formula_to_ite_cascades('~o <=> __history_o_1', ['o'],  ['__history_o_1:bool', 'o:bool'])
+    bool_test = formula_to_ite_cascades('~o <=> __history_o_1', ['o'], ['__history_o_1:bool', 'o:bool'])
     assert len(bool_test) == 1 and bool_test.keys() == {'o'}
 
-    int_test = formula_to_ite_cascades("y' = 2 * x + (y - 1) & y' > 0 & x' = y'", ["x'", "y'"],  ['x[1,6]', 'y[1,6]'])
+    int_test = formula_to_ite_cascades("y' = 2 * x + (y - 1) & y' > 0 & x' = y'", ["x'", "y'"], ['x[1,6]', 'y[1,6]'])
     assert len(int_test) == 6 and int_test.keys() == {"x_0'", "x_1'", "x_2'", "y_0'", "y_1'", "y_2'"}
 
     signed_int_test = formula_to_ite_cascades("y' = (y * y)", ["y'"], ['y[-128,127]'])
     assert (len(signed_int_test) == 8 and signed_int_test.keys() == {f"y_{i}'" for i in range(0, 8)}
             and "y_8" not in " ".join(signed_int_test.values()))
 
-    dont_care_test = formula_to_ite_cascades('TRUE', ['x'],  ['x[0,7]'])
+    signed_int_pick_test = formula_to_ite_cascades(
+        'x > y + z & y = 64 & z = 62', ['x'], ['x[-128,127]', 'y[-128,127]', 'z[-128,127]']
+    )
+    assert (len(signed_int_pick_test) == 8
+            and signed_int_pick_test['x_0'] == 'TRUE' and signed_int_pick_test['x_1'] == 'TRUE'
+            and signed_int_pick_test['x_2'] == 'TRUE' and signed_int_pick_test['x_3'] == 'TRUE'
+            and signed_int_pick_test['x_4'] == 'TRUE' and signed_int_pick_test['x_5'] == 'TRUE'
+            and signed_int_pick_test['x_6'] == 'TRUE' and signed_int_pick_test['x_7'] == 'FALSE')
+
+    dont_care_test = formula_to_ite_cascades('TRUE', ['x'], ['x[0,7]'])
     assert len(dont_care_test) == 0
