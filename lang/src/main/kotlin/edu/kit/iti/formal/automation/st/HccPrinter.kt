@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.datatypes.AnyBit
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.IECString
+import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.FALSE
 import edu.kit.iti.formal.automation.datatypes.values.TRUE
 import edu.kit.iti.formal.automation.datatypes.values.Value
@@ -241,10 +239,13 @@ open class HccPrinter
 
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
-        if (simpleTypeDeclaration.baseType.obj is AnyBit.BOOL) {
-            sb.printf("int") //TODO nicer
+        if (simpleTypeDeclaration.baseType.obj is AnyBit.BOOL) { //TODO
+            sb.printf("int")
+        } else if (simpleTypeDeclaration.baseType.obj is EnumerateType) {
+            sb.printf("int")
         } else {
             sb.printf(simpleTypeDeclaration.baseType.identifier!!.toLowerCase())
+
         }
 
     }
@@ -325,7 +326,7 @@ open class HccPrinter
             is BooleanLit -> {
                 if(literal == BooleanLit.LTRUE) {"1"}
                 else {"0"}
-            } //TODO nicer?
+            }
             is BitLit -> {
                 print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
             }
@@ -385,14 +386,20 @@ open class HccPrinter
                 sb.printf(" = ")
                 val (dt, v) = vd.initValue as Value<*, *>
 
-                if(dt is AnyBit.BOOL) {
-                    if (v ==  true) {
-                        sb.printf("1")
-                    } else if (v == false) {
-                        sb.printf("0")
+                when (dt) {
+                    is AnyBit.BOOL -> {
+                        if (v ==  true) {
+                            sb.printf("1")
+                        } else if (v == false) {
+                            sb.printf("0")
+                        }
                     }
-                } else {
-                    sb.printf(v.toString())
+                    is EnumerateType -> {
+                        sb.printf("${dt.name}__${v}")
+
+
+                    }
+                    else -> sb.printf(v.toString())
                 }
             }
             vd.init != null -> {

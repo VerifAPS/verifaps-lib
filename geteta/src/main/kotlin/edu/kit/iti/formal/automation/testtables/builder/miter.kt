@@ -32,7 +32,7 @@ import java.io.File
 import java.io.PrintWriter
 
 data class Miter(
-        val scope: Scope, //TODO to init-Statements?
+        val scope: Scope,
         val init: StatementList,
         val body: StatementList,
         val functions: List<FunctionDeclaration>) {}
@@ -83,14 +83,21 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
 
         gtt.programVariables.forEach { pv ->
             val vd = VariableDeclaration(pv.name, VariableDeclaration.INPUT, pv.dataType)
+            if (pv.dataType is EnumerateType) {
+                pv.dataType = INT
+            }
             vd.initValue = getInit(pv.dataType)
             fbScope.variables.add(vd)
-            if (pv.dataType is EnumerateType) {
-                //TODO
-            }
         }
         gtt.constraintVariables.forEach { cv ->
             val vd = VariableDeclaration(cv.name, VariableDeclaration.INPUT, cv.dataType)
+            if (cv.dataType is EnumerateType) {
+                cv.dataType = INT
+            }
+
+            if (false) { //TODO if cv ist already initialized
+                //TODO initValue = ...
+            }
             vd.initValue = getInit(cv.dataType)
             fbScope.variables.add(vd)
         }
@@ -156,13 +163,13 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
         if (gtt.constraintVariables.isNotEmpty()) {
             //haveoc
             val haveocConstraints = CommentStatement("haveoc constraints")
-            val cVars = gtt.constraintVariables.map { VariableDeclaration(it.name, it.dataType) }.toMutableList()
+            val cVars = gtt.constraintVariables.map { VariableDeclaration("miter__${it.name}", it.dataType) }.toMutableList()
             haveocConstraints.setMetadata(SpecialComment::class.java, SpecialComment.HaveocComment(cVars))
             init.add(haveocConstraints)
 
             //assume
             val constraints = gtt.constraintVariables.map {
-                GetetaFacade.exprToSMV(it.constraint!!, SVariable(it.name), 0, gtt.parseContext)
+                GetetaFacade.exprToSMV(it.constraint!!, SVariable("miter__${it.name}"), 0, gtt.parseContext)
             }.conjunction(SLiteral.TRUE).translateToSt()
 
             val thenStmt = CommentStatement("assume constraints")
@@ -246,8 +253,8 @@ class ProgMiterConstruction(val pous: PouElements) {
                             is EnumerationTypeDeclaration -> {
 
                                 td.allowedValues.forEachIndexed { i, it ->
-                                    val vd = VariableDeclaration(name = "${td.name}_${it.text}", type = it.type,
-                                            td = SimpleTypeDeclaration(name = "", baseType = RefTo(INT), initialization = IntegerLit(td.values[i])))
+                                    val vd = VariableDeclaration(name = "${td.name}__${it.text.toUpperCase()}", type = VariableDeclaration.CONSTANT,
+                                            td = SimpleTypeDeclaration(name = "", baseType = RefTo(INT), initialization = IntegerLit(i)))
 
                                     scope.add(vd)
                                 }
@@ -362,7 +369,7 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 
 
         val assert = CommentStatement("assert __INV__")
-        assert.setMetadata(SpecialComment::class.java, SpecialComment.AssertComment(SymbolicReference("__INV__")))
+        assert.setMetadata(SpecialComment::class.java, SpecialComment.AssertComment(SymbolicReference("miter____INV__")))
         whileBody.add(assert)
 
 
@@ -380,7 +387,7 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 //        hiBody.add(AssignmentStatement(SymbolicReference("nondet"), SymbolicReference("_")))
 //        hiBody.add(AssignmentStatement(SymbolicReference("inout"), SymbolicReference("nondet")))
 //        val haveocIntFunDec = FunctionDeclaration("haveoc_int", hiScope, RefTo(INT), hiBody)
-//        //+ same for bool
+
 
         val elems = PouElements()
 //        elems.add(haveocIntFunDec)
