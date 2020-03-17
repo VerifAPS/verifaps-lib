@@ -1,18 +1,17 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
 import edu.kit.iti.formal.automation.SymbExFacade.simplify
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
 import edu.kit.iti.formal.automation.datatypes.INT
+import edu.kit.iti.formal.automation.datatypes.values.VBool
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.SpecialComment
-import edu.kit.iti.formal.automation.st.Statements.ifthen
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -94,10 +93,6 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
             if (cv.dataType is EnumerateType) {
                 cv.dataType = INT
             }
-
-            if (false) { //TODO if cv ist already initialized
-                //TODO initValue = ...
-            }
             vd.initValue = getInit(cv.dataType)
             fbScope.variables.add(vd)
         }
@@ -108,10 +103,14 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
             val vd1 = VariableDeclaration(rowState.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
             val vd2 = VariableDeclaration("_" + rowState.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
             vd1.initValue = getInit(AnyBit.BOOL)
+            if (automaton.initialStates.contains(rowState)) {
+                vd1.initValue = VBool(AnyBit.BOOL, true)
+            }
             vd2.initValue = getInit(AnyBit.BOOL)
             fbScope.variables.add(vd1)
             fbScope.variables.add(vd2)
         }
+
 
         val sentinel = VariableDeclaration(automaton.stateSentinel.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
         sentinel.initValue = getInit(AnyBit.BOOL)
@@ -172,11 +171,11 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
                 GetetaFacade.exprToSMV(it.constraint!!, SVariable("miter__${it.name}"), 0, gtt.parseContext)
             }.conjunction(SLiteral.TRUE).translateToSt()
 
-            val thenStmt = CommentStatement("assume constraints")
-            thenStmt.setMetadata(SpecialComment::class.java,
+            val assumeStmt = CommentStatement("assume constraints")
+            assumeStmt.setMetadata(SpecialComment::class.java,
                     SpecialComment.AssumeComment(constraints))
 
-            init.add(ifthen(constraints.not(), thenStmt))
+            init.add(assumeStmt)
         }
 
         //Body
@@ -221,7 +220,6 @@ class ProgMiterConstruction(val pous: PouElements) {
                         scope.variables.add(vd)
                     }
 
-                    //TODO Scope -> Init ?
 
                     //Body
                     val vars = programFb.scope.variables.filter { it.isInput }.toMutableList()
@@ -379,22 +377,24 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
         body.add(WhileStatement(BooleanLit.LTRUE, whileBody))
         //end program
 
-//        //haveoc-functions TODO
-//        val hiScope = Scope()
-//        hiScope.add(VariableDeclaration("inout", VariableDeclaration.INOUT, INT))
-//        hiScope.add(VariableDeclaration("nondet", VariableDeclaration.LOCAL, INT))
-//        val hiBody = StatementList()
-//        hiBody.add(AssignmentStatement(SymbolicReference("nondet"), SymbolicReference("_")))
-//        hiBody.add(AssignmentStatement(SymbolicReference("inout"), SymbolicReference("nondet")))
-//        val haveocIntFunDec = FunctionDeclaration("haveoc_int", hiScope, RefTo(INT), hiBody)
+        //haveoc-function TODO possible?
+//        val hScope = Scope()
+//        hScope.add(VariableDeclaration("haveoc_out", VariableDeclaration.OUTPUT, INT))
+//        val hBody = StatementList()
+//        hBody.add(AssignmentStatement(SymbolicReference("haveoc_out"), SymbolicReference("_")))
+//        val haveocFunDec = FunctionDeclaration("haveoc", hScope, RefTo(INT), hBody)
+
 
 
         val elems = PouElements()
-//        elems.add(haveocIntFunDec)
         elems.addAll(program.functions)
         elems.addAll(miter.functions)
         elems.add(ProgramDeclaration(name = "combinedProgram", scope = scope, stBody = body))
-        return elems
+        val simpleElems = simplify(elems)
+//        simpleElems.add(0, haveocFunDec)
+        return simpleElems
+
+
     }
 
 
@@ -408,14 +408,8 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
-
-    /*run("geteta/examples/MinMax/MinMax.st",
+    run("geteta/examples/MinMax/MinMax.st",
             "geteta/examples/MinMax/MinMax.gtt")
-    */
-
-    run("geteta/examples/constantprogram/constantprogram.st",
-            "geteta/examples/constantprogram/constantprogram_broken.gtt")
-
 
     // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
     // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
@@ -447,13 +441,13 @@ fun run(program: String, table: String) {
     val miter = mc.constructMiter()
     val productProgram = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
 
-    val out = PrintWriter(System.out)
-    IEC61131Facade.printTo(out, productProgram)
-    val simplifiedProductProgram = simplify(productProgram)
-    val hccprinter = HccPrinter(CodeWriter(out))
-    hccprinter.isPrintComments = true
-    simplifiedProductProgram.accept(hccprinter)
-    out.close()
+    PrintWriter(System.out).use { out ->
+        //            IEC61131Facade.printTo(out, simplify(combi), true)
+        val hccprinter = HccPrinter(CodeWriter(out))
+        hccprinter.isPrintComments = true
+        productProgram.accept(hccprinter)
+
+    }
 
     //region Sandbox------------------------------
 

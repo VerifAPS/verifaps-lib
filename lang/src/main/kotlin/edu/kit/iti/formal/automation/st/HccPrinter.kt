@@ -31,7 +31,7 @@ open class HccPrinter
     }
 
     override fun visit(binaryExpression: BinaryExpression) {
-        if (binaryExpression.operator == Operators.POWER) { //TODO ?
+        if (binaryExpression.operator == Operators.POWER) {
             sb.printf("pow( ")
             binaryExpression.leftExpr.accept(this)
             sb.printf(", ")
@@ -100,7 +100,7 @@ open class HccPrinter
 
     }
 
-//        override fun visit(typeDeclarations: TypeDeclarations) {} TODO
+
 
     override fun visit(caseStatement: CaseStatement) {
 
@@ -122,7 +122,7 @@ open class HccPrinter
 
     }
 
-//    override fun visit(symbolicReference: SymbolicReference) {} TODO?
+
 
     override fun visit(programDeclaration: ProgramDeclaration) {
         printComment(programDeclaration.comment)
@@ -160,15 +160,15 @@ open class HccPrinter
 
     }
 
-    override fun visit(functionDeclaration: FunctionDeclaration) { //TODO input/output
+    override fun visit(functionDeclaration: FunctionDeclaration) {
         printComment(functionDeclaration.comment)
         sb.printf("/* function ").printf(functionDeclaration.name).printf(" */").nl()
 
         val returnType = functionDeclaration.returnType.identifier
         if (!(returnType == null || returnType.isEmpty()))
             sb.printf(returnType.toLowerCase()).printf(" ${functionDeclaration.name}( ")
-        functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEach{
-            if((it != functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.first())) {
+        functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEachIndexed{ i, it ->
+            if(i != 0) {
                 sb.printf(", ")
             }
             variableDataType(it)
@@ -227,7 +227,7 @@ open class HccPrinter
 
 //    override fun visit(actionDeclaration: ActionDeclaration) {}
 
-    override fun visit(aCase: Case) { //TODO big gap after "case"
+    override fun visit(aCase: Case) {
         sb.nl()
         sb.printf("case ")
         aCase.conditions.joinInto(sb) { it.accept(this) }
@@ -279,11 +279,11 @@ open class HccPrinter
                 is SpecialComment.HaveocComment -> {
                     meta.variables.forEach {
                         sb.nl()
-//                        sb.printf("sc_haveoc ").print(it.name)
+//                        sb.print(it.name).printf(" = haveoc();")
                         val haveocName = "haveoc_${it.name}"
                         variableDataType(it)
                         sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
-                        sb.printf(it.name).printf(" = ").printf(haveocName).printf(";") //TODO as function?
+                        sb.printf(it.name).printf(" = ").printf(haveocName).printf(";")
                         
                     }
                 }
@@ -293,7 +293,7 @@ open class HccPrinter
         }
     }
 
-    override fun visit(literal: Literal) { //TODO
+    override fun visit(literal: Literal) {
         fun print(prefix: Any?, suffix: Any) = "$suffix"
 //                (if (prefix != null) "$prefix#" else "") + suffix
 
