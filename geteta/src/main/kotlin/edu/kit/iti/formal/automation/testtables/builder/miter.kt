@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
 import edu.kit.iti.formal.automation.SymbExFacade.simplify
 import edu.kit.iti.formal.automation.datatypes.AnyBit
@@ -24,7 +25,6 @@ import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomato
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
 import edu.kit.iti.formal.automation.testtables.monitor.SMVToStVisitor
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
-import edu.kit.iti.formal.smt.SmtEnumType
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -90,7 +90,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
             fbScope.variables.add(vd)
         }
         gtt.constraintVariables.forEach { cv ->
-            val vd = VariableDeclaration(cv.name, VariableDeclaration.INPUT, cv.dataType)
+            val vd = VariableDeclaration(cv.name, VariableDeclaration.LOCAL, cv.dataType)
             if (cv.dataType is EnumerateType) {
                 cv.dataType = INT
             }
@@ -394,9 +394,7 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
         elems.addAll(program.functions)
         elems.addAll(miter.functions)
         elems.add(ProgramDeclaration(name = "combinedProgram", scope = scope, stBody = body))
-
-        return simplify(elems)
-
+        return elems
     }
 
 
@@ -410,8 +408,14 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
-    run("geteta/examples/MinMax/MinMax.st",
+
+    /*run("geteta/examples/MinMax/MinMax.st",
             "geteta/examples/MinMax/MinMax.gtt")
+    */
+
+    run("geteta/examples/constantprogram/constantprogram.st",
+            "geteta/examples/constantprogram/constantprogram_broken.gtt")
+
 
     // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
     // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
@@ -443,13 +447,13 @@ fun run(program: String, table: String) {
     val miter = mc.constructMiter()
     val productProgram = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
 
-    PrintWriter(System.out).use { out ->
-        //            IEC61131Facade.printTo(out, simplify(combi), true)
-        val hccprinter = HccPrinter(CodeWriter(out))
-        hccprinter.isPrintComments = true
-        productProgram.accept(hccprinter)
-
-    }
+    val out = PrintWriter(System.out)
+    IEC61131Facade.printTo(out, productProgram)
+    val simplifiedProductProgram = simplify(productProgram)
+    val hccprinter = HccPrinter(CodeWriter(out))
+    hccprinter.isPrintComments = true
+    simplifiedProductProgram.accept(hccprinter)
+    out.close()
 
     //region Sandbox------------------------------
 
