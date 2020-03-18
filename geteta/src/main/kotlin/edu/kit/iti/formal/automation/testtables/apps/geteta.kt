@@ -196,7 +196,6 @@ class GetetaApp : CliktCommand(
         }
     }
 
-
     private fun drawAutomaton(gtt: List<GeneralizedTestTable>, tt: TestTableAutomaton) {
         val ad = AutomatonDrawer(File(outputFolder, "${gtt.first().name}.dot"),
                 gtt.map { it.region }, tt)
@@ -206,7 +205,6 @@ class GetetaApp : CliktCommand(
         if (automataOptions.showAutomaton)
             info("Image viewer should open now")
     }
-
 
     private fun drawAutomaton(gtt: GeneralizedTestTable, tt: SMVConstructionModel) {
         val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),

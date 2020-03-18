@@ -8,7 +8,6 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
-import me.tomassetti.kanvas.BaseLanguageSupport
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.ParserRuleContext
@@ -55,7 +54,8 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
             TestTableLanguageLexer.BACKWARD,
             TestTableLanguageLexer.PLAY,
             TestTableLanguageLexer.PAUSE,
-            TestTableLanguageLexer.STATE
+            TestTableLanguageLexer.STATE,
+            TestTableLanguageLexer.RELATIONAL
     )
     private val SEPS = setOf(
             TestTableLanguageLexer.RBRACE,
@@ -73,16 +73,14 @@ class TestTableSyntaxScheme(lookup: Lookup) : SyntaxScheme(true) {
 
     override fun getStyle(index: Int): Style {
         return when (index) {
-            //in SEPS -> colors.DARK_GREEN
-            //TestTableLanguageLexer.ERROR_CHAR -> RED
-            in STRUCTURAL_KEYWORDS -> Colors.structural
-            //in CONTROL_KEYWORDS -> colors.control
-            in LITERALS -> Colors.literal
-            TestTableLanguageLexer.FQ_VARIABLE -> Colors.identifier
-            IDENTIFIER -> Colors.identifier
-            TestTableLanguageLexer.COMMENT -> Colors.comment
-            TestTableLanguageLexer.LINE_COMMENT -> Colors.comment
-            else -> Colors.default
+            in SEPS -> colors.separators
+            in STRUCTURAL_KEYWORDS -> colors.structural
+            in LITERALS -> colors.literal
+            TestTableLanguageLexer.FQ_VARIABLE -> colors.identifier
+            IDENTIFIER -> colors.identifier
+            TestTableLanguageLexer.COMMENT -> colors.comment
+            TestTableLanguageLexer.LINE_COMMENT -> colors.comment
+            else -> colors.default
         }
     }
 }
@@ -199,7 +197,6 @@ class TTOverviewTransformer(val editor: CodeEditor) {
 }
 
 class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() {
-    val problemList by lookup.with<ProblemList>()
     val outlineService by lookup.with<OutlineService>()
     val previewService by lookup.with<GetetaPreviewService>()
 
@@ -216,7 +213,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
             previewService.render(gtt)
             previewService.select(findCurrentTableByCursor(ctx, textArea.textArea.caretPosition))
             outlineService.show(node)
-            problemList.set(textArea, listOf())
+            lookup.get<ProblemService>().announceProblems(textArea, listOf())
         } catch (e: SyntaxErrorReporter.ParserException) {
             e.errors.forEach {
                 res.addNotice(DefaultParserNotice(this, it.msg,
@@ -291,3 +288,4 @@ class TTFolderParser() : FoldParser {
     }
 
 }
+

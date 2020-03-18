@@ -385,7 +385,6 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 //        val haveocFunDec = FunctionDeclaration("haveoc", hScope, RefTo(INT), hBody)
 
 
-
         val elems = PouElements()
         elems.addAll(program.functions)
         elems.addAll(miter.functions)

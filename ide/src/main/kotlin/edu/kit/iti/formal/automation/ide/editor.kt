@@ -8,8 +8,6 @@ import edu.kit.iti.formal.automation.ide.editors.IECLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.SmvLanguageSupport
 import edu.kit.iti.formal.automation.ide.editors.TestTableLanguageSupport
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
-import me.tomassetti.kanvas.LanguageSupport
-import me.tomassetti.kanvas.NoneLanguageSupport
 import org.fife.rsta.ui.CollapsibleSectionPanel
 import org.fife.rsta.ui.search.FindToolBar
 import org.fife.rsta.ui.search.ReplaceToolBar
@@ -32,7 +30,6 @@ import javax.swing.KeyStroke
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import kotlin.properties.Delegates
-
 
 interface Saveable {
     fun saveAs()
@@ -169,6 +166,7 @@ class DockableCodeEditorFactory(var lookup: Lookup)
 class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
     : DefaultMultipleCDockable(factory), Saveable, HasFont, Closeable {
     private val colors: Colors by lookup.with()
+
     var text: String
         get() = textArea.text
         set(value) {
@@ -231,7 +229,7 @@ class CodeEditor(val lookup: Lookup, factory: MultipleCDockableFactory<*, *>)
         (textArea.document as RSyntaxDocument).setSyntaxStyle(AntlrTokenMakerFactory(languageSupport.antlrLexerFactory))
         textArea.syntaxScheme = languageSupport.syntaxScheme
         textArea.isCodeFoldingEnabled = true
-        textArea.currentLineHighlightColor = colors.HIGHTLIGHT_LINE
+        textArea.currentLineHighlightColor = colors.highLightLine
         textArea.background = colors.background
 
         textArea.document.addDocumentListener(object : DocumentListener {

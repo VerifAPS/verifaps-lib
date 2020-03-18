@@ -140,7 +140,6 @@ class GetetaPreview(val lookup: Lookup) : ToolPane("geteta-preview"), GetetaPrev
                 }
             })
 
-
             (0 until outline.columnCount).forEach { ci ->
                 val n = rowModel.getColumnName(ci)
                 outline.getColumn(n)?.also {
@@ -219,7 +218,6 @@ class RTTRowModel(val programRuns: List<String>, val columns: List<ProgramVariab
     override fun getColumnCount(): Int = 1 + programRuns.size + columns.size
 }
 
-
 class TTTableModel(val gtt: GeneralizedTestTable) : TreeModel {
     protected var listenerList: EventListenerList = EventListenerList()
 
@@ -277,3 +275,4 @@ open class MyTableModel<T>(rows: Int, cols: Int) : AbstractTableModel() {
         return values[rowIndex][columnIndex]
     }
 }
+
