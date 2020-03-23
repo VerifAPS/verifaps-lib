@@ -39,6 +39,7 @@ def mainClasses = [
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
         , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
         , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
+        , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
 ]
 
 launch4j {

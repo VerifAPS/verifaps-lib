@@ -407,8 +407,8 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
-    run("geteta/examples/MinMax/MinMax.st",
-            "geteta/examples/MinMax/MinMax.gtt")
+    run("geteta/examples/cycles/cycles.st",
+            "geteta/examples/cycles/cycles.tt.txt")
 
     // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
     // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
