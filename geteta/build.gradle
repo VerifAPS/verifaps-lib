@@ -7,7 +7,7 @@ description = """
     Generalized Test Table
 """
 
-version = "0.9-beta"
+version = "0.10"
 
 def antlrOutputDir = file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/testtables/grammar")
 
