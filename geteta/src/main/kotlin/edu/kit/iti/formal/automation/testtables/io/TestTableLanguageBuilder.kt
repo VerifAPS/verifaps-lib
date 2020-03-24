@@ -42,8 +42,15 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     override fun visitTable(ctx: TestTableLanguageParser.TableContext) {
         current = GeneralizedTestTable()
         testTables += current
-        //ctx.tableHeader().accept(this)
         visitChildren(ctx)
+    }
+
+    override fun visitInheritance_signature(ctx: TestTableLanguageParser.Inheritance_signatureContext) {
+        val name = ctx.IDENTIFIER().text
+        val gtt = testTables.find { it.name == name }
+                ?: error("Could not find table ${name} to inherit from.")
+        gtt.programVariables.forEach { current.programVariables.add(it.clone()) }
+        gtt.constraintVariables.forEach { current.constraintVariables.add(it.copy()) }
     }
 
     override fun visitTableHeaderFunctional(ctx: TestTableLanguageParser.TableHeaderFunctionalContext) {
@@ -64,7 +71,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     }
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext) {
-        current.region = ctx.accept(RegionVisitor(current)) as Region
+        current.region = ctx.accept(RegionVisitor(current, testTables)) as Region
         val nodeIds = mutableSetOf<String>()
         current.region.visit { node ->
             if (node.id in nodeIds) {
@@ -178,7 +185,8 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     }
 }
 
-class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguageParserBaseVisitor<TableNode>() {
+class RegionVisitor(private val gtt: GeneralizedTestTable,
+                    private val tables: List<GeneralizedTestTable>) : TestTableLanguageParserBaseVisitor<TableNode>() {
     var currentId = 0
 
     private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
@@ -215,6 +223,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
         val id = rowId(ctx.intOrId())
         currentRow = TableRow(id)
         currentRow.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
+
+        ctx.rowInherit().forEach { it.accept(this) }
+
         ctx.kc().forEach {
             val id = it.IDENTIFIER()
             val fq = it.FQ_VARIABLE()
@@ -238,6 +249,17 @@ class RegionVisitor(private val gtt: GeneralizedTestTable) : TestTableLanguagePa
                     .map { visitGotoTransition(it) }
                     .toMutableList()
         }
+        return currentRow
+    }
+
+    override fun visitRowInherit(ctx: TestTableLanguageParser.RowInheritContext): TableNode {
+        val table = tables.find { ctx.name.text == it.name }
+                ?: error("Could not find table ${ctx.name.text}.")
+
+        val row = table.region.flat().find { it.id == ctx.rowId.text }
+                ?: error("Could not find row ${ctx.rowId.text} in ${table.name}.")
+
+        currentRow.rawFields += row.rawFields
         return currentRow
     }
 
