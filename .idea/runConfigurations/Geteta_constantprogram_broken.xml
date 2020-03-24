@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Geteta constantprogram_broken" type="JetRunConfigurationType" factoryName="Kotlin">
+  <configuration default="false" name="Geteta constantprogram_broken" type="JetRunConfigurationType" factoryName="Kotlin" folderName="geteta">
     <module name="verifaps.geteta" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="--row-map -t constantprogram_broken.gtt -c constantprogram.st --cexout" />

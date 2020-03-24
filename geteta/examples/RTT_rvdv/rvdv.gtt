@@ -1,0 +1,259 @@
+relational table rvdv(old, new) {
+
+    var input {old, new}
+        CraneDown, CraneOnConveyor, CraneOnMagazin,
+        CranePositionStamp, CraneSucked, CraneUp, MagazinCapacitiveSensor,
+        SFCReset, SliderMovedOut, SliderNotMovedOut, StampLowered,
+        StampSliderFilled, StartButtonMagazin, StartVar, WorkpieceReady : BOOLEAN
+
+    var output {old, new}
+        CraneTurnClockwise, CraneTurnCounterclockwise, CraneLower, MagazinVacuumOn,
+	MagazinVacuumOff, StartCommandCrane :BOOLEAN
+
+
+    var state assume {old, new} _state : ENUM
+
+	options {  technique: IC3; }
+	
+	group {
+		row {
+                        \play: old, new
+
+			old|>CraneDown: =new|>CraneDown
+			old|>CraneUp: =new|>CraneUp
+			
+			old|>CraneOnConveyor: =new|>CraneOnConveyor
+			old|>CraneOnMagazin: =new|>CraneOnMagazin
+			old|>CranePositionStamp: =new|>CranePositionStamp
+			
+			old|>CraneSucked: =new|>CraneSucked
+			old|>MagazinCapacitiveSensor: =new|>MagazinCapacitiveSensor
+			old|>WorkpieceReady: =new|>WorkpieceReady
+			old|>SliderNotMovedOut: =new|>SliderNotMovedOut
+			
+			old|>CraneLower: =new|>CraneLower
+			old|>CraneTurnCounterclockwise: =new|>CraneTurnCounterclockwise
+			
+			old|>MagazinVacuumOff: =new|>MagazinVacuumOff
+			old|>MagazinVacuumOn: =new|>MagazinVacuumOn
+			old|>CraneTurnClockwise: =new|>CraneTurnClockwise
+			
+			old|>SliderMovedOut: =new|>SliderMovedOut
+			old|>StampLowered: new|>StampLowered
+			old|>StampSliderFilled: new|>StampSliderFilled
+			old|>StartButtonMagazin: new|>StartButtonMagazin
+			old|>StartVar: new|>StartVar
+			
+			old|>_state: -
+			new|>_state: -
+
+		}
+		group omega {
+			row [1,1] {
+				// FALSE / CraneUp AND NOT MagazinCapacitiveSensor AND WorkpieceReady
+				old|>CraneUp: =new|>CraneUp,TRUE
+				old|>MagazinCapacitiveSensor: =new|>MagazinCapacitiveSensor, FALSE
+				old|>WorkpieceReady: =new|>WorkpieceReady, TRUE
+				old|>_state: =new|>_state, Crane_Go_Up
+			}
+			row [0,-] {
+                                \pause: old
+
+                                //-- release equivalence --:
+				old|>CraneUp: -
+				old|>CraneDown: -
+				old|>CraneOnConveyor: -
+				old|>CraneOnMagazin: -
+				old|>CranePositionStamp: -
+				
+				old|>CraneSucked: -
+				old|>MagazinCapacitiveSensor: -
+				old|>WorkpieceReady: -
+				old|>SliderNotMovedOut: -
+				
+				old|>CraneLower: -
+				old|>CraneTurnCounterclockwise: -
+				
+				old|>MagazinVacuumOff: -
+				old|>MagazinVacuumOn: -
+				old|>CraneTurnClockwise: -
+				
+				old|>SliderMovedOut: -
+				old|>StampLowered: -
+				old|>StampSliderFilled: -
+				old|>StartButtonMagazin: -
+				old|>StartVar: -
+
+				
+				//reset old constriant --: 
+				old|>CraneUp: -
+				old|>MagazinCapacitiveSensor: -
+				old|>WorkpieceReady: -
+				
+				//release state equal --: 
+				old|>_state: -
+				
+				//use the new|>* vars for setting the correct values. _old|> is
+				//stopped, and stutters ==> no effect. -->
+				
+				//block
+				new|>CraneOnMagazin: FALSE
+				//Turn_Right_Black
+				new|>CraneTurnClockwise: TRUE
+				new|>CraneTurnCounterclockwise: FALSE
+			}
+			row [1,1] {
+                                \pause: old
+				//-- let it go --: 
+				new|>CraneOnMagazin: TRUE
+			}
+			row [0,-] {
+			        \pause: old
+
+                                new|>CraneOnMagazin: -
+				
+				//-- block --: 
+				new|>CraneSucked: FALSE
+				
+				//-- Magazin_Stop_Black --: 
+				new|>CraneTurnClockwise: FALSE
+				new|>CraneTurnCounterclockwise: FALSE
+				new|>MagazinVacuumOn: TRUE
+				new|>MagazinVacuumOff: FALSE
+				new|>CraneLower: TRUE
+			}
+			row [1,1] {
+			        \pause: old
+				new|>CraneSucked: TRUE
+			}
+			row [0,-] {
+                                \pause: old
+				new|>CraneSucked: -
+				//--block--: 
+				new|>CraneUp: FALSE
+				//-- Crane_Lift_NOT_Metallic_Black --: 
+				new|>CraneLower: FALSE
+			}
+			row [1,1] {
+                        \pause: old
+				new|>CraneUp: TRUE
+			}
+			row [0,-] {
+                        \pause: old
+				new|>CraneUp: -
+				//--block--: 
+				new|>CraneOnConveyor: FALSE
+				//-- Crane_Turn_Left_NOT_Metallic_Black --: 
+				new|>CraneTurnCounterclockwise: TRUE
+				new|>CraneTurnClockwise: FALSE
+			}
+			row [1,1] {
+                        \pause: old
+				new|>CraneOnConveyor: TRUE
+			}
+			row [0,-] {
+                        \pause: old
+				new|>CraneOnConveyor: -
+				//-- block --: 
+				new|>CraneDown: FALSE
+				//-- Crane_On_Conveyor_Not_Metallica_Black --: 
+				new|>CraneTurnCounterclockwise: FALSE
+				new|>CraneTurnClockwise: FALSE
+				new|>CraneLower: TRUE
+			}
+			row [1,1] {
+                        \pause: old
+				new|>CraneDown: TRUE
+			}
+			row [1,1] {
+                        \pause: old
+				new|>CraneDown: -
+				//--release_Black--: 
+				new|>MagazinVacuumOn: FALSE
+				new|>MagazinVacuumOff: TRUE
+			}
+			row [0,-] {
+                        \pause: old
+				//-- block --: 
+				new|>CraneUp: FALSE
+				//-- Crane_Lift_Conveyor_Black --: 
+				new|>CraneLower: FALSE
+			}
+			row [1,1] {
+                        \pause: old
+				//--release--: 
+				new|>CraneUp: TRUE
+				//-- Crane_Lift_Conveyor_Black --: 
+				new|>CraneLower: FALSE
+			}
+			row [0,-] {
+                        \pause: old
+				new|>CranePositionStamp: FALSE
+				//-- Crane_Turn_Left_Back_To_Stamp --: 
+				new|>CraneTurnCounterclockwise: TRUE
+				new|>CraneTurnClockwise: FALSE
+			}
+			row [1,1] {
+                        \pause: old
+				new|>CranePositionStamp: TRUE
+				//-- Crane_Turn_Left_Back_To_Stamp --: 
+				new|>CraneTurnCounterclockwise: TRUE
+				new|>CraneTurnClockwise: FALSE
+			}
+			row [1,1] {
+                        \pause: old
+				//--release--: 
+				new|>CranePositionStamp: -
+				//-- Crane_On_Stamp_Stop_Black --: 
+				new|>CraneTurnCounterclockwise: FALSE
+				new|>CraneTurnClockwise: FALSE
+			}
+			row - progress {
+                                \play: old
+                                \pause: new
+
+				//--clear--: 
+				new|>CraneTurnCounterclockwise: -
+				new|>CraneTurnClockwise: -
+				new|>CraneLower: -
+				new|>MagazinVacuumOn: -
+				new|>MagazinVacuumOff: -
+			}
+			row {
+                                \play: old, new
+				old|>_state: =new|>_state
+				old|>SliderMovedOut: =new|>SliderMovedOut
+			}
+			row - progress {
+                                \play: old, new
+				old|>CraneDown: =new|>CraneDown
+				old|>CraneUp: =new|>CraneUp
+				
+				old|>CraneOnConveyor: =new|>CraneOnConveyor
+				old|>CraneOnMagazin: =new|>CraneOnMagazin
+				old|>CranePositionStamp: =new|>CranePositionStamp
+				
+				old|>CraneSucked: =new|>CraneSucked
+				old|>MagazinCapacitiveSensor: =new|>MagazinCapacitiveSensor
+				old|>WorkpieceReady: =new|>WorkpieceReady
+				old|>SliderNotMovedOut: =new|>SliderNotMovedOut
+				
+				old|>CraneLower: =new|>CraneLower
+				old|>CraneTurnCounterclockwise: =new|>CraneTurnCounterclockwise
+				
+				old|>MagazinVacuumOff: =new|>MagazinVacuumOff
+				old|>MagazinVacuumOn: =new|>MagazinVacuumOn
+				old|>CraneTurnClockwise: =new|>CraneTurnClockwise
+				
+				old|>SliderMovedOut: =new|>SliderMovedOut
+				old|>StampLowered: new|>StampLowered
+				old|>StampSliderFilled: new|>StampSliderFilled
+				old|>StartButtonMagazin: new|>StartButtonMagazin
+				old|>StartVar: new|>StartVar
+				
+				old|>_state: -
+				new|>_state: -
+			}
+		}
+	}	
+}

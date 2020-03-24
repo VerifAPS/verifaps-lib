@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Geteta cycles" type="JetRunConfigurationType" factoryName="Kotlin">
+  <configuration default="false" name="Geteta cycles" type="JetRunConfigurationType" factoryName="Kotlin" folderName="geteta">
     <module name="verifaps.geteta" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="-t cycles.gtt -c cycles.st" />

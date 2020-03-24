@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="reteta counter" type="JetRunConfigurationType" factoryName="Kotlin" folderName="reteta">
+    <module name="verifaps.geteta" />
+    <option name="VM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value="--nuxmv $USER_HOME$/share/nuXmv-1.1.1-Linux/bin/nuXmv -v -t table.tt.txt -P OneCnt.st -P TwoCnt.st" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <option name="MAIN_CLASS_NAME" value="edu.kit.iti.formal.automation.testtables.apps.RetetaApp" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/geteta/examples/rttcounter" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

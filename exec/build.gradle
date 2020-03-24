@@ -17,7 +17,7 @@ dependencies {
 
     compile group: 'io.github.microutils', name: 'kotlin-logging', version: '1.7.8'
     implementation 'com.github.ajalt:clikt:2.1.0'
-    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.3.70'
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.3.71'
 }
 
 
@@ -73,7 +73,6 @@ mainClasses.each { a, b ->
         jar = ""
         chdir = ".."
         classpath = startScripts.classpath.collect { "lib/" + it.getName() }
-        println(classpath)
     }
     applicationDistribution.from(exe) { into("bin") exclude("lib/") }
     exe.dependsOn startScripts
