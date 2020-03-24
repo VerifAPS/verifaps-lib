@@ -85,17 +85,31 @@ monex: $(GETETA)
 
 ## RTT
 RTT_Counter: $(RETETA)
-	cd RTT_Counter && $(RETETA) $(RETETA_DEBUG) -t table.tt.txt -P OneCnt.st -P TwoCnt.st
+	cd RTT_Counter && $(RETETA) $(RETETA_DEBUG) \
+		-t table.tt.txt -P OneCnt.st -P TwoCnt.st
 
 RTT_emergency: $(RETETA)
-	cd RTT_emergency && $(RETETA) $(RETETA_DEBUG) 
+	cd RTT_emergency && $(RETETA) $(RETETA_DEBUG) \
+		-t emerg.gtt -P PPU_13.st -P PPU_13+ESystem.st -P ESystem@ESystem.st
 
-RTT_if: $(RETETA)
+RTT_if_13: $(RETETA)
+	cd RTT_if &&  $(RETETA) $(RETETA_DEBUG) \
+		-t emerg.gtt -P PPU_13.st -P PPU_13+ESystem.st -P ESystem@ESystem.st
+
+RTT_if_5: $(RETETA)
+	cd RTT_if &&  $(RETETA) $(RETETA_DEBUG) \
+		-t emerg.gtt -P PPU_13.st -P PPU_13+ESystem.st -P ESystem@ESystem.st
+
+RTT_if_5_noif: $(RETETA)
+	cd RTT_if &&  $(RETETA) $(RETETA_DEBUG) \
+		-t emerg.gtt -P PPU_13.st -P PPU_13+ESystem.st -P ESystem@ESystem.st
+
 
 RTT_restart: $(RETETA)
+	cd RTT_restart && $(RETETA) $(RETETA_DEBUG) \
+		-t restart.gtt -P Crane@Crane_13.st -P Crane@Crane_13.st
 
 RTT_rvdv: $(RETETA)
-	--nuxmv /home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv --print-augmented-programs -t rvdv.gtt -L Preamble.st -P Crane3@Code_3.st -P Crane5@Code_5.st
-
-
+	cd RTT_rvdv && $(RETETA) $(RETETA_DEBUG) \
+		-t rvdv.gtt -L Preamble.st -P Crane3@Code_3.st -P Crane5@Code_5.st
 # end

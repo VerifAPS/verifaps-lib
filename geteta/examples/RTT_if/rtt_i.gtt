@@ -1,0 +1,58 @@
+relational table rtt_i(a,b) {
+
+        var input {a,b} PARAMETER_CRANE_PRESSURE : INT
+
+        var output {a,b} Actuator_CraneTurnClockwise, Actuator_CraneTurnClockwise : BOOLEAN
+
+        var output {a} Crane$StartVar: BOOLEAN
+
+        var input {a,b}
+            Sensor_CraneDown, Sensor_CraneOnConveyor, Sensor_CraneOnMagazin,
+            Sensor_CranePosition, Sensor_CranePositionStamp, Sensor_CraneSucked,
+            Sensor_CraneUp, Sensor_MagazinCapacitiveSensor,
+            Sensor_MagazinEmergencyStop, Sensor_MagazinOpticalSensor,
+            Sensor_MagazinSwitchManuellAutomatic, Sensor_SliderMovedOut,
+            Sensor_SliderNotMovedOut, Sensor_StampEmergencyStop,
+            Sensor_StampLowered, Sensor_StampSliderFilled,
+            Sensor_StampSliderSensorMovedIn, Sensor_StampSliderSensorMovedOut,
+            Sensor_StampStartButton, Sensor_StampSwitchManuellAutomatic,
+            Sensor_StampUp, Sensor_StartButtonMagazin, Sensor_WorkpieceReady : BOOLEAN
+
+
+        group ROOT -  {
+              root - {
+                a|>Sensor_CraneDown                     : b|>Sensor_CraneDown
+                a|>Sensor_CraneOnConveyor               : b|>Sensor_CraneOnConveyor
+                a|>Sensor_CraneOnMagazin                : b|>Sensor_CraneOnMagazin
+                a|>Sensor_CranePosition                 : b|>Sensor_CranePosition
+                a|>Sensor_CranePositionStamp            : b|>Sensor_CranePositionStamp
+                a|>Sensor_CraneSucked                   : b|>Sensor_CraneSucked
+                a|>Sensor_CraneUp                       : b|>Sensor_CraneUp
+                a|>Sensor_MagazinCapacitiveSensor       : b|>Sensor_MagazinCapacitiveSensor
+                a|>Sensor_MagazinEmergencyStop          : b|>Sensor_MagazinEmergencyStop
+                a|>Sensor_MagazinOpticalSensor          : b|>Sensor_MagazinOpticalSensor
+                a|>Sensor_MagazinSwitchManuellAutomatic : b|>Sensor_MagazinSwitchManuellAutomatic
+                a|>Sensor_SliderMovedOut                : b|>Sensor_SliderMovedOut
+                a|>Sensor_SliderNotMovedOut             : b|>Sensor_SliderNotMovedOut
+                a|>Sensor_StampEmergencyStop            : b|>Sensor_StampEmergencyStop
+                a|>Sensor_StampLowered                  : b|>Sensor_StampLowered
+                a|>Sensor_StampSliderFilled             : b|>Sensor_StampSliderFilled
+                a|>Sensor_StampSliderSensorMovedIn      : b|>Sensor_StampSliderSensorMovedIn
+                a|>Sensor_StampSliderSensorMovedOut     : b|>Sensor_StampSliderSensorMovedOut
+                a|>Sensor_StampStartButton              : b|>Sensor_StampStartButton
+                a|>Sensor_StampSwitchManuellAutomatic   : b|>Sensor_StampSwitchManuellAutomatic
+                a|>Sensor_StampUp                       : b|>Sensor_StampUp
+                a|>Sensor_StartButtonMagazin            : b|>Sensor_StartButtonMagazin
+                a|>Sensor_WorkpieceReady                : b|>Sensor_WorkpieceReady
+                a|>Crane$StartVar                       : FALSE
+            }
+            
+            row 1 { a|>Crane$StartVar: TRUE }
+
+            row omega {
+                a|>Crane$StartVar                     : -
+                a|>Actuator_CraneTurnClockwise        : =b_Actuator_CraneTurnClockwise
+                a|>Actuator_CraneTurnCounterclockwise : =b_Actuator_CraneTurnCounterclockwise
+            }
+        }
+}
