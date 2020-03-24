@@ -1,4 +1,4 @@
-table TTable {
+table OneIncrement {
     var output o : INT
 
     group 0 [1, 1] {

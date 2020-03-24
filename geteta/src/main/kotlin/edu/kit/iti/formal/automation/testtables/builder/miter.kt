@@ -197,7 +197,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
     private fun SMVAst.translateToSt(): Expression = this.accept(ExpressionConversion(enumValues))
 }
 
-class ProgMiterConstruction(val pous: PouElements) {
+class ProgMiterConstruction(val pous: List<PouElement>) {
 
     fun constructMiter(): Miter {
 
@@ -367,7 +367,8 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 
 
         val assert = CommentStatement("assert __INV__")
-        assert.setMetadata(SpecialComment::class.java, SpecialComment.AssertComment(SymbolicReference("miter____INV__")))
+        assert.setMetadata(SpecialComment::class.java,
+                SpecialComment.AssertComment(SymbolicReference("miter${SCOPE_SEPARATOR}__INV__")))
         whileBody.add(assert)
 
 
