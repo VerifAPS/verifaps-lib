@@ -26,11 +26,12 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.jferard.fastods.tool.FastOds
 import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.rvt.LineMap
+import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
-import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
-import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
+import edu.kit.iti.formal.automation.testtables.builder.*
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
@@ -62,7 +63,6 @@ class GetetaApp : CliktCommand(
 
     val cexAnalysation by CexAnalysationArguments()
 
-    val tableWhitelist = tableOptions.tableWhitelist
 
     val automataOptions by AutomataOptions()
 
@@ -268,6 +268,60 @@ fun useCounterExamplePrinter(
                     program = program,
                     stream = stream)
             cep.getAll()
+        }
+    }
+}
+
+
+object GetetaSmt {
+    @JvmStatic
+    fun main(args: Array<String>) = GetetaSmtApp().main(args)
+}
+
+class GetetaSmtApp : CliktCommand() {
+    val programOptions by ProgramOptions()
+    val tableOptions by TableArguments()
+    val outputFolder by outputFolder()
+
+    override fun run() {
+        SCOPE_SEPARATOR = "___"
+
+        //region read table
+        val tables = tableOptions.table.flatMap {
+            info("Use table file ${it.absolutePath}")
+            GetetaFacade.readTables(it)
+        }.map {
+            it.programRuns = listOf("")
+            it.generateSmvExpression()
+            it.simplify()
+        }.filterByName(tableOptions.tableWhitelist)
+
+
+        //endregion
+        info("Tables found: ${tables.joinToString()}")
+
+        //region read program
+        val executable = programOptions.readProgram()
+        val pous = executable.scope.getDefinedPous()
+        //endregion
+
+        val enum = executable.scope.enumValuesToType()
+
+        for (table in tables) {
+            info("Compute miter and product program for table ${table.name}")
+            val automaton = GetetaFacade.constructTable(table)
+            val mc = GttMiterConstruction(table, automaton.automaton, enum)
+            val miter = mc.constructMiter()
+            val program = ProgMiterConstruction(pous).constructMiter()
+            val productProgram = ProgramCombination(program, miter).combine()
+            val outputFile = File(outputFolder ?: ".", table.name + ".hcc").absoluteFile
+            outputFile.bufferedWriter().use { out ->
+                val simplifiedProductProgram = SymbExFacade.simplify(productProgram)
+                val hccprinter = HccPrinter(CodeWriter(out))
+                hccprinter.isPrintComments = true
+                simplifiedProductProgram.accept(hccprinter)
+            }
+            info("File: $outputFile written")
         }
     }
 }

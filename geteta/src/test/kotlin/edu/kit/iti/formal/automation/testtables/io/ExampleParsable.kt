@@ -13,16 +13,23 @@ import java.util.stream.Stream
 object ExampleParsable {
     @ParameterizedTest
     @MethodSource("findExamples")
-    fun test(file : File): Unit {
+    fun parsable(file : File): Unit {
         val p = GetetaFacade.createParser(CharStreams.fromFileName(file.absolutePath))
         p.errorReporter.throwException()
     }
+
+    @ParameterizedTest
+    @MethodSource("findExamples")
+    fun loadable(file : File): Unit {
+        GetetaFacade.parseTableDSL(file)
+    }
+
 
     @JvmStatic
     fun findExamples() : List<File> {
         val walker = File("examples").walkTopDown()
         return walker.filter {
-            it.isFile && (it.name.endsWith(".tt") || it.name.endsWith(".gtt") || it.name.endsWith(".rtt"))
+            it.isFile && (it.name.endsWith(".tt.txt") || it.name.endsWith(".gtt") || it.name.endsWith(".rtt"))
         }.toList()
     }
 }

@@ -1,0 +1,18 @@
+table simpleTable {
+  var input in : BOOL
+  var output o : INT
+
+  group {
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE }
+    row { in: TRUE; o: !=o;  } //wrong
+  }
+}

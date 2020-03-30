@@ -45,6 +45,8 @@ abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory
         get() = !isAssumption
 
     abstract fun respondTo(name: String, run: Int?): Boolean
+
+    abstract fun clone(): ColumnVariable
 }
 
 data class ProgramVariable(
@@ -71,8 +73,10 @@ data class ProgramVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
+    override fun clone() =copy()
 
     var realName: String = name
+
     /**
      *
      */
@@ -108,6 +112,8 @@ data class ProjectionVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name
+    override fun clone() =copy()
+
 
     /**
      *
@@ -468,6 +474,11 @@ data class TableRow(override var id: String) : TableNode(id) {
     val defFailed = SVariable("${id}_fail", SMVTypes.BOOLEAN)
     val defInput = SVariable("${id}_in", SMVTypes.BOOLEAN)
     val defMiss = SVariable("${id}_miss", SMVTypes.BOOLEAN)
+
+    /**
+     * A list of rows, from which this rows inherits.
+     */
+    val inheritsFromRows = arrayListOf<Pair<String, String>>()
 
     /**
      * The predicate that allows keeping in this state.

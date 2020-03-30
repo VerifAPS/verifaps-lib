@@ -1,138 +1,136 @@
 TYPE
-  var_OpMode : (var_Op , var_Teach);
-  var_TeachStatus :  (var_Ok, var_NoTeachPoints, var_Teaching, var_InvalidTeachPoints, var_InvalidInputValue);
+  OpMode : (Op , Teach);
+  TeachStatus :  (Ok, NoTeachPoints, Teaching, InvalidTeachPoints, InvalidInputValue);
 END_TYPE
 
 
-FUNCTION_BLOCK var_TON
+FUNCTION_BLOCK TON
 
 VAR_INPUT
-    var_IN : BOOL;
-    var_PT : USINT;
+    IN : BOOL;
+    PT : INT;
 END_VAR
 
 VAR_OUTPUT
-    var_Q  : BOOL;
-    var_ET : USINT;
+    Q  : BOOL;
+    ET : INT;
 END_VAR
 
-IF var_IN THEN
-    var_Q:= var_ET = USINT#0;
-    IF var_ET > USINT#0 THEN
-        var_ET := var_ET - USINT#1;
+IF IN THEN
+    Q:= ET = INT#0;
+    IF ET > INT#0 THEN
+        ET := ET - USINT#1;
     ELSE
-        var_ET := USINT#0;
+        ET := INT#0;
     END_IF
 ELSE
-    var_Q  := FALSE;
-    var_ET := var_PT;
+    Q  := FALSE;
+    ET := PT;
 END_IF;
 
 END_FUNCTION_BLOCK
 
 
-PROGRAM  var_Analogsensor
+PROGRAM  Analogsensor
 
 VAR CONSTANT
-  var_SENSORINPUT_MIN : INT := 0;
-  var_SENSORINPUT_MAX : INT := 4095;
-  var_TEACHTIMEOUT : TIME := TIME#20s0ms;
-  var_ICONST : INT := 1000;
+  SENSORINPUT_MIN : INT := 0;
+  SENSORINPUT_MAX : INT := 4095;
+  TEACHTIMEOUT : TIME := TIME#20s0ms;
+  ICONST : INT := 1000;
 END_VAR
 
 VAR_INPUT
-  var_TPSet : BOOL;
-  var_SensorInput, var_TPy  : INT;
-  var_OperationMode : var_OpMode;
+  TPSet : BOOL;
+  SensorInput, TPy  : INT;
+  OperationMode : OpMode;
 END_VAR
 
 VAR_OUTPUT
-  var_SensorOutput : INT;
+  SensorOutput : INT;
 END_VAR
 
 VAR
-  var_initial          : BOOL;
-  var_lastmode         : var_OpMode;
-  var_Status           : var_TeachStatus;
-  var_teachstep        : INT;
-  var_x_temp, var_y_temp, var_t, var_m, var_x1, var_y1, var_x2, var_y2 : INT;
-  var_timeout          	: var_TON;
+  initial          : BOOL;
+  lastmode         : OpMode;
+  Status           : TeachStatus;
+  teachstep        : INT;
+  x_temp, y_temp, t, m, x1, y1, x2, y2 : INT;
+  timeout          	: TON;
 END_VAR
 
-IF NOT var_initial THEN
-  var_x1 := 0;
-  var_y1 := 0;
-  var_x2 := 0;
-  var_y2 := 0;
-  var_Status := var_TeachStatus#var_NoTeachPoints;
-  var_initial := TRUE;
+IF NOT initial THEN
+  x1 := 0;
+  y1 := 0;
+  x2 := 0;
+  y2 := 0;
+  Status := TeachStatus#NoTeachPoints;
+  initial := TRUE;
 ELSE
-  IF var_OperationMode = var_OpMode#var_Op THEN
-    IF var_Status = var_TeachStatus#var_Ok AND var_SensorInput >= var_SENSORINPUT_MIN AND var_SensorInput <= var_SENSORINPUT_MAX THEN
-      var_SensorOutput := var_m * var_SensorInput / var_ICONST + var_t;
+  IF OperationMode = OpMode#Op THEN
+    IF Status = TeachStatus#Ok AND SensorInput >= SENSORINPUT_MIN AND SensorInput <= SENSORINPUT_MAX THEN
+      SensorOutput := m * SensorInput / ICONST + t;
     ELSE
-      var_SensorOutput := 0;
+      SensorOutput := 0;
     END_IF;
-  ELSIF var_OperationMode = var_OpMode#var_Teach THEN
-    IF var_lastmode <> var_OperationMode THEN
-      var_teachstep := 0;
-      var_timeout(var_IN := FALSE);
+  ELSIF OperationMode = OpMode#Teach THEN
+    IF lastmode <> OperationMode THEN
+      teachstep := 0;
+      timeout(IN := FALSE);
     END_IF;
 
-    CASE var_teachstep OF
+    CASE teachstep OF
       0:
-         var_Status := var_TeachStatus#var_Teaching;
-         var_timeout(var_IN := TRUE, var_PT:=var_TEACHTIMEOUT);
-         IF var_timeout.var_Q THEN
-           var_OperationMode := var_OpMode#var_Op;
+         Status := TeachStatus#Teaching;
+         timeout(IN := TRUE, PT:=TEACHTIMEOUT);
+         IF timeout.Q THEN
+           OperationMode := OpMode#Op;
          END_IF;
 
-         IF var_TPSet AND var_SensorInput >= var_SENSORINPUT_MIN AND var_SensorInput <= var_SENSORINPUT_MAX THEN
-           var_y1 := var_TPy;
-           var_x1 := var_SensorInput;
-           var_teachstep := 1;
-           var_timeout(var_IN := FALSE);
+         IF TPSet AND SensorInput >= SENSORINPUT_MIN AND SensorInput <= SENSORINPUT_MAX THEN
+           y1 := TPy;
+           x1 := SensorInput;
+           teachstep := 1;
+           timeout(IN := FALSE);
          END_IF;
       1:
-         IF var_TPSet = FALSE THEN
-           var_teachstep := 2;
+         IF TPSet = FALSE THEN
+           teachstep := 2;
          END_IF
       2:
-         var_timeout(var_IN := TRUE, var_PT:=var_TEACHTIMEOUT);
+         timeout(IN := TRUE, PT:=TEACHTIMEOUT);
 
-         IF var_timeout.var_Q THEN
-           var_OperationMode := var_OpMode#var_Op;
+         IF timeout.Q THEN
+           OperationMode := OpMode#Op;
          END_IF;
 
-         IF var_TPSet AND var_SensorInput >= var_SENSORINPUT_MIN
-             AND var_SensorInput <= var_SENSORINPUT_MAX THEN
-           var_y2 := var_TPy;
-           var_x2 := var_SensorInput;
-           var_teachstep := 3;
-           var_timeout(var_IN := FALSE);
+         IF TPSet AND SensorInput >= SENSORINPUT_MIN
+             AND SensorInput <= SENSORINPUT_MAX THEN
+           y2 := TPy;
+           x2 := SensorInput;
+           teachstep := 3;
+           timeout(IN := FALSE);
          END_IF;
        3:
-        IF var_x1 > var_x2 THEN
-           var_x_temp := var_x1;
-	   var_y_temp := var_y1;
-	   var_x1 := var_x2;
-	   var_y1 := var_y2;
-	   var_x2 := var_x_temp;
-	   var_y2 := var_y_temp;
+        IF x1 > x2 THEN
+           x_temp := x1;
+	   y_temp := y1;
+	   x1 := x2;
+	   y1 := y2;
+	   x2 := x_temp;
+	   y2 := y_temp;
          END_IF;
 
-         IF var_x2 - var_x1 <> 0 THEN
-           var_m   := (var_y2 - var_y1) * var_ICONST / (var_x2 - var_x1);
-           var_t   := var_y1 - var_m * var_x1 / var_ICONST;
-           var_Status := var_TeachStatus#var_Ok;
+         IF x2 - x1 <> 0 THEN
+           m   := (y2 - y1) * ICONST / (x2 - x1);
+           t   := y1 - m * x1 / ICONST;
+           Status := TeachStatus#Ok;
 	 ELSE
-           var_Status := var_TeachStatus#var_InvalidTeachPoints;
-	   var_OperationMode := var_OpMode#var_Op;
+           Status := TeachStatus#InvalidTeachPoints;
+	   OperationMode := OpMode#Op;
          END_IF
        END_CASE
   END_IF
 END_IF
-  var_lastmode := var_OperationMode;
+  lastmode := OperationMode;
 END_PROGRAM
-        
-        

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Geteta cycle_wrong" type="JetRunConfigurationType" factoryName="Kotlin">
+  <configuration default="false" name="Geteta cycle_wrong" type="JetRunConfigurationType" factoryName="Kotlin" folderName="geteta">
     <module name="verifaps.geteta" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="--row-map -t cycles_wrong.gtt -c cycles.st --cexout" />

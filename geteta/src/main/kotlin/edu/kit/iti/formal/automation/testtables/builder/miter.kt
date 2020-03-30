@@ -197,7 +197,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
     private fun SMVAst.translateToSt(): Expression = this.accept(ExpressionConversion(enumValues))
 }
 
-class ProgMiterConstruction(val pous: PouElements) {
+class ProgMiterConstruction(val pous: List<PouElement>) {
 
     fun constructMiter(): Miter {
 
@@ -367,7 +367,8 @@ open class ProgramCombination(val program: Miter, val miter: Miter) {
 
 
         val assert = CommentStatement("assert __INV__")
-        assert.setMetadata(SpecialComment::class.java, SpecialComment.AssertComment(SymbolicReference("miter____INV__")))
+        assert.setMetadata(SpecialComment::class.java,
+                SpecialComment.AssertComment(SymbolicReference("miter${SCOPE_SEPARATOR}__INV__")))
         whileBody.add(assert)
 
 
@@ -408,15 +409,15 @@ fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
     run("geteta/examples/cycles/cycles.st",
-            "geteta/examples/cycles/cycles.tt.txt")
+            "geteta/examples/cycles/cycles.gtt")
 
     // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
     // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
     // val stLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.st")
-    // val gttCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.tt.txt")
+    // val gttCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.gtt")
     // val gttConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram_broken.gtt")
     // val gttMinMax_broken = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax_Broken.gtt")
-    // val gttLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.tt")
+    // val gttLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.gtt")
 }
 
 fun run(program: String, table: String) {

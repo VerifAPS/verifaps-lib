@@ -17,7 +17,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 public boolean relational = false;
 }
 
-
+INHERIT_FROM:'\\inherit_from';
 DOT:'.';
 SEMICOLON:';';
 OMEGA:'omega';

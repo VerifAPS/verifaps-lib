@@ -23,6 +23,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 //structure level
 file  : table* EOF;
 table : tableHeader LBRACE
+            (inheritance_signature)*
             (signature | freeVariable | column)*
             opts?
             group
@@ -35,6 +36,8 @@ tableHeader:
   | RELATIONAL {relational=true; } TABLE name=IDENTIFIER LPAREN
   run+=IDENTIFIER (COMMA run+=IDENTIFIER)* RPAREN #tableHeaderRelational
 ;
+
+inheritance_signature: INHERIT_FROM name=IDENTIFIER osem;
 
 opts: OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=option_key (EQUALS|COLON) (constant|variable) osem;
@@ -66,7 +69,8 @@ osem : SEMICOLON?;
 
 group : GROUP (id=IDENTIFIER|idi=i)? time? LBRACE goto_* (group|row)* RBRACE;
 intOrId: id=IDENTIFIER | idi=i;
-row : ROW intOrId? time? LBRACE goto_* (controlCommands)? (kc osem)* RBRACE;
+row : ROW intOrId? time? LBRACE (rowInherit)* goto_* (controlCommands)? (kc osem)* RBRACE;
+rowInherit: INHERIT_FROM name=IDENTIFIER rowId=intOrId;
 kc: (FQ_VARIABLE|IDENTIFIER) COLON value=cell;
 controlCommands: {relational}? (controlCommand osem?)+;
 controlCommand:

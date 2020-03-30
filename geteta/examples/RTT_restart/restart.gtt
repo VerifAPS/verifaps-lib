@@ -1,0 +1,113 @@
+relational table Restart(alpha, beta) {
+    var input {alpha, beta} AnalogCranePosition : INT
+
+    
+    var input  {alpha, beta} 
+    			CraneDown, CraneSucked, CraneUp, MagazinCapacitiveSensor, 
+     		MagazinOpticalSensor, SFCReset, SliderMovedOut, SliderNotMovedOut, 
+     		StampLowered, StampSliderFilled, StampSliderSensorMovedOut, 
+     		StartButtonMagazin, StartVar, WorkpieceReady : BOOL
+
+    var output {alpha, beta} AnalogCranePressure : INT
+
+    var output {alpha, beta}
+    			CraneLower, CraneTurnClockwise, CraneTurnCounterclockwise, 
+    			MagazinSlider, MagazinVacuumOff, MagazinVacuumOn, StartCommandCrane : BOOL
+
+	/* State Variables not needed:
+		VAR  Duration1 : TIME := TIME#1.0s500.0ms; END_VAR
+		VAR  SFCInit : BOOL; END_VAR
+		VAR  TimeDelay_Timer : TON; END_VAR
+		VAR  TimeDelay_Timer_Duration : TIME := TIME#50.0ms; END_VAR
+		VAR  TimeDelay_Timer_interconnect : BOOL; END_VAR
+		VAR  Timer1 : TON; END_VAR
+		
+		VAR  _state : Crane_states_t; END_VAR
+		VAR  _transit : BOOL; END_VAR
+		VAR  actualtime1 : TIME; END_VAR
+		VAR  interconnect : BOOL; END_VAR
+		VAR  interconnectCraneStartCommand : BOOL; END_VAR
+	*/
+
+	group omega {
+		row equal [1,1] {
+			alpha::AnalogCranePosition:       =beta::AnalogCranePosition
+			alpha::CraneDown:                 =beta::CraneDown
+			alpha::CraneSucked:               =beta::CraneSucked
+			alpha::CraneUp:                   =beta::CraneUp
+			alpha::MagazinCapacitiveSensor:   =beta::MagazinCapacitiveSensor
+			alpha::MagazinOpticalSensor:      =beta::MagazinOpticalSensor
+			alpha::SFCReset:                  =beta::SFCReset, FALSE
+			alpha::SliderMovedOut:            =beta::SliderMovedOut
+			alpha::SliderNotMovedOut:         =beta::SliderNotMovedOut
+			alpha::StampLowered:              =beta::StampLowered
+			alpha::StampSliderFilled:         =beta::StampSliderFilled
+			alpha::StampSliderSensorMovedOut: =beta::StampSliderSensorMovedOut
+			alpha::StartButtonMagazin:        =beta::StartButtonMagazin
+			alpha::StartVar:                  =beta::StartVar
+			alpha::WorkpieceReady:            =beta::WorkpieceReady
+			alpha::AnalogCranePressure:       =beta::AnalogCranePressure
+			alpha::CraneLower:                =beta::CraneLower
+			alpha::CraneTurnClockwise:        =beta::CraneTurnClockwise
+			alpha::CraneTurnCounterclockwise: =beta::CraneTurnCounterclockwise
+			alpha::MagazinSlider:             =beta::MagazinSlider
+			alpha::MagazinVacuumOff:          =beta::MagazinVacuumOff
+			alpha::MagazinVacuumOn:           =beta::MagazinVacuumOn
+			alpha::StartCommandCrane:         =beta::StartCommandCrane			
+		}
+
+		row equal2 >= 0 {
+			alpha::AnalogCranePosition:       =beta::AnalogCranePosition
+			alpha::CraneDown:                 =beta::CraneDown
+			alpha::CraneSucked:               =beta::CraneSucked
+			alpha::CraneUp:                   =beta::CraneUp
+			alpha::MagazinCapacitiveSensor:   =beta::MagazinCapacitiveSensor
+			alpha::MagazinOpticalSensor:      =beta::MagazinOpticalSensor
+			alpha::SFCReset:                  =beta::SFCReset, FALSE
+			alpha::SliderMovedOut:            =beta::SliderMovedOut
+			alpha::SliderNotMovedOut:         =beta::SliderNotMovedOut
+			alpha::StampLowered:              =beta::StampLowered
+			alpha::StampSliderFilled:         =beta::StampSliderFilled
+			alpha::StampSliderSensorMovedOut: =beta::StampSliderSensorMovedOut
+			alpha::StartButtonMagazin:        =beta::StartButtonMagazin
+			alpha::StartVar:                  =beta::StartVar
+			alpha::WorkpieceReady:            =beta::WorkpieceReady
+			alpha::AnalogCranePressure:       =beta::AnalogCranePressure
+			alpha::CraneLower:                =beta::CraneLower
+			alpha::CraneTurnClockwise:        =beta::CraneTurnClockwise
+			alpha::CraneTurnCounterclockwise: =beta::CraneTurnCounterclockwise
+			alpha::MagazinSlider:             =beta::MagazinSlider
+			alpha::MagazinVacuumOff:          =beta::MagazinVacuumOff
+			alpha::MagazinVacuumOn:           =beta::MagazinVacuumOn
+			alpha::StartCommandCrane:         =beta::StartCommandCrane			
+		}
+
+		row reset 1 {
+			\backward(equal): alpha //reset alpha to its initial state
+			
+			alpha::AnalogCranePosition:       =beta::AnalogCranePosition
+			alpha::CraneDown:                 =beta::CraneDown
+			alpha::CraneSucked:               =beta::CraneSucked
+			alpha::CraneUp:                   =beta::CraneUp
+			alpha::MagazinCapacitiveSensor:   =beta::MagazinCapacitiveSensor
+			alpha::MagazinOpticalSensor:      =beta::MagazinOpticalSensor
+			//alpha::SFCReset:                  =beta::SFCReset
+			alpha::SliderMovedOut:            =beta::SliderMovedOut
+			alpha::SliderNotMovedOut:         =beta::SliderNotMovedOut
+			alpha::StampLowered:              =beta::StampLowered
+			alpha::StampSliderFilled:         =beta::StampSliderFilled
+			alpha::StampSliderSensorMovedOut: =beta::StampSliderSensorMovedOut
+			alpha::StartButtonMagazin:        =beta::StartButtonMagazin
+			alpha::StartVar:                  =beta::StartVar
+			alpha::WorkpieceReady:            =beta::WorkpieceReady
+			alpha::AnalogCranePressure:       =beta::AnalogCranePressure
+			alpha::CraneLower:                =beta::CraneLower
+			alpha::CraneTurnClockwise:        =beta::CraneTurnClockwise
+			alpha::CraneTurnCounterclockwise: =beta::CraneTurnCounterclockwise
+			alpha::MagazinSlider:             =beta::MagazinSlider
+			alpha::MagazinVacuumOff:          =beta::MagazinVacuumOff
+			alpha::MagazinVacuumOn:           =beta::MagazinVacuumOn
+			alpha::StartCommandCrane:         =beta::StartCommandCrane
+		}
+	}
+}

@@ -1,0 +1,106 @@
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.1" version="1.1">
+    <variables>
+
+        <!--
+        <variable io="input" data-type="INT" name="a_DIAGNOSIS_ACTIVE"/>
+        <variable io="input" data-type="INT" name="b_DIAGNOSIS_ACTIVE"/>
+        -->
+
+        <variable io="input" data-type="INT" name="a_PARAMETER_CRANE_PRESSURE"/>
+        <variable io="input" data-type="INT" name="b_PARAMETER_CRANE_PRESSURE"/>
+
+        <variable io="output" data-type="INT" name="a_Actuator_CraneTurnClockwise"/>
+        <variable io="output" data-type="INT" name="a_Actuator_CraneTurnCounterclockwise"/>
+        <variable io="output" data-type="INT" name="b_Actuator_CraneTurnClockwise"/>
+        <variable io="output" data-type="INT" name="b_Actuator_CraneTurnCounterclockwise"/>
+        <variable io="output" data-type="BOOLEAN" name="a_Crane$StartVar"/>
+
+        <variable io="input" name="a_Sensor_CraneDown" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CraneOnConveyor" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CraneOnMagazin" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CranePosition" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CranePositionStamp" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CraneSucked" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_CraneUp" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_MagazinCapacitiveSensor" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_MagazinEmergencyStop" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_MagazinOpticalSensor" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_MagazinSwitchManuellAutomatic" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_SliderMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_SliderNotMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampEmergencyStop" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampLowered" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampSliderFilled" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampSliderSensorMovedIn" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampSliderSensorMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampStartButton" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampSwitchManuellAutomatic" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StampUp" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_StartButtonMagazin" data-type="BOOLEAN" />
+        <variable io="input" name="a_Sensor_WorkpieceReady" data-type="BOOLEAN" />
+
+        <variable io="input" name="b_Sensor_CraneDown" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CraneOnConveyor" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CraneOnMagazin" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CranePosition" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CranePositionStamp" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CraneSucked" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_CraneUp" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_MagazinCapacitiveSensor" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_MagazinEmergencyStop" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_MagazinOpticalSensor" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_MagazinSwitchManuellAutomatic" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_SliderMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_SliderNotMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampEmergencyStop" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampLowered" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampSliderFilled" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampSliderSensorMovedIn" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampSliderSensorMovedOut" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampStartButton" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampSwitchManuellAutomatic" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StampUp" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_StartButtonMagazin" data-type="BOOLEAN" />
+        <variable io="input" name="b_Sensor_WorkpieceReady" data-type="BOOLEAN" />
+        
+    </variables>
+    <steps>
+        <step duration="[0,-]">
+            <a_Sensor_CraneDown>b_Sensor_CraneDown</a_Sensor_CraneDown>
+            <a_Sensor_CraneOnConveyor>b_Sensor_CraneOnConveyor</a_Sensor_CraneOnConveyor>
+            <a_Sensor_CraneOnMagazin>b_Sensor_CraneOnMagazin</a_Sensor_CraneOnMagazin>
+            <a_Sensor_CranePosition>b_Sensor_CranePosition</a_Sensor_CranePosition>
+            <a_Sensor_CranePositionStamp>b_Sensor_CranePositionStamp</a_Sensor_CranePositionStamp>
+            <a_Sensor_CraneSucked>b_Sensor_CraneSucked</a_Sensor_CraneSucked>
+            <a_Sensor_CraneUp>b_Sensor_CraneUp</a_Sensor_CraneUp>
+            <a_Sensor_MagazinCapacitiveSensor>b_Sensor_MagazinCapacitiveSensor</a_Sensor_MagazinCapacitiveSensor>
+            <a_Sensor_MagazinEmergencyStop>b_Sensor_MagazinEmergencyStop</a_Sensor_MagazinEmergencyStop>
+            <a_Sensor_MagazinOpticalSensor>b_Sensor_MagazinOpticalSensor</a_Sensor_MagazinOpticalSensor>
+            <a_Sensor_MagazinSwitchManuellAutomatic>b_Sensor_MagazinSwitchManuellAutomatic</a_Sensor_MagazinSwitchManuellAutomatic>
+            <a_Sensor_SliderMovedOut>b_Sensor_SliderMovedOut</a_Sensor_SliderMovedOut>
+            <a_Sensor_SliderNotMovedOut>b_Sensor_SliderNotMovedOut</a_Sensor_SliderNotMovedOut>
+            <a_Sensor_StampEmergencyStop>b_Sensor_StampEmergencyStop</a_Sensor_StampEmergencyStop>
+            <a_Sensor_StampLowered>b_Sensor_StampLowered</a_Sensor_StampLowered>
+            <a_Sensor_StampSliderFilled>b_Sensor_StampSliderFilled</a_Sensor_StampSliderFilled>
+            <a_Sensor_StampSliderSensorMovedIn>b_Sensor_StampSliderSensorMovedIn</a_Sensor_StampSliderSensorMovedIn>
+            <a_Sensor_StampSliderSensorMovedOut>b_Sensor_StampSliderSensorMovedOut</a_Sensor_StampSliderSensorMovedOut>
+            <a_Sensor_StampStartButton>b_Sensor_StampStartButton</a_Sensor_StampStartButton>
+            <a_Sensor_StampSwitchManuellAutomatic>b_Sensor_StampSwitchManuellAutomatic</a_Sensor_StampSwitchManuellAutomatic>
+            <a_Sensor_StampUp>b_Sensor_StampUp</a_Sensor_StampUp>
+            <a_Sensor_StartButtonMagazin>b_Sensor_StartButtonMagazin</a_Sensor_StartButtonMagazin>
+            <a_Sensor_WorkpieceReady>b_Sensor_WorkpieceReady</a_Sensor_WorkpieceReady>
+
+            <a_PARAMETER_CRANE_PRESSURE>!=b_PARAMETER_CRANE_PRESSURE</a_PARAMETER_CRANE_PRESSURE>
+            <a_Crane___StartVar>FALSE</a_Crane___StartVar>
+        </step>
+        <step duration="[1,1]">
+            <a_Crane___StartVar>TRUE</a_Crane___StartVar>
+        </step>
+        <step duration="omega">
+            <a_Crane___StartVar>-</a_Crane___StartVar>
+            <a_Actuator_CraneTurnClockwise>=b_Actuator_CraneTurnClockwise</a_Actuator_CraneTurnClockwise>
+            <a_Actuator_CraneTurnCounterclockwise>=b_Actuator_CraneTurnCounterclockwise</a_Actuator_CraneTurnCounterclockwise>
+            <b_Crane___AnalogCranePressure>=a_Crane$AnalogCranePressure</b_Crane___AnalogCranePressure>
+        </step>
+    </steps>
+</test-table>

@@ -81,7 +81,7 @@ data class Scope(val variables: VariableScope = VariableScope())
 
 
     fun getDefinedPous(): List<PouElement> {
-        val p = PouElements()
+        val p = (parent?.getDefinedPous() ?: mutableListOf()).toMutableList()
         p.addAll(programs.values())
         p.addAll(functionBlocks.values())
         p.addAll(functions.values())
