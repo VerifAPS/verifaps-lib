@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.st.HccPrinter
+import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.GttMiterConstruction
 import edu.kit.iti.formal.automation.testtables.builder.ProgMiterConstruction
@@ -24,13 +25,14 @@ object SMTeta {
 
 class SMTetaApp : CliktCommand() {
     val programFile by argument(help = "program file", name = "PROGRAM").file(mustExist = true)
-    val tableFile by argument(help = "GTT File", name = "GTT").file(mustExist = true)
+    val tableFile by argument(help = "GTT file", name = "GTT").file(mustExist = true)
 
     val outputFile by option("--output", "-o", help = "destination to write output files")
             .file()
             .default(File("productProgram.hcc"))
 
     override fun run() {
+        SCOPE_SEPARATOR = "__"
         //region read table
         val gtt = GetetaFacade.readTables(tableFile).first()
         gtt.programRuns = listOf("")
