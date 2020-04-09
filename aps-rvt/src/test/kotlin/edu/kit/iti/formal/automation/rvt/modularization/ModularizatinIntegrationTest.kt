@@ -1,5 +1,5 @@
-import edu.kit.iti.formal.automation.modularization.ModApp
- import org.junit.jupiter.api.Test
+package edu.kit.iti.formal.automation.rvt.modularization
+
 import java.io.File
 
 /**

@@ -53,6 +53,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     private lateinit var gather: VariableBuilder
     private lateinit var sfc: SFCImplementation
     private lateinit var currentStep: SFCStep
+
     //private lateinit var currentTopLevelScopeElement: HasScope
     private var tscope = TypeScope.builtin()
 
@@ -457,30 +458,31 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val localScope = Scope()
         gather = localScope.builder()
         ctx.var_decl().forEach { vd -> vd.accept(this) }
-        //assert(currentTopLevelScopeElement != null)
-        //for (variableDeclaration in localScope.variables.values)
-        //    variableDeclaration.parent = currentTopLevelScopeElement
-        //gather = null
         return localScope
     }
 
     override fun visitVar_decl(ctx: IEC61131Parser.Var_declContext): Any? {
         gather.clear()
         val p = ctx.pragma().map { it.accept(this) as Pragma }
-        if (!p.isNullOrEmpty()) gather.pragma = p
+        gather.pushPragma(p)
         ctx.variable_keyword().accept(this)
         ctx.var_decl_inner().accept(this)
+        gather.popPragma()
         return null
     }
 
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
+        val p = ctx.pragma().map { it.accept(this) as Pragma }
         for (i in 0 until ctx.type_declaration().size) {
             val seq = ctx.identifier_list(i).names
                     .map { it.IDENTIFIER().symbol }
 
-            gather.identifiers(seq)
+            gather
+                    .pushPragma(p)
+                    .identifiers(seq)
                     .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
                     .close()
+                    .popPragma()
         }
         return null
     }
@@ -860,7 +862,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         for (i in ctx.cond.indices) {
             val c = ctx.cond[i].accept(this) as Expression
             val b = ctx.thenlist[i].accept(this) as StatementList
-            val gs = GuardedStatement(c,b)
+            val gs = GuardedStatement(c, b)
             gs.ruleContext = ctx.cond[i]
             ast.addGuardedCommand(gs)
         }

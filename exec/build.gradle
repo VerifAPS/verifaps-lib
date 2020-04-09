@@ -10,7 +10,6 @@ description = 'Case Studies and Executables of VerifAPS'
 dependencies {
     compile project(':symbex')
     compile project(':geteta')
-    compile project(':modularization')
     compile project(':aps-rvt')
     compile project(':run')
     compile project(':ide')

@@ -13,7 +13,6 @@ mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 dependencies {
     compile project(':symbex')
     compile project(':geteta')
-    compile project(':modularization')
     compile project(':aps-rvt')
     compile project(':run')
 

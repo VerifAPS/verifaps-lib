@@ -1,6 +1,6 @@
+package edu.kit.iti.formal.automation.rvt.modularization
+
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.modularization.CallSiteFinder
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.findProgram
 import org.antlr.v4.runtime.CharStreams
  import org.junit.jupiter.api.Test
@@ -21,18 +21,18 @@ class ModularizationAppTest {
         }
     }
 
-/*    @Test
-    fun listCallSites0() = testListCallSite("/program.st")
+    @Test
+    fun listCallSites0() = testListCallSite("/modularization/program.st")
 
     @Test
-    fun listCallSites1() = testListCallSite("/program1.st")
+    fun listCallSites1() = testListCallSite("/modularization/program1.st")
 
     @Test
-    fun listCallSites2() = testListCallSite("/program2.st")
-*/
-    @Test
-    fun listCallSites3() = testListCallSite("/scenario0.st")
+    fun listCallSites2() = testListCallSite("/modularization/program2.st")
 
     @Test
-    fun listCallSites4() = testListCallSite("/scenario1.st")
+    fun listCallSites3() = testListCallSite("/modularization/scenario0.st")
+
+    @Test
+    fun listCallSites4() = testListCallSite("/modularization/scenario1.st")
 }

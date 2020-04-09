@@ -340,7 +340,8 @@ var_decl
 
 var_decl_inner
 :
-        (identifier_list COLON td=type_declaration SEMICOLON)*
+    pragma*
+    (identifier_list COLON td=type_declaration SEMICOLON)*
 ;
 
 

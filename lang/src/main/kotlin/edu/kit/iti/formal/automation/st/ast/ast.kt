@@ -913,6 +913,7 @@ data class InvocationParameter(
 //region Type
 interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
     override var name: String
+
     //var dataType: AnyDt
     @property:Deprecated("should be an type DECLARATION")
     var baseType: RefTo<AnyDt>
@@ -1462,159 +1463,6 @@ data class UnindentifiedLit(var value: String) : Literal() {
     override fun clone() = copy()
 }
 
-/*class LiteralOld : Initialization {
-    val dataType = RefTo<AnyDt>()
-    var dataTypeExplicit: Boolean = false
-    var token: Token? = null
-    // for integers only
-    var signed: Boolean = false
-
-
-    val textValue: String?
-        get() {
-            val s = split(text)
-            return s.value
-        }
-
-    val dataTypeName: String?
-        get() = dataType.identifier
-
-    val text: String
-        get() = (if (signed) "-" else "") + token!!.text
-
-    constructor() {}
-
-    constructor(symbol: Token) {
-        token = symbol
-        dataType.identifier = dataTypeName
-    }
-
-    constructor(dataTypeName: String?, symbol: String) {
-        token = CommonToken(-1, symbol)
-        dataType.identifier = dataTypeName
-        assert(dataTypeName != null)
-    }
-
-    constructor(dataType: AnyDt, symbol: String) {
-        token = CommonToken(-1, symbol)
-        this.dataType.obj = dataType
-    }
-
-    constructor(dataType: AnyDt, symbol: Token) {
-        token = symbol
-        this.dataType.obj = dataType
-    }
-
-    @Throws(VariableNotDefinedException::class, TypeConformityException::class)
-    override fun dataType(localScope: Scope): AnyDt {
-        return dataType.obj!!
-    }
-
-    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-
-    fun asValue(): Value<*, *>? = asValue(ValueTransformation(this))
-
-    private fun asValue(transformer: DataTypeVisitor<Value<*, *>>): Value<*, *> =
-            if (dataType.obj == null)
-                throw IllegalStateException(
-                        "No identified data type. Given data type name " + dataType.identifier!!)
-            else
-                dataType.obj!!.accept(transformer)!!
-
-    override fun clone(): Literal {
-        val l = Literal(dataTypeName, token)
-        l.dataTypeExplicit = dataTypeExplicit
-        l.signed = signed
-        l.dataType.setIdentifier(dataType.identifier)
-        l.dataType.setIdentifiedObject(dataType.obj)
-        return l
-    }
-
-    companion object {
-        val LFALSE = Literal(AnyBit.BOOL, "LFALSE")
-        val LTRUE = Literal(AnyBit.BOOL, "LTRUE")
-
-        fun integer(token: Token, signed: Boolean): Literal {
-            val l = Literal(ANY_INT, token)
-            val s = split(token.text)
-            if (s.prefix != null) {
-                l.dataTypeExplicit = true
-                l.dataType.obj = DataTypes.getDataType(s.prefix)
-            }
-            l.signed = signed
-            return l
-        }
-
-        fun enumerate(token: Token): Literal {
-            val dataTypeName = token.text.split("[.#]".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()[0]
-            return Literal(dataTypeName, token)
-        }
-
-        fun bool(symbol: Token): Literal {
-            assert("LTRUE".equals(symbol.text, ignoreCase = true) || "LFALSE".equals(symbol.text, ignoreCase = true))
-            return Literal(AnyBit.BOOL, symbol)
-        }
-
-        fun word(symbol: Token): Literal {
-            val s = symbol.text
-            val first = split(s)
-
-            if ("LTRUE".equals(first.value, ignoreCase = true))
-                return bool(symbol)
-            if ("LFALSE".equals(first.value, ignoreCase = true))
-                return bool(symbol)
-
-
-            var dataType: AnyBit? = null
-            if (first.prefix != null) {
-                dataType = AnyBit.DATATYPES
-                        .stream()
-                        .filter { a -> a.name.equals(first.prefix, ignoreCase = true) }
-                        .findAny()
-                        .get()
-
-            }
-            return Literal(dataType!!, symbol)
-        }
-
-        fun real(symbol: Token): Literal {
-            return Literal(AnyReal.REAL, symbol)
-        }
-
-        fun string(symbol: Token, b: Boolean): Literal {
-            return Literal(if (b) IECString.WSTRING else IECString.STRING, symbol)
-
-        }
-
-
-        fun time(text: Token): Literal {
-            return Literal(TimeType.TIME_TYPE, text)
-        }
-
-        fun timeOfDay(text: Token): Literal {
-            return Literal(AnyDate.TIME_OF_DAY, text)
-
-        }
-
-        fun date(symbol: Token): Literal {
-            return Literal(AnyDate.DATE, symbol)
-
-        }
-
-        fun dateAndTime(symbol: Token): Literal {
-            return Literal(AnyDate.DATE_AND_TIME, symbol)
-        }
-
-        fun integer(`val`: Int): Literal {
-            return integer(CommonToken(-1, "" + Math.abs(`val`)), `val` < 0)
-        }
-
-        fun ref_null(symbol: Token): Literal {
-            return Literal(ReferenceDt.ANY_REF, symbol)
-        }
-    }
-}*/
-
 class Location : Expression {
     internal var path: MutableList<Reference> = ArrayList(5)
 
@@ -1745,28 +1593,29 @@ abstract class Reference : Initialization() {
 }
 
 class VariableBuilder(val scope: VariableScope) {
-    var pragma: List<Pragma>? = null
     private val stack = Stack<Int>()
+    private val pragmaStack = Stack<List<Pragma>>()
     private var initialization: Initialization? = null
     private var identifiers: MutableList<Token> = arrayListOf()
     private var type: TypeDeclaration? = null
-    private val pEnd: Position? = null
-    private val pStart: Position? = null
+
 
     //region Handling of special flags (like constant, input or global)
-
+    fun popPragma() = pragmaStack.pop()
+    fun pushPragma(p: List<Pragma>): VariableBuilder {
+        pragmaStack.push(p)
+        return this
+    }
 
     fun clear(): VariableBuilder {
         identifiers = ArrayList()
         return this
     }
 
-
     fun pop(): VariableBuilder {
         stack.pop()
         return this
     }
-
 
     fun peek(): Int {
         try {
@@ -1777,12 +1626,10 @@ class VariableBuilder(val scope: VariableScope) {
 
     }
 
-
     fun push(input: Int): VariableBuilder {
         stack.push(input)
         return this
     }
-
 
     fun clear(i: Int): VariableBuilder {
         stack.clear()
@@ -1790,18 +1637,15 @@ class VariableBuilder(val scope: VariableScope) {
         return this
     }
 
-
     fun mix(i: Int): VariableBuilder {
         push(stack.pop() or i)
         return this
     }
     //endregion
 
-
     fun boolType(): VariableBuilder {
         return type("BOOL")
     }
-
 
     fun pointerType(pointsTo: String): VariableBuilder {
         return type(PointerTypeDeclaration(pointsTo))
@@ -1832,18 +1676,21 @@ class VariableBuilder(val scope: VariableScope) {
         return this
     }
 
-
     fun setInitialization(initialization: Initialization): VariableBuilder {
         this.initialization = initialization
         return this
     }
 
+    fun pragma(): List<Pragma>? {
+        if (pragmaStack.isEmpty()) return null
+        return pragmaStack.reduce { acc, list -> acc + list }
+    }
 
     fun create(): VariableBuilder {
         for (id in identifiers) {
             val vd = VariableDeclaration(id.text.trim('`'), peek(), type!!)
-            pragma?.run { forEach { vd.pragmas += it.clone() } }
             vd.token = id
+            pragma()?.run { forEach { vd.pragmas += it.clone() } }
             this.scope.add(vd)
         }
         return this
@@ -1866,8 +1713,6 @@ class VariableBuilder(val scope: VariableScope) {
         identifiers.add(ast)
         return this
     }
-
-    //fun identifiers(vararg e: ParserRuleContext) = identifiers(e.toList())
 }
 
 data class VariableDeclaration(
@@ -1879,6 +1724,7 @@ data class VariableDeclaration(
 
 
     var typeDeclaration: TypeDeclaration? = null
+
     /**
      * determined by the typeDeclaration
      */
@@ -2124,6 +1970,7 @@ data class SFCActionQualifier(
         RAISING("P1", false),               //could be renamed to RISING
         FALLING("P0", false),
         PULSE("P", false),
+
         /** special case for code sys */
         WHILE("A", false)
     }

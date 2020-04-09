@@ -1,4 +1,4 @@
-package edu.kit.iti.formal.automation.modularization
+package edu.kit.iti.formal.automation.rvt.modularization
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
