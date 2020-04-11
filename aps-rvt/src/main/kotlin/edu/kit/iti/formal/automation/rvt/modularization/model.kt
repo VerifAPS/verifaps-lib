@@ -25,7 +25,7 @@ class ModularProgram(val filename: String) {
     }
 
     val callSites: List<CallSite> by lazy {
-        CallSiteFinder(entry, elements).run()
+        CallSiteFinder(entry).run()
     }
 }
 
@@ -33,6 +33,7 @@ class ModularProgram(val filename: String) {
  * Global Identificator of a function block call
  */
 data class CallSite(val vars: List<String>, val number: Int, val statement: InvocationStatement) {
+
     val inferedContext = HashMap<String, SMVExpr>()
     var specifiedContext : SMVExpr? = null
 
@@ -61,7 +62,7 @@ data class CallSiteContext(val vars: Stack<String> = Stack(),
     }
 }
 
-class CallSiteFinder(val entry: ProgramDeclaration, val pous: PouElements) {
+class CallSiteFinder(val entry: ProgramDeclaration) {
     val callSites: MutableList<CallSite> = arrayListOf()
     val context = CallSiteContext()
 
@@ -76,12 +77,11 @@ class CallSiteFinder(val entry: ProgramDeclaration, val pous: PouElements) {
     }
 
     inner class CallSiteFinderSearcher : AstVisitorWithScope<Unit>() {
-
         override fun defaultVisit(obj: Any) {}
-
         override fun visit(invocation: InvocationStatement) {
-            callSites += context.startCall(invocation)
-
+            val ctx = context.startCall(invocation)
+            invocation.setMetadata(ctx.javaClass, ctx)
+            callSites += ctx
             val vd = scope.resolveVariable(invocation.callee)
             if (vd != null) {
                 try {
