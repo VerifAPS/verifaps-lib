@@ -105,7 +105,7 @@ class FBEmbeddParameters : CodeTransformation {
                     }
                 }
 
-                stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
+                //stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
                 stmt += invocation
 
                 //rewrite output variables as trailing assignments.
@@ -117,7 +117,7 @@ class FBEmbeddParameters : CodeTransformation {
                         throw IllegalStateException("Output parameter in function block call w/o name.")
                     }
                 }
-                stmt += CommentStatement.single("End of call")
+                //stmt += CommentStatement.single("End of call")
 
                 //clear all parameters
                 invocation.parameters.clear()
@@ -156,16 +156,18 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         return state
     }
 
-    fun getBody(prefix: String, state: TransformationState): StatementList {
+    fun getBody(prefix: String, state: TransformationState): BlockStatement {
         if (state !in bodyCache) {
             val istate = TransformationState(
                     state.scope, state.stBody.clone(), SFCImplementation())
             val s = EMBEDDING_BODY_PIPELINE.transform(istate)
             bodyCache[state] = s.stBody
         }
-        val statements = bodyCache[state]!!
-        val renamed =  VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
-        return renamed
+        val statements = bodyCache[state]!!.clone()
+        val renamed = VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
+        val block = BlockStatement(prefix)
+        block.statements= renamed
+        return block
     }
 
     override fun visit(invocation: InvocationStatement): Statement {
@@ -175,7 +177,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         if (invoked is Invoked.FunctionBlock) {
             val state = TransformationState(invoked.fb)
             val prefix = invocation.callee.toPath().joinToString(SCOPE_SEPARATOR)
-            return getBody(prefix, state)
+            return getBody(prefix, state).also { it.originalInvoked=invoked }
         }
 
         if (invoked is Invoked.Action && invocation.callee.hasSub()) {
@@ -183,7 +185,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             val fb = action.subList(0, action.lastIndex - 1)
             val prefix = fb.joinToString(SCOPE_SEPARATOR)
             val state = TransformationState(invoked.scope, invoked.action.stBody!!, SFCImplementation())
-            return getBody(prefix, state)
+            return getBody(prefix, state).also { it.originalInvoked=invoked }
         }
 
         if (invoked is Invoked.Function) {

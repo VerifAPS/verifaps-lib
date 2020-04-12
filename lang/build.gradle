@@ -15,7 +15,7 @@ dependencies {
     compile project(':util')
     compile project(':xml')
 
-    implementation 'com.github.ajalt:clikt:2.5.0'
+    implementation 'com.github.ajalt:clikt:2.6.0'
 
     testCompile 'org.mdkt.compiler:InMemoryJavaCompiler:1.3.0'
     compile group: 'com.squareup', name: 'javapoet', version: '1.12.1'

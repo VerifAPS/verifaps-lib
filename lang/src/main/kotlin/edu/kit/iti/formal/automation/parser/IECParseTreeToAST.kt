@@ -471,8 +471,22 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return null
     }
 
+
+    fun <T> List<ParserRuleContext>.map(): MutableList<T> = this.map { it -> it.accept(this@IECParseTreeToAST) as T }.toMutableList()
+
+    override fun visitBlock_statement(ctx: IEC61131Parser.Block_statementContext): BlockStatement {
+        val bs = BlockStatement()
+        val statementList = ctx.statement_list().accept(this) as StatementList
+        bs.statements = statementList
+        bs.name = ctx.id.text
+        bs.state = ctx.state?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        bs.input = ctx.input?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        bs.output = ctx.output?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        return bs
+    }
+
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
-        val p = ctx.pragma().map { it.accept(this) as Pragma }
+        val p: List<Pragma> = ctx.pragma().map()
         for (i in 0 until ctx.type_declaration().size) {
             val seq = ctx.identifier_list(i).names
                     .map { it.IDENTIFIER().symbol }
@@ -487,8 +501,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return null
     }
 
-    override fun visitVariable_keyword(
-            ctx: IEC61131Parser.Variable_keywordContext): Any? {
+    override fun visitVariable_keyword(ctx: IEC61131Parser.Variable_keywordContext): Any? {
         if (ctx.VAR() != null) {
             gather.push(VariableDeclaration.LOCAL)
         }
@@ -778,7 +791,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitStatement(ctx: IEC61131Parser.StatementContext): Any? {
         val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.invocation_statement(),
+                ctx.case_statement(), ctx.invocation_statement(), ctx.block_statement(),
                 ctx.jump_statement(), ctx.for_statement()) as Statement
         val p = ctx.pragma().map { it.accept(this) as Pragma }
         if (p.isNullOrEmpty()) statement.pragmas += p

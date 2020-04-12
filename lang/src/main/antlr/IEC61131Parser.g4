@@ -721,7 +721,20 @@ statement
     | while_statement
     | repeat_statement
     | exit_statement SEMICOLON
+    | block_statement
     )
+;
+
+// [s,t,u] (i,k) => (o,p)
+block_statement:
+  BLOCK_START id=IDENTIFIER
+  (
+    (LBRACKET state=identifier_list? RBRACKET)?
+    (LPAREN input=identifier_list? RPAREN)?
+    ARROW_RIGHT (LPAREN output=identifier_list? RPAREN)?
+  )?
+  statement_list
+  BLOCK_END
 ;
 
 jump_statement

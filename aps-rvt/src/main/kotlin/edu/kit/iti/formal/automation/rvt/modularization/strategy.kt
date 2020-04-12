@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.automation.rvt.modularization
 
-import edu.kit.iti.formal.automation.st.ast.Invoked
+import edu.kit.iti.formal.automation.st.ast.BlockStatement
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.util.info
@@ -152,13 +152,14 @@ class DefaultEqualityStrategy(val mp: ModularProver) {
     val outputFolder = mp.args.outputFolder
     val callSitePairs = mp.callSitePairs
 
-    suspend fun equalityOf(oldProgram: ModularProgram, newProgram: ModularProgram)
-            = equalBodiesUnderAbstraction(oldProgram.entry, newProgram.entry, listOf(), listOf())
+    suspend fun equalityOf(oldProgram: ModularProgram, newProgram: ModularProgram) = equalBodiesUnderAbstraction(oldProgram.entry, newProgram.entry, listOf(), listOf())
 
     private suspend fun proofBodyEquivalenceXmv(a: PouExecutable, b: PouExecutable,
                                                 csm: CallSiteMapping,
                                                 oP: List<String>, oN: List<String>): Boolean {
-        val aa = csm.filter { (a, b) -> a.isPrefix(oP) && b.isPrefix(oN) }
+        val aa = csm.filter { (a, b) ->
+            a.isPrefix(oP) && b.isPrefix(oN)
+        }
         val oldAbstractedInvocation = aa.map { (a, _) -> a }
         val newAbstractedInvocation = aa.map { (_, b) -> b }
 
@@ -184,10 +185,10 @@ class DefaultEqualityStrategy(val mp: ModularProver) {
             val ctxEqual = callSitePairs
                     .filter { (a, b) -> a.isPrefix(oldPrefix) && b.isPrefix(newPrefix) }
                     .all { (cOld, cNew) ->
-                        val oldFb = (cOld.statement.invoked as Invoked.FunctionBlock).fb
-                        val newFb = (cNew.statement.invoked as Invoked.FunctionBlock).fb
-                        val oP = oldPrefix + cOld.statement.callee.identifier
-                        val nP = newPrefix + cNew.statement.callee.identifier
+                        val oldFb = ModFacade.slice(cOld, mp.oldProgram)
+                        val newFb = ModFacade.slice(cNew, mp.newProgram)
+                        val oP = oldPrefix + cOld.fqName
+                        val nP = newPrefix + cNew.fqName
                         equalBodiesUnderAbstraction(oldFb, newFb, oP, nP)
                     }
             if (ctxEqual)
@@ -207,7 +208,7 @@ class DefaultEqualityStrategy(val mp: ModularProver) {
     }
 
     private fun proofBodyEquivalenceSource(oldProgram: PouExecutable, newProgram: PouExecutable): Boolean {
-        info("Check source code of ${oldProgram.name} against $newProgram.name")
+        info("Check source code of ${oldProgram.name} against ${newProgram.name}")
         val result = oldProgram.stBody!! == newProgram.stBody!!
         info("==> $result")
         return result
@@ -227,6 +228,10 @@ class DefaultEqualityStrategy(val mp: ModularProver) {
             is NuXMVOutput.Cex -> false
         }
     }
+}
+
+private fun BlockStatement.isPrefix(prefix: List<String>): Boolean {
+    return fqName.startsWith(prefix.joinToString("."))
 }
 
 class ProcessRunner(val commandLine: Array<String>,

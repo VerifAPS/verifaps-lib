@@ -12,14 +12,17 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.TranslationSfcToStOld
 import edu.kit.iti.formal.automation.st.TranslationSfcToStPipeline
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.*
+import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.automation.visitors.findProgram
+import edu.kit.iti.formal.automation.visitors.selectByName
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
-import java.util.*
+import java.util.stream.Collectors
 
 /**
  * IEC61131Facade class.
@@ -138,8 +141,10 @@ object IEC61131Facade {
     }
 
     fun fileResolve(input: List<CharStream>, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
-        val seq = LinkedList<PouElement>()
-        input.parallelStream().forEach { synchronized(seq) { seq.addAll(file(it)) } }
+        val seq = input.parallelStream()
+                .map { file(it) }
+                .flatMap { it.stream() }
+                .collect(Collectors.toList())
         val p = PouElements(seq)
         if (builtins)
             p.addAll(BuiltinLoader.loadDefault())

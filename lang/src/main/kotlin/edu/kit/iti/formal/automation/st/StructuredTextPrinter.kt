@@ -35,6 +35,12 @@ open class StructuredTextPrinter
         throw IllegalArgumentException("not implemented: " + obj::class.java)
     }
 
+    override fun visit(blockStatement: BlockStatement) {
+        blockStatement.commentStart.accept(this)
+        blockStatement.statements.accept(this)
+        blockStatement.commentEnd.accept(this)
+    }
+
     override fun visit(empty: EMPTY_EXPRESSION) {
         sb.print("(* empty expression *)")
     }
@@ -547,9 +553,13 @@ open class StructuredTextPrinter
     override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
             sb.nl()
-            sb.printf(literals.comment_open())
-            sb.printf(commentStatement.comment)
-            sb.printf(literals.comment_close())
+            if ('\n' in commentStatement.comment) {
+                sb.printf(literals.comment_open())
+                sb.printf(commentStatement.comment)
+                sb.printf(literals.comment_close())
+            }else{
+                sb.printf("//%s\n", commentStatement.comment)
+            }
         }
     }
 

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.automation.rvt.modularization
 
 import edu.kit.iti.formal.util.info
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 fun parseCallSitePair(it: String) = if ("=" in it) {
     val (a, b) = it.split("=")
@@ -23,21 +22,27 @@ class ModularProver(val args: ModularizationApp) {
     val callSitePairs: CallSiteMapping =
             args.allowedCallSites
                     .map(::parseCallSitePair)
-                    .map { (a, b) -> oldProgram.findCallSite(a) to newProgram.findCallSite(b) }
+                    .map { (a, b) ->
+                        val x = oldProgram.findCallSite(a)
+                                ?: error("Could not find $a")
+                        val y = newProgram.findCallSite(b)
+                                ?: error("Could not find $b")
+                        x to y
+                    }
 
     fun printCallSites() {
         info("Call sites for the old program: ${oldProgram.filename}")
         oldProgram.callSites.forEach {
-            info("${it.repr()} in line ${it.statement.startPosition}")
+            info("${it.repr()} in line ${it.startPosition}")
         }
         info("Call sites for the new program: ${newProgram.filename}")
         newProgram.callSites.forEach {
-            info("${it.repr()} in line ${it.statement.startPosition}")
+            info("${it.repr()} in line ${it.startPosition}")
         }
     }
 
     fun printContexts() {
-        args.showContexts
+        /*args.showContexts
                 .map(::parseCallSitePair)
                 .map { (a, b) -> oldProgram.findCallSite(a) to newProgram.findCallSite(b) }
                 .forEach { (o, n) ->
@@ -47,8 +52,8 @@ class ModularProver(val args: ModularizationApp) {
                     }
                     println("'${o.repr()}=${n.repr()}/$smv")
                 }
+         */
     }
-
 
     fun proof() {
         val proveStrategy = DefaultEqualityStrategy(this)
@@ -59,23 +64,4 @@ class ModularProver(val args: ModularizationApp) {
         }
     }
 }
-
-/*
-    * Introduce new a parameter for each instance and count activations.
-    * Prove equality of all parameter calls/activation in each sub module.
-    * Prove equality of module under abstraction
-class ProveStrategy {
-    fun equalityOf(oldProgram: ModularProgram,
-                   newProgram: ModularProgram,
-                   callSitePairs: CallSiteMapping,
-                   stateCondition: Any): List<ProofTask> {
-        return listOf()
-    }
-
-    fun equalActivation(oldProgram: ModularProgram, newProgram: ModularProgram, callSite: CallSite) {
-        // slice program
-        // translate stateCondition
-    }
-}
-*/
 

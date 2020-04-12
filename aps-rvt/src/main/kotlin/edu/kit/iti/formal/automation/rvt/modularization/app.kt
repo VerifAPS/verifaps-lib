@@ -3,6 +3,7 @@ package edu.kit.iti.formal.automation.rvt.modularization
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
 import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.analysis.ReportLevel
 
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
 import edu.kit.iti.formal.automation.st.ast.PouElements
@@ -16,7 +17,7 @@ import java.io.File
  * @version 1 (15.07.18)
  */
 object ModApp {
-    val processContext = newFixedThreadPoolContext(4, "aps-rvt")
+    val processContext = newFixedThreadPoolContext(1, "aps-rvt")
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -26,7 +27,7 @@ object ModApp {
 
 internal fun readProgramsOrError(p: String): PouElements {
     val (c, ok) = IEC61131Facade.fileResolve(File(p))
-    if (ok.isNotEmpty()) {
+    if (ok.any { it.level == ReportLevel.ERROR }) {
         ok.forEach { edu.kit.iti.formal.util.error(it.toHuman()) }
         throw IllegalStateException("Aborted due to errors")
     }
@@ -52,7 +53,6 @@ class ModularizationApp() : CliktCommand() {
     val outputFolder by option("-o", "--output", help = "output folder")
             .convert { File(it) }
             .default(File(getUniqueName("output_")))
-
 
     fun readProgramsOrError() = readProgramsOrError(old) to readProgramsOrError(new)
 

@@ -16,14 +16,14 @@ dependencies {
     compile project(':aps-rvt')
     compile project(':run')
 
-    implementation 'com.github.ajalt:clikt:2.1.0'
+    implementation 'com.github.ajalt:clikt:2.6.0'
 
     compile group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
     compile group: 'org.javassist', name: 'javassist', version: '3.26.0-GA'
     compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.0'
-    compile group: 'com.fifesoft', name: 'rstaui', version: '3.0.6'
-    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.0.4'
+    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
+    compile group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
+    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
 
     //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
     implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1_pre-release_6.1'

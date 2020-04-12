@@ -421,6 +421,11 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         }
         return sb
     }
+
+    override fun visit(blockStatement: BlockStatement): SMVExpr? {
+        blockStatement.statements.accept(this)
+        return null
+    }
 }
 
 class SymbolicBranches {
