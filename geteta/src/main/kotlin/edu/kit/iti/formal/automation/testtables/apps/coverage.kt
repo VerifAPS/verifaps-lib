@@ -63,7 +63,7 @@ class CoverageApp : CliktCommand(
         val fnTranslator: S2SFunctionTranslator = DefaultS2SFunctionTranslator()
         val toSmt = Smv2SmtVisitor(fnTranslator, dtTranslator, "")
         val toSmtState = Smv2SmtVisitor(fnTranslator, dtTranslator, "old")
-        val program = SMTFacade.translate(modCode)
+        val program = SmvSmtFacade.translate(modCode)
 
 
         gtts.forEach { gtt ->

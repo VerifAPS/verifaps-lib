@@ -6,8 +6,6 @@ import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.DefaultInitValue
-import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -19,44 +17,45 @@ val TYPE_INPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or Variab
 val TYPE_OUTPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.INPUT
 
 
-fun createProgramWithAbstraction(a: PouExecutable, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
+fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
 
-fun evaluateProgramWithAbstraction(exec: PouExecutable, abstractedBlocks: List<BlockStatement>): SMVModule {
+fun evaluateFrameWithAbstraction(exec: Frame, abstractedBlocks: List<BlockStatement>): SMVModule {
     //val elements = exec.scope.getVisiblePous()
     val abstracted =
-            if (abstractedBlocks.isEmpty()) exec
+            if (abstractedBlocks.isEmpty()) exec.block
             else createProgramWithAbstraction(exec, abstractedBlocks)
 
     //IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
 
-    File("${exec.name}_abstracted.st").bufferedWriter()
+    File("${exec.block.name}_abstracted.st").bufferedWriter()
             .use { IEC61131Facade.printTo(it, abstracted, true) }
 
     val se = SymbolicExecutioner(exec.scope.topLevel)
-    exec.accept(se)
+    exec.block.accept(se)
 
-    val moduleBuilder = ModuleBuilder(exec, se.peek())
+    val moduleBuilder = ModuleBuilder(exec.block.name, exec.scope, se.peek())
     moduleBuilder.run()
     return moduleBuilder.module
 }
 
-fun rewriteInvocation(a: PouExecutable, abstractedInvocation: List<BlockStatement>): PouExecutable {
-    val new = a.clone()
+fun rewriteInvocation(a: Frame, abstractedInvocation: List<BlockStatement>): BlockStatement {
+    var new = a.block.clone()
+    val scope = a.scope.copy()
 
     // foreach reference create a call counter
     abstractedInvocation.distinctBy { it.fqName }.forEach {
         val prefix = it.fqName.replace('.', '$')
         val sr = SymbolicReference(prefix + "_ccnt")
-        new.stBody!!.add(0, AssignmentStatement(sr, IntegerLit(INT, BigInteger.ZERO)))
+        new.statements.add(0, AssignmentStatement(sr, IntegerLit(INT, BigInteger.ZERO)))
 
         val vd = VariableDeclaration(sr.identifier, TYPE_COUNTER, UINT)
-        new.scope.add(vd)
+        scope.add(vd)
     }
 
     abstractedInvocation.forEach {
         val prefix = it.fqName.replace('.', '$')
-        val rewriter = InvocationRewriter(prefix, new.scope, it)
-        new.stBody = new.stBody!!.accept(rewriter) as StatementList
+        val rewriter = InvocationRewriter(prefix, scope, it)
+        new.statements = new.statements.accept(rewriter) as StatementList
     }
     return new
 }
@@ -81,7 +80,7 @@ class InvocationRewriter(val prefix: String,
                     val vdOut = scope.getVariable(it)
                     val inputName = "${n}__input"
                     scope.add(VariableDeclaration(inputName, 0 or TYPE_INPUT_FUNCTION_BLOCK, vdOut.dataType!!))
-                    n assignTo inputName
+                    inputName assignTo n
                 }
 
         val randomOutput = blockStatement.output.map {

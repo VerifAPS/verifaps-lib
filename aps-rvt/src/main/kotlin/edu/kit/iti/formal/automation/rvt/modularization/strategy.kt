@@ -1,14 +1,29 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package edu.kit.iti.formal.automation.rvt.modularization
 
+import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.rvt.SymbolicState
+import edu.kit.iti.formal.automation.rvt.modularization.ModFacade.createFrame
+import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
+import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.smt.*
 import edu.kit.iti.formal.automation.st.ast.BlockStatement
-import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SSymbol
+import edu.kit.iti.formal.smt.SmtAnswer
+import edu.kit.iti.formal.smt.SmtFacade
 import edu.kit.iti.formal.smv.*
+import edu.kit.iti.formal.smv.ast.SMVExpr
+import edu.kit.iti.formal.smv.ast.SVariable
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
 
 /*
+typealias ProofTask = suspend () -> Boolean
+
 enum class ProofTaskState {
     /**
      * Uninitialized proof state.
@@ -146,72 +161,211 @@ class ProofExecutor(val tasks: List<ProofTask>,
 */
 */
 
-typealias ProofTask = suspend () -> Boolean
+data class Frame(val block: BlockStatement, val scope: Scope)
 
 class DefaultEqualityStrategy(val mp: ModularProver) {
     val outputFolder = mp.args.outputFolder
     val callSitePairs = mp.callSitePairs
 
-    suspend fun equalityOf(oldProgram: ModularProgram, newProgram: ModularProgram) = equalBodiesUnderAbstraction(oldProgram.entry, newProgram.entry, listOf(), listOf())
+    val oldProgram = mp.oldProgram
+    val newProgram = mp.newProgram
+    val topLevelContext = mp.context
 
-    private suspend fun proofBodyEquivalenceXmv(a: PouExecutable, b: PouExecutable,
-                                                csm: CallSiteMapping,
-                                                oP: List<String>, oN: List<String>): Boolean {
-        val aa = csm.filter { (a, b) ->
-            a.isPrefix(oP) && b.isPrefix(oN)
-        }
-        val oldAbstractedInvocation = aa.map { (a, _) -> a }
-        val newAbstractedInvocation = aa.map { (_, b) -> b }
+    val smvCache = HashMap<Frame, SymbolicState>()
 
-        val old = evaluateProgramWithAbstraction(a, oldAbstractedInvocation)
-        val new = evaluateProgramWithAbstraction(b, newAbstractedInvocation)
-        //TODO add assertion
+    suspend fun proofEquivalenceTopLevel() =
+            proofEquivalence(oldProgram.frame, newProgram.frame, topLevelContext)
 
-        val smvFile = File(mp.args.outputFolder, "${a.name}_${b.name}.smv")
-        val logFile = File(mp.args.outputFolder, "${a.name}_${b.name}.log")
+    suspend fun proofEquivalence(old: Frame, new: Frame, ctx: ReveContext): Boolean {
+        var equal = false
 
-        //smvFile.bufferedWriter().use(module::writeTo)
-        return runNuXmv(smvFile, logFile)
+        if (!equal) equal = checkCache(old, new, ctx)
+        if (!equal) equal = proofBodyEquivalenceSource(old, new, ctx)
+        if (!equal) equal = proofBodyEquivalenceSSA(old, new, ctx)
+        if (!equal) equal = proofBodyEquivalenceSMT(old, new, ctx)
+        if (!equal) equal = proofBodyEquivalenceWithAbstraction(old, new, ctx)
+        if (!equal) equal = proofBodyEquivalenceClassic(old, new, ctx)
+
+        if (equal) updateCache(old, new, ctx, equal)
+
+        return equal
     }
 
-    private suspend fun equalBodiesUnderAbstraction(
-            a: PouExecutable, b: PouExecutable, oldPrefix: List<String>, newPrefix: List<String>): Boolean {
+    private val equivCache = arrayListOf<Triple<String, String, ReveContext>>()
 
-        val eqBody = proofBodyEquivalenceSource(a, b) || proofBodyEquivalenceXmv(
-                a, b, callSitePairs, oldPrefix, newPrefix)
+    private fun checkCache(old: Frame, new: Frame, ctx: ReveContext): Boolean {
+        val oldInstance = old.block.originalInvoked.name
+        val newInstance = new.block.originalInvoked.name
+        return equivCache.any { (a, b, c) -> oldInstance == a && b == newInstance && ctx <= c }
+    }
 
-        if (eqBody) {
-            // find call sites
-            val ctxEqual = callSitePairs
-                    .filter { (a, b) -> a.isPrefix(oldPrefix) && b.isPrefix(newPrefix) }
-                    .all { (cOld, cNew) ->
-                        val oldFb = ModFacade.slice(cOld, mp.oldProgram)
-                        val newFb = ModFacade.slice(cNew, mp.newProgram)
-                        val oP = oldPrefix + cOld.fqName
-                        val nP = newPrefix + cNew.fqName
-                        equalBodiesUnderAbstraction(oldFb, newFb, oP, nP)
+    private fun updateCache(old: Frame, new: Frame, ctx: ReveContext, equal: Boolean) {
+        val oldInstance = old.block.originalInvoked.name
+        val newInstance = new.block.originalInvoked.name
+        if (equal && oldInstance != null && newInstance != null)
+            equivCache.add(Triple(oldInstance, newInstance, ctx))
+    }
+
+    suspend fun proofBodyEquivalenceClassic(old: Frame, new: Frame, ctx: ReveContext): Boolean = coroutineScope {
+        return@coroutineScope true
+    }
+
+    private suspend fun proofBodyEquivalenceWithAbstraction(old: Frame, new: Frame, ctx: ReveContext): Boolean =
+            coroutineScope {
+                val aa = callSitePairs.filter { (a, b) ->
+                    a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName)
+                }
+                val oldAbstractedFrames = aa.map { (a, _) -> a }
+                val newAbstractedFrames = aa.map { (_, b) -> b }
+
+                val body = async { proofBodyEquivalenceWithAbstractionBody(old, new, ctx, oldAbstractedFrames, newAbstractedFrames) }
+                val subframes = async { proofBodyEquivalenceWithAbstractionSubFrames(old, new, ctx, oldAbstractedFrames, newAbstractedFrames) }
+                body.await() && subframes.await()
+            }
+
+    /**
+     *
+     */
+    private suspend fun proofBodyEquivalenceWithAbstractionBody(
+            old: Frame, new: Frame, ctx: ReveContext,
+            oldAbstractedFrames: List<BlockStatement>,
+            newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
+        val old = evaluateFrameWithAbstraction(old, oldAbstractedFrames)
+        val new = evaluateFrameWithAbstraction(new, newAbstractedFrames)
+
+        //TODO add assertion, build common model
+
+        val smvFile = File(mp.args.outputFolder, "${old.name}_${new.name}.smv")
+        val logFile = File(mp.args.outputFolder, "${old.name}_${new.name}.log")
+        runNuXmv(smvFile, logFile)
+    }
+
+    /**
+     *
+     */
+    private suspend fun proofBodyEquivalenceWithAbstractionSubFrames(
+            old: Frame, new: Frame, ctx: ReveContext,
+            oldAbstractedFrames: List<BlockStatement>,
+            newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
+
+        val ctxEqual = callSitePairs.asSequence()
+                .filter { (a, b) -> a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName) }
+                .map { (cOld, cNew) ->
+                    async {
+                        val subCtx = ctx //TODO create subCtx
+                        return@async proofEquivalence(createFrame(cOld, oldProgram.complete.scope),
+                                createFrame(cNew, newProgram.complete.scope), subCtx)
                     }
-            if (ctxEqual)
-                return true;
+                }
+
+        var ret = true
+        for (deferred in ctxEqual) {
+            if (!ret) {
+                deferred.cancel("Because!")
+                continue
+            }
+            ret = ret && !deferred.await()
         }
-        //fallback
-        return equalBodiesFull(a, b, oldPrefix, newPrefix)
+        ret
     }
 
-    private suspend fun equalBodiesFull(a: PouExecutable, b: PouExecutable, oP: List<String>, oN: List<String>): Boolean {
-        return proofBodyEquivalenceXmv(a, b, listOf(), oP, oN)
-        /*val smvFile = File(mp.args.outputFolder, "${a.name}_${b.name}_full.smv")
-        val logFile = File(mp.args.outputFolder, "${a.name}_${b.name}_full.log")
-        smvFile.bufferedWriter().use(module::writeTo)
-        info("Equality of ${a.name} against ${b.name}")
-        return runNuXmv(smvFile, logFile)*/
-    }
+    /*val smvFile = File(mp.args.outputFolder, "${a.name}_${b.name}_full.smv")
+    val logFile = File(mp.args.outputFolder, "${a.name}_${b.name}_full.log")
+    smvFile.bufferedWriter().use(module::writeTo)
+    info("Equality of ${a.name} against ${b.name}")
+    return runNuXmv(smvFile, logFile)*/
 
-    private fun proofBodyEquivalenceSource(oldProgram: PouExecutable, newProgram: PouExecutable): Boolean {
-        info("Check source code of ${oldProgram.name} against ${newProgram.name}")
-        val result = oldProgram.stBody!! == newProgram.stBody!!
+    fun proofBodyEquivalenceSource(oldProgram: Frame, newProgram: Frame, ctx: ReveContext): Boolean {
+        if (!ctx.onlyEquivalence) {
+            info("proofBodyEquivalenceSSA -- not suitable for frames ${oldProgram.block.name} and ${newProgram.block.name}")
+            return false
+        }
+        info("Check frame ${oldProgram.block.name} against ${newProgram.block.name}")
+        val result = oldProgram.block == newProgram.block
         info("==> $result")
         return result
+    }
+
+    suspend fun proofBodyEquivalenceSSA(old: Frame, new: Frame, ctx: ReveContext): Boolean {
+        if (!ctx.onlyEquivalence) {
+            info("proofBodyEquivalenceSSA -- not suitable for frames ${old} and ${new}")
+            return false
+        }
+
+        val oldSmv = symbex(old)
+        val newSmv = symbex(new)
+        val reachedStateVariables = hashSetOf<SVariable>()
+
+        val commonOutput = old.block.output.intersect(new.block.output)
+
+        return commonOutput.all {
+            oldSmv[it.identifier].equalModuloState(newSmv[it.identifier], oldSmv, newSmv)
+        }
+    }
+
+    suspend fun proofBodyEquivalenceSMT(old: Frame, new: Frame, ctx: ReveContext): Boolean {
+        val oldSmv = smt(old, oldProgram.complete.scope, "O_")
+        val newSmv = smt(new, newProgram.complete.scope, "N_")
+        val commonOutput = old.block.output.intersect(new.block.output)
+        val assertion = CodeWriter()
+
+        //TODO assertion.write(ctx.relation)
+        //TODO assertion.write(ctx.condition)
+        val equal = commonOutput.joinToString(" ") {
+            val op = ctx.relationOf(it.identifier, it.identifier)
+            "(${op.symbol()} O_${it} N_${it})"
+        }
+        assertion.write("(assert (not (and $equal))\n")
+        assertion.write("(check-sat)\n")
+        val smtProblem = oldSmv + newSmv + assertion
+        return SmtFacade.checkSmtSat(smtProblem) == SmtAnswer.UNSAT
+    }
+
+    private fun smt(frame: Frame, e: Scope, prefix: String): String {
+        val dtSTranslator = DefaultTypeTranslator()
+        val dtTranslator = DefaultS2STranslator()
+        val fnTranslator = DefaultS2SFunctionTranslator()
+
+        val v = Smv2SmtVisitor(fnTranslator, dtTranslator)
+        val out = CodeWriter()
+        val input = symbex(frame)
+        val inputVars = frame.block.input.map { it.identifier }
+        val stateVars = frame.block.state.map { it.identifier }
+        val outputVars = frame.block.output.map { it.identifier }
+
+        e.variables.filter { it.name in inputVars || it.name in outputVars || it.name in stateVars }
+                .forEach {
+                    val dt = dtTranslator.translate(dtSTranslator.translate(it.dataType!!))
+                    out.write("(declare-const ${prefix}${it.name} $dt)\n")
+                }
+        //define definition
+        /*input.getAllDefinitions().forEach { t, e ->
+            val type = dtTranslator.translate(e.dataType!!)
+            val smt = e.accept(v)
+            out.write("(define-const ${prefix}${t.name} $type $smt)\n"))
+        }*/
+        //assert next
+        val defs: Map<SMVExpr, SMVExpr> = input.definitions
+                .map { (a, b) -> (a as SMVExpr) to b.value!! }
+                .toMap()
+        input.keys.filter { it.name in outputVars }
+                .forEach {
+                    val e = input[it] ?: error("output variable not in defined in SSA.")
+                    val e1 = e.replaceExhaustive(defs)
+                    val expr = e1.accept(v)
+                    expr.toString(prefix)
+                    out.write("(assert (= ${prefix}${it.name} $expr))\n")
+                }
+        return out.stream.toString()
+    }
+
+    fun SExpr.toString(varPrefix: String) = when (this) {
+        is SSymbol -> "${varPrefix}${this.text}"
+        else -> toString()
+    }
+
+    private fun symbex(frame: Frame): SymbolicState = smvCache.computeIfAbsent(frame) {
+        SymbExFacade.evaluateStatements(frame.block.statements, frame.scope)
     }
 
     private suspend fun runNuXmv(smvFile: File, logFile: File): Boolean {
@@ -230,8 +384,17 @@ class DefaultEqualityStrategy(val mp: ModularProver) {
     }
 }
 
-private fun BlockStatement.isPrefix(prefix: List<String>): Boolean {
-    return fqName.startsWith(prefix.joinToString("."))
+private fun SMVExpr?.equalModuloState(smvExpr: SMVExpr?, thisState: SymbolicState, otherState: SymbolicState): Boolean {
+    if (this == null && smvExpr == null) return true
+    if (this == smvExpr) return true
+    //TODO This could be better, if we would not care about variable names of input and state vars
+    // If x and y' are reached, assert that the states expr are equal.
+
+    return false
+}
+
+private fun BlockStatement.isPrefix(prefix: String): Boolean {
+    return fqName.startsWith(prefix)
 }
 
 class ProcessRunner(val commandLine: Array<String>,

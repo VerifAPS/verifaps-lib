@@ -11,7 +11,7 @@ import edu.kit.iti.formal.util.info
 import java.util.*
 import kotlin.collections.HashMap
 
-private val Invoked?.name: String?
+val Invoked?.name: String?
     get() = when (this) {
         is Invoked.Program -> program.name
         is Invoked.FunctionBlock -> fb.name
@@ -24,6 +24,10 @@ private val Invoked?.name: String?
 typealias CallSiteMapping = List<Pair<BlockStatement, BlockStatement>>
 
 object ModFacade {
+    fun createFrame(cNew: BlockStatement, scope: Scope): Frame {
+        return Frame(cNew, scope)
+    }
+
     fun inferBlockAssignable(scope: Scope, block: BlockStatement) {
         val a = UsageFinder.investigate(block)
         val known = a.knownVariables
@@ -75,6 +79,13 @@ class ModularProgram(val filename: String) {
     fun findCallSite(aa: String): BlockStatement? {
         return callSites.find { it.repr() == aa }
     }
+
+    val frame: Frame
+        get() {
+            val blockStatement = BlockStatement(complete.name, complete.stBody!!)
+            ModFacade.inferBlockAssignable(complete.scope, blockStatement)
+            return ModFacade.createFrame(blockStatement, complete.scope)
+        }
 }
 
 data class CallSiteSpec(val contextPath: List<String>, val number: Int = 0) {

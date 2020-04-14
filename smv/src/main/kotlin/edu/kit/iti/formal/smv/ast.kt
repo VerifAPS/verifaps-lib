@@ -3,9 +3,7 @@ package edu.kit.iti.formal.smv.ast
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.util.HasMetadata
 import edu.kit.iti.formal.util.HasMetadataImpl
-import edu.kit.iti.formal.util.meta
 import org.antlr.v4.runtime.Token
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -33,7 +31,7 @@ sealed class SMVAst : HasMetadata {
     abstract fun <T> accept(visitor: SMVAstVisitor<T>): T
     abstract fun clone(): SMVAst
 
-    private val metadata by lazy{ HasMetadataImpl()}
+    private val metadata by lazy { HasMetadataImpl() }
     override fun <T> getMetadata(clazz: Class<T>): T? = metadata.getMetadata(clazz)
     override fun <T : Any> setMetadata(clazz: Class<T>, obj: T) = metadata.setMetadata(clazz, obj)
     override fun getAllMetadata(): Collection<Any> = metadata.getAllMetadata()
@@ -60,20 +58,19 @@ data class SBinaryExpression(private var _left: SMVExpr,
                              private var _right: SMVExpr)
     : SMVExpr() {
 
-    var left : SMVExpr
+    var left: SMVExpr
         get() = _left
         set(value) {
-            if(value === this) throw IllegalArgumentException()
+            if (value === this) throw IllegalArgumentException()
             _left = value
         }
 
-    var right : SMVExpr
+    var right: SMVExpr
         get() = _right
         set(value) {
-            if(value === this) throw IllegalArgumentException()
+            if (value === this) throw IllegalArgumentException()
             _right = value
         }
-
 
 
     override val dataType: SMVType?
@@ -331,7 +328,6 @@ abstract class SMVExpr : SMVAst() {
     infix fun neq(e: SMVExpr) = op(SBinaryOperator.NOT_EQUAL, e)
 
 
-
     operator fun not(): SUnaryExpression = SUnaryExpression(SUnaryOperator.NEGATE, this)
 
     fun negate(): SUnaryExpression = SUnaryExpression(SUnaryOperator.MINUS, this)
@@ -361,6 +357,11 @@ abstract class SMVExpr : SMVAst() {
     //endregion
 
     abstract override fun clone(): SMVExpr
+
+    fun replaceExhaustive(definitions: Map<out SMVExpr, SMVExpr>): SMVExpr {
+        val r = ExpressionReplacer(definitions)
+        return accept(r) as SMVExpr
+    }
 }
 
 
@@ -494,42 +495,52 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
      *
      */
     PLUS("+", 8),
+
     /**
      *
      */
     MINUS("-", 8),
+
     /**
      *
      */
     DIV("/", 4),
+
     /**
      *
      */
     MUL("*", 6),
+
     /**
      *
      */
     AND("&", 13),
+
     /**
      *
      */
     OR("|", 14),
+
     /**
      *
      */
     LESS_THAN("<", 12),
+
     /**
      *
      */
     LESS_EQUAL("<=", 12),
+
     /**
      *
      */
     GREATER_THAN(">", 12),
+
     /**
      *
      */
     GREATER_EQUAL(">=", 12),
+
     /**
      *
      */
@@ -720,6 +731,7 @@ enum class SUnaryOperator private constructor(private val symbol: String, privat
      *
      */
     NEGATE("!", 1),
+
     /**
      *
      */

@@ -22,14 +22,13 @@ package edu.kit.iti.formal.automation.smt
  * #L%
  */
 
-import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.smv.ast.SMVModule
 
 /**
  * @author Alexander Weigl
  * @version 1 (15.10.17)
  */
-object SMTFacade {
+object SmvSmtFacade {
     fun translate(module: SMVModule): SMTProgram {
         val s2s = SSA2SMT(module)
         s2s.run()

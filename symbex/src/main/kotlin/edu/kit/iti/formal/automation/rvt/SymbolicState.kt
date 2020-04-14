@@ -22,12 +22,11 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.smv.SMVAstMutableVisitor
+import edu.kit.iti.formal.smv.ExpressionReplacer
 import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import kotlin.collections.HashMap
-import kotlin.collections.HashSet
 
 const val ASSIGN_SEPARATOR: String = "\$"
 
@@ -162,47 +161,3 @@ data class SymbolicState(val definitions: HashMap<SVariable, SymbolicVariable> =
     fun isAuxiliary(key: SVariable) = key in auxVariables*/
 }
 
-class ExpressionReplacer(private val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
-    var changed = false
-    override fun visit(v: SVariable): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-
-    override fun visit(v: SBinaryExpression): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-
-    override fun visit(v: SUnaryExpression): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-
-    override fun visit(v: SLiteral): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-
-    override fun visit(v: SFunction): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-
-    override fun visit(v: SQuantified): SMVExpr {
-        val a = assignments[v]
-        return if (a == null) super.visit(v) else {
-            changed = true; a
-        }
-    }
-}

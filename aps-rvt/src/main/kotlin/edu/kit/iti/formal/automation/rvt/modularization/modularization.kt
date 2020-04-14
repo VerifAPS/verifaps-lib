@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.rvt.modularization
 
+import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.info
 import kotlinx.coroutines.runBlocking
 
@@ -10,6 +11,43 @@ fun parseCallSitePair(it: String) = if ("=" in it) {
     it to it
 }
 
+/**
+ *
+ */
+class ReveContext {
+    fun relationOf(oldVar: String, newVar: String): SBinaryOperator =
+            relation.find { it.oldVar.name == oldVar && it.newVar.name == newVar }?.operator ?: SBinaryOperator.EQUAL
+
+    /**
+     * Sub context relation, we are using an heuristic.
+     */
+    operator fun compareTo(c: ReveContext): Int {
+        if (c.isPerfect) {
+            if (isPerfect) return 0
+            return -1
+        }
+        return 1
+    }
+
+    val isPerfect: Boolean
+        get() = onlyEquivalence && condition == SLiteral.TRUE
+
+    val condition: SMVExpr = SLiteral.TRUE
+    val relation: MutableList<RelatedVariables> = arrayListOf()
+
+    val onlyEquivalence: Boolean
+        get() {
+            return relation.all { it.operator == SBinaryOperator.EQUAL }
+        }
+}
+
+data class RelatedVariables(
+        val oldVar: SVariable,
+        val operator: SBinaryOperator,
+        val newVar: SVariable) {
+    val expr
+        get() = SBinaryExpression(oldVar, operator, newVar)
+}
 
 /**
  *
@@ -17,6 +55,8 @@ fun parseCallSitePair(it: String) = if ("=" in it) {
  * @version 1 (14.07.18)
  */
 class ModularProver(val args: ModularizationApp) {
+    val context = ReveContext()
+
     val oldProgram = ModularProgram(args.old)
     val newProgram = ModularProgram(args.new)
     val callSitePairs: CallSiteMapping =
@@ -59,9 +99,10 @@ class ModularProver(val args: ModularizationApp) {
         val proveStrategy = DefaultEqualityStrategy(this)
         args.outputFolder.mkdirs()
         runBlocking(ModApp.processContext) {
-            val equal = proveStrategy.equalityOf(oldProgram, newProgram)
+            val equal = proveStrategy.proofEquivalenceTopLevel()
             info("Proof result: $equal")
         }
     }
 }
+
 

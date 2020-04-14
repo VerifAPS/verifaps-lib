@@ -169,8 +169,41 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
             map { it.accept(this@SMVAstMutableVisitor) as E }.toMutableList()
 }
 
-class VariableReplacer(val map: Map<SVariable, SMVExpr>) : SMVAstMutableVisitor() {
+class VariableReplacer(val map: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
     override fun visit(v: SVariable): SMVExpr {
         return map.getOrDefault(v, v)
+    }
+}
+
+open class ExpressionReplacer(protected val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
+    var changed = false
+    protected open fun replace(x: SMVExpr): SMVExpr {
+        val a = assignments[x]
+        return if (a == null)
+            super.visit(x) as SMVExpr
+        else {
+            changed = true;
+            a
+        }
+    }
+
+    override fun visit(v: SVariable): SMVExpr = replace(v)
+    override fun visit(v: SBinaryExpression) = replace(v)
+    override fun visit(v: SUnaryExpression) = replace(v)
+    override fun visit(v: SLiteral) = replace(v)
+    override fun visit(v: SFunction) = replace(v)
+    override fun visit(v: SQuantified) = replace(v)
+}
+
+open class ExpressionReplacerRecur(assignments: Map<out SMVExpr, SMVExpr>)
+    : ExpressionReplacer(assignments) {
+    protected override fun replace(x: SMVExpr): SMVExpr {
+        val a = assignments[x]
+        return if (a == null)
+            super.visit(x) as SMVExpr
+        else {
+            changed = true;
+            a.accept(this) as SMVExpr
+        }
     }
 }

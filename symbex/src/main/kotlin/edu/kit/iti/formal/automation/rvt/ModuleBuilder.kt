@@ -25,11 +25,13 @@ package edu.kit.iti.formal.automation.rvt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.rvt.translators.DefaultValueTranslator
 import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.smv.ExpressionReplacer
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -103,13 +105,18 @@ class DefinitionReducer(private val module: SMVModule) {
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
-class ModuleBuilder(val program: PouExecutable,
-                    finalState: SymbolicState,
-                    val reduceDefinitions: Boolean = true) : Runnable {
+class ModuleBuilder(
+        name: String,
+        val scope: Scope,
+        finalState: SymbolicState,
+        val reduceDefinitions: Boolean = true) : Runnable {
+
+    constructor(program: PouExecutable, finalState: SymbolicState, reduceDefinitions: Boolean = true)
+            : this(program.name, program.scope, finalState, reduceDefinitions)
+
     val state = finalState//.unfolded()
 
-
-    val module = SMVModule(program.name)
+    val module = SMVModule(name)
     //val vardeps: VariableDependency = VariableDependency(finalState)
     //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
 
@@ -118,13 +125,8 @@ class ModuleBuilder(val program: PouExecutable,
     var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     override fun run() {
-        module.name = program.name
-
-        val outputVars = HashSet(program.scope
-                .filterByFlags(VariableDeclaration.OUTPUT))
-
-        val inputVars = program.scope
-                .filterByFlags(VariableDeclaration.INPUT)
+        val outputVars = scope.filterByFlags(VariableDeclaration.OUTPUT).toSet()
+        val inputVars = scope.filterByFlags(VariableDeclaration.INPUT)
 
         // TODO fix so this terminates
         //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
@@ -180,7 +182,7 @@ class ModuleBuilder(val program: PouExecutable,
     }
 
     private fun addInitAssignment(variable: SVariable) {
-        val s = program.scope.getVariable(variable.name)
+        val s = scope.getVariable(variable.name)
         val e: SMVExpr
         if (s!!.init != null) {
             val sv = s.init as Literal?
