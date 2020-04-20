@@ -245,6 +245,8 @@ class ProgMiterConstruction(val pous: List<PouElement>) {
                 }
                 is FunctionDeclaration ->
                     functions.add(pouE)
+                is FunctionBlockDeclaration -> {}
+
                 is TypeDeclarations -> {
                     pouE.forEach { td ->
                         when (td) {

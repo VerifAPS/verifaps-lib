@@ -206,7 +206,7 @@ open class HccPrinter
             if (i == 0)
                 sb.printf("if( ")
             else
-                sb.printf("else if( ")
+                sb.printf("} else if( ")
 
             ifStatement.conditionalBranches[i].condition.accept(this)
 
@@ -239,10 +239,12 @@ open class HccPrinter
 
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
-        if (simpleTypeDeclaration.baseType.obj is AnyBit.BOOL) { //TODO
+        if (simpleTypeDeclaration.baseType.obj is AnyBit.BOOL) {
             sb.printf("int")
         } else if (simpleTypeDeclaration.baseType.obj is EnumerateType) {
             sb.printf("int")
+        } else if (simpleTypeDeclaration.baseType.obj is UINT) {
+            sb.printf("unsigned int")
         } else {
             sb.printf(simpleTypeDeclaration.baseType.identifier!!.toLowerCase())
 
