@@ -2,11 +2,9 @@ package edu.kit.iti.formal.automation.rvt.modularization
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.analysis.ReportLevel
-
 import edu.kit.iti.formal.automation.sfclang.getUniqueName
-import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.util.info
 import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.File
@@ -25,16 +23,7 @@ object ModApp {
     }
 }
 
-internal fun readProgramsOrError(p: String): PouElements {
-    val (c, ok) = IEC61131Facade.fileResolve(File(p))
-    if (ok.any { it.level == ReportLevel.ERROR }) {
-        ok.forEach { edu.kit.iti.formal.util.error(it.toHuman()) }
-        throw IllegalStateException("Aborted due to errors")
-    }
-    return c
-}
-
-class ModularizationApp() : CliktCommand() {
+class ModularizationApp : CliktCommand() {
     val v by option("-v", help = "enable verbose mode").flag()
     val old by option("--old", help = "old program ").required()
     val new by option("--new", help = "new program").required()
@@ -49,15 +38,30 @@ class ModularizationApp() : CliktCommand() {
             .multiple()
 
     val run: Boolean by option("--run", "-r", help = "run prover").flag()
+
     val allowedCallSites by option("-s", "--site", help = "call sites to abstract").multiple()
+
     val outputFolder by option("-o", "--output", help = "output folder")
             .convert { File(it) }
             .default(File(getUniqueName("output_")))
 
-    fun readProgramsOrError() = readProgramsOrError(old) to readProgramsOrError(new)
+    val library by option().file().multiple()
 
     override fun run() {
-        val m = ModularProver(this)
+        outputFolder.mkdirs()
+        val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new))
+        require(oldExec != null) { "Could not find program in $old" }
+        require(newExec != null) { "Could not find program in $new" }
+
+        val oldProgram = ModFacade.createModularProgram(oldExec, outputFolder, "old")
+        val newProgram = ModFacade.createModularProgram(newExec, outputFolder, "new")
+        val m = ModularProver(
+                oldProgram, newProgram,
+                callSitePairs = ModFacade.findCallSitePairs(allowedCallSites, oldProgram, newProgram),
+                context = ReveContext(),
+                outputFolder = outputFolder
+        )
+
         when {
             list -> m.printCallSites()
             contexts.isNotEmpty() -> m.printContexts()

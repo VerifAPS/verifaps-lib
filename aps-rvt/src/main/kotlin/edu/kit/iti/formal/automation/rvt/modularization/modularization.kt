@@ -3,13 +3,7 @@ package edu.kit.iti.formal.automation.rvt.modularization
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.info
 import kotlinx.coroutines.runBlocking
-
-fun parseCallSitePair(it: String) = if ("=" in it) {
-    val (a, b) = it.split("=")
-    a to b
-} else {
-    it to it
-}
+import java.io.File
 
 /**
  *
@@ -54,28 +48,20 @@ data class RelatedVariables(
  * @author Alexander Weigl
  * @version 1 (14.07.18)
  */
-class ModularProver(val args: ModularizationApp) {
-    val context = ReveContext()
-
-    val oldProgram = ModularProgram(args.old)
-    val newProgram = ModularProgram(args.new)
-    val callSitePairs: CallSiteMapping =
-            args.allowedCallSites
-                    .map(::parseCallSitePair)
-                    .map { (a, b) ->
-                        val x = oldProgram.findCallSite(a)
-                                ?: error("Could not find $a")
-                        val y = newProgram.findCallSite(b)
-                                ?: error("Could not find $b")
-                        x to y
-                    }
+class ModularProver(
+        val oldProgram: ModularProgram,
+        val newProgram: ModularProgram,
+        var context: ReveContext = ReveContext(),
+        var callSitePairs: CallSiteMapping = arrayListOf(),
+        var outputFolder: File = File(".")
+) {
 
     fun printCallSites() {
-        info("Call sites for the old program: ${oldProgram.filename}")
+        info("Call sites for the old program: ${oldProgram.entry.name}")
         oldProgram.callSites.forEach {
             info("${it.repr()} in line ${it.startPosition}")
         }
-        info("Call sites for the new program: ${newProgram.filename}")
+        info("Call sites for the new program: ${newProgram.entry.name}")
         newProgram.callSites.forEach {
             info("${it.repr()} in line ${it.startPosition}")
         }
@@ -97,7 +83,7 @@ class ModularProver(val args: ModularizationApp) {
 
     fun proof() {
         val proveStrategy = DefaultEqualityStrategy(this)
-        args.outputFolder.mkdirs()
+        outputFolder.mkdirs()
         runBlocking(ModApp.processContext) {
             val equal = proveStrategy.proofEquivalenceTopLevel()
             info("Proof result: $equal")

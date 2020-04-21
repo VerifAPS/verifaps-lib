@@ -68,7 +68,6 @@ object SmtFacade {
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .start()
 
-        println(problem)
         process.outputStream.writer().use { it.write(problem) }
         val error = process.waitFor()
         process.inputStream.bufferedReader().useLines { lines ->

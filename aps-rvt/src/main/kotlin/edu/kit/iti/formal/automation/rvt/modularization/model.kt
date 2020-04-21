@@ -1,16 +1,21 @@
 package edu.kit.iti.formal.automation.rvt.modularization
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.automation.st.util.UsageFinder
-import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.ast.SMVExpr
+import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
+import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 
+/** Get the name of the callee */
 val Invoked?.name: String?
     get() = when (this) {
         is Invoked.Program -> program.name
@@ -24,6 +29,45 @@ val Invoked?.name: String?
 typealias CallSiteMapping = List<Pair<BlockStatement, BlockStatement>>
 
 object ModFacade {
+    fun createModularProgram(entry: PouExecutable,
+                             outputFolder: File,
+                             prefix: String = ""): ModularProgram {
+
+        val complete = SymbExFacade.simplify(entry)
+        val simplifiedFile = File(outputFolder, "${prefix}_${entry.name}_simplified.st")
+        info("Write simplified version of '$prefix' to $simplifiedFile")
+        simplifiedFile.bufferedWriter().use { IEC61131Facade.printTo(it, complete) }
+
+        val symbex = SymbExFacade.evaluateProgram(complete, true)
+        val smvFile = File(outputFolder, "${prefix}_${entry.name}_simplified.smv")
+        info("Write complete SMV file of '$prefix' to $smvFile")
+        smvFile.bufferedWriter().use { symbex.accept(SMVPrinter(CodeWriter(it))) }
+
+        info("Maintain frames in $prefix")
+        val callSites = ModFacade.updateBlockStatements(complete)
+
+        return ModularProgram(entry, complete, symbex, callSites)
+    }
+
+    fun parseCallSitePair(it: String) = if ("=" in it) {
+        val (a, b) = it.split("=")
+        a to b
+    } else {
+        it to it
+    }
+
+    fun findCallSitePair(old: String, new: String,
+                         oldProgram: ModularProgram, newProgram: ModularProgram)
+            : Pair<BlockStatement, BlockStatement> {
+        val x = oldProgram.findCallSite(old)
+                ?: error("Could not find $old")
+        val y = newProgram.findCallSite(new)
+                ?: error("Could not find $new")
+        return x to y
+    }
+
+    fun findCallSitePairs(seq: List<String>, oldProgram: ModularProgram, newProgram: ModularProgram) = seq.map(::parseCallSitePair).map { (a, b) -> findCallSitePair(a, b, oldProgram, newProgram) }
+
     fun createFrame(cNew: BlockStatement, scope: Scope): Frame {
         return Frame(cNew, scope)
     }
@@ -64,17 +108,9 @@ object ModFacade {
     }
 }
 
-private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) =
-        vars.map { reference -> this.getVariable(reference).clone().also { it.type = newType } }
-
-class ModularProgram(val filename: String) {
-    val elements: PouElements by lazy { readProgramsOrError(filename) }
-    val entry: ProgramDeclaration = elements.findFirstProgram()
-            ?: error("Could not find any PROGRAM in $filename")
-    val complete: PouExecutable by lazy { SymbExFacade.simplify(entry) }
-    val symbex by lazy { SymbExFacade.evaluateProgram(complete, true) }
-
-    val callSites: List<BlockStatement> by lazy { ModFacade.updateBlockStatements(complete) }
+class ModularProgram(val entry: PouExecutable,
+                     val complete: PouExecutable, val symbex: SMVModule,
+                     val callSites: List<BlockStatement>) {
 
     fun findCallSite(aa: String): BlockStatement? {
         return callSites.find { it.repr() == aa }
@@ -150,3 +186,6 @@ class MaintainBlocks(val entry: PouExecutable) {
         }
     }
 }
+
+private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) =
+        vars.map { reference -> this.getVariable(reference).clone().also { it.type = newType } }

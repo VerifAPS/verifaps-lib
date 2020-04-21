@@ -180,7 +180,7 @@ data class SCaseExpression(var cases: MutableList<Case> = arrayListOf()) : SMVEx
  */
 data class SFunction(
         val name: String,
-        val arguments: List<SMVExpr>) : SMVExpr() {
+        var arguments: List<SMVExpr>) : SMVExpr() {
     var typeSolver: FunctionTypeSolver? = null
 
     override val dataType: SMVType?
@@ -359,7 +359,7 @@ abstract class SMVExpr : SMVAst() {
     abstract override fun clone(): SMVExpr
 
     fun replaceExhaustive(definitions: Map<out SMVExpr, SMVExpr>): SMVExpr {
-        val r = ExpressionReplacer(definitions)
+        val r = ExpressionReplacerRecur(definitions)
         return accept(r) as SMVExpr
     }
 }

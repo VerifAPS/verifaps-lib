@@ -259,12 +259,12 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
     override fun visit(variableDeclaration: VariableDeclaration) {
         variableDeclaration.initValue
                 ?: reporter.report(variableDeclaration.token,
-                        "Could not determine initial value for variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration}",
+                        "Could not determine initial value for variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
                         ReportCategory.INIT_VALUE)
 
         variableDeclaration.dataType
                 ?: reporter.report(variableDeclaration.token,
-                        "Could not determine data type of variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration}",
+                        "Could not determine data type of variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
                         ReportCategory.TYPE_RESOLVE)
     }
 

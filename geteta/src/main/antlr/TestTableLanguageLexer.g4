@@ -86,7 +86,7 @@ IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
 
 fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;
-//FLOAT:   '-'? NUMBER '.' NUMBER?;
+FLOAT:   NUMBER '.' NUMBER;
 INTEGER: NUMBER;
 
 WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);

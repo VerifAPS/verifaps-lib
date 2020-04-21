@@ -195,15 +195,87 @@ open class ExpressionReplacer(protected val assignments: Map<out SMVExpr, SMVExp
     override fun visit(v: SQuantified) = replace(v)
 }
 
-open class ExpressionReplacerRecur(assignments: Map<out SMVExpr, SMVExpr>)
-    : ExpressionReplacer(assignments) {
-    protected override fun replace(x: SMVExpr): SMVExpr {
-        val a = assignments[x]
-        return if (a == null)
-            super.visit(x) as SMVExpr
-        else {
-            changed = true;
-            a.accept(this) as SMVExpr
-        }
+class SMVAstMutableTraversal(val visitor: SMVAstMutableVisitor) : SMVAstMutableVisitor() {
+    override fun visit(top: SMVAst) = top
+    override fun visit(v: SVariable): SMVExpr = v
+
+    override fun visit(be: SBinaryExpression): SMVExpr {
+        be.left = be.left.accept(visitor) as SMVExpr
+        be.right = be.right.accept(visitor) as SMVExpr
+        return be
     }
+
+    override fun visit(ue: SUnaryExpression): SMVExpr {
+        ue.expr = ue.expr.accept(visitor) as SMVExpr
+        return ue
+    }
+
+    override fun visit(l: SLiteral): SMVExpr = l
+
+    override fun visit(a: SAssignment): SAssignment {
+        a.expr = a.expr.accept(visitor) as SMVExpr
+        a.target = a.target.accept(visitor) as SVariable
+        return a
+    }
+
+    override fun visit(ce: SCaseExpression): SMVExpr {
+        for (c in ce.cases) {
+            c.condition = c.condition.accept(visitor) as SMVExpr
+            c.then = c.then.accept(visitor) as SMVExpr
+        }
+        return ce
+    }
+
+    /*override fun visit(smvModule: SMVModule): SMVModule {
+        smvModule.initAssignments = smvModule.initAssignments.visitAll()
+        smvModule.nextAssignments = smvModule.nextAssignments.visitAll()
+        smvModule.definitions = smvModule.definitions.visitAll()
+        smvModule.ltlSpec = smvModule.ltlSpec.visitAll()
+        smvModule.ctlSpec = smvModule.ctlSpec.visitAll()
+        smvModule.frozenVars = smvModule.frozenVars.visitAll()
+        smvModule.stateVars = smvModule.stateVars.visitAll()
+        smvModule.inputVars = smvModule.inputVars.visitAll()
+        smvModule.invariants = smvModule.invariants.visitAll()
+        smvModule.moduleParameters = smvModule.moduleParameters.visitAll()
+        return smvModule
+    }
+*/
+    override fun visit(func: SFunction): SMVExpr {
+        func.arguments =
+                func.arguments.map { it.accept(visitor) as SMVExpr }
+                        .toMutableList()
+        return func
+    }
+
+    override fun visit(quantified: SQuantified): SMVExpr {
+        quantified.quantified = quantified.quantified
+                .map { it.accept(visitor) as SMVExpr }
+                .toMutableList()
+        return quantified
+    }
+}
+
+open class ExpressionReplacerRecur(val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
+    val traversal = SMVAstMutableTraversal(this)
+
+    private var changed: Boolean = false
+
+    protected fun replace(x: SMVExpr): SMVExpr {
+        var a = x
+        do {
+            val nxt = assignments[a]
+            if (nxt != null) a = nxt
+            else break
+        } while (true)
+
+        changed = changed || a != x
+        return a.accept(traversal) as SMVExpr
+    }
+
+    override fun visit(v: SVariable): SMVExpr = replace(v)
+    override fun visit(v: SBinaryExpression): SMVExpr = replace(v) as SMVExpr
+    override fun visit(v: SUnaryExpression): SMVExpr = (replace(v)) as SMVExpr
+    override fun visit(v: SLiteral): SMVExpr = (replace(v)) as SMVExpr
+    override fun visit(v: SFunction): SMVExpr = (replace(v)) as SMVExpr
+    override fun visit(v: SQuantified): SMVExpr = (replace(v)) as SMVExpr
 }

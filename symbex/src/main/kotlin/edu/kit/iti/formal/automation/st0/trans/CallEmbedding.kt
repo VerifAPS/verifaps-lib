@@ -111,8 +111,8 @@ class FBEmbeddParameters : CodeTransformation {
                 //rewrite output variables as trailing assignments.
                 invocation.outputParameters.forEach { (name, _, expression) ->
                     if (name != null) {
-                        invocation.callee.copy(sub = SymbolicReference(name))
-                        stmt += AssignmentStatement(expression as SymbolicReference, SymbolicReference(name))
+                        val out = invocation.callee.copy(sub = SymbolicReference(name))
+                        stmt += AssignmentStatement(expression as SymbolicReference, out)
                     } else {
                         throw IllegalStateException("Output parameter in function block call w/o name.")
                     }
@@ -164,10 +164,22 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             bodyCache[state] = s.stBody
         }
         val statements = bodyCache[state]!!.clone()
-        val renamed = VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
+        val renameFn: (String) -> String = { prefix + SCOPE_SEPARATOR + it }
+        val renamed = VariableRenamer(state.scope::isGlobalVariable, statements.clone(), renameFn).rename()
         val block = BlockStatement(prefix)
-        block.statements= renamed
+        block.input = rewrite(renameFn, state.scope) { it.isInput }
+        block.output = rewrite(renameFn, state.scope) { it.isOutput }
+        block.state = rewrite(renameFn, state.scope) { it.isLocal }
+        block.statements = renamed
         return block
+    }
+
+    private fun rewrite(renameFn: (String) -> String,
+                        scope: Scope,
+                        filter: (VariableDeclaration) -> Boolean): MutableList<SymbolicReference> {
+        return scope.variables.filter(filter)
+                .map { SymbolicReference(renameFn(it.name)) }
+                .toMutableList()
     }
 
     override fun visit(invocation: InvocationStatement): Statement {
@@ -177,7 +189,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         if (invoked is Invoked.FunctionBlock) {
             val state = TransformationState(invoked.fb)
             val prefix = invocation.callee.toPath().joinToString(SCOPE_SEPARATOR)
-            return getBody(prefix, state).also { it.originalInvoked=invoked }
+            return getBody(prefix, state).also { it.originalInvoked = invoked }
         }
 
         if (invoked is Invoked.Action && invocation.callee.hasSub()) {
@@ -185,7 +197,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             val fb = action.subList(0, action.lastIndex - 1)
             val prefix = fb.joinToString(SCOPE_SEPARATOR)
             val state = TransformationState(invoked.scope, invoked.action.stBody!!, SFCImplementation())
-            return getBody(prefix, state).also { it.originalInvoked=invoked }
+            return getBody(prefix, state).also { it.originalInvoked = invoked }
         }
 
         if (invoked is Invoked.Function) {
