@@ -39,10 +39,11 @@ class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap())
  * 2020-02-11 weigl: add branch conditions to line map
  * 2020-03-10 weigl: add branch conditions for cases
  */
-open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
+open class SymbolicExecutioner(
+        var scope: Scope = Scope.defaultScope(),
+        val useDefinitions: Boolean = true) : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
-    var scope: Scope = Scope.defaultScope()
     private val varCache = HashMap<String, SVariable>()
     var operationMap: OperationMap = DefaultOperationMap()
     var typeTranslator: TypeTranslator = DefaultTypeTranslator()
@@ -50,17 +51,11 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     private val state = Stack<SymbolicState>()
-    private var globalState = SymbolicState()
+    private var globalState = SymbolicState(useDefinitions = useDefinitions)
     private var caseExpression: Expression? = null
 
     init {
         push(SymbolicState(globalState))
-    }
-
-    constructor(globalScope: Scope?) : this() {
-        if (globalScope != null) {
-            this.scope = globalScope
-        }
     }
 
     fun peek(): SymbolicState {
@@ -145,7 +140,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
         scope = exec.scope
 
-        push(SymbolicState())
+        push(SymbolicState(useDefinitions = useDefinitions))
 
         // initialize root state
         for (vd in scope) {
@@ -317,7 +312,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
 
         val cur = peek()
         val combined = branchStates.asCompressed(ifStatement.endPosition)
-        cur.definitions.putAll(combined.definitions)
+        cur.variables.putAll(combined.variables)
         cur.auxiliaryDefinitions.putAll(combined.auxiliaryDefinitions)
         return null
     }
@@ -351,7 +346,7 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
         }
         val cur = peek()
         val combined = branchStates.asCompressed(caseStatement.endPosition)
-        cur.definitions.putAll(combined.definitions)
+        cur.variables.putAll(combined.variables)
         return null
     }
 
@@ -409,15 +404,17 @@ open class SymbolicExecutioner() : DefaultVisitor<SMVExpr>() {
     }
 
     fun SymbolicBranches.asCompressed(pos: Position): SymbolicState {
-        val sb = SymbolicState()
+        val sb = SymbolicState(useDefinitions = useDefinitions)
         sb.auxiliaryDefinitions.putAll(auxiliary)
         variables.forEach { (t, u) ->
-            val sv = SymbolicVariable(t)
+            val sv = sb.ensureVariable(t)
             val cnt = assignmentCounter.incrementAndGet()
             lineNumberMap[cnt] = t.name to pos
             sv.push(u.compress(), "$ASSIGN_SEPARATOR$cnt")
-            defines[t]?.let { sv.values.putAll(it) }
-            sb.definitions[t] = sv
+
+            if (sv is SymbolicVariableTracing)
+                defines[t]?.let { sv.values.putAll(it) }
+            sb.variables[t] = sv
         }
         return sb
     }
@@ -434,9 +431,10 @@ class SymbolicBranches {
     val auxiliary = HashMap<SVariable, SMVExpr>()
 
     fun addBranch(condition: SMVExpr, state: SymbolicState) {
-        for ((key, value) in state.definitions) {
-            getVariable(key).add(condition, if (state.useDefinitions) value.current else value.value!!)
-            getDefines(key).putAll(value.values)
+        for ((key, value) in state.variables) {
+            getVariable(key).add(condition, value.value)
+            if (value is SymbolicVariableTracing)
+                getDefines(key).putAll(value.values)
         }
         this.auxiliary.putAll(state.auxiliaryDefinitions)
     }

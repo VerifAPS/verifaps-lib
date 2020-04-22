@@ -33,7 +33,6 @@ import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
@@ -155,10 +154,10 @@ object SymbExFacade {
         return DefaultTypeTranslator().translate(vd)
     }
 
-    fun evaluateStatements(seq: StatementList, scope: Scope): SymbolicState {
+    fun evaluateStatements(seq: StatementList, scope: Scope, useDefinitions: Boolean = true): SymbolicState {
         val program = ProgramDeclaration(scope = scope, stBody = seq)
         IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(program)))
-        val symbex = SymbolicExecutioner(scope)
+        val symbex = SymbolicExecutioner(scope, useDefinitions)
         symbex.scope = scope
         program.accept(symbex)
         return symbex.peek()

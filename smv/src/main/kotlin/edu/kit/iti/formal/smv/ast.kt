@@ -53,12 +53,12 @@ data class SAssignment(
     override fun clone() = copy()
 }
 
-data class SBinaryExpression(private var _left: SMVExpr,
+data class SBinaryExpression(var left: SMVExpr,
                              var operator: SBinaryOperator,
-                             private var _right: SMVExpr)
+                             var right: SMVExpr)
     : SMVExpr() {
 
-    var left: SMVExpr
+/*    var left: SMVExpr
         get() = _left
         set(value) {
             if (value === this) throw IllegalArgumentException()
@@ -71,7 +71,7 @@ data class SBinaryExpression(private var _left: SMVExpr,
             if (value === this) throw IllegalArgumentException()
             _right = value
         }
-
+*/
 
     override val dataType: SMVType?
         get() = SMVTypes.infer(operator, left.dataType!!, right.dataType!!)

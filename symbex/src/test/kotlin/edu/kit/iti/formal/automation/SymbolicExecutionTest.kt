@@ -26,6 +26,7 @@ import com.google.common.truth.Truth.assertThat
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.SymbolicVariable
+import edu.kit.iti.formal.automation.rvt.SymbolicVariableTracing
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -38,14 +39,21 @@ private val Map<SVariable, SymbolicVariable>.stringified: Map<String, String>
     get() =
         asSequence()
                 .flatMap { (a, b) ->
-                    b.values.entries.asSequence().map { (a, b) -> a.repr() to b.repr() }
+                    if (b is SymbolicVariableTracing)
+                        b.values.entries.asSequence().map { (a, b) -> a.repr() to b.repr() }
+                    else
+                        listOf(a.repr() to b.value.repr()).asSequence()
                 }
                 .toMap()
 
-private val SymbolicState.definitions: Map<String, String>
-    get() = definitions.flatMap { (_, b) ->
-        b.values.map { (a, b) -> a.name to b.repr() }
+/*private val SymbolicState.definitions: Map<String, String>
+    get() = variables.flatMap { (_, b) ->
+        if (b is SymbolicVariableTracing)
+            b.values.map { (a, b) -> a.name to b.repr() }
+        else
+            emptySet()
     }.toMap()
+*/
 
 private val Map<SVariable, SMVExpr>.stringifed: Map<String, String>
     get() = asSequence()
@@ -69,7 +77,7 @@ class SymbolicExecutionTest {
                 "c := a+c;" +
                 "b := 2*a+c;"
         val state = executeStatements(statments)
-        val defs = state.definitions.stringified
+        val defs = state.variables.stringified
         val states = state.stringifed
 
         assertThat(defs).run {
@@ -104,6 +112,31 @@ class SymbolicExecutionTest {
     }
 
     @Test
+    fun simpleTestNoDefs() {
+        val statments = "a := 2;" +
+                "c := 3;" +
+                "c := a+c;" +
+                "b := 2*a+c;"
+        val state = executeStatements(statments, false)
+        val defs = state.variables.stringified
+        val states = state.stringifed
+
+        println(defs)
+        println(states)
+
+        assertThat(states).run {
+            containsEntry("a", "0sd16_2")
+            containsEntry("b", "0sd16_2 * 0sd16_2 + 0sd16_2 + 0sd16_3")
+            containsEntry("c", "0sd16_2 + 0sd16_3")
+            containsEntry("d", "d")
+            containsEntry("e", "e")
+            containsEntry("f", "f")
+            containsEntry("o", "o")
+            isEqualTo(states)
+        }
+    }
+
+    @Test
     fun simpleIfTest() {
         val statements = """
                     a := 2; 
@@ -112,7 +145,7 @@ class SymbolicExecutionTest {
                     IF a = 2 THEN  b := 2; 
                     ELSE b := 1; c:=2; END_IF;"""
         val state = executeStatements(statements)
-        val defs = state.definitions.stringified
+        val defs = state.variables.stringified
         val states = state.stringifed
 
         defs.forEach { (t, u) -> println("$t = $u") }
@@ -158,7 +191,7 @@ class SymbolicExecutionTest {
     fun simpleIfWithoutElse() {
         val list = "a := 1; c:= a; b:=b; IF a = 2 THEN b := 2; c := 1;END_IF;"
         val state = executeStatements(list);
-        val defs = state.definitions
+        val defs = state.variables
         val states = state.stringifed
         defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
         states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
@@ -191,7 +224,7 @@ class SymbolicExecutionTest {
          END_CASE
         """.trimIndent()
         val state = executeStatements(list)
-        val defs = state.definitions.stringified
+        val defs = state.variables.stringified
         val states = state.stringifed
         //defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
         //states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
@@ -266,7 +299,7 @@ class SymbolicExecutionTest {
     fun simpleAssignmentTest() {
         val statements = "a := 2;\na := 3;\na:= 4;\nb := a + 1;\nb := a + 1;\nb := b + 1;"
         val state = executeStatements(statements)
-        val definitions = state.definitions.stringified
+        val definitions = state.variables.stringified
 
         assertThat(definitions).run {
             containsEntry("a$00000", "a")
@@ -296,10 +329,10 @@ class SymbolicExecutionTest {
         }
     }
 
-    private fun executeStatements(statements: String): SymbolicState {
+    private fun executeStatements(statements: String, useDefs: Boolean=true): SymbolicState {
         val list = IEC61131Facade.statements(statements)
         IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
-        return SymbExFacade.evaluateStatements(list, scope)
+        return SymbExFacade.evaluateStatements(list, scope, useDefs)
     }
 }
 

@@ -42,4 +42,16 @@ class ModularizationIntegrationTest {
         )
         ModApp.main(args)
     }
+
+    @Test
+    fun testSimpleCtx() {
+        val input = File("$base/simpleA.st").absolutePath
+        val args = arrayOf("--old", "A@$input", "--new", "B@$input",
+                "-o", "build/testScenario/simple",
+                "-fc", "A.f1.0=B.f1.0##",
+                "-fc", "A.f2.0=B.f2.0##",
+                "--info"
+        )
+        ModApp.main(args)
+    }
 }

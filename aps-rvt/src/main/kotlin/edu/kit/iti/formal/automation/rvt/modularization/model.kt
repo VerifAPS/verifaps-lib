@@ -2,13 +2,16 @@ package edu.kit.iti.formal.automation.rvt.modularization
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.rvt.ModuleBuilder
+import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
+import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.automation.st.util.UsageFinder
+import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.SMVPrinter
-import edu.kit.iti.formal.smv.ast.SMVExpr
-import edu.kit.iti.formal.smv.ast.SMVModule
+import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
 import java.io.File
@@ -38,22 +41,31 @@ object ModFacade {
         info("Write simplified version of '$prefix' to $simplifiedFile")
         simplifiedFile.bufferedWriter().use { IEC61131Facade.printTo(it, complete) }
 
-        val symbex = SymbExFacade.evaluateProgram(complete, true)
+        info("Maintain frames in $prefix")
+        val callSites = updateBlockStatements(complete)
+
+        val (symbex, frameContext) = evaluateProgram(complete)
         val smvFile = File(outputFolder, "${prefix}_${entry.name}_simplified.smv")
         info("Write complete SMV file of '$prefix' to $smvFile")
         smvFile.bufferedWriter().use { symbex.accept(SMVPrinter(CodeWriter(it))) }
 
-        info("Maintain frames in $prefix")
-        val callSites = ModFacade.updateBlockStatements(complete)
-
-        return ModularProgram(entry, complete, symbex, callSites)
+        return ModularProgram(entry, complete, symbex, callSites, frameContext)
     }
 
-    fun parseCallSitePair(it: String) = if ("=" in it) {
-        val (a, b) = it.split("=")
-        a to b
-    } else {
-        it to it
+    private fun evaluateProgram(complete: PouExecutable): Pair<SMVModule, HashMap<BlockStatement, SymbolicState>> {
+        class SymbolicExecutionerFC(topLevel: Scope) : SymbolicExecutioner(topLevel) {
+            val catch = HashMap<BlockStatement, SymbolicState>()
+            override fun visit(blockStatement: BlockStatement): SMVExpr? {
+                catch[blockStatement] = SymbolicState(peek())
+                return super.visit(blockStatement)
+            }
+        }
+
+        val se = SymbolicExecutionerFC(complete.scope.topLevel)
+        complete.accept(se)
+        val moduleBuilder = ModuleBuilder(complete, se.peek())
+        moduleBuilder.run()
+        return moduleBuilder.module to se.catch
     }
 
     fun findCallSitePair(old: String, new: String,
@@ -66,7 +78,38 @@ object ModFacade {
         return x to y
     }
 
-    fun findCallSitePairs(seq: List<String>, oldProgram: ModularProgram, newProgram: ModularProgram) = seq.map(::parseCallSitePair).map { (a, b) -> findCallSitePair(a, b, oldProgram, newProgram) }
+    fun createReveContextsBySpecification(seq: List<String>, oldProgram: ModularProgram, newProgram: ModularProgram): ReveContextManager {
+        val cm = ReveContextManager()
+        seq.map { createReveContextsBySpecification(it, oldProgram, newProgram, cm) }
+        return cm
+    }
+
+    fun createReveContextsBySpecification(it: String, oldProgram: ModularProgram, newProgram: ModularProgram,
+                                          ctxManager: ReveContextManager) {
+        // it == "A.f=A.f#cond#relations"
+        val sharp = it.count { it == '#' }
+        val (sitemap, cond, relations) = when (sharp) {
+            2 -> it.split("#")
+            //1 -> it.split("#")
+            else -> error("Contract format violated: $it")
+        }
+        val (left, right) = if ("=" in sitemap) sitemap.split("=") else listOf(sitemap, sitemap)
+        val (bA, bB) = findCallSitePair(left, right, oldProgram, newProgram)
+
+        val ctx = TopReveContext()
+        ctx.condition = if (cond.isBlank()) SLiteral.TRUE else SMVFacade.expr(cond)
+        ctx.relation = if (relations.isBlank()) arrayListOf() else
+            relations.split(",").map(::parseRelation).toMutableList()
+        ctxManager.add(bA, bB, ctx)
+    }
+
+    fun parseRelation(it: String): RelatedVariables {
+        val b = SMVFacade.expr(it) as SBinaryExpression
+        val left = b.left as SVariable
+        val right = b.right as SVariable
+        return RelatedVariables(left, b.operator, right)
+    }
+
 
     fun createFrame(cNew: BlockStatement, scope: Scope): Frame {
         return Frame(cNew, scope)
@@ -109,8 +152,10 @@ object ModFacade {
 }
 
 class ModularProgram(val entry: PouExecutable,
-                     val complete: PouExecutable, val symbex: SMVModule,
-                     val callSites: List<BlockStatement>) {
+                     val complete: PouExecutable,
+                     val symbex: SMVModule,
+                     val callSites: List<BlockStatement>,
+                     val frameContext: HashMap<BlockStatement, SymbolicState>) {
 
     fun findCallSite(aa: String): BlockStatement? {
         return callSites.find { it.repr() == aa }
