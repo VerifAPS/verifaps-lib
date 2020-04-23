@@ -137,7 +137,6 @@ open class RegressionVerification(
         addInputVariables()
         addStateVariables()
         addProofObligation(oldInstanceName, newInstanceName)
-        //TODO fix constants or SVariables
     }
 
     open fun writeTo(writer: Writer) {

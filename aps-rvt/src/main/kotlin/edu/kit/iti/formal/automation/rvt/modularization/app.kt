@@ -44,12 +44,10 @@ class ModularizationApp : CliktCommand() {
     val disableUpdateCache by option(help = "").flag()
     val disableCheckCache by option(help = "").flag()
 
-
     /*val contexts by option("--context",
             help = "expected equality of sub modules",
             metavar = "callsite=callsite/<smv>")
             .multiple()*/
-
 
     val inputRelation by option("-ri", "--rel-input").convert() { ModFacade.parseRelation(it) }.multiple()
     val outputRelation by option("-ro", "--rel-output").convert() { ModFacade.parseRelation(it) }.multiple()
@@ -107,18 +105,12 @@ class ModularizationApp : CliktCommand() {
         m.proveStrategy.disableProofBodyEquivalenceWithAbstractionSubFrames = disableProofBodyEquivalenceWithAbstractionSubFrames
         m.proveStrategy.disableUpdateCache = disableUpdateCache
 
-        //m.inferReveContexts()
-
-        when {
-            showInfos -> {
-                m.printCallSites()
-            }
-            else -> {
-                info("Output folder: ${outputFolder}")
-                info("Generate SMV files")
-                m.proof()
-                info("Files generated")
-            }
+        m.printCallSites()
+        if (!showInfos) {
+            info("Output folder: ${outputFolder}")
+            info("Start with the proof")
+            m.proof()
+            info("Files generated")
         }
     }
 }
