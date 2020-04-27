@@ -94,7 +94,7 @@ class ModularizationApp : CliktCommand() {
                 context = ctx,
                 outputFolder = outputFolder
         )
-        m.ctxManager = reveContextManager
+        m.ctxManager.addAll(reveContextManager)
 
         m.proveStrategy.disableCheckCache = disableCheckCache
         m.proveStrategy.disableProofBodyEquivalenceClassic = disableProofBodyEquivalenceClassic

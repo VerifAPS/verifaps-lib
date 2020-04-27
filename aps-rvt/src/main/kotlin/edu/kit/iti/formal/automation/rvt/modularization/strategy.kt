@@ -6,6 +6,7 @@ import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.UINT
+import edu.kit.iti.formal.automation.datatypes.USINT
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.modularization.ModFacade.createFrame
@@ -46,7 +47,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     var disableUpdateCache = false
     var disableCheckCache = false
 
-    val reveContextManager = mp.ctxManager
+    val reveContextManager: ReveContextManager = mp.ctxManager
 
     val outputFolder = mp.outputFolder
     val callSitePairs = mp.callSitePairs
@@ -157,9 +158,18 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return moduleBuilder.module
     }
 
+    private val abstractionRecursionProtection = HashSet<Pair<String, String>>()
+
     private suspend fun proofBodyEquivalenceWithAbstraction(old: Frame, new: Frame, ctx: ReveContext): Boolean =
             coroutineScope {
                 val lp = logprfx("proofBodyEquivalenceWithAbstraction", old, new)
+
+                if (old.name.endsWith("_abstracted") && (new.name.endsWith("_abstracted"))) {
+                    info("$lp declined, recursion protection triggered")
+                    return@coroutineScope false
+                }
+
+                abstractionRecursionProtection.add(old.name to new.name)
 
                 if (disableProofBodyEquivalenceWithAbstraction) {
                     info("$lp Skipped because `disableProofBodyEquivalenceWithAbstraction` is set")
@@ -202,18 +212,37 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             return@coroutineScope false
         }
 
-        val oldM = evaluateFrameWithAbstraction(old, oldAbstractedFrames)
-        val newM = evaluateFrameWithAbstraction(new, newAbstractedFrames)
-        val modules = glueWithMiter(old, new, oldM, newM, ctx)
+        val oldM = abstractFrames(old, oldAbstractedFrames)
+        val newM = abstractFrames(new, newAbstractedFrames)
 
+        val ctxNew = ctx.clone()
+
+        callSitePairs.filter { (a, b) ->
+            a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName)
+        }.forEach { (a, b) ->
+            // assertion of call
+            val c = a.getCallCounter()
+            val d = b.getCallCounter()
+            ctxNew.outRelation.add(RelatedVariables(
+                    SVariable(c.name), SBinaryOperator.EQUAL, SVariable(d.name)))
+
+            //add assertion of input
+            val q = reveContextManager?.get(a, b)
+            if (q != null) {
+                ctxNew.outRelation.addAll(q.inRelation)
+            }
+        }
+
+        // recursion
+        info("$lp Recursion for proofing abstracted body")
+        proofEquivalence(oldM, newM, ctxNew)
+
+        /*val modules = glueWithMiter(old, new, oldM, newM, ctx)
         val smvFile = file("${old.name}_${new.name}.smv")
         val logFile = file("${old.name}_${new.name}.log")
-
-        info("$lp Starting proof: $smvFile, $logFile")
-
         val r = runNuXmv(modules, smvFile, logFile)
 
-        r
+        r*/
     }
 
     private suspend fun proofBodyEquivalenceWithAbstractionSubFrames(
@@ -438,14 +467,11 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     //endregion
 
     //region symbolic execution with abstraction
-    fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
 
-    fun evaluateFrameWithAbstraction(exec: Frame, abstractedBlocks: List<BlockStatement>): SMVModule {
+    fun abstractFrames(exec: Frame, abstractedBlocks: List<BlockStatement>): Frame {
         val abstracted =
                 if (abstractedBlocks.isEmpty()) exec.block
                 else createProgramWithAbstraction(exec, abstractedBlocks)
-        //IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
-
         file("${exec.block.name}_abstracted.st").bufferedWriter()
                 .use {
                     IEC61131Facade.printTo(
@@ -453,24 +479,22 @@ class DefaultEqualityStrategy(mp: ModularProver) {
                             ProgramDeclaration("<frame>", exec.scope, StatementList(abstracted)),
                             true)
                 }
-        val state = symbex(Frame(abstracted, exec.scope))
-        val moduleBuilder = ModuleBuilder(exec.block.name, exec.scope, state)
-        moduleBuilder.run()
-        return moduleBuilder.module
+        val f = Frame(abstracted, exec.scope) //TODO additional assertion!
+        abstracted.fqName = exec.block.fqName + "_abstracted"
+        return f
     }
 
+    private fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
     fun rewriteInvocation(a: Frame, abstractedInvocation: List<BlockStatement>): BlockStatement {
         val new = a.block.clone()
         val scope = a.scope.copy()
 
         // foreach reference create a call counter
         abstractedInvocation.distinctBy { it.fqName }.forEach {
-            val prefix = it.fqName.replace('.', '$')
-            val sr = SymbolicReference(prefix + "_ccnt")
+            val prefix = it.getCallCounter()
+            val sr = SymbolicReference(prefix.name)
             new.statements.add(0, AssignmentStatement(sr, IntegerLit(INT, BigInteger.ZERO)))
-
-            val vd = VariableDeclaration(sr.identifier, TYPE_COUNTER, UINT)
-            scope.add(vd)
+            scope.add(prefix)
         }
 
         abstractedInvocation.forEach {
@@ -488,6 +512,11 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return "$method(${a.name},${b.name}): "
     }
 //endregion
+}
+
+private fun BlockStatement.getCallCounter(): VariableDeclaration {
+    val name = "${fqName.replace('.', '$')}_ccnt"
+    return VariableDeclaration(name, VariableDeclaration.OUTPUT or TYPE_COUNTER, USINT)
 }
 
 private class SmvReveBuilder(
@@ -542,11 +571,10 @@ private class InvocationRewriter(val prefix: String,
 
         val cnt = SymbolicReference(prefix + "_ccnt")
         val counterIncr = AssignmentStatement(cnt, cnt plus IntegerLit(UINT, BigInteger.ONE))
-
         list += counterIncr
 
         //Inputs
-        val instanceName = blockStatement.fqName.removeSuffix(".${blockStatement.name}").replace('.','$')
+        val instanceName = blockStatement.fqName.removeSuffix(".${blockStatement.name}").replace('.', '$')
         val prefix = blockStatement.repr().replace('.', '$')
         val inputsAssign =
                 blockStatement.input.map {

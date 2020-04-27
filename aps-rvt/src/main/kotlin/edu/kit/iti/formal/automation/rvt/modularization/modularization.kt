@@ -69,6 +69,8 @@ interface ReveContext {
         return seq.conjunction(SLiteral.TRUE)
     }
 
+    fun clone(): ReveContext
+
     val onlyEquivalence: Boolean
     val isPerfect: Boolean
 }
@@ -85,10 +87,11 @@ operator fun ReveContext.compareTo(c: ReveContext): Int {
 }
 
 
-class TopReveContext : ReveContext {
-    override var inRelation: MutableList<RelatedVariables> = arrayListOf()
-    override var outRelation: MutableList<RelatedVariables> = arrayListOf()
-    override var condition: SMVExpr = SLiteral.TRUE
+data class TopReveContext(override var inRelation: MutableList<RelatedVariables> = arrayListOf(),
+                          override var outRelation: MutableList<RelatedVariables> = arrayListOf(),
+                          override var condition: SMVExpr = SLiteral.TRUE) : ReveContext {
+
+    override fun clone() = copy()
 
     //override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator =
     //        relation.find { it.oldVar.name == oldVar && it.newVar.name == newVar }?.operator ?: SBinaryOperator.EQUAL
@@ -145,6 +148,10 @@ class ReveContextManager {
     fun get(old: BlockStatement, new: BlockStatement) = map[old to new]
     fun get(old: Frame, new: Frame) = get(old.block, new.block)
             ?: error("Could not found a context for ${old.name} and ${new.name}")
+
+    fun addAll(manager: ReveContextManager) {
+        map.putAll(manager.map)
+    }
 }
 
 /**
@@ -159,8 +166,8 @@ class ModularProver(
         var callSitePairs: CallSiteMapping = arrayListOf(),
         var outputFolder: File = File(".")
 ) {
+    val ctxManager = ReveContextManager()
     val proveStrategy = DefaultEqualityStrategy(this)
-    var ctxManager = ReveContextManager()
 
     fun printCallSites() {
         info("Call sites for the old program: ${oldProgram.entry.name}")
