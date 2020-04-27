@@ -7,7 +7,6 @@ import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
-import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.rvt.SymbolicState
 import edu.kit.iti.formal.automation.rvt.modularization.ModFacade.createFrame
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
@@ -77,7 +76,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     //region caching
     private val equivCache = arrayListOf<Triple<String, String, ReveContext>>()
     private fun checkCache(old: Frame, new: Frame, ctx: ReveContext): Boolean {
-        val lp = logprfx(old, new)
+        val lp = logprfx("checkCache", old, new)
 
         if (disableCheckCache) {
             info("$lp Skipped because `disableCheckCache` is set")
@@ -96,7 +95,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     private fun updateCache(old: Frame, new: Frame, ctx: ReveContext, equal: Boolean) {
-        val lp = logprfx(old, new)
+        val lp = logprfx("updateCache", old, new)
 
         if (disableUpdateCache) {
             info("$lp Skipped because `disableUpdateCache` is set")
@@ -118,7 +117,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     suspend fun proofBodyEquivalenceClassic(old: Frame, new: Frame,
                                             ctx: ReveContext = reveContextManager.get(old, new))
             : Boolean = coroutineScope {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceClassic", old, new)
 
         if (disableProofBodyEquivalenceClassic) {
             info("$lp Skipped because `disableProofBodyEquivalenceClassic` is set")
@@ -160,7 +159,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
     private suspend fun proofBodyEquivalenceWithAbstraction(old: Frame, new: Frame, ctx: ReveContext): Boolean =
             coroutineScope {
-                val lp = logprfx(old, new)
+                val lp = logprfx("proofBodyEquivalenceWithAbstraction", old, new)
 
                 if (disableProofBodyEquivalenceWithAbstraction) {
                     info("$lp Skipped because `disableProofBodyEquivalenceWithAbstraction` is set")
@@ -196,7 +195,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             old: Frame, new: Frame, ctx: ReveContext = reveContextManager.get(old, new),
             oldAbstractedFrames: List<BlockStatement>,
             newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceWithAbstractionBody", old, new)
 
         if (disableProofBodyEquivalenceWithAbstractionBody) {
             info("$lp Skipped because `disableProofBodyEquivalenceWithAbstractionBody` is set")
@@ -221,7 +220,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             old: Frame, new: Frame, ctx: ReveContext = reveContextManager.get(old, new),
             oldAbstractedFrames: List<BlockStatement>,
             newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceWithAbstractionSubFrames", old, new)
         if (disableProofBodyEquivalenceWithAbstractionSubFrames) {
             info("$lp Skipped because `disableProofBodyEquivalenceWithAbstractionSubFrames` is set")
             return@coroutineScope false
@@ -254,7 +253,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     fun proofBodyEquivalenceSource(old: Frame, new: Frame, ctx: ReveContext): Boolean {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceSource", old, new)
         if (disableProofBodyEquivalenceSource) {
             info("$lp Skipped because `disableProofBodyEquivalenceSource` is set")
             return false
@@ -274,14 +273,14 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     suspend fun proofBodyEquivalenceSSA(old: Frame, new: Frame, ctx: ReveContext): Boolean = coroutineScope {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceSSA", old, new)
         if (disableProofBodyEquivalenceSSA) {
             info("$lp Skipped because `disableProofBodyEquivalenceSSA` is set")
             return@coroutineScope false
         }
 
         if (!ctx.onlyEquivalence) {
-            info("$lp not suitable for frames ${old} and ${new}")
+            info("$lp not suitable for frames ${old.name} and ${new.name}")
             return@coroutineScope false
         }
 
@@ -299,7 +298,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     suspend fun proofBodyEquivalenceSMT(old: Frame, new: Frame, ctx: ReveContext) = coroutineScope {
-        val lp = logprfx(old, new)
+        val lp = logprfx("proofBodyEquivalenceSMT", old, new)
         if (disableProofBodyEquivalenceSMT) {
             info("$lp Skipped because `disableProofBodyEquivalenceSMT` is set")
             return@coroutineScope false
@@ -323,9 +322,8 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
         val assertion = CodeWriter()
 
-        val equalInputStateSmv = ctx.createRelation(old.block.input, new.block.input,
-                pfxOld, pfxNew) and ctx.condition
-        val equalOutputStateSmv = ctx.createRelation(old.block.output, new.block.output, pfxOld, pfxNew)
+        val equalInputStateSmv = ctx.createInRelation(old.block, new.block, pfxOld, pfxNew) and ctx.condition
+        val equalOutputStateSmv = ctx.createOutRelation(old.block, new.block, pfxOld, pfxNew)
 
         val equalInputState = smv2smt(equalInputStateSmv).toString()
         /*commontInputState.joinToString(" ") {
@@ -370,7 +368,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     private fun smt(frame: Frame, e: Scope, prefix: String): String {
         val v = Smv2SmtVisitor(fnTranslator, dtTranslator, statePrefix = "")
         val out = CodeWriter()
-        val input = symbex(frame)
+        val state = symbex(frame)
         val inputVars = frame.block.input.map { it.identifier }
         val stateVars = frame.block.state.map { it.identifier }
         val outputVars = frame.block.output.map { it.identifier }
@@ -381,10 +379,10 @@ class DefaultEqualityStrategy(mp: ModularProver) {
                     out.write("(declare-const ${prefix}${it.name} $dt)\n")
                 }
 
-        val defs = input.getAllDefinitions()
-        input.keys.filter { it.name in outputVars }
+        val defs = state.getAllDefinitions()
+        state.keys.filter { it.name in outputVars }
                 .forEach {
-                    val e = input[it] ?: error("output variable not in defined in SSA.")
+                    val e = state[it] ?: error("output variable not in defined in SSA.")
                     val e1 = e.replaceExhaustive(defs)
                     val expr = e1.accept(v)
                     out.write("(assert (= ${prefix}${it.name} ${expr.toString(prefix)}))\n")
@@ -405,7 +403,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     private fun symbex(frame: Frame): SymbolicState = smvCache.computeIfAbsent(frame) {
-        SymbExFacade.evaluateStatements(frame.block.statements, frame.scope)
+        SymbExFacade.evaluateStatements(frame.block.statements, frame.scope, useDefinitions = false)
     }
 
     private suspend fun runNuXmv(modules: List<SMVModule>, smvFile: File, logFile: File): Boolean {
@@ -449,12 +447,14 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         //IEC61131Facade.resolveDataTypes(PouElements(elements.toMutableList()), exec.scope.topLevel)
 
         file("${exec.block.name}_abstracted.st").bufferedWriter()
-                .use { IEC61131Facade.printTo(it, abstracted, true) }
-
-        val se = SymbolicExecutioner(exec.scope.topLevel)
-        exec.block.accept(se)
-
-        val moduleBuilder = ModuleBuilder(exec.block.name, exec.scope, se.peek())
+                .use {
+                    IEC61131Facade.printTo(
+                            it,
+                            ProgramDeclaration("<frame>", exec.scope, StatementList(abstracted)),
+                            true)
+                }
+        val state = symbex(Frame(abstracted, exec.scope))
+        val moduleBuilder = ModuleBuilder(exec.block.name, exec.scope, state)
         moduleBuilder.run()
         return moduleBuilder.module
     }
@@ -484,9 +484,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
     //region helpers
     private fun file(s: String) = File(outputFolder, s)
-    private fun logprfx(a: Frame, b: Frame): String {
-        val trace = Thread.currentThread().stackTrace
-        val method = trace[trace.lastIndex - 1].methodName
+    private fun logprfx(method: String, a: Frame, b: Frame): String {
         return "$method(${a.name},${b.name}): "
     }
 //endregion
@@ -515,11 +513,11 @@ private class SmvReveBuilder(
         main.stateVars.add(premise)
         main.initAssignments.add(SAssignment(premise, SLiteral.TRUE))
 
-        val inputRelated = ctx.createRelation(oldFrame.block.input, newFrame.block.input,
+        val inputRelated = ctx.createInRelation(oldFrame.block, newFrame.block,
                 "old", "new") and ctx.condition
 
-        val outputRelated = ctx.createRelation(oldFrame.block.output,
-                newFrame.block.output, "old", "new")
+        val outputRelated = ctx.createOutRelation(oldFrame.block,
+                newFrame.block, "old", "new")
 
         main.nextAssignments.add(SAssignment(premise, premise and inputRelated))
         main.invariantSpecs.add(premise implies outputRelated)
@@ -548,27 +546,32 @@ private class InvocationRewriter(val prefix: String,
         list += counterIncr
 
         //Inputs
+        val instanceName = blockStatement.fqName.removeSuffix(".${blockStatement.name}").replace('.','$')
         val prefix = blockStatement.repr().replace('.', '$')
         val inputsAssign =
                 blockStatement.input.map {
-                    val n = "$prefix$${it.identifier}"
+                    val n = it.identifier
+                    val new = "$prefix$${it.identifier}"
                     val vdOut = scope.getVariable(it)
-                    val inputName = "${n}__input"
+                    val inputName = "${new}__input"
                     scope.add(VariableDeclaration(inputName, 0 or TYPE_INPUT_FUNCTION_BLOCK, vdOut.dataType!!))
                     inputName assignTo n
                 }
 
         val randomOutput = blockStatement.output.map {
-            val n = "$prefix$${it.identifier}"
+            val n = it.identifier
+            val new = "$prefix$${it.identifier}"
             val vdOut = scope.getVariable(it)
-            val inputName = "${n}__random"
-            scope.add(VariableDeclaration(inputName, 0 or TYPE_OUTPUT_FUNCTION_BLOCK, vdOut.dataType!!))
-            n assignTo inputName
+            val outputName = "${new}__random"
+            scope.add(VariableDeclaration(outputName, 0 or TYPE_OUTPUT_FUNCTION_BLOCK, vdOut.dataType!!))
+            n assignTo outputName
         }
         list.addAll(inputsAssign)
         list.addAll(randomOutput)
-        //TODO remove state,
+
+        //TODO remove state
         //TODO add condition assertion
+
         return list
     }
 }
@@ -596,10 +599,14 @@ private class InferEqualMod(
     val defs2 = state2.getAllDefinitions()
 
     val cache = HashMap<Pair<SMVExpr?, SMVExpr?>, Boolean>()
-    fun equalExprMemoized(a: SMVExpr?, b: SMVExpr?): Boolean =
-            cache.computeIfAbsent(a to b) {
-                equalExpr(a, b)
-            }
+    fun equalExprMemoized(a: SMVExpr?, b: SMVExpr?): Boolean {
+        val key = a to b
+        return if (key !in cache) {
+            val r = equalExpr(a, b)
+            cache[key] = r
+            r
+        } else cache[key]!!
+    }
 
     fun equalExpr(a: SMVExpr?, b: SMVExpr?): Boolean =
             when {

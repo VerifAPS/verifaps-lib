@@ -32,29 +32,39 @@ import kotlin.collections.set
  */
 interface ReveContext {
     val condition: SMVExpr
-    val relation: MutableList<RelatedVariables>
+    val inRelation: MutableList<RelatedVariables>
+    val outRelation: MutableList<RelatedVariables>
 
-    fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
+    //fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
+    fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
+            createRelation(old.input, new.input, oldModule, newModule, inRelation)
+
+    fun createOutRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
+            createRelation(old.output, new.output, oldModule, newModule, outRelation)
+
     fun createRelation(oldVars: MutableList<SymbolicReference>,
                        newVars: MutableList<SymbolicReference>,
-                       oldModule: String, newModule: String
-    ): SMVExpr {
+                       oldModule: String,
+                       newModule: String,
+                       specification: MutableList<RelatedVariables>): SMVExpr {
+        //TODO find a nice way to reduce specification effort for perfect equivalence
         val ov = oldVars.map { it.identifier }.toMutableSet()
         val nv = newVars.map { it.identifier }.toMutableSet()
-
         val seq = mutableListOf<SMVExpr>()
-        for ((o, op, n) in relation) {
-            if (o.name in ov && n.name in nv) {
+        if (specification.isNotEmpty()) {
+            for ((o, op, n) in inRelation) {
+                //if (o.name in ov && n.name in nv) {
                 seq.add(SBinaryExpression(o.inModule(oldModule), op, n.inModule(newModule)))
-                ov.remove(o.name)
-                nv.remove(n.name)
+                //ov.remove(o.name)
+                //nv.remove(n.name)
+                //}
             }
-        }
-
-        val common = ov.intersect(nv)
-        for (c in common) {
-            val a = SVariable(c)
-            seq.add(SBinaryExpression(a.inModule(oldModule), SBinaryOperator.EQUAL, a.inModule(newModule)))
+        } else {
+            val common = ov.intersect(nv)
+            for (c in common) {
+                val a = SVariable(c)
+                seq.add(SBinaryExpression(a.inModule(oldModule), SBinaryOperator.EQUAL, a.inModule(newModule)))
+            }
         }
         return seq.conjunction(SLiteral.TRUE)
     }
@@ -76,48 +86,49 @@ operator fun ReveContext.compareTo(c: ReveContext): Int {
 
 
 class TopReveContext : ReveContext {
-    override var relation: MutableList<RelatedVariables> = arrayListOf()
+    override var inRelation: MutableList<RelatedVariables> = arrayListOf()
+    override var outRelation: MutableList<RelatedVariables> = arrayListOf()
     override var condition: SMVExpr = SLiteral.TRUE
 
-    override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator =
-            relation.find { it.oldVar.name == oldVar && it.newVar.name == newVar }?.operator ?: SBinaryOperator.EQUAL
+    //override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator =
+    //        relation.find { it.oldVar.name == oldVar && it.newVar.name == newVar }?.operator ?: SBinaryOperator.EQUAL
 
     override val isPerfect: Boolean
         get() = onlyEquivalence && condition == SLiteral.TRUE
 
     override val onlyEquivalence: Boolean
         get() {
-            return relation.all { it.operator == SBinaryOperator.EQUAL }
+            return inRelation.all { it.operator == SBinaryOperator.EQUAL }
         }
 }
 
-class ReveSubContext(val topContext: ReveContext,
+/*class ReveSubContext(val topContext: ReveContext,
                      val snapshot: SymbolicState = SymbolicState(),
                      newCtx: SymbolicState) : ReveContext {
     override val condition: SMVExpr by lazy {
         //TODO()
         SLiteral.TRUE
     }
-    override val relation: MutableList<RelatedVariables> by lazy {
+    override val inRelation: MutableList<RelatedVariables> by lazy {
         //TODO
         arrayListOf<RelatedVariables>()
     }
 
-    override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator {
+    /*override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator {
         TODO("Not yet implemented")
-    }
+    }*/
 
     override val onlyEquivalence: Boolean
         get() = TODO("Not yet implemented")
 
     override val isPerfect: Boolean
         get() = TODO("Not yet implemented")
-}
+}*/
 
 data class RelatedVariables(
-        val oldVar: SVariable,
+        val oldVar: SMVExpr,
         val operator: SBinaryOperator,
-        val newVar: SVariable) {
+        val newVar: SMVExpr) {
     val expr
         get() = SBinaryExpression(oldVar, operator, newVar)
 }
@@ -165,7 +176,8 @@ class ModularProver(
             val ctx = ctxManager.get(bold, bnew) ?: error("no context found")
             info("Matched ${bold.repr()} to ${bnew.repr()}")
             info("\tContext: ${ctx.condition.repr()}")
-            info("\tRelation: ${ctx.relation}")
+            info("\tInput-Relation: ${ctx.createInRelation(bold, bnew, "old", "new").repr()}")
+            info("\tOutput-Relation: ${ctx.createOutRelation(bold, bnew, "old", "new").repr()}")
         }
     }
 
@@ -181,7 +193,7 @@ class ModularProver(
         callSitePairs.forEach { (bold, bnew) ->
             val oldCtx = oldProgram.frameContext[bold]!!
             val newCtx = newProgram.frameContext[bnew]!!
-            ctxManager.add(bold, bnew, ReveSubContext(context, oldCtx, newCtx))
+            //ctxManager.add(bold, bnew, ReveSubContext(context, oldCtx, newCtx))
         }
     }
 }
@@ -255,27 +267,29 @@ object ModFacade {
 
     fun createReveContextsBySpecification(it: String, oldProgram: ModularProgram, newProgram: ModularProgram,
                                           ctxManager: ReveContextManager) {
-        // it == "A.f=A.f#cond#relations"
+        // it == "A.f=A.f#cond#input#output"
         val sharp = it.count { it == '#' }
-        val (sitemap, cond, relations) = when (sharp) {
-            2 -> it.split("#")
-            //1 -> it.split("#")
-            else -> error("Contract format violated: $it")
+        val (sitemap, cond, inrel, outrel) = when (sharp) {
+            3 -> it.split("#")
+            2 -> it.split("#")?.let { (a, b, c) -> listOf(a, b, c, "") }
+            1 -> it.split("#")?.let { (a, b) -> listOf(a, b, "", "") }
+            0 -> listOf(it, "", "")
+            else -> error("Contract format violated: $it should be `X=Y#cond#relation`")
         }
         val (left, right) = if ("=" in sitemap) sitemap.split("=") else listOf(sitemap, sitemap)
         val (bA, bB) = findCallSitePair(left, right, oldProgram, newProgram)
 
         val ctx = TopReveContext()
         ctx.condition = if (cond.isBlank()) SLiteral.TRUE else SMVFacade.expr(cond)
-        ctx.relation = if (relations.isBlank()) arrayListOf() else
-            relations.split(",").map(::parseRelation).toMutableList()
+        ctx.inRelation = if (inrel.isBlank()) arrayListOf() else inrel.split(",").map(::parseRelation).toMutableList()
+        ctx.outRelation = if (outrel.isBlank()) arrayListOf() else outrel.split(",").map(::parseRelation).toMutableList()
         ctxManager.add(bA, bB, ctx)
     }
 
     fun parseRelation(it: String): RelatedVariables {
         val b = SMVFacade.expr(it) as SBinaryExpression
-        val left = b.left as SVariable
-        val right = b.right as SVariable
+        val left = b.left
+        val right = b.right
         return RelatedVariables(left, b.operator, right)
     }
 

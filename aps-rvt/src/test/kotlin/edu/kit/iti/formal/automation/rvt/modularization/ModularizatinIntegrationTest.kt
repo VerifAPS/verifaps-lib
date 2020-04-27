@@ -44,6 +44,19 @@ class ModularizationIntegrationTest {
     }
 
     @Test
+    fun testComplexArithmetic() {
+        val input = File("$base/complex_arithmetic.st").absolutePath
+        val args = arrayOf("--old", "WARN_ABOVE@$input", "--new", "WARN_BELOW@$input",
+                "-o", "build/testScenario/simple",
+                "-s", "WARN_ABOVE.sm.0=WARN_BELOW.sm.0##",
+                "-ri", "threshold=threshold&sensor=sensor",
+                "-ro", "critical=!critical"
+        )
+        ModApp.main(args)
+    }
+
+
+    @Test
     fun testSimpleCtx() {
         val input = File("$base/simpleA.st").absolutePath
         val args = arrayOf("--old", "A@$input", "--new", "B@$input",

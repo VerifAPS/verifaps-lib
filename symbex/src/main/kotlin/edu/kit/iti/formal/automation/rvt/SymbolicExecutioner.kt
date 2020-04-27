@@ -91,9 +91,14 @@ open class SymbolicExecutioner(
             if (v != null) {
                 varCache[vd.identifier] = v
                 return v
-            } else {
             }
-            throw UnknownVariableException("Variable access to not declared variable: ${IEC61131Facade.print(vd)}. Line: ${vd.startPosition}")
+            try {
+                return lift(scope.getVariable(vd))
+            } catch (e: Exception) {
+                throw UnknownVariableException(
+                        "Variable access to not declared variable: ${IEC61131Facade.print(vd)}." +
+                        " Line: ${vd.startPosition}")
+            }
         }
     }
 

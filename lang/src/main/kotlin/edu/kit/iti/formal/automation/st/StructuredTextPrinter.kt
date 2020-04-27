@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.IECString
@@ -36,9 +37,14 @@ open class StructuredTextPrinter
     }
 
     override fun visit(blockStatement: BlockStatement) {
-        blockStatement.commentStart.accept(this)
+        val state = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
+        val input = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
+        val output = blockStatement.output.joinToString(", ") { IEC61131Facade.print(it) }
+        sb.nl().print("// REGION ${blockStatement.name} [$state] ($input) => ($output)")
+        sb.increaseIndent()
         blockStatement.statements.accept(this)
-        blockStatement.commentEnd.accept(this)
+        sb.decreaseIndent()
+        sb.nl().print("// END_REGION")
     }
 
     override fun visit(empty: EMPTY_EXPRESSION) {
@@ -557,7 +563,7 @@ open class StructuredTextPrinter
                 sb.printf(literals.comment_open())
                 sb.printf(commentStatement.comment)
                 sb.printf(literals.comment_close())
-            }else{
+            } else {
                 sb.printf("//%s\n", commentStatement.comment)
             }
         }

@@ -89,7 +89,7 @@ object SMVTypes {
 
 
     @JvmStatic
-    fun infer(op: SBinaryOperator, a: SMVType, b: SMVType): SMVType? {
+    fun infer(op: SBinaryOperator, a: SMVType?, b: SMVType?): SMVType? {
         return when (op) {
             SBinaryOperator.AND -> BOOLEAN
             SBinaryOperator.OR -> BOOLEAN
@@ -109,7 +109,7 @@ object SMVTypes {
     }
 
     @JvmStatic
-    fun infer(a: SMVType, b: SMVType): SMVType? {
+    fun infer(a: SMVType?, b: SMVType?): SMVType? {
         return if (a == b) a else null
     }
 

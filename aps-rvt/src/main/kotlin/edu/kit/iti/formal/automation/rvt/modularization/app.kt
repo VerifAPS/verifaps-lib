@@ -56,7 +56,7 @@ class ModularizationApp : CliktCommand() {
     val run: Boolean by option("--run", "-r", help = "run prover").flag()
 
     val relationalFrameContracts
-            by option("-fc", "--add-frame-contract", help = "call sites to abstract")
+            by option("-fc", "--add-frame-contract", "-s", help = "call sites to abstract")
                     .multiple()
 
     val outputFolder by option("-o", "--output", help = "output folder")
@@ -76,10 +76,11 @@ class ModularizationApp : CliktCommand() {
 
 
         val ctx = TopReveContext()
-        ctx.relation = (inputRelation + outputRelation).toMutableList()
+        ctx.inRelation = inputRelation.toMutableList()
+        ctx.outRelation = outputRelation.toMutableList()
         ctx.condition = condition.conjunction(SLiteral.TRUE)
 
-        info("Top level relation: ${ctx.relation}")
+        info("Top level relation: ${ctx.inRelation.joinToString(" & ") { it.expr.repr() }}")
         info("Top level conditon: ${ctx.condition}")
         info("Proof for perfect equality? ${ctx.isPerfect}")
         info("Only equalities? ${ctx.onlyEquivalence}")
@@ -110,7 +111,6 @@ class ModularizationApp : CliktCommand() {
             info("Output folder: ${outputFolder}")
             info("Start with the proof")
             m.proof()
-            info("Files generated")
         }
     }
 }
