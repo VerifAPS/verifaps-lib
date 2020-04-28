@@ -1,0 +1,79 @@
+table calc {
+    var input mode_selector : USINT
+    var input operand : SINT
+    var output result : SINT
+
+    group [1,1] {
+        row initial [1,1] {
+            mode_selector: -
+            operand: -
+            result: 0
+        }
+        group omega {
+            row noop [0,1] {
+                mode_selector: 0
+                operand: -
+                result: =result[-1]
+            }
+            row plus [0,1] {
+                mode_selector: 1
+                operand: -
+                result: =result[-1] + operand
+            }
+            row minus [0,1] {
+                mode_selector: 2
+                operand: -
+                result: =result[-1] - operand
+            }
+            row times [0,1] {
+                mode_selector: 3
+                operand: -
+                result: =result[-1] * operand
+            }
+            row div [0,1] {
+                mode_selector: 4
+                operand: !=0
+                result: =result[-1] / operand
+            }
+            row negate [0,1] {
+                mode_selector: 5
+                operand: -
+                result: =-result[-1]
+            }
+        }
+    }
+}
+
+table calc_emergency_shutdown {
+    var input mode_selector : USINT
+    var input operand : SINT
+    var input safe_mode : BOOL
+    var output off : BOOL
+
+    group [1,1] {
+        row default >=1 progress {
+            mode_selector: -
+            operand: -
+            safe_mode: -
+            off: FALSE
+        }
+        row emergency_trigger {
+            mode_selector: 4
+            operand: 0
+            safe_mode: TRUE
+            off: TRUE
+        }
+        row emergency_stop [5,5] {
+            mode_selector: -
+            operand: -
+            safe_mode: -
+            off: TRUE
+        }
+        row reset {
+            mode_selector: -
+            operand: -
+            safe_mode: -
+            off: FALSE
+        }
+    }
+}
