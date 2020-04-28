@@ -20,7 +20,7 @@ object TypesTest {
     @MethodSource("getTypeTests")
     fun testCopy(testFile: Path) {
         val ast = IEC61131Facade.file(testFile)
-        Assertions.assertEquals(ast, ast.setAllMetadata())
+        Assertions.assertEquals(ast, ast.clone())
     }
 
     @JvmStatic

@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.datatypes.AnyBit
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.datatypes.EnumerateType
-import edu.kit.iti.formal.automation.datatypes.IECString
+import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.il.IlPrinter
 import edu.kit.iti.formal.automation.operators.Operators

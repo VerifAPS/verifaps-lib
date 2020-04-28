@@ -48,7 +48,7 @@ fun evaluateProgramWithAbstraction(exec: PouExecutable, abstractedInvocation: Li
 }
 
 fun rewriteInvocation(a: PouExecutable, abstractedInvocation: List<CallSite>): PouExecutable {
-    val new = a.setAllMetadata()
+    val new = a.clone()
 
     // foreach reference create a call counter
     abstractedInvocation.distinctBy { it.vars }.forEach {
@@ -86,7 +86,7 @@ class InvocationRewriter(val prefix: String, val scope: Scope, val callSite: Cal
         if (invocation == toBeReplaced) {
             val list = StatementList()
             val assignments = invocation.inputParameters.map {
-                val a = invocation.callee.setAllMetadata()
+                val a = invocation.callee.clone()
                 a.sub = SymbolicReference(it.name!!)
                 AssignmentStatement(a, it.expression)
             }
