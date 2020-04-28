@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BIN=$(pwd)/ide/build/install/ide/bin/
+BIN=$(pwd)/exec/build/install/exec/bin/
 TESTS=$(pwd)/share/integration-tests
 
 gettests() {
