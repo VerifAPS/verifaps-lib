@@ -33,7 +33,6 @@ import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*

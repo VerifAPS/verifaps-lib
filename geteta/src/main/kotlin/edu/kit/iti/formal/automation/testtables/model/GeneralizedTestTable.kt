@@ -18,6 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.abs
+import kotlin.math.min
 
 
 enum class ColumnCategory { ASSUME, ASSERT }
@@ -73,7 +74,7 @@ data class ProgramVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
-    override fun clone() =copy()
+    override fun clone() = copy()
 
     var realName: String = name
 
@@ -112,7 +113,7 @@ data class ProjectionVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name
-    override fun clone() =copy()
+    override fun clone() = copy()
 
 
     /**
@@ -149,16 +150,15 @@ class ParseContext(
             vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
     fun getReference(variable: SVariable, cycles: Int): SVariable =
-            if (cycles == 0) {
-                variable
-            } else if (cycles > 0) {
-                throw IllegalArgumentException("no future references are allowed.")
-            } else {
-                val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
-                val ref = SVariable(newName, variable.dataType!!)
-                val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
-                refs[variable] = max
-                ref
+            when {
+                cycles == 0 -> variable
+                cycles > 0 -> throw IllegalArgumentException("no future references are allowed.")
+                else -> {
+                    val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
+                    val ref = SVariable(newName, variable.dataType!!)
+                    refs[variable] = min(refs.getOrDefault(variable, cycles), cycles)
+                    ref
+                }
             }
 
     operator fun contains(varText: String) = vars.keys.any { it.name == varText }
@@ -372,6 +372,7 @@ sealed class Duration {
     }
 
     abstract var modifier: DurationModifier
+
     /**
      * returns true, iff the step can be applied arbitrary often (no upper bound)
      * @return
@@ -449,9 +450,9 @@ data class Region(override var id: String,
 data class GotoTransition(
         var tableName: String,
         var rowId: String,
-        var kind : Kind = Kind.PASS
+        var kind: Kind = Kind.PASS
 ) {
-    enum class Kind {PASS, MISS, FAIL}
+    enum class Kind { PASS, MISS, FAIL }
 }
 
 data class TableRow(override var id: String) : TableNode(id) {

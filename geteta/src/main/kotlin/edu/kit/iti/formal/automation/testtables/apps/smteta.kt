@@ -11,12 +11,11 @@ import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.GttMiterConstruction
+import edu.kit.iti.formal.automation.testtables.builder.InvocationBasedProductProgramBuilder
 import edu.kit.iti.formal.automation.testtables.builder.ProgMiterConstruction
-import edu.kit.iti.formal.automation.testtables.builder.ProgramCombination
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
-import java.io.PrintWriter
 
 object SMTeta {
     @JvmStatic
@@ -47,9 +46,11 @@ class SMTetaApp : CliktCommand() {
         val enum = progs.findFirstProgram()?.scope?.enumValuesToType() ?: mapOf()
         val mc = GttMiterConstruction(gtt, gttAsAutomaton, enum)
         val miter = mc.constructMiter()
-        val productProgram = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
-
-
+        val productProgramBuilder = InvocationBasedProductProgramBuilder()
+        val program = ProgMiterConstruction(progs).constructMiter()
+        productProgramBuilder.add(program)
+        productProgramBuilder.add(miter)
+        val productProgram = productProgramBuilder.build(false)
         val out = outputFile.bufferedWriter()
         val simplifiedProductProgram = SymbExFacade.simplify(productProgram)
         val hccprinter = HccPrinter(CodeWriter(out))

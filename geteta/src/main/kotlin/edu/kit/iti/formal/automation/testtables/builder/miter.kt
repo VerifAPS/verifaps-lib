@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
-import edu.kit.iti.formal.automation.SymbExFacade.simplify
+import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
@@ -11,17 +11,15 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st.RefTo
-import edu.kit.iti.formal.automation.st.SpecialComment
+import edu.kit.iti.formal.automation.st.SpecialCommentFactory
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
+import edu.kit.iti.formal.automation.st0.trans.VariableRenamer
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.GetetaFacade.constructTable
 import edu.kit.iti.formal.automation.testtables.GetetaFacade.readTables
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
-import edu.kit.iti.formal.automation.testtables.model.automata.RowState
-import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
+import edu.kit.iti.formal.automation.testtables.model.automata.*
 import edu.kit.iti.formal.automation.testtables.monitor.SMVToStVisitor
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
@@ -29,76 +27,131 @@ import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
 import java.io.PrintWriter
+import kotlin.math.abs
 
-data class Miter(
-        val scope: Scope,
-        val init: StatementList,
-        val body: StatementList,
-        val functions: List<FunctionDeclaration>) {}
+data class ReactiveProgram(
+        val name: String,
+        val scope: Scope = Scope(),
+        val init: StatementList = StatementList(),
+        val body: StatementList = StatementList(),
+        val functions: MutableList<FunctionDeclaration> = ArrayList())
 
 /**
  * Maps the value of a enum to its type.
  */
 typealias EnumValueTable = Map<String, EnumerateType>
 
+private fun createNext(t: Transition): SMVExpr {
+    val stateVar = SVariable(t.from.name, SMVTypes.BOOLEAN)
+    return if (t.type == TransitionType.TRUE) {
+        stateVar
+    } else {
+
+        val inputExpr = (t.from as RowState).row.inputExpr.values.conjunction(SLiteral.TRUE)
+        val outputExpr = (t.from as RowState).row.outputExpr.values.conjunction(SLiteral.TRUE)
+
+        when (t.type) {
+            TransitionType.ACCEPT ->
+                stateVar and inputExpr and outputExpr
+            TransitionType.ACCEPT_PROGRESS ->
+                stateVar and inputExpr and outputExpr
+            TransitionType.FAIL ->
+                stateVar and inputExpr and outputExpr.not()
+            TransitionType.MISS -> stateVar and inputExpr.not()
+            TransitionType.TRUE -> stateVar
+        }
+    }
+}
+
 class GttMiterConstruction(val gtt: GeneralizedTestTable,
                            val automaton: TestTableAutomaton,
-                           val enumValues: EnumValueTable,
-                           val parentScope: Scope = Scope()) {
+                           val enumValues: EnumValueTable) {
     private var transitions = automaton.transitions.groupBy { it.to }
+    private val sentinel = VariableDeclaration(automaton.stateSentinel.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
+    private val inv = VariableDeclaration("__INV__", VariableDeclaration.OUTPUT, AnyBit.BOOL)
+    private val err = VariableDeclaration("error", VariableDeclaration.LOCAL, AnyBit.BOOL)
 
-    private fun createNext(state: AutomatonState): Expression {
+    val target = ReactiveProgram("Miter", Scope(Scope()))
 
-        val expr =
-                transitions[state]?.map { t ->
-                    val stateVar = SVariable(t.from.name, SMVTypes.BOOLEAN)
-                    if (t.type == TransitionType.TRUE) {
-                        stateVar
-                    } else {
+    fun constructMiter(): ReactiveProgram {
+        //region prepare variable scope
+        translateProgramVariables()
+        translateConstraintVariables()
+        addHistoryVariables()
+        addVariablesForAutomatonStates(automaton)
 
-                        val inputExpr = (t.from as RowState).row.inputExpr.values.conjunction(SLiteral.TRUE)
-                        val outputExpr = (t.from as RowState).row.outputExpr.values.conjunction(SLiteral.TRUE)
+        sentinel.initValue = getInit(AnyBit.BOOL)
+        target.scope.variables.add(sentinel)
+        err.initValue = getInit(AnyBit.BOOL)
+        target.scope.variables.add(err)
+        //inv.initValue = getInit(AnyBit.BOOL)
+        target.scope.variables.add(inv)
+        //endregion
 
-                        when (t.type) {
-                            TransitionType.ACCEPT ->
-                                stateVar and inputExpr and outputExpr
-                            TransitionType.ACCEPT_PROGRESS ->
-                                stateVar and inputExpr and outputExpr
-                            TransitionType.FAIL ->
-                                stateVar and inputExpr and outputExpr.not()
-                            TransitionType.MISS -> stateVar and inputExpr.not()
-                            TransitionType.TRUE -> stateVar
-                        }
-                    }
-                }?.disjunction() ?: SLiteral.FALSE
-        return expr.translateToSt()
+        //region prepare body
+        addNextAssignments()
+        assignFromTempVariables()
+        addInvariant()
+        shiftHistory()
+        //endregion
+
+        //Init
+        initialiseConstraintVariables()
+
+        target.functions.addAll(gtt.functions)
+
+        return target
     }
 
-    fun constructMiter(): Miter {
-        val automaton = constructTable(gtt).automaton
+    private fun initialiseConstraintVariables() {
+        if (gtt.constraintVariables.isEmpty())
+            return
 
-        //Scope
-        val fbScope = Scope(parentScope)
-
-        gtt.programVariables.forEach { pv ->
-            val vd = VariableDeclaration(pv.name, VariableDeclaration.INPUT, pv.dataType)
-            if (pv.dataType is EnumerateType) {
-                pv.dataType = INT
-            }
-            vd.initValue = getInit(pv.dataType)
-            fbScope.variables.add(vd)
-        }
-        gtt.constraintVariables.forEach { cv ->
-            val vd = VariableDeclaration(cv.name, VariableDeclaration.LOCAL, cv.dataType)
-            if (cv.dataType is EnumerateType) {
-                cv.dataType = INT
-            }
-            vd.initValue = getInit(cv.dataType)
-            fbScope.variables.add(vd)
+        //havoc
+        target.init += CommentStatement("havocing the contraint variables")
+        gtt.constraintVariables.forEach { it ->
+            val hc = SpecialCommentFactory.createHavoc(it.name, it.dataType)
+            target.init.add(hc)
         }
 
+        //assume
+        val constraints = gtt.constraintVariables.map {
+            GetetaFacade.exprToSMV(it.constraint!!, SVariable(it.name), 0, gtt.parseContext)
+        }
+        val combinedConstraints = constraints.conjunction(SLiteral.TRUE).translateToSt()
+        target.init += SpecialCommentFactory.createAssume(combinedConstraints)
+    }
 
+    private fun assignFromTempVariables() {
+        automaton.getRowStates().forEach { rowState ->
+            target.body += (rowState.name assignTo "_${rowState.name}")
+        }
+    }
 
+    private fun addNextAssignments() {
+        gtt.region.flat().forEach { tr ->
+            automaton.getStates(tr)?.forEach { state ->
+                val expr = createNext(state)
+                target.body += "_${state.name}" assignTo expr
+            }
+        }
+        target.body.add(err.name assignTo createNext(automaton.stateError))
+        target.body.add(sentinel.name assignTo createNext(automaton.stateSentinel))
+    }
+
+    private fun addInvariant() {
+        val invAssign: SMVExpr = automaton.getRowStates()
+                .map { SVariable(it.name, SMVTypes.BOOLEAN) }
+                .asIterable()
+                .disjunction()
+                .or(SVariable(sentinel.name, SMVTypes.BOOLEAN))
+                .or(SVariable(err.name, SMVTypes.BOOLEAN).not())
+        target.body.add("__INV__" assignTo invAssign.translateToSt())
+        val assert = SpecialCommentFactory.createAssert(SymbolicReference("__INV__"));
+        target.body.add(assert)
+    }
+
+    private fun addVariablesForAutomatonStates(automaton: TestTableAutomaton) {
         automaton.getRowStates().forEach { rowState ->
             val vd1 = VariableDeclaration(rowState.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
             val vd2 = VariableDeclaration("_" + rowState.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
@@ -107,188 +160,125 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
                 vd1.initValue = VBool(AnyBit.BOOL, true)
             }
             vd2.initValue = getInit(AnyBit.BOOL)
-            fbScope.variables.add(vd1)
-            fbScope.variables.add(vd2)
+            target.scope.variables.add(vd1)
+            target.scope.variables.add(vd2)
         }
-
-
-        val sentinel = VariableDeclaration(automaton.stateSentinel.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
-        sentinel.initValue = getInit(AnyBit.BOOL)
-        fbScope.variables.add(sentinel)
-
-        val err = VariableDeclaration("error", VariableDeclaration.LOCAL, AnyBit.BOOL)
-        err.initValue = getInit(AnyBit.BOOL)
-        fbScope.variables.add(err)
-
-        val inv = VariableDeclaration("__INV__", VariableDeclaration.OUTPUT, AnyBit.BOOL)
-//        inv.initValue = getInit(AnyBit.BOOL)
-        fbScope.variables.add(inv)
-
-
-        //Statements
-        val stmts = StatementList()
-        gtt.region.flat().forEach { tr ->
-            automaton.getStates(tr)?.forEach { state ->
-                val expr = createNext(state)
-                val assign = "_${state.name}" assignTo expr
-                stmts.add(assign)
-            }
-        }
-
-
-        stmts.add(err.name assignTo createNext(automaton.stateError))
-        stmts.add(sentinel.name assignTo createNext(automaton.stateSentinel))
-
-
-        automaton.getRowStates().forEach { rowState ->
-            stmts.add(rowState.name assignTo "_${rowState.name}")
-        }
-
-
-        val invassign: SMVExpr = automaton.getRowStates().toList()
-                .map { SVariable(it.name, SMVTypes.BOOLEAN) }.disjunction().or(SVariable(sentinel.name, SMVTypes.BOOLEAN)).or(SVariable(err.name, SMVTypes.BOOLEAN).not())
-
-        stmts.add("__INV__" assignTo invassign.translateToSt())
-
-
-        val miterFb = FunctionBlockDeclaration(name = "miter", scope = fbScope, stBody = stmts)
-        //Scope
-        val scope = Scope()
-        scope.variables.add(VariableDeclaration(miterFb.name, VariableDeclaration.LOCAL, FunctionBlockDataType(miterFb)))
-
-
-        //Init
-        val init = StatementList()
-        if (gtt.constraintVariables.isNotEmpty()) {
-            //haveoc
-            val haveocConstraints = CommentStatement("haveoc constraints")
-            val cVars = gtt.constraintVariables.map { VariableDeclaration("miter__${it.name}", it.dataType) }.toMutableList()
-            haveocConstraints.setMetadata(SpecialComment::class.java, SpecialComment.HaveocComment(cVars))
-            init.add(haveocConstraints)
-
-            //assume
-            val constraints = gtt.constraintVariables.map {
-                GetetaFacade.exprToSMV(it.constraint!!, SVariable("miter__${it.name}"), 0, gtt.parseContext)
-            }.conjunction(SLiteral.TRUE).translateToSt()
-
-            val assumeStmt = CommentStatement("assume constraints")
-            assumeStmt.setMetadata(SpecialComment::class.java,
-                    SpecialComment.AssumeComment(constraints))
-
-            init.add(assumeStmt)
-        }
-
-        //Body
-        val miterParams =
-                miterFb.scope.variables.filter { it.isInput }.map {
-                    InvocationParameter(it.name, false, SymbolicReference("program", SymbolicReference(it.name)))
-                }.toMutableList()
-
-
-        val miterInvoc = InvocationStatement(SymbolicReference(miterFb.name), miterParams)
-        miterInvoc.invoked = Invoked.FunctionBlock(miterFb)
-        val body = StatementList(miterInvoc)
-
-        //Functions (empty)
-        val funcs = mutableListOf<FunctionDeclaration>()
-        return Miter(scope, init, body, funcs)
     }
 
-    private fun SMVAst.translateToSt(): Expression = this.accept(ExpressionConversion(enumValues))
+    private val exprConverter = ExpressionConversion(enumValues).also {
+        for ((a, b) in gtt.parseContext.refs) {
+            for (n in (1..abs(b))) {
+                val ref = gtt.parseContext.getReference(a, -n)
+                it.variableReplacement[ref.name] = historyName(a.name, n)
+            }
+        }
+    }
+
+    private fun createNext(state: AutomatonState): Expression {
+        val expr: List<SMVExpr>? = transitions[state]?.map { createNext(it) }
+        val a: SMVExpr = expr?.disjunction() ?: SLiteral.FALSE
+        return a.translateToSt()
+    }
+
+    private fun addHistoryVariables() {
+        gtt.parseContext.refs.forEach { (svar, maxhis) ->
+            for (n in (1..abs(maxhis))) {
+                val dt = gtt.programVariables.find { it.name == svar.name }?.dataType
+                        ?: error("Could not find datatype for SVariable: `${svar.name}")
+                val vd = VariableDeclaration(historyName(svar.name, n), VariableDeclaration.LOCAL,
+                        if (dt is EnumerateType) INT else dt)
+                vd.initValue = getInit(vd.dataType!!)
+                target.scope.variables.add(vd)
+            }
+        }
+    }
+
+    private fun shiftHistory() {
+        gtt.parseContext.refs.forEach { (svar, maxhis) ->
+            val names = (1..abs(maxhis)).map { historyName(svar.name, it) }.toMutableList()
+            names.add(0, svar.name)
+            names.asReversed().zipWithNext().forEach { (old, new) ->
+                target.body += old assignTo new
+            }
+        }
+    }
+
+    private fun translateConstraintVariables() {
+        gtt.constraintVariables.forEach { cv ->
+            val vd = VariableDeclaration(cv.name, VariableDeclaration.LOCAL, cv.dataType)
+            if (cv.dataType is EnumerateType) {
+                cv.dataType = INT
+            }
+            vd.initValue = getInit(cv.dataType)
+            target.scope.variables.add(vd)
+        }
+    }
+
+    private fun translateProgramVariables() {
+        gtt.programVariables.forEach { pv ->
+            val vd = VariableDeclaration(pv.name, VariableDeclaration.INPUT, pv.dataType)
+            if (pv.dataType is EnumerateType) {
+                pv.dataType = INT
+            }
+            vd.initValue = getInit(pv.dataType)
+            target.scope.variables.add(vd)
+        }
+    }
+
+    private fun SMVExpr.translateToSt(): Expression = this.accept(exprConverter)
 }
 
-class ProgMiterConstruction(val pous: List<PouElement>) {
+fun historyName(s: String, n: Int) = "_h_${s}_$n";
 
-    fun constructMiter(): Miter {
-
-        val scope = Scope()
-        val init = StatementList() //additional init
-        val body = StatementList()
-        val functions: MutableList<FunctionDeclaration> = mutableListOf()
-
-        //////////////////////
-        pous.forEach { pouE ->
-            when (pouE) {
-                is ProgramDeclaration -> {
-                    val programFb = pouE.toFB()
-                    //Scope
-                    scope.variables.add(VariableDeclaration(programFb.name, VariableDeclaration.LOCAL, FunctionBlockDataType(programFb)))
-
-                    pouE.scope.variables.filter { it.isInput }.forEach {
-                        val vd = it.clone()
-                        vd.type = VariableDeclaration.LOCAL
-                        scope.variables.add(vd)
-                    }
-
-
-                    //Body
-                    val vars = programFb.scope.variables.filter { it.isInput }.toMutableList()
-                    var comm = "haveoc"
-                    vars.forEach { comm += " ${it.name}" }
-                    val commStmt = CommentStatement(comm)
-                    commStmt.setMetadata(SpecialComment::class.java, SpecialComment.HaveocComment(vars))
-                    body.add(commStmt)
-
-
-                    val progParams =
-                            programFb.scope.variables.filter { it.isInput }.map {
-                                InvocationParameter(it.name, false, SymbolicReference(it.name))
-                            }.toMutableList()
-
-
-                    val programInvoc = InvocationStatement(SymbolicReference(programFb.name), progParams)
-                    programInvoc.invoked = Invoked.FunctionBlock(programFb)
-                    body.add(programInvoc)
-
-
-                    return@forEach //only one Programdeclaration
-                }
-                is FunctionDeclaration ->
-                    functions.add(pouE)
-                is FunctionBlockDeclaration -> {}
-
-                is TypeDeclarations -> {
-                    pouE.forEach { td ->
-                        when (td) {
-                            is EnumerationTypeDeclaration -> {
-
-                                td.allowedValues.forEachIndexed { i, it ->
-                                    val vd = VariableDeclaration(name = "${td.name}__${it.text.toUpperCase()}", type = VariableDeclaration.CONSTANT,
-                                            td = SimpleTypeDeclaration(name = "", baseType = RefTo(INT), initialization = IntegerLit(i)))
-
-                                    scope.add(vd)
-                                }
-                            }
-                            else -> println("other TypeDeclaration")
-                        }
-
-
-                    }
-                }
-                else -> println("not a Program, Function or Typedeclarations")
-
-
-                /////////////////////
-
-
+class ProgMiterConstruction(val exec: PouExecutable) {
+    constructor(exec: PouElements) : this(exec.findFirstProgram()!!) {
+        exec.forEach {
+            when (it) {
+                is TypeDeclarations -> addTypeDeclaration(it)
+                is FunctionDeclaration -> addFunctionDeclaration(it)
             }
         }
-        return Miter(scope, init, body, functions)
     }
 
-    private fun ProgramDeclaration.toFB(): FunctionBlockDeclaration = FunctionBlockDeclaration(
-            "program", scope, stBody, sfcBody, ilBody, fbBody, actions)
+    val target = ReactiveProgram(exec.name, exec.scope)
+
+    fun addFunctionDeclaration(func: FunctionDeclaration) = target.functions.add(func)
+
+    fun addTypeDeclaration(td: TypeDeclarations) {
+        td.forEach {
+            when (it) {
+                is EnumerationTypeDeclaration -> {
+                    it.allowedValues.forEachIndexed { i, it ->
+                        val vd = VariableDeclaration(name = "${td.name}__${it.text.toUpperCase()}", type = VariableDeclaration.CONSTANT,
+                                td = SimpleTypeDeclaration(name = "", baseType = RefTo(INT), initialization = IntegerLit(i)))
+                        target.scope.add(vd)
+                    }
+                }
+                else -> error("Found unsupported declared type: $td")
+            }
+        }
+    }
+
+    fun constructMiter(): ReactiveProgram {
+        target.body.addAll(exec.stBody!!)
+        return target
+    }
 }
 
 class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expression> {
+    val variableReplacement: HashMap<String, String> = HashMap()
+
     override fun visit(top: SMVAst): Expression {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(v: SVariable): Expression = SymbolicReference(v.name)
+    override fun visit(v: SVariable): Expression {
+        val n = variableReplacement.getOrDefault(v.name, v.name)
+        return SymbolicReference(n)
+    }
+
     override fun visit(be: SBinaryExpression): Expression = BinaryExpression(be.left.accept(this),
             SMVToStVisitor.operator(be.operator), be.right.accept(this))
-
 
     override fun visit(ue: SUnaryExpression): Expression = UnaryExpression(SMVToStVisitor.operator(ue.operator), ue.expr.accept(this))
 
@@ -339,90 +329,116 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
         )
     }
 
-
     override fun visit(quantified: SQuantified): Expression {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
-open class ProgramCombination(val program: Miter, val miter: Miter) {
+class SimpleProductProgramBuilder(name: String = "main") {
+    val target = ReactiveProgram(name)
 
-    fun combine(): PouElements {
+    fun combine(vararg programs: ReactiveProgram) {
+        programs.forEach { add(it) }
+    }
 
-        //Scope
-        val scope = Scope()
-        scope.addVariables(program.scope)
-        scope.addVariables(miter.scope)
+    fun add(program: ReactiveProgram) {
+        target.scope.addVariables(program.scope)
+        target.init.addAll(program.init)
+        target.body.addAll(program.body)
+        target.functions.addAll(program.functions)
+    }
 
+    fun build(): PouExecutable {
+        val target = target.toProgram()
+        return SymbExFacade.simplify(target)
+    }
+}
 
-        //Body
-        val body = StatementList()
+class InvocationBasedProductProgramBuilder(name: String = "main") {
+    val target = ReactiveProgram(name)
 
-        body.addAll(program.init)
-        body.addAll(miter.init)
+    val definedVariables = HashMap<String, SymbolicReference>()
 
-        //while
-        val whileBody = StatementList()
+    fun combine(vararg programs: ReactiveProgram) {
+        programs.forEach { add(it) }
+    }
 
-        whileBody.addAll(program.body)
-        whileBody.addAll(miter.body)
-
-
-        val assert = CommentStatement("assert __INV__")
-        assert.setMetadata(SpecialComment::class.java,
-                SpecialComment.AssertComment(SymbolicReference("miter${SCOPE_SEPARATOR}__INV__")))
-        whileBody.add(assert)
-
-
-        //end while
-
-
-        body.add(WhileStatement(BooleanLit.LTRUE, whileBody))
-        //end program
-
-        //haveoc-function TODO possible?
-//        val hScope = Scope()
-//        hScope.add(VariableDeclaration("haveoc_out", VariableDeclaration.OUTPUT, INT))
-//        val hBody = StatementList()
-//        hBody.add(AssignmentStatement(SymbolicReference("haveoc_out"), SymbolicReference("_")))
-//        val haveocFunDec = FunctionDeclaration("haveoc", hScope, RefTo(INT), hBody)
-
-
-        val elems = PouElements()
-        elems.addAll(program.functions)
-        elems.addAll(miter.functions)
-        elems.add(ProgramDeclaration(name = "combinedProgram", scope = scope, stBody = body))
-        val simpleElems = simplify(elems)
-//        simpleElems.add(0, haveocFunDec)
-        return simpleElems
-
+    private fun createInstance(p: ReactiveProgram, fbd: FunctionBlockDeclaration): VariableDeclaration {
+        val vd = VariableDeclaration(p.name.toLowerCase(), VariableDeclaration.LOCAL, FunctionBlockDataType(fbd))
+        target.scope.add(vd)
+        return vd
 
     }
 
+    private fun createParameters(p: ReactiveProgram): MutableList<InvocationParameter> {
+        return p.scope.variables.filter { it.isInput }.map {
+            InvocationParameter(it.name, false, findOrCreateInput(it))
+        }.toMutableList()
+    }
 
-    private fun ProgramDeclaration.toFB(): FunctionBlockDeclaration = FunctionBlockDeclaration(
-            name, scope, stBody, sfcBody, ilBody, fbBody, actions)
+    // looks up a given variable, if it is already declared as an output of a previous program
+    // returns a ref to it, else an input variable is declared
+    private fun findOrCreateInput(it: VariableDeclaration): Expression = definedVariables.computeIfAbsent(it.name) { k ->
+        val vd = it.clone()
+        vd.type = VariableDeclaration.LOCAL
+        target.scope.add(vd)
+        target.body += SpecialCommentFactory.createHavoc(it.name, it.dataType!!)
+        SymbolicReference(it.name)
+    }
 
+    fun add(program: ReactiveProgram) {
+        val fbd = program.asFunctionBlock()
+        val instance = createInstance(program, fbd)
+        val parameter = createParameters(program)
+        val invocation = InvocationStatement(SymbolicReference(instance.name), parameter)
+        invocation.invoked = Invoked.FunctionBlock(fbd)
 
+        val renamed = VariableRenamer(program.scope::isGlobalVariable, program.init.clone()) { instance.name + SCOPE_SEPARATOR + it }
+        target.init.addAll(renamed.rename())
+
+        //will be rewritten by simplify
+        target.body.add(invocation)
+
+        target.functions.addAll(program.functions)
+
+        announceOutputs(instance, program)
+    }
+
+    private fun announceOutputs(instance: VariableDeclaration, program: ReactiveProgram) {
+        program.scope.variables.filter { it.isOutput }
+                .forEach {
+                    definedVariables[it.name] = SymbolicReference(instance.name, SymbolicReference(it.name))
+                }
+    }
+
+    fun build(b: Boolean): PouExecutable {
+        val target = target.toProgram()
+        if (b)
+            return SymbExFacade.simplify(target)
+        else
+            return target
+    }
 }
 
+private fun ReactiveProgram.toProgram(): ProgramDeclaration {
+    val stmts = StatementList()
+    stmts.addAll(init)
+    stmts.add(WhileStatement(BooleanLit.LTRUE, body))
+    return ProgramDeclaration(name, scope, stmts)
+}
+
+private fun ReactiveProgram.asFunctionBlock(): FunctionBlockDeclaration {
+    return FunctionBlockDeclaration(name, scope, body)
+}
 
 fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
-    run("geteta/examples/cycles/cycles.st",
-            "geteta/examples/cycles/cycles.gtt")
-
-    // val stCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.st")
-    // val stConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram.st")
-    // val stLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.st")
-    // val gttCycles = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/cycles/cycles.gtt")
-    // val gttConst = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/constantprogram/constantprogram_broken.gtt")
-    // val gttMinMax_broken = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/MinMax/MinMax_Broken.gtt")
-    // val gttLinRe = File("c:/Users/User/Documents/studium/ws_1920/Bachelorarbeit/verifaps/verifaps-lib/geteta/examples/LinRe/lr.gtt")
+    run("geteta/examples/history/history.st",
+            "geteta/examples/history/history.gtt")
 }
 
-fun run(program: String, table: String) {
+fun run(programFile: String, table: String) {
     //region read table
     val gtt = readTables(File(table)).first()
     gtt.programRuns = listOf("")
@@ -431,61 +447,31 @@ fun run(program: String, table: String) {
     //endregion
 
     //region read program
-    val progs = fileResolve(File(program)).first
+    val progs = fileResolve(File(programFile)).first
     //endprogram
 
-    /* PrintWriter(System.out).use { out ->
-         val fb = FunctionBlockDeclaration(name = "miter", scope = miter.scope, stBody = miter.statements)
-         IEC61131Facade.printTo(out, fb)
-     }*/
     val enum = progs.findFirstProgram()?.scope?.enumValuesToType() ?: mapOf()
-    val mc = GttMiterConstruction(gtt, gttAsAutomaton, enum)
-    val miter = mc.constructMiter()
-    val productProgram = ProgramCombination(ProgMiterConstruction(progs).constructMiter(), miter).combine()
+    val miter = GttMiterConstruction(gtt, gttAsAutomaton, enum).constructMiter()
+    val program = ProgMiterConstruction(progs.findFirstProgram()!!).let { p ->
+        progs.forEach {
+            when (it) {
+                is TypeDeclarations -> p.addTypeDeclaration(it)
+                is FunctionDeclaration -> p.addFunctionDeclaration(it)
+            }
+        }
+        p.constructMiter()
+    }
 
+    val productProgramBuilder = InvocationBasedProductProgramBuilder()
+    productProgramBuilder.add(program)
+    productProgramBuilder.add(miter)
+    val productProgram = productProgramBuilder.build(false)
     PrintWriter(System.out).use { out ->
-        //            IEC61131Facade.printTo(out, simplify(combi), true)
         val hccprinter = HccPrinter(CodeWriter(out))
         hccprinter.isPrintComments = true
         productProgram.accept(hccprinter)
 
+        hccprinter.isPrintComments = true
+        SymbExFacade.simplify(productProgram).accept(hccprinter)
     }
-
-    //region Sandbox------------------------------
-
-//        val body = StatementList()
-//        val cc: CaseCondition = CaseCondition.IntegerCondition(IntegerLit(INT, 1.toString().toBigInteger()))
-//        val ccArray = arrayListOf<CaseCondition>(cc)
-//        val sl = StatementList()
-//        sl.add(CommentStatement("Some"))
-//
-//        sl.add(CommentStatement("Code Block"))
-//
-//
-//        body.add(ForStatement(variable = "counter", start = IntegerLit(0),
-//                stop = IntegerLit(20), step = IntegerLit(2), statements = sl))
-//
-//
-//
-//        val scope = Scope()
-//        val decl = VariableDeclaration(name = "1simpletypedecl", type = VariableDeclaration.LOCAL, td = SimpleTypeDeclaration(name = "simpletd", baseType = RefTo(AnyBit.BOOL), initialization = IntegerLit(1)))
-//        scope.add(decl)
-//
-//        println("TypeDecl: ${decl.typeDeclaration}")
-//        println("Type: ${decl.type}")
-//        println("Datatype: ${decl.dataType}")
-//        println("init: ${decl.init}")
-//        println("initValue: ${decl.initValue?.value}")
-//
-//        val decl2 = VariableDeclaration(name = "2simpletypedecl", type = VariableDeclaration.LOCAL, td = SimpleTypeDeclaration(name = "simpletd", baseType = RefTo(INT), initialization = IntegerLit(1)))
-//        scope.add(decl2)
-//        val decl3 = VariableDeclaration(name = "3simpletypedecl", type = VariableDeclaration.LOCAL, td = SimpleTypeDeclaration(name = "simpletd", baseType = RefTo(AnyBit.BOOL), initialization = BooleanLit.LTRUE))
-//
-//        scope.add(decl3)
-//
-//
-//        val pd = ProgramDeclaration(name = "testingStuff", scope = scope, stBody = body)
-
-
-    //endregion Sandbox_end-------------------------------
 }

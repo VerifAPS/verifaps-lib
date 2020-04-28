@@ -22,7 +22,7 @@ object ValidExpressionTest {
     @MethodSource("getExpressions")
     fun testCopy(validExpression: String) {
         val e = IEC61131Facade.expr(validExpression)
-        Assertions.assertEquals(e, e.clone())
+        Assertions.assertEquals(e, e.setAllMetadata())
     }
 
 

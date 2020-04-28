@@ -27,6 +27,7 @@ import com.github.jferard.fastods.tool.FastOds
 import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.st.HccPrinter
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -312,8 +313,14 @@ class GetetaSmtApp : CliktCommand() {
             val automaton = GetetaFacade.constructTable(table)
             val mc = GttMiterConstruction(table, automaton.automaton, enum)
             val miter = mc.constructMiter()
-            val program = ProgMiterConstruction(pous).constructMiter()
-            val productProgram = ProgramCombination(program, miter).combine()
+            val program = ProgMiterConstruction(PouElements(pous.toMutableList()))
+                    .constructMiter()
+
+            val productProgramBuilder = InvocationBasedProductProgramBuilder()
+            productProgramBuilder.add(program)
+            productProgramBuilder.add(miter)
+            val productProgram = productProgramBuilder.build(false)
+
             val outputFile = File(outputFolder ?: ".", table.name + ".hcc").absoluteFile
             outputFile.bufferedWriter().use { out ->
                 val simplifiedProductProgram = SymbExFacade.simplify(productProgram)
@@ -322,6 +329,7 @@ class GetetaSmtApp : CliktCommand() {
                 simplifiedProductProgram.accept(hccprinter)
             }
             info("File: $outputFile written")
+
         }
     }
 }

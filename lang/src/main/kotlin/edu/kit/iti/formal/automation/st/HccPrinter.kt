@@ -1,9 +1,10 @@
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.datatypes.*
-import edu.kit.iti.formal.automation.datatypes.values.FALSE
-import edu.kit.iti.formal.automation.datatypes.values.TRUE
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.IECString
 import edu.kit.iti.formal.automation.datatypes.values.Value
 import edu.kit.iti.formal.automation.il.IlPrinter
 import edu.kit.iti.formal.automation.operators.Operators
@@ -11,9 +12,18 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
+import edu.kit.iti.formal.util.meta
 
-open class HccPrinter
-@JvmOverloads constructor(sb: CodeWriter = CodeWriter()) : StructuredTextPrinter(sb) {
+open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false) : StructuredTextPrinter(sb) {
+    init {
+        if (!noPreamble) {
+            sb.print("""
+                int nondet_int() { int i; return i; }
+                int nondet_bool() { return nondet_int()?0:1; }
+                int nondet_enum() { return nondet_int(); }
+            """.trimIndent())
+        }
+    }
 
     override fun visit(empty: EMPTY_EXPRESSION) {
         sb.print("/* empty expression */")
@@ -101,7 +111,6 @@ open class HccPrinter
     }
 
 
-
     override fun visit(caseStatement: CaseStatement) {
 
         sb.nl().printf("switch( ")
@@ -113,15 +122,14 @@ open class HccPrinter
             sb.nl() //TODO "break;" ?
         }
 
-        if (caseStatement.elseCase!!.size > 0) {
+        if (caseStatement.elseCase.size > 0) {
             sb.nl().printf("default: ")
-            caseStatement.elseCase!!.accept(this)
+            caseStatement.elseCase.accept(this)
         }
 
         sb.nl().decreaseIndent().appendIdent().printf("}")
 
     }
-
 
 
     override fun visit(programDeclaration: ProgramDeclaration) {
@@ -141,8 +149,6 @@ open class HccPrinter
 
         sb.decreaseIndent().nl().printf("}").nl().printf("/* end program */").nl()
     }
-
-
 
 
     override fun visit(forStatement: ForStatement) {
@@ -167,8 +173,8 @@ open class HccPrinter
         val returnType = functionDeclaration.returnType.identifier
         if (!(returnType == null || returnType.isEmpty()))
             sb.printf(returnType.toLowerCase()).printf(" ${functionDeclaration.name}( ")
-        functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEachIndexed{ i, it ->
-            if(i != 0) {
+        functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEachIndexed { i, it ->
+            if (i != 0) {
                 sb.printf(", ")
             }
             variableDataType(it)
@@ -185,10 +191,9 @@ open class HccPrinter
         printBody(functionDeclaration)
 
 
-
-        val outVars  = functionDeclaration.scope.variables.filter { it.isOutput || it.isInOut }
+        val outVars = functionDeclaration.scope.variables.filter { it.isOutput || it.isInOut }
         if (outVars.isNotEmpty())
-        sb.nl().printf("return ${outVars.first().name};")
+            sb.nl().printf("return ${outVars.first().name};")
 
 
         sb.decreaseIndent().nl().printf("}").nl().printf("/* end function */").nl().nl()
@@ -263,35 +268,26 @@ open class HccPrinter
             sb.printf(commentStatement.comment)
             sb.printf(" */")
         }
-        val meta = commentStatement.getMetadata(SpecialComment::class.java)
-        if (meta is SpecialComment) {
-            when (meta) {
-                is SpecialComment.AssertComment -> {
-                    sb.nl()
-                    sb.printf("assert( ")
-                    meta.expr.accept(this)
-                    sb.printf(" );")
-                }
-                is SpecialComment.AssumeComment -> {
-                    sb.nl()
-                    sb.printf("assume( ")
-                    meta.expr.accept(this)
-                    sb.printf(" );")
-                }
-                is SpecialComment.HaveocComment -> {
-                    meta.variables.forEach {
-                        sb.nl()
-//                        sb.print(it.name).printf(" = haveoc();")
-                        val haveocName = "haveoc_${it.name}"
-                        variableDataType(it)
-                        sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
-                        sb.printf(it.name).printf(" = ").printf(haveocName).printf(";")
-                        
-                    }
-                }
-                else -> sb.nl().printf("/*unidentified SpecialComment*/")
+        val meta: SpecialCommentMeta? = commentStatement.meta<SpecialCommentMeta>()
+        when (meta) {
+            is SpecialCommentMeta.AssertComment -> {
+                sb.nl()
+                sb.printf("assert( ")
+                meta.expr.accept(this)
+                sb.printf(" );")
             }
-
+            is SpecialCommentMeta.AssumeComment -> {
+                sb.nl()
+                sb.printf("assume( ")
+                meta.expr.accept(this)
+                sb.printf(" );")
+            }
+            is SpecialCommentMeta.HavocComment -> {
+                sb.nl()
+                val haveocName = "nondet_${meta.dataType.name.toLowerCase()}();"
+                //sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
+                sb.printf(meta.variable).printf(" = ").printf(haveocName)
+            }
         }
     }
 
@@ -300,7 +296,7 @@ open class HccPrinter
 //                (if (prefix != null) "$prefix#" else "") + suffix
 
         sb.printf(when (literal) {
-            is IntegerLit ->  print(literal.dataType.obj?.name, literal.value.abs())
+            is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
             is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
             //TODO maybe print the integer value
             is EnumLit -> ("${literal.dataType.obj?.name}__${literal.value}")
@@ -326,8 +322,11 @@ open class HccPrinter
                 print(literal.dataType().name, "${literal.value.milliseconds}ms")
             }
             is BooleanLit -> {
-                if(literal == BooleanLit.LTRUE) {"1"}
-                else {"0"}
+                if (literal == BooleanLit.LTRUE) {
+                    "1"
+                } else {
+                    "0"
+                }
             }
             is BitLit -> {
                 print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
@@ -374,7 +373,6 @@ open class HccPrinter
                 }
     }
 
-
     override fun print(vd: VariableDeclaration) {
         sb.nl()
         variableDataType(vd)
@@ -390,7 +388,7 @@ open class HccPrinter
 
                 when (dt) {
                     is AnyBit.BOOL -> {
-                        if (v ==  true) {
+                        if (v == true) {
                             sb.printf("1")
                         } else if (v == false) {
                             sb.printf("0")
@@ -457,20 +455,28 @@ open class HccPrinter
 
 }
 
-open class SpecialComment() {
-    class AssertComment(val expr: Expression = EMPTY_EXPRESSION)
-        : SpecialComment() {
-
+object SpecialCommentFactory {
+    fun createHavoc(name: String, dt: AnyDt): CommentStatement {
+        val comment = CommentStatement("havoc $name")
+        comment.meta<SpecialCommentMeta>(SpecialCommentMeta.HavocComment(name, dt))
+        return comment
     }
 
-    class AssumeComment(val expr: Expression = EMPTY_EXPRESSION)
-        : SpecialComment() {
-
+    fun createAssume(expression: Expression): CommentStatement {
+        val comment = CommentStatement("assumption of constraints")
+        comment.meta<SpecialCommentMeta>(SpecialCommentMeta.AssumeComment(expression))
+        return comment
     }
 
-    class HaveocComment(val variables: MutableList<VariableDeclaration> = arrayListOf())
-        : SpecialComment() {
-
+    fun createAssert(expression: Expression): Statement {
+        val comment = CommentStatement("assert")
+        comment.meta<SpecialCommentMeta>(SpecialCommentMeta.AssertComment(expression))
+        return comment
     }
 }
 
+sealed class SpecialCommentMeta {
+    class AssertComment(var expr: Expression) : SpecialCommentMeta()
+    class AssumeComment(var expr: Expression) : SpecialCommentMeta()
+    class HavocComment(var variable: String, val dataType: AnyDt) : SpecialCommentMeta()
+}

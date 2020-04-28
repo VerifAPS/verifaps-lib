@@ -21,8 +21,7 @@ import java.util.*
  * @author weigl, Augusto Modanese
  * @version $Id: $Id
  */
-open class StructuredTextPrinter
-@JvmOverloads constructor(var sb: CodeWriter = CodeWriter()) : AstVisitor<Unit>() {
+open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor<Unit>() {
     private val literals: StringLiterals = SL_ST
     var bodyPrintingOrder = listOf(BodyPrinting.ST, BodyPrinting.SFC, BodyPrinting.IL)
     var isPrintComments: Boolean = false

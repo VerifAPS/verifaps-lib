@@ -31,7 +31,7 @@ object ProgramTest {
         val ctx = parser.start()
         Assertions.assertEquals(0, parser.numberOfSyntaxErrors.toLong())
         val sl = ctx.accept(IECParseTreeToAST()) as PouElements
-        Assertions.assertEquals(sl, sl.clone())
+        Assertions.assertEquals(sl, sl.setAllMetadata())
     }
 
     /*

@@ -40,8 +40,7 @@ import kotlin.collections.HashMap
 
 public val SVariable.info: SmvVariableInfo
     get() {
-        return meta<SmvVariableInfo>()
-                ?: SmvVariableInfo().also { setMetadata(SmvVariableInfo::class.java, it) }
+        return meta<SmvVariableInfo>() ?: SmvVariableInfo().also { meta<SmvVariableInfo>(it) }
     }
 
 public var SVariable.isInput: Boolean

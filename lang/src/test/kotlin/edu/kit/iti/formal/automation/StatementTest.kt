@@ -22,7 +22,7 @@ object StatementTest {
     fun testCopy(testFile: Path) {
         println("F:$testFile")
         val sl = IEC61131Facade.statements(CharStreams.fromPath(testFile))
-        Assertions.assertEquals(sl, sl.clone())
+        Assertions.assertEquals(sl, sl.setAllMetadata())
     }
 
     @JvmStatic

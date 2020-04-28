@@ -1,7 +1,7 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.3.71" apply false
+    id "org.jetbrains.kotlin.jvm" version "1.3.72" apply false
     id "org.jetbrains.dokka" version "0.10.1"
     id "com.jfrog.bintray" version "1.8.4" apply false
     id "org.sonarqube" version "2.8"
@@ -54,7 +54,7 @@ subprojects {
     apply plugin: 'maven'
     apply plugin: 'jacoco'
 
-    ext.kotlin_version = '1.3.70'
+    ext.kotlin_version = '1.3.72'
 
     sourceCompatibility = 11
     targetCompatibility = 11

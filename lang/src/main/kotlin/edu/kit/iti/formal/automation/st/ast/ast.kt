@@ -19,7 +19,7 @@ import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
 import edu.kit.iti.formal.util.HasMetadata
-import edu.kit.iti.formal.util.HasMetadataImpl
+import edu.kit.iti.formal.util.Metadata
 import edu.kit.iti.formal.util.times
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
@@ -32,7 +32,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.reflect.full.memberProperties
 
-sealed class Top : Visitable, Cloneable, HasMetadata by HasMetadataImpl(),
+sealed class Top : Visitable, Cloneable, HasMetadata,
         HasRuleContext, Serializable {
     override var ruleContext: ParserRuleContext? = null
 
@@ -45,8 +45,15 @@ sealed class Top : Visitable, Cloneable, HasMetadata by HasMetadataImpl(),
                     .map {
                         it.getter.call(this)
                     }
-                    .filter { it is Top }
+                    .filterIsInstance<Top>()
                     .map { it as Top }
+
+    private var _metadata: Metadata? = null
+    override fun metadata(create: Boolean): Metadata? {
+        if (create && _metadata == null)
+            _metadata = Metadata()
+        return _metadata
+    }
 }
 
 interface HasScope {
@@ -546,7 +553,7 @@ data class CommentStatement(var comment: String) : Statement() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): CommentStatement {
-        return CommentStatement(comment)
+        return CommentStatement(comment).also { it.copyMetaFrom(this) }
     }
 
     companion object {
@@ -913,6 +920,7 @@ data class InvocationParameter(
 //region Type
 interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
     override var name: String
+
     //var dataType: AnyDt
     @property:Deprecated("should be an type DECLARATION")
     var baseType: RefTo<AnyDt>
@@ -1879,6 +1887,7 @@ data class VariableDeclaration(
 
 
     var typeDeclaration: TypeDeclaration? = null
+
     /**
      * determined by the typeDeclaration
      */
@@ -2124,6 +2133,7 @@ data class SFCActionQualifier(
         RAISING("P1", false),               //could be renamed to RISING
         FALLING("P0", false),
         PULSE("P", false),
+
         /** special case for code sys */
         WHILE("A", false)
     }
