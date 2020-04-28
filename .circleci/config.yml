@@ -53,7 +53,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ./gradlew --build-cache :ide:installDist :ide:assembleDist
+      - run: ./gradlew --build-cache :exec:installDist :exec:assembleDist
 
       - persist_to_workspace:
           root: ~/repo
@@ -192,7 +192,7 @@ jobs:
           name: Synthesis Tests
           command: |
             cd geteta/examples/synthesis_test_cases
-            ../../../ide/build/install/ide/bin/ttsynth --python=/usr/bin/python3 files/* -o generated/
+            ../../../exec/build/install/exec/bin/ttsynth --python=/usr/bin/python3 files/* -o generated/
             ./gradlew test --info
 
 
