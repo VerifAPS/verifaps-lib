@@ -28,16 +28,16 @@ namespace {
                 {true, true},
         };
         auto expected_outputs = std::vector<synthesized::result> {
-                {true, {false}},
-                {true, {false}},
-                {true, {false}},
-                {true, {false}},
-                {true, {true}},
-                {true, {true}},
-                {true, {true}},
-                {true, {true}},
-                {true, {false}},
-                {false, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::INACTIVE}, {false}},
         };
 
         auto iteration = std::size_t{0};
@@ -63,14 +63,14 @@ namespace {
                 {false},
         };
         auto expected_outputs = std::vector<synthesized::result> {
-                {true, {false}},
-                {true, {false}},
-                {true, {true}},
-                {true, {true}},
-                {true, {false}},
-                {true, {true}},
-                {true, {false}},
-                {true, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {true}},
+                {{table_status::ACTIVE}, {false}},
+                {{table_status::ACTIVE}, {false}},
         };
 
         auto iteration = std::size_t{0};
@@ -115,24 +115,24 @@ namespace {
                 {CalculatorMode::DIV, 2, false},
         };
         auto expected_outputs = std::vector<synthesized::result> {
-                {true, {0, false}},
-                {true, {2, false}},
-                {true, {-4, false}},
-                {true, {4, false}},
-                {true, {2, false}},
-                {true, {2, false}},
-                {true, {127, false}},
-                {true, {-127, false}},
-                {true, {-128, false}},
-                {true, {-128, false}},
-                {true, {0, true}},
-                {true, {0, true}},
-                {true, {0, true}},
-                {true, {0, true}},
-                {true, {0, true}},
-                {true, {0, true}},
-                {true, {0, false}},
-                {false, {0, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, false},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {2, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {-4, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {4, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {2, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {2, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {127, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {-127, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {-128, false}},
+                {{table_status::ACTIVE, table_status::ACTIVE}, {-128, false}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::ACTIVE}, {0, true}},
+                {{table_status::INACTIVE, table_status::COMPLETED}, {0, false}},
+                {{table_status::INACTIVE, table_status::COMPLETED}, {0, false}},
         };
 
         auto iteration = std::size_t{0};
@@ -152,8 +152,8 @@ namespace {
                 {42},
         };
         auto expected_outputs = std::vector<synthesized::result> {
-                {true, {63, 126, 127, -128}},
-                {false, {0, 0, 0, 0}},
+                {{table_status::COMPLETED}, {63, 126, 127, -128}},
+                {{table_status::COMPLETED}, {0, 0, 0, 0}},
         };
 
         auto iteration = std::size_t{0};

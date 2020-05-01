@@ -16,7 +16,6 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.monitor.SmvToCTranslator
 import edu.kit.iti.formal.smv.SMVAstDefaultVisitorNN
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
@@ -612,7 +611,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Accumulates values from all SVariables in the expression
      */
-    abstract class SVariableVisitor<T> : SMVAstDefaultVisitorNN<Set<T>>() {
+    private abstract class SVariableVisitor<T> : SMVAstDefaultVisitorNN<Set<T>>() {
         final override fun defaultVisit(top: SMVAst): Set<T> = setOf()
 
         abstract override fun visit(v: SVariable): Set<T>
@@ -634,7 +633,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Extracts SVariables matching the given pattern from an expression
      */
-    class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
+    private class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
         override fun visit(v: SVariable): Set<Pair<String, MatchResult>> =
                 pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
     }
@@ -643,10 +642,65 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Extracts the dependencies to output variables (other than self) and other variables from an expression
      */
-    class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String) :
-            SVariableVisitor<Pair<String, Boolean>>() {
+    private class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String)
+        : SVariableVisitor<Pair<String, Boolean>>() {
         override fun visit(v: SVariable): Set<Pair<String, Boolean>> =
                 if (v.name == self) setOf() else setOf(Pair(v.name, outputVariables.contains(v.name)))
+    }
+
+
+    /**
+     * Translates SMV expressions to C++ expressions
+     */
+    private inner class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
+        val variableReplacement = mutableMapOf<String, String>()
+
+        override fun defaultVisit(top: SMVAst): String = throw IllegalArgumentException("unsupported expression $top")
+
+        override fun visit(v: SVariable): String = variableReplacement[v.name] ?: v.name
+
+        override fun visit(ue: SUnaryExpression) = when(ue.dataType) {
+            is SMVWordType -> "(${generateCppDataType(ue.dataType!!)}) "
+            else -> ""
+        } + "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
+
+        override fun visit(be: SBinaryExpression) = when(be.dataType) {
+            is SMVWordType -> "(${generateCppDataType(be.dataType!!)}) "
+            else -> ""
+        } + "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
+
+        private fun opToC(op: SBinaryOperator) = when (op) {
+            SBinaryOperator.PLUS -> "+"
+            SBinaryOperator.MINUS -> "-"
+            SBinaryOperator.DIV -> "/"
+            SBinaryOperator.MUL -> "*"
+            SBinaryOperator.AND -> " && "
+            SBinaryOperator.OR -> " || "
+            SBinaryOperator.LESS_THAN -> " < "
+            SBinaryOperator.LESS_EQUAL -> " <= "
+            SBinaryOperator.GREATER_THAN -> " > "
+            SBinaryOperator.GREATER_EQUAL -> " >="
+            SBinaryOperator.XOR -> " ^ "
+            SBinaryOperator.EQUAL -> " == "
+            SBinaryOperator.EQUIV -> " == "
+            SBinaryOperator.NOT_EQUAL -> " != "
+            SBinaryOperator.MOD -> " % "
+            SBinaryOperator.SHL -> " << "
+            SBinaryOperator.SHR -> " >> "
+            else -> throw IllegalArgumentException("unsupported binary operator $op")
+        }
+
+        private fun opToC(op: SUnaryOperator): String = when (op) {
+            SUnaryOperator.MINUS -> "-"
+            SUnaryOperator.NEGATE -> "!"
+            else -> throw IllegalArgumentException("unsupported unary operator $op")
+        }
+
+        override fun visit(l: SLiteral) = l.value.toString()
+
+        override fun visit(ce: SCaseExpression): String = ce.cases.fold(StringBuilder()) { sb, case ->
+            sb.append("${case.condition.accept(this)} ? (${case.then.accept(this)}) : ")
+        }.append("assert(false)").toString()
     }
 }
 
