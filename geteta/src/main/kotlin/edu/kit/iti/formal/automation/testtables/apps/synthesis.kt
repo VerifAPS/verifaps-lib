@@ -164,7 +164,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     // indexed by table
     private val automata = mutableListOf<TestTableAutomaton>()
     private val states = mutableListOf<List<RowState>>()
-    private val unrolledRowOffsets = mutableListOf<Int>()
 
     init {
         // preprocessing
@@ -191,7 +190,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // extract context information
-        var unrolledRowCount = 0
         tables.forEach { table ->
             val inputVariables = table.programVariables.filter { it.isAssumption }.toSet()
             val variables = table.programVariables.map { it.name to it }.toMap()
@@ -242,19 +240,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             automata.add(automaton)
             // loop over table.region.flat() instead of automaton.rowStates to preserve declaration order
             states.add(table.region.flat().flatMap { row -> automaton.rowStates.getValue(row) })
-            unrolledRowOffsets += unrolledRowCount
-            unrolledRowCount += automaton.rowStates.size
         }
     }
 
     fun generateHeader(): String {
-        val initialState = states.foldIndexed(listOf<Boolean>()) { index, acc, rowStates ->
-            val automaton = automata[index]
-            acc + rowStates.map { automaton.initialStates.contains(it) }
-        }
-        // initial state as string, bits reversed to match bitset constructor order
-        val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
-
         return """
             #pragma once
 
@@ -293,6 +282,15 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     void add_value(const T& value) {}
                 };
                 
+                
+                enum class table_status {
+                    ACTIVE,
+                    ACTIVE_COMPLETED,
+                    COMPLETED,
+                    INACTIVE,
+                    ERROR,
+                };
+                
             
                 class synthesized {
                 public:
@@ -308,14 +306,16 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                             return ${generateOutputEqualityComparison()};
                         }
                     };
+                    
+                    using status_type = std::array<table_status, ${automata.size}>;
     
                     struct result {
-                        bool in_spec;
+                        status_type status;
                         output_type output;
                         
                         // for testing purposes - in C++20, we'll be able to simply use a defaulted spaceship operator
                         bool operator==(const result& other) const {
-                            return in_spec == other.in_spec && output == other.output;
+                            return status == other.status && output == other.output;
                         }
                     };
     
@@ -327,10 +327,12 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     };
                     
                     static constexpr std::size_t MAX_LOOKBACK = $maxLookBack;
-                    static constexpr std::string_view INITIAL_STATE = "$stateDescription";
+                    ${indentLines(generateInitialStates(), 20)}
     
-                    std::bitset<INITIAL_STATE.size()> state{INITIAL_STATE.data()};
+                    ${indentLines(generateStateVariables(), 20)}
                     history<memory_type, MAX_LOOKBACK> var_history;
+                    
+                    status_type status{{${generateStatusInitializerContents()}}};
     
                     void update_state_prediction(const input_type& input);
                     output_type calculate_output(const input_type& input);
@@ -383,13 +385,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
                 synthesized::result synthesized::next(const input_t& input) {
                     update_state_prediction(input);
-                    if (state.none()) {
-                        return {false, {}};
-                    }
                     auto output = calculate_output(input);
                     state_transition(input, output);
                     update_history(input, output);
-                    return {true, output};
+                    return {status, output};
                 }
                 
                 void synthesized::update_state_prediction(const input_t& input) {
@@ -407,9 +406,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
                 void synthesized::state_transition(const input_t &input, const output_t &output) {
                     // check which states were actually fulfilled by the output and progress accordingly
-                    std::bitset<INITIAL_STATE.size()> new_state{};
                     ${indentLines(generateStateProgression(), 20)}
-                    state = new_state;
                 }
                                 
                 void synthesized::update_history(const input_t &input, const output_t &output) {
@@ -431,18 +428,42 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 outputs.keys.map { variableNames.getValue(it) }.joinToString(" && ") { "$it == other.$it" }
             }
 
+    private fun generateInitialStates(): Iterable<String> =
+            states.foldIndexed(listOf()) { index, acc, rowStates ->
+                val automaton = automata[index]
+                val initialState = rowStates.map { automaton.initialStates.contains(it) }
+                // initial state as string, bits reversed to match bitset constructor order
+                val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
+                acc + """static constexpr std::string_view INITIAL_STATE_$index = "$stateDescription";"""
+            }
+
+    private fun generateStateVariables(): Iterable<String> =
+            (0 until automata.size).map { index ->
+                "std::bitset<INITIAL_STATE_${index}.size()> state_${index}{INITIAL_STATE_${index}.data()};"
+            }
+
+    private fun generateStatusInitializerContents(): String =
+            (0 until automata.size).joinToString(", ") {
+                "state_${it}.any() ? table_status::ACTIVE : table_status::INACTIVE"
+            }
+
     private fun generateStateChecks(): Iterable<String> =
-            states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
+            states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
                     require(!inputCheckExpr.contains("output.")) {
                         "Referring to output variables in assumptions is unsupported"
                     }
-                    acc + "if (state[${index}] and not (${inputCheckExpr})) {" +
-                            "    state[${index}] = false;" +
+                    acc + "if (state_${tableIndex}[${rowIndex}] and not (${inputCheckExpr})) {" +
+                            "    state_${tableIndex}[${rowIndex}] = false;" +
                             "}"
                 }
+            } + (0 until automata.size).flatMap { index ->
+                listOf(
+                        "if (state_${index}.none() && status[${index}] == table_status::ACTIVE) {",
+                        "    status[${index}] = table_status::INACTIVE;",
+                        "}"
+                )
             }
 
     private fun generateOutputFunctions(): Iterable<String> =
@@ -450,12 +471,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 val memoizedOutputFunctions = mutableMapOf<TableRow, List<String>>()
 
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
                     val outputFunctions = memoizedOutputFunctions.getOrPut(rowState.row,
                             { generateOutputFunctions(rowState.row.outputExpr) })
 
-                    acc + "if (state[${index}] and (${inputCheckExpr})) {" +
+                    acc + "if (state_${tableIndex}[${rowIndex}] and (${inputCheckExpr})) {" +
                             outputFunctions.map { line -> "    $line" } +
                             "}"
                 }
@@ -534,21 +554,37 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             ) ?: throw IllegalArgumentException("Unsatisfiable formula: ${expr.repr()}")
 
     private fun generateStateProgression(): Iterable<String> =
-            states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
-                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
+            (0 until automata.size).map { index ->
+                "std::bitset<INITIAL_STATE_${index}.size()> new_state_${index}{};"
+            } + states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
+                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, tableLines, rowState ->
                     val outputCheckExpr = generateCheckExpression(rowState.row.outputExpr)
                     val outgoingTransitions = automata[tableIndex].getOutgoingTransition(rowState)
-                    val successors = states.foldIndexed(listOf<Int>()) { successorTableIndex, successors, rowStates ->
-                        successors + rowStates.mapIndexed { successorRowIndex, successorCandidate ->
-                            val successorIndex = unrolledRowOffsets[successorTableIndex] + successorRowIndex
-                            Pair(successorIndex, outgoingTransitions.any { it.to == successorCandidate })
-                        }.filter { (_, isSuccessor) -> isSuccessor }.map { (i, _) -> i }
+                    val successors = states.foldIndexed(listOf<Pair<Int, Int>>()) { successorTable, acc, rowStates ->
+                        acc + rowStates.mapIndexed { successorRow, successorCandidate ->
+                            val successor = Pair(successorTable, successorRow)
+                            Pair(successor, outgoingTransitions.any { it.to == successorCandidate })
+                        }.filter { (_, isSuccessor) -> isSuccessor }.map { (s, _) -> s }
                     }
-                    acc + "if (state[${index}] and (${outputCheckExpr})) {" +
-                            successors.map { "    new_state[${it}] = true;" } +
+                    var stateUpdates = successors.map { (table, row) -> "new_state_${table}[$row] = true;" }
+                    if (outgoingTransitions.any { it.to == automata[tableIndex].stateSentinel }) {
+                        stateUpdates = stateUpdates + "status[${tableIndex}] = table_status::ACTIVE_COMPLETED;"
+                    }
+                    tableLines + "if (state_${tableIndex}[${rowIndex}] and (${outputCheckExpr})) {" +
+                            stateUpdates.map { line -> "    $line" } +
                             "}"
                 }
+            } + (0 until automata.size).flatMap { index ->
+                listOf(
+                        "state_${index} = new_state_${index};",
+                        "if (state_${index}.none()) {",
+                        "    if (status[${index}] == table_status::ACTIVE_COMPLETED) {",
+                        "        status[${index}] = table_status::COMPLETED;",
+                        "    } else if (status[${index}] == table_status::ACTIVE) {",
+                        "        status[${index}] = table_status::ERROR;",
+                        "    }",
+                        "}"
+                )
             }
 
     private fun generateHistoryValues(): Iterable<String> =
