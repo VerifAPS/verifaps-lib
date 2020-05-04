@@ -149,6 +149,14 @@ class FBAssignments : CodeTransformation {
 class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
     companion object {
         private val bodyCache = hashMapOf<TransformationState, StatementList>()
+
+        var renaming: (state: TransformationState, statements: StatementList, prefix: String) -> StatementList =
+                ::defaultRenaming
+
+        fun defaultRenaming(state: TransformationState, statements: StatementList, prefix: String): StatementList {
+            return VariableRenamer(state.scope::isGlobalVariable, statements.clone())
+            { prefix + SCOPE_SEPARATOR + it }.rename()
+        }
     }
 
     override fun transform(state: TransformationState): TransformationState {
@@ -164,9 +172,10 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             bodyCache[state] = s.stBody
         }
         val statements = bodyCache[state]!!
-        val renamed =  VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
+        val renamed = renaming(state, statements, prefix)
         return renamed
     }
+
 
     override fun visit(invocation: InvocationStatement): Statement {
         val invoked = invocation.invoked

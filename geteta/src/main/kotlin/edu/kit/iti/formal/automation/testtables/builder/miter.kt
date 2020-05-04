@@ -12,7 +12,10 @@ import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.SpecialCommentFactory
+import edu.kit.iti.formal.automation.st.SpecialCommentMeta
 import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
+import edu.kit.iti.formal.automation.st0.trans.FBEmbeddCode
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.st0.trans.VariableRenamer
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -25,6 +28,7 @@ import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.meta
 import java.io.File
 import java.io.PrintWriter
 import kotlin.math.abs
@@ -147,7 +151,8 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
                 .or(SVariable(sentinel.name, SMVTypes.BOOLEAN))
                 .or(SVariable(err.name, SMVTypes.BOOLEAN).not())
         target.body.add("__INV__" assignTo invAssign.translateToSt())
-        val assert = SpecialCommentFactory.createAssert(SymbolicReference("__INV__"));
+        val assert = SpecialCommentFactory
+                .createAssert(SymbolicReference("__INV__"));
         target.body.add(assert)
     }
 
@@ -356,8 +361,14 @@ class SimpleProductProgramBuilder(name: String = "main") {
 
 class InvocationBasedProductProgramBuilder(name: String = "main") {
     val target = ReactiveProgram(name)
+    private val definedVariables = HashMap<String, SymbolicReference>()
 
-    val definedVariables = HashMap<String, SymbolicReference>()
+    init {
+        FBEmbeddCode.renaming = { a, b, prefix ->
+            VariableRenamerSC(a.scope::isGlobalVariable, b.clone())
+            { prefix + SCOPE_SEPARATOR + it }.rename()
+        }
+    }
 
     fun combine(vararg programs: ReactiveProgram) {
         programs.forEach { add(it) }
@@ -393,7 +404,7 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         val invocation = InvocationStatement(SymbolicReference(instance.name), parameter)
         invocation.invoked = Invoked.FunctionBlock(fbd)
 
-        val renamed = VariableRenamer(program.scope::isGlobalVariable, program.init.clone()) { instance.name + SCOPE_SEPARATOR + it }
+        val renamed = VariableRenamerSC(program.scope::isGlobalVariable, program.init.clone()) { instance.name + SCOPE_SEPARATOR + it }
         target.init.addAll(renamed.rename())
 
         //will be rewritten by simplify
@@ -417,6 +428,43 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
             return SymbExFacade.simplify(target)
         else
             return target
+    }
+}
+
+/**
+ * Renames everything
+ */
+class VariableRenamerSC(isGlobal: (SymbolicReference) -> Boolean,
+                        statements: StatementList,
+                        newName: (String) -> String)
+    : VariableRenamer(isGlobal, statements, newName) {
+    val commentsRenamer = SpecialCommentRenamer(isGlobal, newName, this)
+    override fun visit(commentStatement: CommentStatement): CommentStatement {
+        return commentStatement.accept(commentsRenamer) as CommentStatement
+    }
+}
+
+/**
+ * Renames only SpecialComments and below
+ */
+class SpecialCommentRenamer(val isGlobal: (SymbolicReference) -> Boolean,
+                            val newName: (String) -> String,
+                            val renamer: AstMutableVisitor) : AstMutableVisitor() {
+    override fun visit(commentStatement: CommentStatement): CommentStatement {
+        when (val meta = commentStatement.meta<SpecialCommentMeta>()) {
+            is SpecialCommentMeta.AssertComment -> {
+                meta.expr = meta.expr.accept(renamer) as Expression
+            }
+            is SpecialCommentMeta.AssumeComment -> {
+                meta.expr = meta.expr.accept(renamer) as Expression
+            }
+            is SpecialCommentMeta.HavocComment -> {
+                if (!isGlobal(SymbolicReference(meta.variable))) {
+                    meta.variable = newName(meta.variable)
+                }
+            }
+        }
+        return commentStatement
     }
 }
 

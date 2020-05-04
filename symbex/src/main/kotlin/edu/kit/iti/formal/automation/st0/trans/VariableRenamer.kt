@@ -29,7 +29,7 @@ import edu.kit.iti.formal.automation.st.util.setAll
 /**
  * @author Alexander Weigl (26.06.2014)
  */
-class VariableRenamer(
+open class VariableRenamer(
         private val isGlobal: (SymbolicReference) -> Boolean,
         private val statements: StatementList?,
         private val newName: (String) -> String)
