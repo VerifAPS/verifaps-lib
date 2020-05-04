@@ -76,9 +76,9 @@ data class SBinaryExpression(var left: SMVExpr,
     override val dataType: SMVType?
         get() = SMVTypes.infer(operator, left.dataType, right.dataType)
 
-    override fun inModule(module: String): SBinaryExpression {
-        return SBinaryExpression(left.inModule(module),
-                operator, right.inModule(module))
+    override fun prefix(module: String): SBinaryExpression {
+        return SBinaryExpression(left.prefix(module),
+                operator, right.prefix(module))
     }
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
@@ -134,10 +134,10 @@ data class SCaseExpression(var cases: MutableList<Case> = arrayListOf()) : SMVEx
         return visitor.visit(this)
     }
 
-    override fun inModule(module: String): SCaseExpression {
+    override fun prefix(module: String): SCaseExpression {
         val sCaseExpression = SCaseExpression()
         for (c in cases) {
-            sCaseExpression.add(c.condition.inModule(module), c.then.inModule(module))
+            sCaseExpression.add(c.condition.prefix(module), c.then.prefix(module))
         }
         return sCaseExpression
     }
@@ -195,9 +195,9 @@ data class SFunction(
         return visitor.visit(this)
     }
 
-    override fun inModule(module: String): SFunction {
+    override fun prefix(module: String): SFunction {
         return SFunction(name,
-                arguments.map { a -> a.inModule(module) })
+                arguments.map { a -> a.prefix(module) })
     }
 }
 
@@ -246,34 +246,34 @@ sealed class SLiteral(open val value: Any, override val dataType: SMVType) : SMV
 
 data class SIntegerLiteral(override var value: BigInteger)
     : SLiteral(value, SMVTypes.INT) {
-    override fun inModule(module: String): SMVExpr = SIntegerLiteral(value)
+    override fun prefix(module: String): SMVExpr = SIntegerLiteral(value)
 
     override fun clone() = copy()
 }
 
 data class SFloatLiteral(override var value: BigDecimal)
     : SLiteral(value, SMVTypes.FLOAT) {
-    override fun inModule(module: String): SMVExpr = SFloatLiteral(value)
+    override fun prefix(module: String): SMVExpr = SFloatLiteral(value)
     override fun clone() = copy()
 }
 
 data class SWordLiteral(override var value: BigInteger,
                         override var dataType: SMVWordType)
     : SLiteral(value, dataType) {
-    override fun inModule(module: String): SMVExpr = SWordLiteral(value, dataType)
+    override fun prefix(module: String): SMVExpr = SWordLiteral(value, dataType)
     override fun clone() = copy()
 }
 
 data class SBooleanLiteral(override var value: Boolean)
     : SLiteral(value, SMVTypes.BOOLEAN) {
-    override fun inModule(module: String): SMVExpr = SBooleanLiteral(value)
+    override fun prefix(module: String): SMVExpr = SBooleanLiteral(value)
     override fun clone() = copy()
 }
 
 data class SEnumLiteral(override var value: String,
                         override var dataType: EnumType = SMVTypes.GENERIC_ENUM)
     : SLiteral(value, dataType) {
-    override fun inModule(module: String): SMVExpr = SEnumLiteral(value)
+    override fun prefix(module: String): SMVExpr = SEnumLiteral(value)
     override fun clone() = copy()
 }
 
@@ -281,7 +281,7 @@ data class SEnumLiteral(override var value: String,
 data class SGenericLiteral(override var value: Any,
                            override var dataType: SMVType)
     : SLiteral(value, dataType) {
-    override fun inModule(module: String): SMVExpr = SGenericLiteral(value, dataType)
+    override fun prefix(module: String): SMVExpr = SGenericLiteral(value, dataType)
     override fun clone() = copy()
 }
 
@@ -341,7 +341,8 @@ abstract class SMVExpr : SMVAst() {
         return inModule(module.name)
     }
 
-    abstract fun inModule(module: String): SMVExpr
+    fun inModule(module: String) = prefix("$module.")
+    abstract fun prefix(prefix: String): SMVExpr
 
     fun wordConcat(b: SMVExpr): SMVExpr =
             op(SBinaryOperator.WORD_CONCAT, b)
@@ -432,8 +433,8 @@ data class SVariable(var name: String) : SMVExpr(), Comparable<SVariable> {
 
     override fun clone() = copy().also { it.dataType = dataType }
 
-    override fun inModule(module: String): SVariable {
-        return SVariable.create("$module.$name").with(dataType)
+    override fun prefix(module: String): SVariable {
+        return SVariable.create("$module$name").with(dataType)
     }
 
     infix fun assignTo(expr: SMVExpr) = SAssignment(this, expr)
@@ -623,9 +624,9 @@ data class SQuantified(var operator: STemporalOperator,
 
     constructor(operator: STemporalOperator, vararg expr: SMVExpr) : this(operator, Arrays.asList<SMVExpr>(*expr)) {}
 
-    override fun inModule(module: String): SQuantified =
+    override fun prefix(module: String): SQuantified =
             SQuantified(operator,
-                    ArrayList(quantified.map { a -> a.inModule(module) }))
+                    ArrayList(quantified.map { a -> a.prefix(module) }))
 
     override fun <T> accept(visitor: SMVAstVisitor<T>): T {
         return visitor.visit(this)
@@ -707,8 +708,8 @@ data class SUnaryExpression(
     override val dataType: SMVType?
         get() = expr.dataType
 
-    override fun inModule(module: String): SUnaryExpression {
-        return SUnaryExpression(operator, expr.inModule(module))
+    override fun prefix(module: String): SUnaryExpression {
+        return SUnaryExpression(operator, expr.prefix(module))
     }
 
     override fun clone() = SUnaryExpression(operator, expr.clone())

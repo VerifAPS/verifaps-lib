@@ -54,7 +54,7 @@ interface ReveContext {
         if (specification.isNotEmpty()) {
             for ((o, op, n) in inRelation) {
                 //if (o.name in ov && n.name in nv) {
-                seq.add(SBinaryExpression(o.inModule(oldModule), op, n.inModule(newModule)))
+                seq.add(SBinaryExpression(o.prefix(oldModule), op, n.prefix(newModule)))
                 //ov.remove(o.name)
                 //nv.remove(n.name)
                 //}
