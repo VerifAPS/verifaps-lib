@@ -333,7 +333,13 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
     }
 
     override fun visit(localScope: Scope) {
+        if (localScope.topLevel != localScope)
+            visitVariables(localScope.topLevel.variables)
         val variables = VariableScope(localScope.variables)
+        visitVariables(variables)
+    }
+
+    private fun visitVariables(variables: VariableScope) {
         variables.groupBy { it.type }
                 .forEach { (type, v) ->
                     val vars = v.toMutableList()

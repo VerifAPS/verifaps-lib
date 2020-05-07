@@ -10,7 +10,6 @@ import edu.kit.iti.formal.automation.datatypes.values.VBool
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
-import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.SpecialCommentFactory
 import edu.kit.iti.formal.automation.st.SpecialCommentMeta
 import edu.kit.iti.formal.automation.st.ast.*
@@ -233,7 +232,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
     private fun SMVExpr.translateToSt(): Expression = this.accept(exprConverter)
 }
 
-fun historyName(s: String, n: Int) = "_h_${s}_$n";
+fun historyName(s: String, n: Int) = "_h_${s}_$n"
 
 class ProgMiterConstruction(val exec: PouExecutable) {
     constructor(exec: PouElements) : this(exec.findFirstProgram()!!) {
@@ -250,13 +249,15 @@ class ProgMiterConstruction(val exec: PouExecutable) {
     fun addFunctionDeclaration(func: FunctionDeclaration) = target.functions.add(func)
 
     fun addTypeDeclaration(td: TypeDeclarations) {
-        td.forEach {
-            when (it) {
+        td.forEach { td ->
+            when (td) {
                 is EnumerationTypeDeclaration -> {
-                    it.allowedValues.forEachIndexed { i, it ->
-                        val vd = VariableDeclaration(name = "${td.name}__${it.text.toUpperCase()}", type = VariableDeclaration.CONSTANT,
-                                td = SimpleTypeDeclaration(name = "", baseType = RefTo(INT), initialization = IntegerLit(i)))
-                        target.scope.add(vd)
+                    td.allowedValues.forEachIndexed { i, value ->
+                        val vd = VariableDeclaration(
+                                "${td.name}__${value.text.toUpperCase()}",
+                                VariableDeclaration.CONSTANT,
+                                SimpleTypeDeclaration(INT, IntegerLit(i)))
+                        target.scope.topLevel.add(vd)
                     }
                 }
                 else -> error("Found unsupported declared type: $td")
@@ -360,7 +361,9 @@ class SimpleProductProgramBuilder(name: String = "main") {
 }
 
 class InvocationBasedProductProgramBuilder(name: String = "main") {
-    val target = ReactiveProgram(name)
+    val target = ReactiveProgram(name).also {
+        it.scope.parent = Scope()
+    }
     private val definedVariables = HashMap<String, SymbolicReference>()
 
     init {
@@ -411,6 +414,10 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         target.body.add(invocation)
 
         target.functions.addAll(program.functions)
+
+        program.scope.parent?.variables?.let {
+            target.scope.parent?.variables?.addAll(it)
+        }
 
         announceOutputs(instance, program)
     }
@@ -482,8 +489,8 @@ private fun ReactiveProgram.asFunctionBlock(): FunctionBlockDeclaration {
 fun main() = run {
     SCOPE_SEPARATOR = "__"
     //choose gtt
-    run("geteta/examples/history/history.st",
-            "geteta/examples/history/history.gtt")
+    run("geteta/examples/LinRe/lr.st",
+            "geteta/examples/LinRe/lr.gtt")
 }
 
 fun run(programFile: String, table: String) {
