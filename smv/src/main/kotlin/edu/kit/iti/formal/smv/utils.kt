@@ -37,7 +37,7 @@ open class HistoryModuleBuilder(
     val moduleType = ModuleType(name, variables)
 
     init {
-        assert(length > 0)
+        require(length > 0) { "History length should be positive." }
     }
 
     open fun addVariable(v: SVariable) {
@@ -46,7 +46,7 @@ open class HistoryModuleBuilder(
 
         // state variables
         val vars = (1..length).map {
-            SVariable("${v.name}_$$it", v.dataType!!)
+            SVariable("_$$it", v.dataType!!)
         }
         module.stateVars.addAll(vars)
 

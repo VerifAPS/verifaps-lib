@@ -141,7 +141,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     private fun printAssignments(func: String, a: List<SAssignment>) {
         val assignments = if (sort) a.sortedBy { it.target.name } else a
         for ((target, expr) in assignments) {
-            stream.nl().print(func).print('(').print(target.name).print(") := ")
+            stream.nl().print(func).print('(').print(quoted(target.name)).print(") := ")
             expr.accept(this)
             stream.print(";")
         }

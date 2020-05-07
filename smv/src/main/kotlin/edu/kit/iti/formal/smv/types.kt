@@ -1,8 +1,6 @@
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
-import edu.kit.iti.formal.util.CodeWriter
-import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
@@ -75,8 +73,7 @@ object SMVTypes {
     }
 
     object BOOLEAN : SMVType {
-        override fun valueOf(str: String)
-                = if(str.equals("true", true) ) SLiteral.TRUE else SLiteral.FALSE
+        override fun valueOf(str: String) = if (str.equals("true", true)) SLiteral.TRUE else SLiteral.FALSE
         override fun format(value: Any): String = value.toString().toUpperCase()
         override fun read(str: String): Any = str.equals("TRUE", true)
         override fun repr(): String = "boolean"
@@ -154,12 +151,11 @@ data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>
             this(name, Arrays.asList<SVariable>(*variables))
 
     override fun toString(): String {
-        val stream = StringWriter()
-        val printer = SMVPrinter(CodeWriter(stream))
-        return String.format("${moduleName}(%s)",
-                if (parameters.size > 0) {
-                    parameters.joinToString(", ") { it.repr() }
-                } else "")
+        val params = if (parameters.isNotEmpty()) {
+            parameters.joinToString(", ") { it.repr() }
+        } else ""
+        return "${moduleName}($params)"
+
     }
 }
 

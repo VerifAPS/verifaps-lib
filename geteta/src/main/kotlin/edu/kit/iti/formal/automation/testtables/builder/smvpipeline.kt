@@ -21,6 +21,7 @@ import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
 import edu.kit.iti.formal.util.warn
+import kotlin.math.abs
 
 
 class SmvConstructionPipeline(
@@ -271,12 +272,12 @@ class ManagingGlobalVariables : SmvConstructionTransformer {
 class BackwardsReferencesTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.variableContext.refs.forEach { variable, history ->
-            this.addDelayModule(model, variable, history)
+            this.addDelayModule(model, variable, abs(history))
         }
     }
 
     private fun addDelayModule(model: SMVConstructionModel, variable: SVariable, history: Int) {
-        val b = HistoryModuleBuilder("History_%d_of_%s", listOf(variable), history)
+        val b = HistoryModuleBuilder("History_${history}_of_${variable.name}", listOf(variable), history)
         b.run()
 
         //Add Variable
