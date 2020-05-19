@@ -154,10 +154,10 @@ object SymbExFacade {
         return DefaultTypeTranslator().translate(vd)
     }
 
-    fun evaluateStatements(seq: StatementList, scope: Scope): SymbolicState {
+    fun evaluateStatements(seq: StatementList, scope: Scope, useDefinitions: Boolean = true): SymbolicState {
         val program = ProgramDeclaration(scope = scope, stBody = seq)
         IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(program)))
-        val symbex = SymbolicExecutioner(scope)
+        val symbex = SymbolicExecutioner(scope, useDefinitions)
         symbex.scope = scope
         program.accept(symbex)
         return symbex.peek()

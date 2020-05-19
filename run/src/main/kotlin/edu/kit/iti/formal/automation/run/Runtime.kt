@@ -11,7 +11,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 import edu.kit.iti.formal.automation.visitors.Visitable
-import mu.KLogging
+import edu.kit.iti.formal.util.debug
 import java.math.BigInteger
 import java.util.*
 
@@ -24,8 +24,6 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
     constructor(state: State, scope: Scope) : this(state) {
         definitionScopeStack.push(scope)
     }
-
-    companion object : KLogging()
 
     override fun defaultVisit(obj: Any) {
         TODO("method not implemented for: $obj")
@@ -104,16 +102,16 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
 
         fun conditionHolds(): Boolean {
             val variableValue = state[variableName] ?: return false
-            logger.debug { "Does the ForStatement-Condition hold? current: $variableValue stopValue: $stopValue" }
+            debug("Does the ForStatement-Condition hold? current: $variableValue stopValue: $stopValue")
             return OperationEvaluator.lessThan(variableValue, stopValue).value
         }
 
         while (conditionHolds()) {
-            logger.debug { "for-loop-condition still holds. execute statement body" }
+            debug("for-loop-condition still holds. execute statement body")
             forStatement.statements.accept(this)
 
             val variableValue = state[variableName]
-            logger.debug { "increase for-loop variable ($variableValue) by step ($stepValue)" }
+            debug("increase for-loop variable ($variableValue) by step ($stepValue)")
             state[variableName] = OperationEvaluator.add(state[variableName]!!, stepValue)
         }
     }
@@ -200,7 +198,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
 
     override fun visit(statements: StatementList) {
         statements.forEach {
-            logger.debug { "Executing statement $it" }
+            debug("Executing statement $it")
             it.accept(this)
         }
     }

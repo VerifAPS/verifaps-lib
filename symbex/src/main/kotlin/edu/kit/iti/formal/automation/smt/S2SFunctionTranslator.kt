@@ -33,9 +33,9 @@ import edu.kit.iti.formal.smv.ast.SUnaryOperator
  * @version 1 (15.10.17)
  */
 interface S2SFunctionTranslator {
-    fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType, rightType: SMVType): SExpr
+    fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType?, rightType: SMVType?): SExpr
 
-    fun translateOperator(operator: SUnaryOperator, type: SMVType): SExpr
+    fun translateOperator(operator: SUnaryOperator, type: SMVType?): SExpr
 
     fun translateOperator(func: SFunction, args: List<SExpr>): SExpr
 }

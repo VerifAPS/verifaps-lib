@@ -5,8 +5,7 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.SMVPrinter
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
-import mu.KLogging
-import java.io.PrintWriter
+import edu.kit.iti.formal.util.info
 import java.io.Writer
 
 /**
@@ -53,8 +52,6 @@ open class RegressionVerification(
     val oldInstanceName = "__old__"
     val newInstanceName = "__new__"
 
-    companion object : KLogging()
-
     protected open fun commonInputVariables(): Set<Pair<SVariable, SVariable>> {
         return commonVariables(oldVersion.moduleParameters, newVersion.moduleParameters, nameEqual)
     }
@@ -69,7 +66,7 @@ open class RegressionVerification(
         if (newVersion.name == oldVersion.name) {
             newVersion.name += "_new"
             oldVersion.name += "_old"
-            logger.info("modules renamed due to collision")
+            info("modules renamed due to collision")
         }
 
         newModuleType = ModuleType(newVersion.name, newVersion.moduleParameters)
@@ -81,11 +78,9 @@ open class RegressionVerification(
         val uncoveredOld = ArrayList<SVariable>(oldVersion.moduleParameters)
         val uncoveredNew = ArrayList<SVariable>(newVersion.moduleParameters)
 
-        logger.info {
-            "Common input variables: " + commonInput.joinToString {
-                "(${it.first.name}, ${it.second.name})"
-            }
-        }
+        info("Common input variables: %s", commonInput.joinToString {
+            "(${it.first.name}, ${it.second.name})"
+        })
 
         for ((first, second) in commonInput) {
             assert(first.dataType == second.dataType) { "Datatypes are not equal for ${first} and ${second}" }
@@ -95,8 +90,8 @@ open class RegressionVerification(
             uncoveredNew.remove(second)
         }
 
-        logger.info { "Old exclusive variables: " + uncoveredOld.joinToString { it.name } }
-        logger.info { "New exclusive variables: " + uncoveredNew.joinToString { it.name } }
+        info("Old exclusive variables: %s", uncoveredOld.joinToString { it.name })
+        info("New exclusive variables: %s", uncoveredNew.joinToString { it.name })
 
         handleSpecialInputVariables(uncoveredOld, uncoveredNew);
     }
@@ -142,7 +137,6 @@ open class RegressionVerification(
         addInputVariables()
         addStateVariables()
         addProofObligation(oldInstanceName, newInstanceName)
-        //TODO fix constants or SVariables
     }
 
     open fun writeTo(writer: Writer) {

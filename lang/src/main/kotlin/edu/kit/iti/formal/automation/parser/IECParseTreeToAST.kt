@@ -53,6 +53,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     private lateinit var gather: VariableBuilder
     private lateinit var sfc: SFCImplementation
     private lateinit var currentStep: SFCStep
+
     //private lateinit var currentTopLevelScopeElement: HasScope
     private var tscope = TypeScope.builtin()
 
@@ -457,36 +458,50 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val localScope = Scope()
         gather = localScope.builder()
         ctx.var_decl().forEach { vd -> vd.accept(this) }
-        //assert(currentTopLevelScopeElement != null)
-        //for (variableDeclaration in localScope.variables.values)
-        //    variableDeclaration.parent = currentTopLevelScopeElement
-        //gather = null
         return localScope
     }
 
     override fun visitVar_decl(ctx: IEC61131Parser.Var_declContext): Any? {
         gather.clear()
         val p = ctx.pragma().map { it.accept(this) as Pragma }
-        if (!p.isNullOrEmpty()) gather.pragma = p
+        gather.pushPragma(p)
         ctx.variable_keyword().accept(this)
         ctx.var_decl_inner().accept(this)
+        gather.popPragma()
         return null
     }
 
+
+    fun <T> List<ParserRuleContext>.map(): MutableList<T> = this.map { it -> it.accept(this@IECParseTreeToAST) as T }.toMutableList()
+
+    override fun visitBlock_statement(ctx: IEC61131Parser.Block_statementContext): BlockStatement {
+        val bs = BlockStatement()
+        val statementList = ctx.statement_list().accept(this) as StatementList
+        bs.statements = statementList
+        bs.name = ctx.id.text
+        bs.state = ctx.state?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        bs.input = ctx.input?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        bs.output = ctx.output?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        return bs
+    }
+
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
+        val p: List<Pragma> = ctx.pragma().map()
         for (i in 0 until ctx.type_declaration().size) {
             val seq = ctx.identifier_list(i).names
                     .map { it.IDENTIFIER().symbol }
 
-            gather.identifiers(seq)
+            gather
+                    .pushPragma(p)
+                    .identifiers(seq)
                     .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
                     .close()
+                    .popPragma()
         }
         return null
     }
 
-    override fun visitVariable_keyword(
-            ctx: IEC61131Parser.Variable_keywordContext): Any? {
+    override fun visitVariable_keyword(ctx: IEC61131Parser.Variable_keywordContext): Any? {
         if (ctx.VAR() != null) {
             gather.push(VariableDeclaration.LOCAL)
         }
@@ -776,7 +791,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitStatement(ctx: IEC61131Parser.StatementContext): Any? {
         val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.invocation_statement(),
+                ctx.case_statement(), ctx.invocation_statement(), ctx.block_statement(),
                 ctx.jump_statement(), ctx.for_statement()) as Statement
         val p = ctx.pragma().map { it.accept(this) as Pragma }
         if (p.isNullOrEmpty()) statement.pragmas += p
@@ -860,7 +875,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         for (i in ctx.cond.indices) {
             val c = ctx.cond[i].accept(this) as Expression
             val b = ctx.thenlist[i].accept(this) as StatementList
-            val gs = GuardedStatement(c,b)
+            val gs = GuardedStatement(c, b)
             gs.ruleContext = ctx.cond[i]
             ast.addGuardedCommand(gs)
         }

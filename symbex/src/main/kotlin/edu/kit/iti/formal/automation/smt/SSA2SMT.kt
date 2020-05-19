@@ -81,7 +81,7 @@ class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
         val left = be.left.accept(this)
         val right = be.right.accept(this)
         val op = fnTranslator.translateOperator(be.operator,
-                be.left.dataType!!, be.right.dataType!!)
+                be.left.dataType, be.right.dataType)
 
         val call = SList()
         call.add(op)
@@ -92,7 +92,7 @@ class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
 
     override fun visit(ue: SUnaryExpression): SExpr {
         val right = ue.expr.accept(this)
-        val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType!!)
+        val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType)
         val call = SList()
         call.add(op)
         call.add(right)

@@ -368,8 +368,7 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
 
     init {
         FBEmbeddCode.renaming = { a, b, prefix ->
-            VariableRenamerSC(a.scope::isGlobalVariable, b.clone())
-            { prefix + SCOPE_SEPARATOR + it }.rename()
+            VariableRenamerSC(a.scope::isGlobalVariable, b.clone(), prefix).rename()
         }
     }
 

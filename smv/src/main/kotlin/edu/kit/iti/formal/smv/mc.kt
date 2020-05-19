@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.smv
 
-import mu.KLogging
+import edu.kit.iti.formal.util.info
 import org.jdom2.input.SAXBuilder
 import java.io.File
 import java.io.StringReader
@@ -82,9 +82,9 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
         workingDirectory.mkdirs()
         val commands = arrayOf(executablePath, "-int", moduleFile.absolutePath)
         try {
-            logger.info(commands.joinToString(" "))
-            logger.info("Working Directory: {}", workingDirectory)
-            logger.info("Result in {}", outputFile)
+            info(commands.joinToString(" "))
+            info("Working Directory: %s", workingDirectory)
+            info("Result in %s", outputFile)
             val pr = ProcessRunner(commands,
                     commandFile,
                     workingDirectory,
@@ -96,9 +96,6 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
             e.printStackTrace()
         }
         return NuXMVOutput.Error()
-    }
-
-    companion object : KLogging() {
     }
 }
 

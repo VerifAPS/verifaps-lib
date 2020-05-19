@@ -40,23 +40,20 @@ import java.util.*
 class UsageFinder : AstVisitor<Unit>() {
     override fun defaultVisit(obj: Any) {}
 
-    var knownVariables = HashSet<SymbolicReference>()
-    var writtenReferences = HashSet<SymbolicReference>()
-    var readReference = HashSet<SymbolicReference>()
+    val knownVariables
+        get() = writtenReferences + readReference
+
+    val writtenReferences = HashSet<SymbolicReference>()
+    val readReference = HashSet<SymbolicReference>()
 
     override fun visit(assignmentStatement: AssignmentStatement) {
-        writtenReferences.add(assignmentStatement.location as SymbolicReference)
+        writtenReferences.add(assignmentStatement.location)
         assignmentStatement.expression.accept(this)
     }
 
     override fun visit(localScope: Scope) {
-        knownVariables.clear()
         writtenReferences.clear()
         readReference.clear()
-
-        localScope.variables.forEach {
-            knownVariables.add(SymbolicReference(it.name))
-        }
     }
 
     override fun visit(symbolicReference: SymbolicReference) {

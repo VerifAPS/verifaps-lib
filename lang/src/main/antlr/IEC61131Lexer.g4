@@ -32,6 +32,9 @@ FBD_CODE: '(***FBD' .*? '***)';
 
 IL_CODE: '//IL\n' -> pushMode(il);
 
+BLOCK_START: '//!' WS* R E G I O N;
+BLOCK_END: '//!' WS* E N D '_' R E G I O N ~[\r\n]*;
+
 /******
  * DATATYPES
  */
@@ -884,7 +887,7 @@ COMMENT
 ;
 
 LINE_COMMENT
-  : '//' ~[\r\n]* -> channel(HIDDEN)
+  : '//'~[!] ~[\r\n]* -> channel(HIDDEN)
   ;
 
 DIRECT_VARIABLE_LITERAL

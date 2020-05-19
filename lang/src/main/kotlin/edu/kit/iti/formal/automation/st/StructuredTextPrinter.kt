@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.st
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.IECString
@@ -32,6 +33,17 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun defaultVisit(obj: Any) {
         throw IllegalArgumentException("not implemented: " + obj::class.java)
+    }
+
+    override fun visit(blockStatement: BlockStatement) {
+        val state = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
+        val input = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
+        val output = blockStatement.output.joinToString(", ") { IEC61131Facade.print(it) }
+        sb.nl().print("// REGION ${blockStatement.name} [$state] ($input) => ($output)")
+        sb.increaseIndent()
+        blockStatement.statements.accept(this)
+        sb.decreaseIndent()
+        sb.nl().print("// END_REGION")
     }
 
     override fun visit(empty: EMPTY_EXPRESSION) {
@@ -546,9 +558,13 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
             sb.nl()
-            sb.printf(literals.comment_open())
-            sb.printf(commentStatement.comment)
-            sb.printf(literals.comment_close())
+            if ('\n' in commentStatement.comment) {
+                sb.printf(literals.comment_open())
+                sb.printf(commentStatement.comment)
+                sb.printf(literals.comment_close())
+            } else {
+                sb.printf("//%s\n", commentStatement.comment)
+            }
         }
     }
 

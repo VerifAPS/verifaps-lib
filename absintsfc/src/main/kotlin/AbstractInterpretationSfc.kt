@@ -179,7 +179,7 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
     private fun executeAction(pou: FunctionBlockDeclaration,
                               body: StatementList): SymbolicState {
         val program = ProgramDeclaration(scope = pou.scope.copy(), stBody = body)
-        val se = SymbolicExecutioner(pou.scope.parent)
+        val se = SymbolicExecutioner(pou.scope.parent!!)
         program.accept(se)
         //remove to many assignments
         val state = se.peek()//.filter { (k, v) -> k != v }

@@ -33,7 +33,7 @@ import java.io.IOException
  * @author Alexander Weigl
  * @version 1 (16.10.17)
  */
-class SMTFacadeTest {
+class SmtFacadeTest {
     @Test
     @Throws(IOException::class)
     fun testTranslateTrafficLights() {
@@ -44,7 +44,7 @@ class SMTFacadeTest {
         IEC61131Facade.resolveDataTypes(code)
         val symplifiedCode = SymbExFacade.simplify(code)
         val module = SymbExFacade.evaluateProgram(symplifiedCode)
-        val program = SMTFacade.translate(module)
+        val program = SmvSmtFacade.translate(module)
         println(program.preamble)
         println(program.getStepDefinition(true, "", "_0"))
         println(program.getStepDefinition(false, "", "_1"))

@@ -28,9 +28,10 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String) = internalVariable(programRunNames).inModule(tableName)
+    open fun externalVariable(programRunNames: List<String>, tableName: String) :SVariable
+            = internalVariable(programRunNames).inModule(tableName) as SVariable
 
-    open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
+    open fun internalVariable(programRunNames: List<String>):SVariable = SVariable(name, logicType)
 }
 
 abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {

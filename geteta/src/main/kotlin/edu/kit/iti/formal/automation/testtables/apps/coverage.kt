@@ -7,10 +7,10 @@ import com.github.ajalt.clikt.parameters.options.option
 import edu.kit.iti.formal.automation.CommonArguments
 import edu.kit.iti.formal.automation.ProgramOptions
 import edu.kit.iti.formal.automation.SymbExFacade
-import edu.kit.iti.formal.automation.rvt.ExpressionReplacer
 import edu.kit.iti.formal.automation.smt.*
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smv.ExpressionReplacer
 import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.conjunction
@@ -63,7 +63,7 @@ class CoverageApp : CliktCommand(
         val fnTranslator: S2SFunctionTranslator = DefaultS2SFunctionTranslator()
         val toSmt = Smv2SmtVisitor(fnTranslator, dtTranslator, "")
         val toSmtState = Smv2SmtVisitor(fnTranslator, dtTranslator, "old")
-        val program = SMTFacade.translate(modCode)
+        val program = SmvSmtFacade.translate(modCode)
 
 
         gtts.forEach { gtt ->

@@ -168,7 +168,7 @@ class ODSCounterExampleWriter constructor(
             }
             output.forEach {
                 val v = counterExample[index,
-                        it.externalVariable(gtt.programRuns, "_${gtt.name}").name]
+                        (it.externalVariable(gtt.programRuns, "_${gtt.name}") as SVariable).name]
                 cell.setStyle(tableStyle.styleOutputValue)
                 cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
                 cell.setStringValue(v)
