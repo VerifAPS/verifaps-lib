@@ -1,5 +1,8 @@
 package edu.kit.iti.formal.automation.rvt
 
+import edu.kit.iti.formal.automation.ASSERTION_PREFIX
+import edu.kit.iti.formal.automation.ASSUMPTION_PREFIX
+import edu.kit.iti.formal.automation.HAVOC_PREFIX
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.analysis.toHuman
 import edu.kit.iti.formal.automation.exceptions.UnknownDatatype
@@ -97,7 +100,7 @@ open class SymbolicExecutioner(
             } catch (e: Exception) {
                 throw UnknownVariableException(
                         "Variable access to not declared variable: ${IEC61131Facade.print(vd)}." +
-                        " Line: ${vd.startPosition}")
+                                " Line: ${vd.startPosition}")
             }
         }
     }
@@ -426,6 +429,38 @@ open class SymbolicExecutioner(
 
     override fun visit(blockStatement: BlockStatement): SMVExpr? {
         blockStatement.statements.accept(this)
+        return null
+    }
+
+    override fun visit(special: SpecialStatement): SMVExpr? {
+        when (special) {
+            is SpecialStatement.Assert -> {
+                val name = special.name ?: "l${special.startPosition.lineNumber}"
+                special.exprs.forEachIndexed { index, e ->
+                    val def = ASSERTION_PREFIX + name + "_" + index
+                    peek().auxiliaryDefinitions[SVariable.bool(def)] = e.accept(this)!!
+                }
+            }
+
+            is SpecialStatement.Assume -> {
+                val name = special.name ?: "l${special.startPosition.lineNumber}"
+                special.exprs.forEachIndexed { index, e ->
+                    val def = ASSUMPTION_PREFIX + name + "_" + index
+                    peek().auxiliaryDefinitions[SVariable.bool(def)] = e.accept(this)!!
+                }
+            }
+            is SpecialStatement.Havoc -> {
+                val name = special.name ?: "l${special.startPosition.lineNumber}"
+                special.variables.forEachIndexed { index, ref ->
+                    val cnt = assignmentCounter.incrementAndGet()
+                    val v = lift(ref)
+                    val uniqueInput = SVariable(HAVOC_PREFIX + name + "_" + index, v.dataType!!)
+                    peek().assign(v, cnt, uniqueInput)
+                    peek().auxiliaryDefinitions[uniqueInput] = SLiteral.TRUE;
+                }
+            }
+        }
+
         return null
     }
 }

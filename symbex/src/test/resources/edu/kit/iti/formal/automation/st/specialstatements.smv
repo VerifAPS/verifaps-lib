@@ -1,0 +1,42 @@
+MODULE main(i, __havoc_l12_0)
+VAR
+    o : signed word[16];
+    s : signed word[16];
+-- end of VAR
+DEFINE
+    s$4 := case
+        i$00000 > 0sd16_0 : s$00003;
+        TRUE : s;
+    esac;
+    s$8 := case
+        s$4 = 0sd16_42 : __havoc_l12_0;
+        TRUE : s$4;
+    esac;
+    o$15 := case
+        s$8 < 0sd16_0 : o$00011;
+        TRUE : s$8;
+    esac;
+    bc_011_011_ := TRUE & s$4 = 0sd16_42;
+    bc_007_000_ := TRUE & !(i$00000 > 0sd16_0);
+    s$00003 := s$00002 + i$00000;
+    bc_015_000_ := TRUE & !(s$8 < 0sd16_0);
+    o$00011 := 0sd16_0;
+    __assume_l6_0 := i$00000 > 0sd16_0;
+    bc_007_007_ := TRUE & i$00000 > 0sd16_0;
+    bc_011_000_ := TRUE & !(s$4 = 0sd16_42);
+    bc_015_015_ := TRUE & s$8 < 0sd16_0;
+    __assert_l21_0 := o$15 > 0sd16_0;
+
+INVARSPEC
+    __assert_l21_0
+
+
+INVAR
+    __assume_l6_0
+
+ASSIGN
+    init(o) := 0sd16_0;
+    init(s) := 0sd16_0;
+    next(o) := o$15;
+    next(s) := s$8;
+-- end of module main

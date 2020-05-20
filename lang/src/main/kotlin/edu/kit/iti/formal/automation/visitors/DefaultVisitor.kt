@@ -99,4 +99,5 @@ abstract class DefaultVisitorNN<T> : Visitor<T> {
     override fun visit(jump: JumpStatement)  = defaultVisit(jump)
     override fun visit(label: LabelStatement) = defaultVisit(label)
     override fun visit(namespace: NamespaceDeclaration)= defaultVisit(namespace)
+    override fun visit(special: SpecialStatement) = defaultVisit(special)
 }

@@ -311,9 +311,15 @@ reference_value
     REF LPAREN ref_to=symbolic_variable RPAREN
 ;
 
+ref_list
+:
+	names+=symbolic_variable (COMMA names+=symbolic_variable)*
+;
+
+
 identifier_list
 :
-	names+=variable_names (COMMA names+=variable_names)*
+	names+=IDENTIFIER (COMMA names+=IDENTIFIER)*
 ;
 
 function_declaration
@@ -341,7 +347,7 @@ var_decl
 var_decl_inner
 :
     pragma*
-    (identifier_list COLON td=type_declaration SEMICOLON)*
+    ( identifier_list COLON td=type_declaration SEMICOLON)*
 ;
 
 
@@ -722,16 +728,19 @@ statement
     | repeat_statement
     | exit_statement SEMICOLON
     | block_statement
+    | special_statement
     )
 ;
+
+special_statement: SPECIAL type=name (COLON id=name)?  expression (COMMA expression)* ;
 
 // [s,t,u] (i,k) => (o,p)
 block_statement:
   BLOCK_START id=IDENTIFIER
   (
-    (LBRACKET state=identifier_list? RBRACKET)?
-    (LPAREN input=identifier_list? RPAREN)?
-    ARROW_RIGHT (LPAREN output=identifier_list? RPAREN)?
+    (LBRACKET state=ref_list? RBRACKET)?
+    (LPAREN input=ref_list? RPAREN)?
+    ARROW_RIGHT (LPAREN output=ref_list? RPAREN)?
   )?
   statement_list
   BLOCK_END

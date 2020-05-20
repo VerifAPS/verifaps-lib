@@ -118,6 +118,8 @@ interface ITraversal<T> {
     fun traverse(empty: EMPTY_EXPRESSION)
     fun traverse(namespace: NamespaceDeclaration)
     fun traverse(blockStatement: BlockStatement)
+    fun traverse(special: SpecialStatement)
+
 }
 
 /**
@@ -407,6 +409,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     override fun traverse(blockStatement: BlockStatement) {
         blockStatement.statements.accept(visitor)
     }
+    override fun traverse(special: SpecialStatement) {}
 }
 
 /**
@@ -483,7 +486,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
         caseStatement.cases.addAll(l)
 
         caseStatement.expression = caseStatement.expression.accept(visitor) as Expression
-        caseStatement.elseCase = caseStatement.elseCase!!.accept(visitor) as StatementList
+        caseStatement.elseCase = caseStatement.elseCase.accept(visitor) as StatementList
     }
 
 
@@ -744,6 +747,8 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     override fun traverse(blockStatement: BlockStatement) {
         blockStatement.statements = (blockStatement.statements.accept(visitor) as StatementList)
     }
+
+    override fun traverse(special: SpecialStatement) {}
 }
 
 fun <E> MutableCollection<E>.setAll(seq: Collection<E>) {

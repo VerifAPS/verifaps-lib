@@ -36,15 +36,22 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     }
 
     override fun visit(blockStatement: BlockStatement) {
-        val state = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
-        val input = blockStatement.input.joinToString(", ") { IEC61131Facade.print(it) }
-        val output = blockStatement.output.joinToString(", ") { IEC61131Facade.print(it) }
-        sb.nl().print("// REGION ${blockStatement.name} [$state] ($input) => ($output)")
+        sb.nl().print("//! REGION ${blockStatement.name}")
+        blockParam(blockStatement.state, "[", "]")
+        blockParam(blockStatement.input, "(", ")")
+        sb.write(" => ")
+        blockParam(blockStatement.output, "(", ")")
         sb.increaseIndent()
         blockStatement.statements.accept(this)
         sb.decreaseIndent()
-        sb.nl().print("// END_REGION")
+        sb.nl().print("//! END_REGION")
     }
+
+    private fun blockParam(p: MutableList<SymbolicReference>, pre: String, suf: String) =
+            p.joinInto(sb, ", ", pre, suf) {
+                it.accept(this@StructuredTextPrinter)
+            }
+
 
     override fun visit(empty: EMPTY_EXPRESSION) {
         sb.print("(* empty expression *)")
@@ -824,6 +831,27 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(label: LabelStatement) {
         sb.nl().write("${label.label}:")
+    }
+
+    override fun visit(special: SpecialStatement) {
+        when (special) {
+            is SpecialStatement.Assert -> {
+                sb.nl().write("//# assert ")
+                special.name?.let { sb.write(": $it") }
+                special.exprs.joinInto(sb, separator = ", ") { it.accept(this) }
+            }
+            is SpecialStatement.Assume -> {
+                sb.nl().write("//# assume ")
+                special.name?.let { sb.write(": $it") }
+                special.exprs.joinInto(sb, separator = ", ") { it.accept(this) }
+            }
+            is SpecialStatement.Havoc -> {
+                sb.nl().write("//# havoc ")
+                special.name?.let { sb.write(": $it") }
+                special.variables.joinInto(sb, separator = ", ") { it.accept(this) }
+            }
+            else -> sb.nl().write("// special statement of type $special not supported")
+        }
     }
 }
 

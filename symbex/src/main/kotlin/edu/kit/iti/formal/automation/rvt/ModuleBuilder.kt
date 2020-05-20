@@ -22,6 +22,9 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
+import edu.kit.iti.formal.automation.ASSERTION_PREFIX
+import edu.kit.iti.formal.automation.ASSUMPTION_PREFIX
+import edu.kit.iti.formal.automation.HAVOC_PREFIX
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.rvt.translators.DefaultValueTranslator
 import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
@@ -39,6 +42,7 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.meta
 import java.util.*
 import kotlin.collections.HashMap
+
 
 public val SVariable.info: SmvVariableInfo
     get() {
@@ -108,17 +112,15 @@ class ModuleBuilder(
         name: String,
         val scope: Scope,
         finalState: SymbolicState,
-        val reduceDefinitions: Boolean = true) : Runnable {
+        val reduceDefinitions: Boolean = true,
+        val supportSpecialStatements: Boolean = false) : Runnable {
 
-    constructor(program: PouExecutable, finalState: SymbolicState, reduceDefinitions: Boolean = true)
-            : this(program.name, program.scope, finalState, reduceDefinitions)
+    constructor(program: PouExecutable, finalState: SymbolicState, reduceDefinitions: Boolean = true,
+                supportSpecialStatements: Boolean = false)
+            : this(program.name, program.scope, finalState, reduceDefinitions, supportSpecialStatements)
 
     val state = finalState//.unfolded()
-
     val module = SMVModule(name)
-    //val vardeps: VariableDependency = VariableDependency(finalState)
-    //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
-
     var typeTranslator: TypeTranslator = DefaultTypeTranslator.INSTANCE
     var valueTranslator = DefaultValueTranslator.INSTANCE
     var initValueTranslator: InitValueTranslator = DefaultInitValue
@@ -126,9 +128,6 @@ class ModuleBuilder(
     override fun run() {
         val outputVars = scope.filterByFlags(VariableDeclaration.OUTPUT).toSet()
         val inputVars = scope.filterByFlags(VariableDeclaration.INPUT)
-
-        // TODO fix so this terminates
-        //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
 
         // Using this workaround instead
         val stateVariables = state.keys
@@ -151,6 +150,25 @@ class ModuleBuilder(
             val dr = DefinitionReducer(module)
             dr.substitute()
         }
+
+        if (supportSpecialStatements) {
+            module.definitions
+                    .filter { (a, _) -> a.name.startsWith(ASSERTION_PREFIX) }
+                    .forEach { (a, _) ->
+                        module.invariantSpecs.add(a)
+                    }
+            module.definitions
+                    .filter { (a, _) -> a.name.startsWith(ASSUMPTION_PREFIX) }
+                    .forEach { (a, _) ->
+                        module.invariants.add(a)
+                    }
+
+            val havoc = module.definitions
+                    .filter { (a, _) -> a.name.startsWith(HAVOC_PREFIX) }
+            module.definitions.removeAll(havoc)
+            havoc.forEach { (a, _) -> module.moduleParameters.add(a) }
+        }
+
     }
 
     private fun insertDefinitions(definitions: Map<SVariable, SMVExpr>) {

@@ -571,10 +571,35 @@ data class CommentStatement(var comment: String) : Statement() {
     }
 }
 
+/**
+ * This is a very special statement, and allows to add arbitrary information
+ * into AST, for example special statements for symbolic execution.
+ *
+ * @see
+ */
+sealed class SpecialStatement : Statement() {
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
+
+    data class Assert(var exprs: MutableList<Expression>,
+                      val name: String? = null) : SpecialStatement() {
+        override fun clone() = Assert(exprs.clone())
+    }
+
+    data class Assume(var exprs: MutableList<Expression>,
+                      val name: String? = null) : SpecialStatement() {
+        override fun clone() = Assume(exprs.clone())
+    }
+
+    data class Havoc(var variables: MutableList<SymbolicReference>,
+                     val name: String? = null) : SpecialStatement() {
+        override fun clone() = Havoc(variables.clone())
+    }
+}
+
+
 data class GuardedStatement(
         var condition: Expression,
         var statements: StatementList = StatementList()) : Statement() {
-
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): GuardedStatement {

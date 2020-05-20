@@ -1,27 +1,5 @@
 package edu.kit.iti.formal.automation
 
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
- * This program isType free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program isType distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a clone of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
@@ -43,6 +21,23 @@ import java.io.StringWriter
 import java.math.BigInteger
 import kotlin.math.ceil
 import kotlin.math.log2
+
+/**
+ *
+ */
+const val ASSERTION_PREFIX = "__assert_"
+
+/**
+ *
+ */
+const val ASSUMPTION_PREFIX = "__assume_"
+
+
+/**
+ *
+ */
+const val HAVOC_PREFIX = "__havoc_"
+
 
 /**
  * @author Alexander Weigl
@@ -89,10 +84,6 @@ object SymbExFacade {
         return p
     }
 
-    /*    public static PouElements simplifyOO(PouElements elements) {
-        return simplifyOO(elements, false);
-    }*/
-
     /*
      * Simplify OO code.
      *
@@ -134,7 +125,7 @@ object SymbExFacade {
         val se = SymbolicExecutioner(exec.scope.topLevel)
         a.accept(se)
 
-        val moduleBuilder = ModuleBuilder(exec, se.peek())
+        val moduleBuilder = ModuleBuilder(exec, se.peek(), supportSpecialStatements = true)
         moduleBuilder.run()
         /*//debug
         for (entry in se.lineNumberMap) {

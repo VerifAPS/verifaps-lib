@@ -485,11 +485,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return bs
     }
 
+    override fun visitRef_list(ctx: IEC61131Parser.Ref_listContext): Any {
+        return ctx.symbolic_variable().map { it.accept(this) }
+    }
+
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
         val p: List<Pragma> = ctx.pragma().map()
         for (i in 0 until ctx.type_declaration().size) {
-            val seq = ctx.identifier_list(i).names
-                    .map { it.IDENTIFIER().symbol }
+            val seq = ctx.identifier_list(i).names.map { it }
 
             gather
                     .pushPragma(p)
@@ -792,7 +795,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
                 ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
                 ctx.case_statement(), ctx.invocation_statement(), ctx.block_statement(),
-                ctx.jump_statement(), ctx.for_statement()) as Statement
+                ctx.jump_statement(), ctx.for_statement(), ctx.special_statement()) as Statement
         val p = ctx.pragma().map { it.accept(this) as Pragma }
         if (p.isNullOrEmpty()) statement.pragmas += p
         return statement
@@ -963,6 +966,22 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return ast
     }
 
+    override fun visitSpecial_statement(ctx: IEC61131Parser.Special_statementContext): SpecialStatement {
+        val exprs = ctx.expression()
+                .map { it.accept(this) as Expression }
+                .toMutableList()
+        val id = ctx.id?.text
+        val s = when (val name = ctx.type.text) {
+            "assert" -> SpecialStatement.Assert(exprs, id)
+            "assume" -> SpecialStatement.Assume(exprs, id)
+            "havoc" -> SpecialStatement.Havoc(exprs.map { it as SymbolicReference }.toMutableList(), id)
+            else -> error("Special statement of name $name unknown/unsupported.")
+        }
+        s.ruleContext = ctx
+        return s
+    }
+
+    //region sfc
     override fun visitSfc(ctx: IEC61131Parser.SfcContext): Any {
         sfc = SFCImplementation()
         ctx.sfc_network().forEach { nc -> sfc.networks.add(visitSfc_network(nc)) }
@@ -1086,6 +1105,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
                 .map { it.get() }
                 .toHashSet()
     }
+    //endregion
 
     //region il
     override fun visitIlBody(ctx: IEC61131Parser.IlBodyContext): IlBody {

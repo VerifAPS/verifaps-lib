@@ -153,7 +153,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     private fun smv(frame: Frame, state: SymbolicState = symbex(frame)): SMVModule {
-        val moduleBuilder = ModuleBuilder(frame.name, frame.scope, state)
+        val moduleBuilder = ModuleBuilder(frame.name, frame.scope, state, true)
         moduleBuilder.run()
         return moduleBuilder.module
     }
