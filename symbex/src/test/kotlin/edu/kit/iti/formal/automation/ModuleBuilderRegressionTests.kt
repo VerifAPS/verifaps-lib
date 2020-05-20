@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation
 
 import com.google.common.truth.Truth
 import org.antlr.v4.runtime.CharStreams
+import org.junit.Assert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -21,7 +22,8 @@ object ModuleBuilderRegressionTests {
         val mod = SymbExFacade.evaluateProgram(stInput, true)
 
         val actual = mod.repr()
-        Truth.assertThat(cleanWs(actual)).isEqualTo(cleanWs(expected))
+        println(actual)
+        Assertions.assertEquals(cleanWs(actual), cleanWs(expected))
     }
 
     private fun cleanWs(s: String) = s.replace("\\s+".toRegex(), "\n")

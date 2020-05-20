@@ -257,8 +257,7 @@ class SMVAstMutableTraversal(val visitor: SMVAstMutableVisitor) : SMVAstMutableV
 
 open class ExpressionReplacerRecur(val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
     val traversal = SMVAstMutableTraversal(this)
-
-    private var changed: Boolean = false
+    var changed: Boolean = false
 
     protected fun replace(x: SMVExpr): SMVExpr {
         var a = x

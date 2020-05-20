@@ -418,7 +418,8 @@ open class SymbolicExecutioner(
             val sv = sb.ensureVariable(t)
             val cnt = assignmentCounter.incrementAndGet()
             lineNumberMap[cnt] = t.name to pos
-            sv.push(u.compress(), "$ASSIGN_SEPARATOR$cnt")
+            val postfix = String.format("%s%05d", ASSIGN_SEPARATOR, cnt)
+            sv.push(u.compress(), postfix)
 
             if (sv is SymbolicVariableTracing)
                 defines[t]?.let { sv.values.putAll(it) }

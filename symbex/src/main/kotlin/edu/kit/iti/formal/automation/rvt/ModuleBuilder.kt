@@ -35,6 +35,7 @@ import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.smv.ExpressionReplacer
+import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -98,7 +99,7 @@ class DefinitionReducer(private val module: SMVModule) {
     fun substitute() {
         identifiedTrivialDefinitions()
         findFixpoints()
-        module.accept(ExpressionReplacer(substitutions))
+        module.accept(ExpressionReplacerRecur(substitutions))
         module.definitions.clear()
         module.definitions.addAll(definitionsForSurvival)
     }

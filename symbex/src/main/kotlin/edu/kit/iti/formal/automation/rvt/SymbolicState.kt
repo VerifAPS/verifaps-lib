@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation.rvt
  */
 
 import edu.kit.iti.formal.smv.ExpressionReplacer
+import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.SMVAst
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -176,7 +177,7 @@ data class SymbolicState(
     fun unfolded(): Map<SVariable, SMVExpr> {
         var m = variables.map { (a, b) -> a to b.value!! }.toMap()
         val defs = getAllDefinitions()
-        val r = ExpressionReplacer(defs)
+        val r = ExpressionReplacerRecur(defs)
         while (true) {
             r.changed = false
             val updated = m.map { (t, u) ->
