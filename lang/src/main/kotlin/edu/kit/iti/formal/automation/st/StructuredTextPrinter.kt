@@ -134,7 +134,9 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
         sb.nl().printf(enumerationTypeDeclaration.name).printf(" : ")
-        enumerationTypeDeclaration.allowedValues.joinTo(sb, ", ", "(", ");")
+        enumerationTypeDeclaration.allowedValues.joinTo(sb, ", ", "(", ");") {
+            it.text
+        }
     }
 
     override fun visit(init: IdentifierInitializer) {
@@ -545,6 +547,11 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         }*/
         sb.printf(";")
 
+    }
+
+    override fun visit(vd: VariableDeclaration) {
+        sb.write("${vd.name} :")
+        variableDataType(vd)
     }
 
     val variableDeclarationUseDataType = false

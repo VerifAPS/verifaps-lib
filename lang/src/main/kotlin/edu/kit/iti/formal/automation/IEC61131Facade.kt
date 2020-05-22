@@ -22,7 +22,6 @@ import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
-import java.util.*
 import java.util.stream.Collectors
 
 /**
@@ -244,20 +243,26 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
+    var useOldSfcTranslator = true
+
     //region translations
     fun translateSfcToSt(scope: Scope, sfc: SFCImplementation,
-                         name: String = "", old: Boolean = false): StatementList {
+                         name: String, old: Boolean = useOldSfcTranslator): Pair<TypeDeclarations, StatementList> {
         val st = StatementList()
+        val td = TypeDeclarations()
         sfc.networks.forEachIndexed { index, network ->
             val element = if (old) TranslationSfcToStOld(network, name, index, scope)
             else TranslationSfcToStPipeline(network, name, index, scope)
+            td.add(element.pipelineData.stateEnumTypeDeclaration)
             st.add(element.call())
         }
-        return st
+        return td to st
     }
 
-    fun translateSfc(elements: PouElements) {
-        elements.forEach { it.accept(TranslateSfcToSt) }
+    fun translateSfcToSt(elements: PouElements) {
+        val t = TranslateSfcToSt()
+        elements.forEach { it.accept(t) }
+        elements.add(t.newTypes)
     }
 
     fun translateFbd(elements: PouElements) {

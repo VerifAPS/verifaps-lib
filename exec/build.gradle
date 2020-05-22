@@ -39,6 +39,7 @@ def mainClasses = [
         , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
         , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
         , "geteta-smt"       : "edu.kit.iti.formal.automation.testtables.apps.GetetaSmt"
+        , "xml2st"           : "edu.kit.iti.formal.automation.Xml2TxtApp"
 ]
 
 launch4j {

@@ -116,7 +116,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             val file = File(it.file?.parentFile, it.file?.nameWithoutExtension +
                     "_translated." + it.file?.extension)
             val elements = IEC61131Facade.file(CharStreams.fromString(it.text))
-            IEC61131Facade.translateSfc(elements)
+            IEC61131Facade.translateSfcToSt(elements)
             file.bufferedWriter().use {
                 IEC61131Facade.printTo(it, elements, true)
             }

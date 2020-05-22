@@ -467,7 +467,6 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     //endregion
 
     //region symbolic execution with abstraction
-
     fun abstractFrames(exec: Frame, abstractedBlocks: List<BlockStatement>): Frame {
         val abstracted =
                 if (abstractedBlocks.isEmpty()) exec.block
@@ -479,7 +478,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
                             ProgramDeclaration("<frame>", exec.scope, StatementList(abstracted)),
                             true)
                 }
-        val f = Frame(abstracted, exec.scope) //TODO additional assertion!
+        val f = Frame(abstracted, exec.scope)
         abstracted.fqName = exec.block.fqName + "_abstracted"
         return f
     }
@@ -574,7 +573,10 @@ private class InvocationRewriter(val prefix: String,
         list += counterIncr
 
         //Inputs
-        val instanceName = blockStatement.fqName.removeSuffix(".${blockStatement.name}").replace('.', '$')
+        val instanceName = blockStatement.fqName
+                .removeSuffix(".${blockStatement.name}")
+                .replace('.', '$')
+
         val prefix = blockStatement.repr().replace('.', '$')
         val inputsAssign =
                 blockStatement.input.map {
@@ -596,10 +598,6 @@ private class InvocationRewriter(val prefix: String,
         }
         list.addAll(inputsAssign)
         list.addAll(randomOutput)
-
-        //TODO remove state
-        //TODO add condition assertion
-
         return list
     }
 }
