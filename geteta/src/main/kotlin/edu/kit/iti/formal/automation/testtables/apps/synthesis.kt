@@ -16,7 +16,6 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.RowState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.monitor.SmvToCTranslator
 import edu.kit.iti.formal.smv.SMVAstDefaultVisitorNN
 import edu.kit.iti.formal.smv.SMVType
 import edu.kit.iti.formal.smv.SMVTypes
@@ -164,7 +163,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     // indexed by table
     private val automata = mutableListOf<TestTableAutomaton>()
     private val states = mutableListOf<List<RowState>>()
-    private val unrolledRowOffsets = mutableListOf<Int>()
 
     init {
         // preprocessing
@@ -191,7 +189,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
 
         // extract context information
-        var unrolledRowCount = 0
         tables.forEach { table ->
             val inputVariables = table.programVariables.filter { it.isAssumption }.toSet()
             val variables = table.programVariables.map { it.name to it }.toMap()
@@ -242,19 +239,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             automata.add(automaton)
             // loop over table.region.flat() instead of automaton.rowStates to preserve declaration order
             states.add(table.region.flat().flatMap { row -> automaton.rowStates.getValue(row) })
-            unrolledRowOffsets += unrolledRowCount
-            unrolledRowCount += automaton.rowStates.size
         }
     }
 
     fun generateHeader(): String {
-        val initialState = states.foldIndexed(listOf<Boolean>()) { index, acc, rowStates ->
-            val automaton = automata[index]
-            acc + rowStates.map { automaton.initialStates.contains(it) }
-        }
-        // initial state as string, bits reversed to match bitset constructor order
-        val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
-
         return """
             #pragma once
 
@@ -293,6 +281,15 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     void add_value(const T& value) {}
                 };
                 
+                
+                enum class table_status {
+                    ACTIVE,
+                    ACTIVE_COMPLETED,
+                    COMPLETED,
+                    INACTIVE,
+                    ERROR,
+                };
+                
             
                 class synthesized {
                 public:
@@ -308,14 +305,16 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                             return ${generateOutputEqualityComparison()};
                         }
                     };
+                    
+                    using status_type = std::array<table_status, ${automata.size}>;
     
                     struct result {
-                        bool in_spec;
+                        status_type status;
                         output_type output;
                         
                         // for testing purposes - in C++20, we'll be able to simply use a defaulted spaceship operator
                         bool operator==(const result& other) const {
-                            return in_spec == other.in_spec && output == other.output;
+                            return status == other.status && output == other.output;
                         }
                     };
     
@@ -327,10 +326,12 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     };
                     
                     static constexpr std::size_t MAX_LOOKBACK = $maxLookBack;
-                    static constexpr std::string_view INITIAL_STATE = "$stateDescription";
+                    ${indentLines(generateInitialStates(), 20)}
     
-                    std::bitset<INITIAL_STATE.size()> state{INITIAL_STATE.data()};
+                    ${indentLines(generateStateVariables(), 20)}
                     history<memory_type, MAX_LOOKBACK> var_history;
+                    
+                    status_type status{{${generateStatusInitializerContents()}}};
     
                     void update_state_prediction(const input_type& input);
                     output_type calculate_output(const input_type& input);
@@ -383,13 +384,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
                 synthesized::result synthesized::next(const input_t& input) {
                     update_state_prediction(input);
-                    if (state.none()) {
-                        return {false, {}};
-                    }
                     auto output = calculate_output(input);
                     state_transition(input, output);
                     update_history(input, output);
-                    return {true, output};
+                    return {status, output};
                 }
                 
                 void synthesized::update_state_prediction(const input_t& input) {
@@ -407,9 +405,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
                 void synthesized::state_transition(const input_t &input, const output_t &output) {
                     // check which states were actually fulfilled by the output and progress accordingly
-                    std::bitset<INITIAL_STATE.size()> new_state{};
                     ${indentLines(generateStateProgression(), 20)}
-                    state = new_state;
                 }
                                 
                 void synthesized::update_history(const input_t &input, const output_t &output) {
@@ -431,18 +427,42 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 outputs.keys.map { variableNames.getValue(it) }.joinToString(" && ") { "$it == other.$it" }
             }
 
+    private fun generateInitialStates(): Iterable<String> =
+            states.foldIndexed(listOf()) { index, acc, rowStates ->
+                val automaton = automata[index]
+                val initialState = rowStates.map { automaton.initialStates.contains(it) }
+                // initial state as string, bits reversed to match bitset constructor order
+                val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
+                acc + """static constexpr std::string_view INITIAL_STATE_$index = "$stateDescription";"""
+            }
+
+    private fun generateStateVariables(): Iterable<String> =
+            (0 until automata.size).map { index ->
+                "std::bitset<INITIAL_STATE_${index}.size()> state_${index}{INITIAL_STATE_${index}.data()};"
+            }
+
+    private fun generateStatusInitializerContents(): String =
+            (0 until automata.size).joinToString(", ") {
+                "state_${it}.any() ? table_status::ACTIVE : table_status::INACTIVE"
+            }
+
     private fun generateStateChecks(): Iterable<String> =
-            states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
+            states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
                     require(!inputCheckExpr.contains("output.")) {
                         "Referring to output variables in assumptions is unsupported"
                     }
-                    acc + "if (state[${index}] and not (${inputCheckExpr})) {" +
-                            "    state[${index}] = false;" +
+                    acc + "if (state_${tableIndex}[${rowIndex}] and not (${inputCheckExpr})) {" +
+                            "    state_${tableIndex}[${rowIndex}] = false;" +
                             "}"
                 }
+            } + (0 until automata.size).flatMap { index ->
+                listOf(
+                        "if (state_${index}.none() && status[${index}] == table_status::ACTIVE) {",
+                        "    status[${index}] = table_status::INACTIVE;",
+                        "}"
+                )
             }
 
     private fun generateOutputFunctions(): Iterable<String> =
@@ -450,12 +470,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 val memoizedOutputFunctions = mutableMapOf<TableRow, List<String>>()
 
                 lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
                     val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
                     val outputFunctions = memoizedOutputFunctions.getOrPut(rowState.row,
                             { generateOutputFunctions(rowState.row.outputExpr) })
 
-                    acc + "if (state[${index}] and (${inputCheckExpr})) {" +
+                    acc + "if (state_${tableIndex}[${rowIndex}] and (${inputCheckExpr})) {" +
                             outputFunctions.map { line -> "    $line" } +
                             "}"
                 }
@@ -512,19 +531,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             if (!needsConversionToBitmap.getValue(resultVariable)) {
                 listOf("output.$name = ${expr.getSingleAssignmentExpr()!!.accept(translator)};")
             } else {
-                val variables = variableDependencies.getValue(resultVariable) + Pair(resultVariable, false)
+                val variables = variableDependencies.getValue(resultVariable).map { (v, _) -> v } + resultVariable
                 outputConversions.getValue(resultVariable) +
                         "auto $name = std::bitset<bit_size_v<decltype(output.$name)>>();" +
-                        synthesizer.synthesize(
-                                expr,
-                                listOf(resultVariable),
-                                variables.map { (v, _) ->
-                                    v to generateCppDataType(
-                                            inputs[v] ?: outputs[v] ?: references.getValue(v)
-                                    )
-                                }.toMap(),
-                                context
-                        ) +
+                        generateAssignments(expr, listOf(resultVariable), variables, context) +
                         "from_bitset(${name}, output.$name);"
             }
         }
@@ -532,22 +542,48 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         return conversions + outputCalculations
     }
 
+    private fun generateAssignments(expr: SMVExpr, resultVariables: Iterable<String>, variables: Iterable<String>,
+                                    context: ExpressionSynthesizer.CppContext): Iterable<String> =
+            synthesizer.synthesize(
+                    expr,
+                    resultVariables,
+                    variables.map { it to generateCppDataType(inputs[it] ?: outputs[it] ?: references.getValue(it)) }
+                            .toMap(),
+                    context
+            ) ?: throw IllegalArgumentException("Unsatisfiable formula: ${expr.repr()}")
+
     private fun generateStateProgression(): Iterable<String> =
-            states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
-                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val index = unrolledRowOffsets[tableIndex] + rowIndex
+            (0 until automata.size).map { index ->
+                "std::bitset<INITIAL_STATE_${index}.size()> new_state_${index}{};"
+            } + states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
+                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, tableLines, rowState ->
                     val outputCheckExpr = generateCheckExpression(rowState.row.outputExpr)
                     val outgoingTransitions = automata[tableIndex].getOutgoingTransition(rowState)
-                    val successors = states.foldIndexed(listOf<Int>()) { successorTableIndex, successors, rowStates ->
-                        successors + rowStates.mapIndexed { successorRowIndex, successorCandidate ->
-                            val successorIndex = unrolledRowOffsets[successorTableIndex] + successorRowIndex
-                            Pair(successorIndex, outgoingTransitions.any { it.to == successorCandidate })
-                        }.filter { (_, isSuccessor) -> isSuccessor }.map { (i, _) -> i }
+                    val successors = states.foldIndexed(listOf<Pair<Int, Int>>()) { successorTable, acc, rowStates ->
+                        acc + rowStates.mapIndexed { successorRow, successorCandidate ->
+                            val successor = Pair(successorTable, successorRow)
+                            Pair(successor, outgoingTransitions.any { it.to == successorCandidate })
+                        }.filter { (_, isSuccessor) -> isSuccessor }.map { (s, _) -> s }
                     }
-                    acc + "if (state[${index}] and (${outputCheckExpr})) {" +
-                            successors.map { "    new_state[${it}] = true;" } +
+                    var stateUpdates = successors.map { (table, row) -> "new_state_${table}[$row] = true;" }
+                    if (outgoingTransitions.any { it.to == automata[tableIndex].stateSentinel }) {
+                        stateUpdates = stateUpdates + "status[${tableIndex}] = table_status::ACTIVE_COMPLETED;"
+                    }
+                    tableLines + "if (state_${tableIndex}[${rowIndex}] and (${outputCheckExpr})) {" +
+                            stateUpdates.map { line -> "    $line" } +
                             "}"
                 }
+            } + (0 until automata.size).flatMap { index ->
+                listOf(
+                        "state_${index} = new_state_${index};",
+                        "if (state_${index}.none()) {",
+                        "    if (status[${index}] == table_status::ACTIVE_COMPLETED) {",
+                        "        status[${index}] = table_status::COMPLETED;",
+                        "    } else if (status[${index}] == table_status::ACTIVE) {",
+                        "        status[${index}] = table_status::ERROR;",
+                        "    }",
+                        "}"
+                )
             }
 
     private fun generateHistoryValues(): Iterable<String> =
@@ -575,7 +611,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Accumulates values from all SVariables in the expression
      */
-    abstract class SVariableVisitor<T> : SMVAstDefaultVisitorNN<Set<T>>() {
+    private abstract class SVariableVisitor<T> : SMVAstDefaultVisitorNN<Set<T>>() {
         final override fun defaultVisit(top: SMVAst): Set<T> = setOf()
 
         abstract override fun visit(v: SVariable): Set<T>
@@ -597,7 +633,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Extracts SVariables matching the given pattern from an expression
      */
-    class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
+    private class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
         override fun visit(v: SVariable): Set<Pair<String, MatchResult>> =
                 pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
     }
@@ -606,10 +642,65 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     /**
      * Extracts the dependencies to output variables (other than self) and other variables from an expression
      */
-    class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String) :
-            SVariableVisitor<Pair<String, Boolean>>() {
+    private class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String)
+        : SVariableVisitor<Pair<String, Boolean>>() {
         override fun visit(v: SVariable): Set<Pair<String, Boolean>> =
                 if (v.name == self) setOf() else setOf(Pair(v.name, outputVariables.contains(v.name)))
+    }
+
+
+    /**
+     * Translates SMV expressions to C++ expressions
+     */
+    private inner class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
+        val variableReplacement = mutableMapOf<String, String>()
+
+        override fun defaultVisit(top: SMVAst): String = throw IllegalArgumentException("unsupported expression $top")
+
+        override fun visit(v: SVariable): String = variableReplacement[v.name] ?: v.name
+
+        override fun visit(ue: SUnaryExpression) = when(ue.dataType) {
+            is SMVWordType -> "(${generateCppDataType(ue.dataType!!)}) "
+            else -> ""
+        } + "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
+
+        override fun visit(be: SBinaryExpression) = when(be.dataType) {
+            is SMVWordType -> "(${generateCppDataType(be.dataType!!)}) "
+            else -> ""
+        } + "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
+
+        private fun opToC(op: SBinaryOperator) = when (op) {
+            SBinaryOperator.PLUS -> "+"
+            SBinaryOperator.MINUS -> "-"
+            SBinaryOperator.DIV -> "/"
+            SBinaryOperator.MUL -> "*"
+            SBinaryOperator.AND -> " && "
+            SBinaryOperator.OR -> " || "
+            SBinaryOperator.LESS_THAN -> " < "
+            SBinaryOperator.LESS_EQUAL -> " <= "
+            SBinaryOperator.GREATER_THAN -> " > "
+            SBinaryOperator.GREATER_EQUAL -> " >="
+            SBinaryOperator.XOR -> " ^ "
+            SBinaryOperator.EQUAL -> " == "
+            SBinaryOperator.EQUIV -> " == "
+            SBinaryOperator.NOT_EQUAL -> " != "
+            SBinaryOperator.MOD -> " % "
+            SBinaryOperator.SHL -> " << "
+            SBinaryOperator.SHR -> " >> "
+            else -> throw IllegalArgumentException("unsupported binary operator $op")
+        }
+
+        private fun opToC(op: SUnaryOperator): String = when (op) {
+            SUnaryOperator.MINUS -> "-"
+            SUnaryOperator.NEGATE -> "!"
+            else -> throw IllegalArgumentException("unsupported unary operator $op")
+        }
+
+        override fun visit(l: SLiteral) = l.value.toString()
+
+        override fun visit(ce: SCaseExpression): String = ce.cases.fold(StringBuilder()) { sb, case ->
+            sb.append("${case.condition.accept(this)} ? (${case.then.accept(this)}) : ")
+        }.append("assert(false)").toString()
     }
 }
 
@@ -618,17 +709,19 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
     companion object {
         const val TEMPORARY_VARIABLE_PREFIX = "__tmp"
+        private const val SYNTHESIS_SCRIPT_RESOURCE_PATH = "/synthesis/formula_to_ite.py"
+        private const val SYNTHESIS_SCRIPT_UNSAT_MARKER = "<unsatisfiable>"
     }
 
     fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
-                   context: CppContext): List<String> =
+                   context: CppContext): List<String>? =
             callOmega(
                     formula.accept(SmvToOmegaTranslator(context.variableNameMap)),
                     resultVariables.map { context.variableNameMap.getValue(it) },
                     variables.map { (variable, type) ->
                         "${context.variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
                     }
-            ).let { assignments -> context.translateIteAssignments(assignments, variables) }
+            )?.let { assignments -> context.translateIteAssignments(assignments, variables) }
 
     inner class CppContext(val variableNameMap: Map<String, String>) {
         private var temporaryVariableCounter = 0
@@ -661,10 +754,11 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
     }
 
-    private fun callOmega(formula: String, resultVariables: List<String>, definitions: List<String>): Iterable<String> {
+    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>)
+            : Iterable<String>? {
         val arguments = listOf(pythonExecutable, "-") +
                 resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
-                formula + definitions
+                formula + variableDefinitions
         val outputFile = createTempFile()
         val process = ProcessBuilder(arguments)
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
@@ -673,7 +767,7 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
                 .start()
 
         process.outputStream.use { stdin ->
-            javaClass.getResourceAsStream("/synthesis/formula_to_ite.py").use { script ->
+            javaClass.getResourceAsStream(SYNTHESIS_SCRIPT_RESOURCE_PATH).use { script ->
                 script.transferTo(stdin)
             }
         }
@@ -695,12 +789,13 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         }
 
         if (exitCode != 0) {
+            if (exitCode == 1 && outputFile.readText().startsWith(SYNTHESIS_SCRIPT_UNSAT_MARKER)) {
+                return null
+            }
             fail("Synthesis via omega failed (formula: ${formula})")
         }
 
-        return outputFile.bufferedReader().use { reader ->
-            reader.readLines().dropLastWhile { it.isEmpty() }
-        }
+        return outputFile.readLines().dropLastWhile { it.isEmpty() }
     }
 
 
