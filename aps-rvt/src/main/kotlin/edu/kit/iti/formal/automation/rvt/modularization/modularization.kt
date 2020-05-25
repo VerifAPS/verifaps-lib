@@ -278,9 +278,9 @@ object ModFacade {
         val sharp = it.count { it == '#' }
         val (sitemap, cond, inrel, outrel) = when (sharp) {
             3 -> it.split("#")
-            2 -> it.split("#")?.let { (a, b, c) -> listOf(a, b, c, "") }
-            1 -> it.split("#")?.let { (a, b) -> listOf(a, b, "", "") }
-            0 -> listOf(it, "", "")
+            2 -> it.split("#").let { (a, b, c) -> listOf(a, b, c, "") }
+            1 -> it.split("#").let { (a, b) -> listOf(a, b, "", "") }
+            0 -> listOf(it, "", "", "")
             else -> error("Contract format violated: $it should be `X=Y#cond#relation`")
         }
         val (left, right) = if ("=" in sitemap) sitemap.split("=") else listOf(sitemap, sitemap)
