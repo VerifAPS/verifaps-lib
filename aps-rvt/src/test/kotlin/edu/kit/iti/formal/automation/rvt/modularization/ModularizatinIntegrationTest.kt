@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.rvt.modularization
 
+import edu.kit.iti.formal.util.findProgram
+import org.junit.Assume
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -13,6 +15,8 @@ const val base = "src/test/resources/modularization"
 class ModularizationIntegrationTest {
     @Test
     fun testProgram() {
+        Assume.assumeNotNull(findProgram("nuXmv"))
+
         val old = File("$base/program1.st").absolutePath
         val new = File("$base/program2.st").absolutePath
         val args = arrayOf("--old", old, "--new", new, "-o", "build/testProgram",

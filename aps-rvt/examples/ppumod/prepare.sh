@@ -6,7 +6,7 @@ set -e
  gradle exec:installDist)
 
 XML2ST=../../../exec/build/install/exec/bin/xml2st
-XML2ST_ARGS=--translate-sfc
+XML2ST_ARGS="--translate-sfc --simplify --ppu"
 
 for i in */*.xml; do
     out=${i/xml/st}

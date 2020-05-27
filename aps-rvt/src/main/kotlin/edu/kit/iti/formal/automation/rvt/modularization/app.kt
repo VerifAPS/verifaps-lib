@@ -9,6 +9,7 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.File
 
@@ -49,8 +50,10 @@ class ModularizationApp : CliktCommand() {
             metavar = "callsite=callsite/<smv>")
             .multiple()*/
 
-    val inputRelation by option("-ri", "--rel-input").convert() { ModFacade.parseRelation(it) }.multiple()
-    val outputRelation by option("-ro", "--rel-output").convert() { ModFacade.parseRelation(it) }.multiple()
+    val inputRelation by option("-ri", "--rel-input", "--rel-in")
+            .convert() { ModFacade.parseRelation(it) }.multiple()
+    val outputRelation by option("-ro", "--rel-output", "--rel-out")
+            .convert() { ModFacade.parseRelation(it) }.multiple()
     val condition by option("-c", "--condition").convert { SMVFacade.expr(it) }.multiple()
 
     val run: Boolean by option("--run", "-r", help = "run prover").flag()

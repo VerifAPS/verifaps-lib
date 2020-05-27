@@ -713,7 +713,7 @@ data class RecordType(override var name: String = ANONYM_DATATYPE, val fields: V
         val record = obj as RecordValue
         return record.fieldValues.entries
                 .joinToString(", ", "(", ")") { (k, v) ->
-                    k + "=" + v.dataType.repr(v.value)
+                    k + ":=" + v.dataType.repr(v.value)
                 }
     }
 

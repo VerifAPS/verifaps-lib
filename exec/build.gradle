@@ -20,7 +20,7 @@ dependencies {
 
 
 def mainClasses = [
-        "modularization"     : "edu.kit.iti.formal.automation.modularization.ModApp"
+        "mod"     : "edu.kit.iti.formal.automation.rvt.modularization.ModApp"
         , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
         , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
         , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
