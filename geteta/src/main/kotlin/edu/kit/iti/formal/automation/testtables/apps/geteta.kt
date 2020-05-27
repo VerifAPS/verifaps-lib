@@ -173,7 +173,7 @@ class GetetaApp : CliktCommand(
 
             if (b is NuXMVOutput.Cex) {
                 if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
-                if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
+                else if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
                 else info("Use `--cexout' to print a cex analysation.")
                 if (cexAnalysation.runAnalyzer) runCexAnalysation(b, tt)
                 else info("Use `--row-map' to print possible row mappings.")
