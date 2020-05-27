@@ -565,7 +565,12 @@ data class TableRow(override var id: String) : TableNode(id) {
         return inputExpr[name] ?: outputExpr[name]
     }
 
-    override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id; it.gotos = gotos.toMutableList() }
+    override fun clone(): TableNode = copy().also {
+        it.rawFields.putAll(rawFields)
+        it.duration = duration
+        it.gotos = gotos.toMutableList()
+    }
+
     override fun visit(visitor: (TableNode) -> Unit) = visitor(this)
 }
 

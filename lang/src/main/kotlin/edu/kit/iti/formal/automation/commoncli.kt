@@ -75,6 +75,6 @@ fun ParameterHolder.nuxmv() =
 
 fun ParameterHolder.dryRun() =
         option("--model-check", help = "the model checker is invoked when set [default:true]")
-                .flag("--dont-model-check", default = true)
+                .flag("--dont-model-check", "--dry-run", default = true)
 
 fun ParameterHolder.outputFolder() = option("-o", "--output", help = "Output directory")
