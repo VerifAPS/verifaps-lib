@@ -68,8 +68,13 @@ class ModularizationApp : CliktCommand() {
 
     val library by option().file().multiple()
 
+    val nuxmvPath by option("--nuxmv", envvar = "NUXMV").default("nuXmv")
+
     override fun run() {
         outputFolder.mkdirs()
+
+        NUXMV_PATH_DEFAULT = nuxmvPath
+
         val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new))
         require(oldExec != null) { "Could not find program in $old" }
         require(newExec != null) { "Could not find program in $new" }

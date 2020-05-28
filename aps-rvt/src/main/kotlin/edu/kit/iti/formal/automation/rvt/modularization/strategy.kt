@@ -4,8 +4,6 @@ package edu.kit.iti.formal.automation.rvt.modularization
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
-import edu.kit.iti.formal.automation.datatypes.INT
-import edu.kit.iti.formal.automation.datatypes.UINT
 import edu.kit.iti.formal.automation.datatypes.USINT
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicState
@@ -22,7 +20,9 @@ import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.math.BigInteger
 
@@ -58,11 +58,11 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
     val smvCache = HashMap<Frame, SymbolicState>()
 
-    suspend fun proofEquivalenceTopLevel() =
+    /*suspend*/ fun proofEquivalenceTopLevel() =
             proofEquivalence(oldProgram.frame, newProgram.frame, topLevelContext)
 
-    suspend fun proofEquivalence(old: Frame, new: Frame,
-                                 ctx: ReveContext = reveContextManager.get(old, new)): Boolean {
+    /*suspend*/ fun proofEquivalence(old: Frame, new: Frame,
+                                     ctx: ReveContext = reveContextManager.get(old, new)): Boolean {
         var equal = false
         if (!equal) equal = checkCache(old, new, ctx)
         if (!equal) equal = proofBodyEquivalenceSource(old, new, ctx)
@@ -102,7 +102,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             info("$lp Skipped because `disableUpdateCache` is set")
             return
         }
-
+        //TODO Consider using a hash-value of the source if there is no originalInvoked name.
         val oldInstance = old.block.originalInvoked.name
         val newInstance = new.block.originalInvoked.name
         if (equal && oldInstance != null && newInstance != null) {
@@ -115,19 +115,23 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     /**
      * Proofs the equivalence of the given frames without respect to the
      */
-    suspend fun proofBodyEquivalenceClassic(old: Frame, new: Frame,
-                                            ctx: ReveContext = reveContextManager.get(old, new))
-            : Boolean = coroutineScope {
+    /*suspend*/ fun proofBodyEquivalenceClassic(old: Frame, new: Frame,
+                                                ctx: ReveContext = reveContextManager.get(old, new)): Boolean {
         val lp = logprfx("proofBodyEquivalenceClassic", old, new)
 
         if (disableProofBodyEquivalenceClassic) {
             info("$lp Skipped because `disableProofBodyEquivalenceClassic` is set")
-            return@coroutineScope false
+            return false
         }
 
 
         val oldSmv = smv(old)
         val newSmv = smv(new)
+
+        if (oldSmv.name == newSmv.name) {//name clash!
+            oldSmv.name += "old"
+            newSmv.name += "new"
+        }
 
         val modules = glueWithMiter(old, new, oldSmv, newSmv, ctx)
         val smvFile = file("${old.name}_${new.name}.smv")
@@ -135,7 +139,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
         info("$lp Starting proof: $smvFile, $logFile")
 
-        val r = runNuXmv(modules, smvFile, logFile)
+        val r = runBlocking { runNuXmv(modules, smvFile, logFile) }
 
         if (r) {
             info("$lp Equality proven")
@@ -143,7 +147,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             info("$lp Equality not proven")
         }
 
-        r
+        return r
     }
 
     private fun glueWithMiter(oldFrame: Frame, newFrame: Frame, old: SMVModule, new: SMVModule, ctx: ReveContext): List<SMVModule> {
@@ -153,67 +157,74 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     }
 
     private fun smv(frame: Frame, state: SymbolicState = symbex(frame)): SMVModule {
-        val moduleBuilder = ModuleBuilder(frame.name, frame.scope, state, true)
+        val moduleBuilder = ModuleBuilder(frame.name.replace(".", "$"),
+                frame.scope, state, true)
         moduleBuilder.run()
         return moduleBuilder.module
     }
 
     private val abstractionRecursionProtection = HashSet<Pair<String, String>>()
 
-    private suspend fun proofBodyEquivalenceWithAbstraction(old: Frame, new: Frame, ctx: ReveContext): Boolean =
-            coroutineScope {
-                val lp = logprfx("proofBodyEquivalenceWithAbstraction", old, new)
+    private /*suspend*/ fun proofBodyEquivalenceWithAbstraction(old: Frame, new: Frame, ctx: ReveContext): Boolean {
+        val lp = logprfx("proofBodyEquivalenceWithAbstraction", old, new)
 
-                if (old.name.endsWith("_abstracted") && (new.name.endsWith("_abstracted"))) {
-                    info("$lp declined, recursion protection triggered")
-                    return@coroutineScope false
-                }
+        if (old.name.endsWith("_abstracted") && (new.name.endsWith("_abstracted"))) {
+            info("$lp declined, recursion protection triggered")
+            return false
+        }
 
-                abstractionRecursionProtection.add(old.name to new.name)
+        abstractionRecursionProtection.add(old.name to new.name)
 
-                if (disableProofBodyEquivalenceWithAbstraction) {
-                    info("$lp Skipped because `disableProofBodyEquivalenceWithAbstraction` is set")
-                    return@coroutineScope false
-                }
+        if (disableProofBodyEquivalenceWithAbstraction) {
+            info("$lp Skipped because `disableProofBodyEquivalenceWithAbstraction` is set")
+            return false
+        }
 
-                val aa = callSitePairs.filter { (a, b) ->
-                    a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName)
-                }
-                val oldAbstractedFrames = aa.map { (a, _) -> a }
-                val newAbstractedFrames = aa.map { (_, b) -> b }
+        val aa = callSitePairs.filter { (a, b) ->
+            a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName)
+        }
+        val oldAbstractedFrames = aa.map { (a, _) -> a }
+        val newAbstractedFrames = aa.map { (_, b) -> b }
 
-                val body = async { proofBodyEquivalenceWithAbstractionBody(old, new, ctx, oldAbstractedFrames, newAbstractedFrames) }
-                val subframes = async { proofBodyEquivalenceWithAbstractionSubFrames(old, new, ctx, oldAbstractedFrames, newAbstractedFrames) }
-                val bodyEq = body.await()
-                val sfEq = subframes.await()
+        val bodyEq = proofBodyEquivalenceWithAbstractionBody(old, new, ctx, oldAbstractedFrames, newAbstractedFrames)
+        val sfEq = if (bodyEq) proofBodyEquivalenceWithAbstractionSubFrames(old, new, ctx, oldAbstractedFrames, newAbstractedFrames)
+        else false
+        //val bodyEq = body.await()
+        //val sfEq = subframes.await()
 
 
-                val r = bodyEq && sfEq
-                if (r) {
-                    info("$lp Equality proven")
-                } else {
-                    info("$lp Equality not proven; body: $bodyEq, subFrame: $sfEq")
-                }
+        val r = bodyEq && sfEq
+        if (r) {
+            info("$lp Equality proven")
+        } else {
+            info("$lp Equality not proven; body: $bodyEq, subFrame: $sfEq")
+        }
 
-                r
-            }
+        return r
+    }
 
     /**
      *
      */
-    private suspend fun proofBodyEquivalenceWithAbstractionBody(
+    private /*suspend*/ fun proofBodyEquivalenceWithAbstractionBody(
             old: Frame, new: Frame, ctx: ReveContext = reveContextManager.get(old, new),
             oldAbstractedFrames: List<BlockStatement>,
-            newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
+            newAbstractedFrames: List<BlockStatement>): Boolean {
         val lp = logprfx("proofBodyEquivalenceWithAbstractionBody", old, new)
 
         if (disableProofBodyEquivalenceWithAbstractionBody) {
             info("$lp Skipped because `disableProofBodyEquivalenceWithAbstractionBody` is set")
-            return@coroutineScope false
+            return false
         }
 
-        val oldM = abstractFrames(old, oldAbstractedFrames)
-        val newM = abstractFrames(new, newAbstractedFrames)
+        if (oldAbstractedFrames.isEmpty() || newAbstractedFrames.isEmpty()) {
+            info("$lp No abstraction known/allowed")
+            return false
+        }
+
+
+        val (oldM, oldInput, oldOutput) = abstractFrames(old, oldAbstractedFrames)
+        val (newM, newInput, newOutput) = abstractFrames(new, newAbstractedFrames)
 
         val ctxNew = ctx.clone()
 
@@ -227,58 +238,66 @@ class DefaultEqualityStrategy(mp: ModularProver) {
                     SVariable(c.name), SBinaryOperator.EQUAL, SVariable(d.name)))
 
             //add assertion of input
-            val q = reveContextManager?.get(a, b)
+            val q = reveContextManager.get(a, b)
             if (q != null) {
-                ctxNew.outRelation.addAll(q.inRelation)
+                val assertInRel = q.completeInRel(a, b).rewrite(oldInput[a]!!, newInput[b]!!)
+                ctxNew.outRelation.addAll(assertInRel)
+
+                val assumeOutRel = q.completeOutRel(a, b).rewrite(oldOutput[a]!!, newOutput[b]!!)
+                ctxNew.inRelation.addAll(assumeOutRel)
             }
+
         }
+
+        info("$lp Add new regression verification contract")
+        info("Frame ${oldM.block.repr()} to ${newM.block.repr()}")
+        info("\tContext: ${ctxNew.condition.repr()}")
+        info("\tInput-Relation: ${ctxNew.createInRelation(oldM.block, newM.block, "old", "new").repr()}")
+        info("\tOutput-Relation: ${ctxNew.createOutRelation(oldM.block, newM.block, "old", "new").repr()}")
 
         // recursion
         info("$lp Recursion for proofing abstracted body")
-        proofEquivalence(oldM, newM, ctxNew)
-
-        /*val modules = glueWithMiter(old, new, oldM, newM, ctx)
-        val smvFile = file("${old.name}_${new.name}.smv")
-        val logFile = file("${old.name}_${new.name}.log")
-        val r = runNuXmv(modules, smvFile, logFile)
-
-        r*/
+        return proofEquivalence(oldM, newM, ctxNew)
     }
 
-    private suspend fun proofBodyEquivalenceWithAbstractionSubFrames(
+    private /*suspend*/ fun proofBodyEquivalenceWithAbstractionSubFrames(
             old: Frame, new: Frame, ctx: ReveContext = reveContextManager.get(old, new),
             oldAbstractedFrames: List<BlockStatement>,
-            newAbstractedFrames: List<BlockStatement>): Boolean = coroutineScope {
+            newAbstractedFrames: List<BlockStatement>): Boolean {
         val lp = logprfx("proofBodyEquivalenceWithAbstractionSubFrames", old, new)
         if (disableProofBodyEquivalenceWithAbstractionSubFrames) {
             info("$lp Skipped because `disableProofBodyEquivalenceWithAbstractionSubFrames` is set")
-            return@coroutineScope false
+            return false
         }
-        val ctxEqual = callSitePairs.asSequence()
-                .filter { (a, b) -> a.isPrefix(old.block.fqName) && b.isPrefix(new.block.fqName) }
-                .map { (cOld, cNew) ->
-                    async {
-                        return@async proofEquivalence(createFrame(cOld, oldProgram.complete.scope),
-                                createFrame(cNew, newProgram.complete.scope))
-                    }
-                }
 
-        var ret = true
+        val subFrames = callSitePairs.asSequence()
+                .filter { (a, b) -> a.isTruePrefix(old.block.fqName) && b.isTruePrefix(new.block.fqName) }
+
+        val names = subFrames.joinToString { (a, b) -> "${a.name}=${b.name}" }
+        info("$lp Proving sub-frames: $names")
+
+        val ctxEqual = subFrames.all { (cOld, cNew) ->
+            //async
+            proofEquivalence(createFrame(cOld, oldProgram.complete.scope),
+                    createFrame(cNew, newProgram.complete.scope))
+        }
+
+        /*var ret = true
         for (deferred in ctxEqual) {
             if (!ret) {
                 deferred.cancel("Because!")
                 continue
             }
-            ret = ret && !deferred.await()
-        }
-
+            ret = ret && !deferred //!deferred.await()
+        }*/
+        val ret = ctxEqual
         if (ret) {
             info("$lp proved equality of subframes")
         } else {
             info("$lp disproved equality of subframes")
         }
 
-        ret
+        return ret
     }
 
     fun proofBodyEquivalenceSource(old: Frame, new: Frame, ctx: ReveContext): Boolean {
@@ -301,16 +320,16 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return result
     }
 
-    suspend fun proofBodyEquivalenceSSA(old: Frame, new: Frame, ctx: ReveContext): Boolean = coroutineScope {
+    /*suspend*/ fun proofBodyEquivalenceSSA(old: Frame, new: Frame, ctx: ReveContext): Boolean {
         val lp = logprfx("proofBodyEquivalenceSSA", old, new)
         if (disableProofBodyEquivalenceSSA) {
             info("$lp Skipped because `disableProofBodyEquivalenceSSA` is set")
-            return@coroutineScope false
+            return false
         }
 
         if (!ctx.onlyEquivalence) {
             info("$lp not suitable for frames ${old.name} and ${new.name}")
-            return@coroutineScope false
+            return false
         }
 
         val oldSmv = symbex(old)
@@ -323,14 +342,14 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             info("$lp Frame ${old.name} is equivalent to  ${new.name} in SSA-form ")
         else
             info("$lp Frame ${old.name} is *not* equivalent to  ${new.name} in SSA-form")
-        r
+        return r
     }
 
-    suspend fun proofBodyEquivalenceSMT(old: Frame, new: Frame, ctx: ReveContext) = coroutineScope {
+    /*suspend*/ fun proofBodyEquivalenceSMT(old: Frame, new: Frame, ctx: ReveContext): Boolean {
         val lp = logprfx("proofBodyEquivalenceSMT", old, new)
         if (disableProofBodyEquivalenceSMT) {
             info("$lp Skipped because `disableProofBodyEquivalenceSMT` is set")
-            return@coroutineScope false
+            return false
         }
         info("$lp Proof equivalence of frames ${old.name} and ${new.name}")
 
@@ -371,17 +390,17 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         val smtProblem = oldSmv + newSmv + assertion.stream
 
         val smtFile = file("${old.name}_${new.name}_equiv.smt")
-        info("proofBodyEquivalenceSMT: Write SMT problem into $smtFile")
+        info("$lp Write SMT problem into $smtFile")
 
-        withContext(Dispatchers.IO) {
-            smtFile.bufferedWriter().use { it.write(smtProblem) }
-        }
+        //withContext(Dispatchers.IO) {
+        smtFile.bufferedWriter().use { it.write(smtProblem) }
+        //}
 
-        info("proofBodyEquivalenceSMT: Run z3 for ${old.name}_${new.name}_equiv.smt")
-        val r = SmtFacade.checkSmtSat(smtProblem) == SmtAnswer.UNSAT
+        info("$lp Run z3 for ${old.name}_${new.name}_equiv.smt")
+        val r = runBlocking { SmtFacade.checkSmtSat(smtProblem) == SmtAnswer.UNSAT }
 
-        info("proofBodyEquivalenceSMT: Result of z3 is $r for ${old.name}_${new.name}_equiv.smt")
-        r
+        info("$lp Result of z3 is $r for ${old.name}_${new.name}_equiv.smt")
+        return r
     }
 
     //region helpers
@@ -467,24 +486,28 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     //endregion
 
     //region symbolic execution with abstraction
-    fun abstractFrames(exec: Frame, abstractedBlocks: List<BlockStatement>): Frame {
-        val abstracted =
-                if (abstractedBlocks.isEmpty()) exec.block
-                else createProgramWithAbstraction(exec, abstractedBlocks)
-        file("${exec.block.name}_abstracted.st").bufferedWriter()
+    var uniqueCnt = 0
+    fun abstractFrames(exec: Frame, abstractedBlocks: List<BlockStatement>)
+            : Triple<Frame, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
+        val (abstracted, inputs, outputs)
+                = createProgramWithAbstraction(exec, abstractedBlocks)
+
+        file("${exec.block.name}_abstracted_${++uniqueCnt}.st").bufferedWriter()
                 .use {
                     IEC61131Facade.printTo(
                             it,
-                            ProgramDeclaration("<frame>", exec.scope, StatementList(abstracted)),
+                            ProgramDeclaration(exec.name, exec.scope, StatementList(abstracted)),
                             true)
                 }
         val f = Frame(abstracted, exec.scope)
         abstracted.fqName = exec.block.fqName + "_abstracted"
-        return f
+        return Triple(f, inputs, outputs)
     }
 
     private fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
-    fun rewriteInvocation(a: Frame, abstractedInvocation: List<BlockStatement>): BlockStatement {
+
+    fun rewriteInvocation(a: Frame, abstractedInvocation: List<BlockStatement>):
+            Triple<BlockStatement, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
         val new = a.block.clone()
         val scope = a.scope.copy()
 
@@ -492,16 +515,22 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         abstractedInvocation.distinctBy { it.fqName }.forEach {
             val prefix = it.getCallCounter()
             val sr = SymbolicReference(prefix.name)
-            new.statements.add(0, AssignmentStatement(sr, IntegerLit(INT, BigInteger.ZERO)))
+            new.statements.add(0, AssignmentStatement(sr, IntegerLit(USINT, BigInteger.ZERO)))
             scope.add(prefix)
         }
+
+        val inputs = HashMap<BlockStatement, Map<String, String>>()
+        val outputs = HashMap<BlockStatement, Map<String, String>>()
 
         abstractedInvocation.forEach {
             val prefix = it.fqName.replace('.', '$')
             val rewriter = InvocationRewriter(prefix, scope, it)
             new.statements = new.statements.accept(rewriter) as StatementList
+            inputs[it] = rewriter.inputs
+            outputs[it] = rewriter.outputs
+            //new.statements.add(0, "${prefix}_ccnt" assignTo IntegerLit(USINT, 0.toBigInteger()))}
         }
-        return new
+        return Triple(new, inputs, outputs)
     }
 //endregion
 
@@ -511,6 +540,20 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return "$method(${a.name},${b.name}): "
     }
 //endregion
+}
+
+private fun List<RelatedVariables>.rewrite(oldMap: Map<String, String>,
+                                           newMap: Map<String, String>): Collection<RelatedVariables> {
+    val oldRename = VariableReplacer(oldMap.asSmv())
+    val newRename = VariableReplacer(newMap.asSmv())
+
+    return map { (o, op, n) ->
+        RelatedVariables(o.accept(oldRename) as SMVExpr, op, n.accept(newRename) as SMVExpr)
+    }
+}
+
+private fun Map<String, String>.asSmv(): Map<SMVExpr, SMVExpr> {
+    return map { (a, b) -> SVariable(a) to SVariable(b) }.toMap()
 }
 
 private fun BlockStatement.getCallCounter(): VariableDeclaration {
@@ -564,12 +607,16 @@ private class SmvReveBuilder(
 private class InvocationRewriter(val prefix: String,
                                  val scope: Scope,
                                  val toBeReplaced: BlockStatement) : AstMutableVisitor() {
+
+    val inputs = hashMapOf<String, String>()
+    val outputs = hashMapOf<String, String>()
+
     override fun visit(blockStatement: BlockStatement): Any {
         if (blockStatement != toBeReplaced) return super.visit(blockStatement)
         val list = StatementList()
 
         val cnt = SymbolicReference(prefix + "_ccnt")
-        val counterIncr = AssignmentStatement(cnt, cnt plus IntegerLit(UINT, BigInteger.ONE))
+        val counterIncr = AssignmentStatement(cnt, cnt plus IntegerLit(USINT, BigInteger.ONE))
         list += counterIncr
 
         //Inputs
@@ -585,6 +632,7 @@ private class InvocationRewriter(val prefix: String,
                     val vdOut = scope.getVariable(it)
                     val inputName = "${new}__input"
                     scope.add(VariableDeclaration(inputName, 0 or TYPE_INPUT_FUNCTION_BLOCK, vdOut.dataType!!))
+                    inputs[n] = inputName
                     inputName assignTo n
                 }
 
@@ -594,6 +642,7 @@ private class InvocationRewriter(val prefix: String,
             val vdOut = scope.getVariable(it)
             val outputName = "${new}__random"
             scope.add(VariableDeclaration(outputName, 0 or TYPE_OUTPUT_FUNCTION_BLOCK, vdOut.dataType!!))
+            outputs[n] = outputName
             n assignTo outputName
         }
         list.addAll(inputsAssign)
@@ -687,6 +736,10 @@ private class InferEqualMod(
 
 }
 
+private fun BlockStatement.isTruePrefix(prefix: String) =
+        fqName.startsWith(prefix + ".")
+
+
 private fun BlockStatement.isPrefix(prefix: String): Boolean {
     return fqName.startsWith(prefix)
 }
@@ -713,8 +766,10 @@ class ProcessRunner(val commandLine: Array<String>,
     }
 }
 
+var NUXMV_PATH_DEFAULT = "nuXmv"
+
 class NuXMVProcess(var moduleFile: File, val commandFile: File) {
-    var executablePath = "nuXmv"
+    var executablePath = NUXMV_PATH_DEFAULT
     var workingDirectory = moduleFile.parentFile
     var outputFile = File(workingDirectory, "nuxmv.log")
     var result: NuXMVOutput? = null
@@ -725,8 +780,8 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) {
         val commands = arrayOf(executablePath, "-int", moduleFile.absolutePath)
         try {
             info(commands.joinToString(" "))
-            info("Working Directory: {}", workingDirectory)
-            info("Result in {}", outputFile)
+            //info("Working Directory: {}", workingDirectory)
+            //info("Result in {}", outputFile)
             val pr = ProcessRunner(commands,
                     commandFile,
                     workingDirectory,

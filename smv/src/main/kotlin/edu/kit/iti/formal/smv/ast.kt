@@ -64,6 +64,7 @@ data class SBinaryExpression(private var _left: SMVExpr,
         get() = _left
         set(value) {
             if (value === this) throw IllegalArgumentException()
+            if (this in value) error("recursion")
             _left = value
         }
 
@@ -88,6 +89,20 @@ data class SBinaryExpression(private var _left: SMVExpr,
     }
 
     override fun clone() = SBinaryExpression(left.clone(), operator, right.clone())
+}
+
+private class Find(val target: SMVExpr) : SMVAstDefaultVisitorNN<Unit>() {
+    internal var found: Boolean = false
+
+    override fun defaultVisit(top: SMVAst) {
+        found = found || top == target
+    }
+}
+
+private operator fun SMVExpr.contains(e: SBinaryExpression): Boolean {
+    val f = Find(e)
+    this.accept(f)
+    return f.found
 }
 
 

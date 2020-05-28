@@ -201,14 +201,16 @@ class ModuleBuilder(
 
     private fun addInitAssignment(variable: SVariable) {
         val s = scope.getVariable(variable.name)
-        val e: SMVExpr
+        val initValue = s?.initValue!!
+        val e = valueTranslator.translate(initValue)
+        /*
         if (s!!.init != null) {
             val sv = s.init as Literal?
             e = sv!!.accept(SymbolicExecutioner())!!
         } else {
             e = this.valueTranslator.translate(
                     this.initValueTranslator.getInit(s.dataType!!))
-        }
+        }*/
         val a = SAssignment(variable, e)
         module.initAssignments.add(a)
     }

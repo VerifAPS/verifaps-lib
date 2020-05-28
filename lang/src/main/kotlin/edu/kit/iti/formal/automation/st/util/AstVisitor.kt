@@ -409,6 +409,7 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
     override fun traverse(blockStatement: BlockStatement) {
         blockStatement.statements.accept(visitor)
     }
+
     override fun traverse(special: SpecialStatement) {}
 }
 
@@ -1198,5 +1199,13 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun visit(empty: EMPTY_EXPRESSION): EMPTY_EXPRESSION {
         return super.visit(empty) as EMPTY_EXPRESSION
+    }
+
+    override fun visit(blockStatement: BlockStatement): Any {
+        blockStatement.input = blockStatement.input.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.output = blockStatement.output.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.state = blockStatement.state.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.statements = blockStatement.statements.accept(this) as StatementList
+        return blockStatement
     }
 }

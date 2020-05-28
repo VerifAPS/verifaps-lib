@@ -5,6 +5,7 @@ set -e
 (cd ../../../;
  gradle exec:installDist --parallel)
 
+export NUXMV=$HOME/share/nuXmv-1.1.1-Linux/bin/nuXmv
 
 MOD=$(readlink -f ../../../exec/build/install/exec/bin/mod)
 MOD_ARGS=@args.txt

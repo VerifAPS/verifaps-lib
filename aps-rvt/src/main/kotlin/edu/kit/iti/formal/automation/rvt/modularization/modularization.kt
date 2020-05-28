@@ -35,6 +35,28 @@ interface ReveContext {
     val inRelation: MutableList<RelatedVariables>
     val outRelation: MutableList<RelatedVariables>
 
+    fun completeRelation(oldVars: MutableList<SymbolicReference>,
+                         newVars: MutableList<SymbolicReference>,
+                         specification: MutableList<RelatedVariables>): MutableList<RelatedVariables> {
+        val seq = mutableListOf<RelatedVariables>()
+        if (specification.isNotEmpty()) {
+            seq.addAll(specification)
+        } else {
+            val ov = oldVars.map { it.identifier }.toMutableSet()
+            val nv = newVars.map { it.identifier }.toMutableSet()
+            val common = ov.intersect(nv)
+            for (c in common) {
+                val a = SVariable(c)
+                seq.add(RelatedVariables(a, SBinaryOperator.EQUAL, a))
+            }
+        }
+        return seq
+    }
+
+    fun completeInRel(old: BlockStatement, new: BlockStatement) = completeRelation(old.input, new.input, inRelation)
+
+    fun completeOutRel(old: BlockStatement, new: BlockStatement) = completeRelation(old.output, new.output, outRelation)
+
     //fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
     fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
             createRelation(old.input, new.input, oldModule, newModule, inRelation)
@@ -52,9 +74,9 @@ interface ReveContext {
         val nv = newVars.map { it.identifier }.toMutableSet()
         val seq = mutableListOf<SMVExpr>()
         if (specification.isNotEmpty()) {
-            for ((o, op, n) in inRelation) {
+            for ((o, op, n) in specification) {
                 //if (o.name in ov && n.name in nv) {
-                seq.add(SBinaryExpression(o.prefix(oldModule), op, n.prefix(newModule)))
+                seq.add(SBinaryExpression(o.inModule(oldModule), op, n.inModule(newModule)))
                 //ov.remove(o.name)
                 //nv.remove(n.name)
                 //}
@@ -190,10 +212,10 @@ class ModularProver(
 
     fun proof() {
         outputFolder.mkdirs()
-        runBlocking(ModApp.processContext) {
+        //runBlocking(ModApp.processContext) {
             val equal = proveStrategy.proofEquivalenceTopLevel()
             info("Proof result: $equal")
-        }
+        //}
     }
 
     fun inferReveContexts() {
