@@ -2828,7 +2828,7 @@ CraneLower := TRUE;</xhtml>
             <inVariable localId="150">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>((AnalogCranePosition &gt; 16060) AND (AnalogCranePosition &lt; 16160))</expression>
+              <expression>((AnalogCranePosition &gt; 16160) AND (AnalogCranePosition &lt; 16260))</expression>
             </inVariable>
             <transition localId="151">
               <position x="0" y="0" />
@@ -6683,7 +6683,7 @@ StampPusher := TRUE;</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#950ms" />
+                <simpleValue value="TIME#900ms" />
               </initialValue>
             </variable>
             <variable name="interconnect_Slide1_Black">
@@ -6719,7 +6719,7 @@ StampPusher := TRUE;</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#320ms" />
               </initialValue>
             </variable>
             <variable name="interconnect_Slide1_White">
@@ -6737,7 +6737,7 @@ StampPusher := TRUE;</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#370ms" />
+                <simpleValue value="TIME#390ms" />
               </initialValue>
             </variable>
             <variable name="interconnect_Slide2_White">
@@ -6755,7 +6755,7 @@ StampPusher := TRUE;</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#300ms" />
+                <simpleValue value="TIME#320ms" />
               </initialValue>
             </variable>
             <variable name="interconnect_Slide1_Metal">
@@ -6773,7 +6773,7 @@ StampPusher := TRUE;</xhtml>
                 <TIME />
               </type>
               <initialValue>
-                <simpleValue value="TIME#370ms" />
+                <simpleValue value="TIME#390ms" />
               </initialValue>
             </variable>
             <variable name="interconnect_Slide2_Metal">
@@ -7183,8 +7183,8 @@ END_IF</xhtml>
           <action name="Reset_interconnect3_active">
             <body>
               <ST>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">interconnect2 := FALSE;
-Timer2(IN:=FALSE,PT:=T#0MS);
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">interconnect3 := FALSE;
+Timer3(IN:=FALSE,PT:=T#0MS);
 Slide3_black := Slide3_black - 1;
 Priority_Var_Black := Priority_Var_Black - 1; </xhtml>
               </ST>

@@ -9,7 +9,6 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
-import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.File
 
@@ -19,8 +18,7 @@ import java.io.File
  * @version 1 (15.07.18)
  */
 object ModApp {
-    val processContext = newFixedThreadPoolContext(1, "aps-rvt")
-
+    //val processContext = newFixedThreadPoolContext(1, "aps-rvt")
     @JvmStatic
     fun main(args: Array<String>) {
         ModularizationApp().main(args)
@@ -34,6 +32,8 @@ class ModularizationApp : CliktCommand() {
 
     val showInfos by option("--info",
             help = "print contextes of call site pairs infered by symbex").flag()
+
+    val assume by option().multiple()
 
     val disableProofBodyEquivalenceSMT by option(help = "").flag()
     val disableProofBodyEquivalenceSSA by option(help = "").flag()
@@ -89,7 +89,7 @@ class ModularizationApp : CliktCommand() {
         ctx.condition = condition.conjunction(SLiteral.TRUE)
 
         info("Top level relation: ${ctx.inRelation.joinToString(" & ") { it.expr.repr() }}")
-        info("Top level conditon: ${ctx.condition}")
+        info("Top level conditon: ${ctx.condition.repr()}")
         info("Proof for perfect equality? ${ctx.isPerfect}")
         info("Only equalities? ${ctx.onlyEquivalence}")
 
@@ -114,7 +114,11 @@ class ModularizationApp : CliktCommand() {
         m.proveStrategy.disableProofBodyEquivalenceWithAbstractionSubFrames = disableProofBodyEquivalenceWithAbstractionSubFrames
         m.proveStrategy.disableUpdateCache = disableUpdateCache
 
+        m.proveStrategy.assumeAsProven.addAll(this.assume)
+        info("Following sub-calls are marked as proven by assumption: ${m.proveStrategy.assumeAsProven}")
+
         m.printCallSites()
+
         if (!showInfos) {
             info("Output folder: ${outputFolder}")
             info("Start with the proof")
@@ -122,3 +126,4 @@ class ModularizationApp : CliktCommand() {
         }
     }
 }
+

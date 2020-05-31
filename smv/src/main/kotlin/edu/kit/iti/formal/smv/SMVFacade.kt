@@ -96,7 +96,7 @@ object SMVFacade {
     }
 
     fun expr(s: String): SMVExpr {
-        val ctx = getParser(CharStreams.fromString(s)).expr()
+        val ctx = getParser(CharStreams.fromString(s)).exprEOF()
         return ctx.accept(SMVTransformToAST()) as SMVExpr
     }
 

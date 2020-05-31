@@ -2177,7 +2177,7 @@ CraneLower := TRUE;</xhtml>
             <body>
               <ST>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := FALSE;
-CraneTurnCounterClockwise := FALSE;</xhtml>
+CraneTurnCounterclockwise := FALSE;</xhtml>
               </ST>
             </body>
             <addData />
@@ -2307,7 +2307,7 @@ interconnectCraneStartCommand := FALSE;</xhtml>
             <body>
               <ST>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := FALSE;
-CraneTurnCounterClockwise := FALSE;
+CraneTurnCounterclockwise := FALSE;
 MagazinVacuumOn := FALSE;
 MagazinVacuumOff := FALSE;
 CraneLower := FALSE;</xhtml>

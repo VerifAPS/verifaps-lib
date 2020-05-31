@@ -1,0 +1,612 @@
+> Task :aps-rvt:versionInfo
+> Task :exec:versionInfo
+> Task :ide:versionInfo
+> Task :aps-rvt:processResources
+> Task :run:versionInfo
+> Task :exec:processResources
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :exec:startScripts UP-TO-DATE
+> Task :smv:versionInfo
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :util:compileKotlin UP-TO-DATE
+> Task :exec:createStartide UP-TO-DATE
+> Task :smv:processResources
+> Task :geteta:versionInfo
+> Task :run:processResources
+> Task :lang:versionInfo
+> Task :util:compileJava NO-SOURCE
+> Task :ide:processResources
+> Task :xml:versionInfo
+> Task :symbex:versionInfo
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :exec:createStartmod UP-TO-DATE
+> Task :smt:versionInfo
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :util:versionInfo
+> Task :symbex:processResources
+> Task :geteta:processResources
+> Task :util:processResources
+> Task :util:classes
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :lang:processResources
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :smv:compileJava UP-TO-DATE
+> Task :smv:classes
+> Task :xml:compileJava NO-SOURCE
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :xml:processResources
+> Task :xml:classes
+> Task :util:jar
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:processResources
+> Task :smt:classes
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :smv:jar
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:jar
+> Task :xml:jar
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :symbex:classes
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :run:compileJava NO-SOURCE
+> Task :run:classes
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:jar
+> Task :aps-rvt:jar
+> Task :symbex:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :lang:jar
+> Task :geteta:jar
+> Task :ide:jar
+> Task :exec:createExecheck
+> Task :exec:createExeflycheck
+> Task :exec:createExegeteta
+> Task :exec:createExegeteta-smt
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.002] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.023] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.162] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.230] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.234] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.326] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.355] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.355] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.356] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.356] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.360] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.361] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.361] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.361] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.361] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.361] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.361] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.362] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.362] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.362] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.363] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.363] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.363] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.364] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.364] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.364] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.364] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.365] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.365] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.365] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.366] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.366] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.374] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.379] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.380] (INFO) [37mcheckCache(Main,Main):  Skipped because `disableCheckCache` is set[0m [[33mstrategy.kt:106[0m]
+[     0.380] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Skipped because `disableProofBodyEquivalenceSource` is set[0m [[33mstrategy.kt:329[0m]
+[     0.380] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Skipped because `disableProofBodyEquivalenceSSA` is set[0m [[33mstrategy.kt:349[0m]
+[     0.381] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Skipped because `disableProofBodyEquivalenceSMT` is set[0m [[33mstrategy.kt:374[0m]
+[     0.381] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Skipped because `disableProofBodyEquivalenceWithAbstraction` is set[0m [[33mstrategy.kt:202[0m]
+[     0.443] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Starting proof: output_1/Main_Main.smv, output_1/Main_Main.log[0m [[33mstrategy.kt:163[0m]
+[     0.474] (INFO) [37mrunNuXmv: Run solver on output_1/Main_Main.smv[0m [[33mstrategy.kt:486[0m]
+[     0.475] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.475] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main_Main.smv[0m [[33mstrategy.kt:819[0m]
+[     8.446] (INFO) [37mrunNuXmv: Solver finished for output_1/Main_Main.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@1583741e[0m [[33mstrategy.kt:490[0m]
+[     8.446] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[     8.446] (INFO) [37mupdateCache(Main,Main):  Skipped because `disableUpdateCache` is set[0m [[33mstrategy.kt:125[0m]
+[     8.447] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=1, cmc=8065, mod=0, smt=0, src=0, ssa=0}[0m [[33mstrategy.kt:96[0m]
+[     8.447] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]
+> Task :aps-rvt:versionInfo
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :aps-rvt:processResources
+> Task :geteta:versionInfo
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :run:versionInfo
+> Task :lang:versionInfo
+> Task :util:compileKotlin UP-TO-DATE
+> Task :geteta:processResources
+> Task :util:compileJava NO-SOURCE
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :run:processResources
+> Task :exec:versionInfo
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :symbex:versionInfo
+> Task :symbex:processResources
+> Task :lang:processResources
+> Task :ide:versionInfo
+> Task :exec:processResources
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :util:versionInfo
+> Task :xml:compileJava NO-SOURCE
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :exec:startScripts UP-TO-DATE
+> Task :util:processResources
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :ide:processResources
+> Task :util:classes
+> Task :xml:versionInfo
+> Task :smv:compileJava UP-TO-DATE
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smv:versionInfo
+> Task :xml:processResources
+> Task :xml:classes
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :exec:createStartide UP-TO-DATE
+> Task :smv:processResources
+> Task :smv:classes
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :exec:createStartmod UP-TO-DATE
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :util:jar
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:versionInfo
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:processResources
+> Task :smt:classes
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smv:jar
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :symbex:classes
+> Task :smt:jar
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :xml:jar
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :run:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :run:compileJava NO-SOURCE
+> Task :run:classes
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :symbex:jar
+> Task :aps-rvt:jar
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :exec:createExecheck
+> Task :exec:createExeflycheck
+> Task :exec:createExegeteta
+> Task :geteta:jar
+> Task :lang:jar
+> Task :exec:createExegeteta-smt
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :ide:jar
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.002] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.031] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.167] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.218] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.221] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.311] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.340] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.340] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.340] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.340] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.344] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.345] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.345] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.345] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.345] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.345] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.346] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.346] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.346] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.346] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.347] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.347] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.347] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.347] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.348] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.348] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.348] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.348] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.348] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.348] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.348] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.349] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.353] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.356] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.357] (INFO) [37mcheckCache(Main,Main):  Skipped because `disableCheckCache` is set[0m [[33mstrategy.kt:106[0m]
+[     0.357] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Skipped because `disableProofBodyEquivalenceSource` is set[0m [[33mstrategy.kt:329[0m]
+[     0.357] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Skipped because `disableProofBodyEquivalenceSSA` is set[0m [[33mstrategy.kt:349[0m]
+[     0.358] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Skipped because `disableProofBodyEquivalenceSMT` is set[0m [[33mstrategy.kt:374[0m]
+[     0.358] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Skipped because `disableProofBodyEquivalenceWithAbstraction` is set[0m [[33mstrategy.kt:202[0m]
+[     0.413] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Starting proof: output_1/Main_Main.smv, output_1/Main_Main.log[0m [[33mstrategy.kt:163[0m]
+[     0.446] (INFO) [37mrunNuXmv: Run solver on output_1/Main_Main.smv[0m [[33mstrategy.kt:486[0m]
+[     0.447] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.448] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main_Main.smv[0m [[33mstrategy.kt:819[0m]
+[     8.362] (INFO) [37mrunNuXmv: Solver finished for output_1/Main_Main.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@1583741e[0m [[33mstrategy.kt:490[0m]
+[     8.363] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[     8.363] (INFO) [37mupdateCache(Main,Main):  Skipped because `disableUpdateCache` is set[0m [[33mstrategy.kt:125[0m]
+[     8.363] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=0, cmc=8005, mod=0, smt=0, src=0, ssa=0}[0m [[33mstrategy.kt:96[0m]
+[     8.363] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]
+> Task :exec:versionInfo
+> Task :ide:versionInfo
+> Task :aps-rvt:versionInfo
+> Task :exec:processResources
+> Task :aps-rvt:processResources
+> Task :run:versionInfo
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :smv:versionInfo
+> Task :ide:processResources
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :symbex:versionInfo
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :exec:startScripts UP-TO-DATE
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :util:compileKotlin UP-TO-DATE
+> Task :smv:processResources
+> Task :run:processResources
+> Task :lang:versionInfo
+> Task :smt:versionInfo
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :util:compileJava NO-SOURCE
+> Task :smt:processResources
+> Task :geteta:versionInfo
+> Task :symbex:processResources
+> Task :exec:createStartide UP-TO-DATE
+> Task :lang:processResources
+> Task :util:versionInfo
+> Task :util:processResources
+> Task :util:classes
+> Task :geteta:processResources
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :xml:compileJava NO-SOURCE
+> Task :exec:createStartmod UP-TO-DATE
+> Task :xml:versionInfo
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :xml:processResources
+> Task :xml:classes
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :util:jar
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:classes
+> Task :smv:compileJava UP-TO-DATE
+> Task :smv:classes
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :xml:jar
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :smv:jar
+> Task :symbex:classes
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:jar
+> Task :run:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :run:compileJava NO-SOURCE
+> Task :run:classes
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :run:jar
+> Task :symbex:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :aps-rvt:jar
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :exec:createExecheck
+> Task :lang:jar
+> Task :exec:createExeflycheck
+> Task :geteta:jar
+> Task :exec:createExegeteta
+> Task :exec:createExegeteta-smt
+> Task :ide:jar
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.001] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.029] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.167] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.219] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.225] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.313] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.335] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.335] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.335] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.335] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.340] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.340] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.340] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.341] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.341] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.341] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.341] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.341] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.342] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.342] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.343] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.343] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.343] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.343] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.344] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.344] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.344] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.344] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.345] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.345] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.345] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.345] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.352] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.357] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.358] (INFO) [37mcheckCache(Main,Main):  Skipped because `disableCheckCache` is set[0m [[33mstrategy.kt:106[0m]
+[     0.358] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Skipped because `disableProofBodyEquivalenceSource` is set[0m [[33mstrategy.kt:329[0m]
+[     0.358] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Skipped because `disableProofBodyEquivalenceSSA` is set[0m [[33mstrategy.kt:349[0m]
+[     0.359] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Skipped because `disableProofBodyEquivalenceSMT` is set[0m [[33mstrategy.kt:374[0m]
+[     0.359] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Skipped because `disableProofBodyEquivalenceWithAbstraction` is set[0m [[33mstrategy.kt:202[0m]
+[     0.422] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Starting proof: output_1/Main_Main.smv, output_1/Main_Main.log[0m [[33mstrategy.kt:163[0m]
+[     0.455] (INFO) [37mrunNuXmv: Run solver on output_1/Main_Main.smv[0m [[33mstrategy.kt:486[0m]
+[     0.456] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.456] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main_Main.smv[0m [[33mstrategy.kt:819[0m]
+[    10.166] (INFO) [37mrunNuXmv: Solver finished for output_1/Main_Main.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@1583741e[0m [[33mstrategy.kt:490[0m]
+[    10.167] (INFO) [37mproofBodyEquivalenceClassic(Main,Main):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[    10.167] (INFO) [37mupdateCache(Main,Main):  Skipped because `disableUpdateCache` is set[0m [[33mstrategy.kt:125[0m]
+[    10.168] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=1, cmc=9808, mod=0, smt=1, src=0, ssa=0}[0m [[33mstrategy.kt:96[0m]
+[    10.168] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]

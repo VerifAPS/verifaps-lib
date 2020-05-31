@@ -204,9 +204,11 @@ class ModularProver(
         callSitePairs.forEach { (bold, bnew) ->
             val ctx = ctxManager.get(bold, bnew) ?: error("no context found")
             info("Matched ${bold.repr()} to ${bnew.repr()}")
+            info("\tIs perfect?: ${ctx.isPerfect}")
             info("\tContext: ${ctx.condition.repr()}")
             info("\tInput-Relation: ${ctx.createInRelation(bold, bnew, "old", "new").repr()}")
             info("\tOutput-Relation: ${ctx.createOutRelation(bold, bnew, "old", "new").repr()}")
+
         }
     }
 
@@ -290,7 +292,7 @@ object ModFacade {
 
     fun createReveContextsBySpecification(seq: List<String>, oldProgram: ModularProgram, newProgram: ModularProgram): ReveContextManager {
         val cm = ReveContextManager()
-        seq.map { createReveContextsBySpecification(it, oldProgram, newProgram, cm) }
+        seq.forEach { createReveContextsBySpecification(it, oldProgram, newProgram, cm) }
         return cm
     }
 

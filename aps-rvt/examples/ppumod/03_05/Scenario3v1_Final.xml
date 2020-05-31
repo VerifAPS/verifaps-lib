@@ -891,7 +891,7 @@ interconnectStampStartCommand := FALSE;</xhtml>
             <inVariable localId="43">
               <position x="0" y="0" />
               <connectionPointOut />
-              <expression>CraneOnConveyor</expression>
+              <expression>CraneOnConveyor AND NOT StampSliderFilled</expression>
             </inVariable>
             <transition localId="44">
               <position x="0" y="0" />
@@ -1958,7 +1958,7 @@ CraneTurnClockwise := FALSE;</xhtml>
             <body>
               <ST>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">CraneTurnClockwise := FALSE;
-CraneTurnCounterClockwise := FALSE;</xhtml>
+CraneTurnCounterclockwise := FALSE;</xhtml>
               </ST>
             </body>
             <addData />

@@ -1,0 +1,825 @@
+> Task :aps-rvt:versionInfo
+> Task :aps-rvt:processResources
+> Task :exec:versionInfo
+> Task :exec:processResources
+> Task :run:versionInfo
+> Task :ide:versionInfo
+> Task :run:processResources
+> Task :symbex:versionInfo
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :lang:versionInfo
+> Task :smv:versionInfo
+> Task :ide:processResources
+> Task :smv:processResources
+> Task :exec:startScripts UP-TO-DATE
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :util:compileKotlin UP-TO-DATE
+> Task :geteta:versionInfo
+> Task :symbex:processResources
+> Task :xml:versionInfo
+> Task :smt:versionInfo
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :util:compileJava NO-SOURCE
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :lang:processResources
+> Task :exec:createStartide UP-TO-DATE
+> Task :util:versionInfo
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :exec:createStartmod UP-TO-DATE
+> Task :util:processResources
+> Task :util:classes
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :geteta:processResources
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :xml:compileJava NO-SOURCE
+> Task :util:jar
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :xml:processResources
+> Task :xml:classes
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smv:compileJava UP-TO-DATE
+> Task :smv:classes
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:processResources
+> Task :smt:classes
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :symbex:classes
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :smv:jar
+> Task :xml:jar
+> Task :run:compileKotlin UP-TO-DATE
+> Task :run:compileJava NO-SOURCE
+> Task :run:classes
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:jar
+> Task :run:jar
+> Task :aps-rvt:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :symbex:jar
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :exec:createExecheck
+> Task :exec:createExeflycheck
+> Task :geteta:jar
+> Task :exec:createExegeteta
+> Task :lang:jar
+> Task :ide:jar
+> Task :exec:createExegeteta-smt
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.001] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.018] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.161] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.220] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.224] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.323] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.351] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.352] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.352] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.352] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.357] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.357] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.357] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.358] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.358] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.358] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.358] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.359] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.359] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.359] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.360] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.361] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.361] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.361] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.361] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.362] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.362] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.362] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.362] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.362] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.363] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.363] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.370] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.376] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.376] (INFO) [37mcheckCache(Main,Main):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.377] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Frame Main is *not* syntactical equivalent to  Main[0m [[33mstrategy.kt:341[0m]
+[     0.425] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Frame Main is *not* equivalent to  Main in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.425] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Proof equivalence of frames Main and Main[0m [[33mstrategy.kt:377[0m]
+[     0.425] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.441] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.449] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.450] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Write SMT problem into output_1/Main_Main_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.451] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Run z3 for Main_Main_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.492] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Result of z3 is false for Main_Main_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.505] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.505] (INFO) [37mFrame Main_abstracted.0 to Main_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.506] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.506] (INFO) [37m	Input-Relation: old.Sensor_CraneDown = new.Sensor_CraneDown & old.Sensor_CraneOnConveyor = new.Sensor_CraneOnConveyor & old.Sensor_CraneOnMagazin = new.Sensor_CraneOnMagazin & old.Sensor_CranePosition = new.Sensor_CranePosition & old.Sensor_CraneSucked = new.Sensor_CraneSucked & old.Sensor_CraneUp = new.Sensor_CraneUp & old.Sensor_MagazinEmergencyStop = new.Sensor_MagazinEmergencyStop & old.Sensor_MagazinSwitchManuellAutomatic = new.Sensor_MagazinSwitchManuellAutomatic & old.Sensor_SliderMovedOut = new.Sensor_SliderMovedOut & old.Sensor_SliderNotMovedOut = new.Sensor_SliderNotMovedOut & old.Sensor_StartButtonMagazin = new.Sensor_StartButtonMagazin & old.Sensor_WorkpieceReady = new.Sensor_WorkpieceReady & old.Main$Crane$0$Crane$CraneLower__random = new.Main$Crane$0$Crane$CraneLower__random & old.Main$Crane$0$Crane$CraneTurnClockwise__random = new.Main$Crane$0$Crane$CraneTurnClockwise__random & old.Main$Crane$0$Crane$CraneTurnCounterclockwise__random = new.Main$Crane$0$Crane$CraneTurnCounterclockwise__random & old.Main$Crane$0$Crane$MagazinVacuumOff__random = new.Main$Crane$0$Crane$MagazinVacuumOff__random & old.Main$Crane$0$Crane$MagazinVacuumOn__random = new.Main$Crane$0$Crane$MagazinVacuumOn__random & old.Main$Crane$0$Crane$StartCommandCrane__random = new.Main$Crane$0$Crane$StartCommandCrane__random & old.Main$Mag$0$Mag$MagazinGreenLamp__random = new.Main$Mag$0$Mag$MagazinGreenLamp__random & old.Main$Mag$0$Mag$MagazinSlider__random = new.Main$Mag$0$Mag$MagazinSlider__random & old.Main$Mag$0$Mag$StartCommandMagazin__random = new.Main$Mag$0$Mag$StartCommandMagazin__random & old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mstrategy.kt:278[0m]
+[     0.507] (INFO) [37m	Output-Relation: old.Actuator_CraneLower = new.Actuator_CraneLower & old.Actuator_CraneTurnClockwise = new.Actuator_CraneTurnClockwise & old.Actuator_CraneTurnCounterclockwise = new.Actuator_CraneTurnCounterclockwise & old.Actuator_MagazinGreenLamp = new.Actuator_MagazinGreenLamp & old.Actuator_MagazinSlider = new.Actuator_MagazinSlider & old.Actuator_MagazinVacuumOff = new.Actuator_MagazinVacuumOff & old.Actuator_MagazinVacuumOn = new.Actuator_MagazinVacuumOn & old.Actuator_MagazinWhiteLamp = new.Actuator_MagazinWhiteLamp & old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Main$Crane$0$Crane$CraneDown__input = new.Main$Crane$0$Crane$CraneDown__input & old.Main$Crane$0$Crane$CraneOnConveyor__input = new.Main$Crane$0$Crane$CraneOnConveyor__input & old.Main$Crane$0$Crane$CraneOnMagazin__input = new.Main$Crane$0$Crane$CraneOnMagazin__input & old.Main$Crane$0$Crane$CraneSucked__input = new.Main$Crane$0$Crane$CraneSucked__input & old.Main$Crane$0$Crane$CraneUp__input = new.Main$Crane$0$Crane$CraneUp__input & old.Main$Crane$0$Crane$SFCReset__input = new.Main$Crane$0$Crane$SFCReset__input & old.Main$Crane$0$Crane$SliderMovedOut__input = new.Main$Crane$0$Crane$SliderMovedOut__input & old.Main$Crane$0$Crane$SliderNotMovedOut__input = new.Main$Crane$0$Crane$SliderNotMovedOut__input & old.Main$Crane$0$Crane$StartButtonMagazin__input = new.Main$Crane$0$Crane$StartButtonMagazin__input & old.Main$Crane$0$Crane$StartVar__input = new.Main$Crane$0$Crane$StartVar__input & old.Main$Crane$0$Crane$WorkpieceReady__input = new.Main$Crane$0$Crane$WorkpieceReady__input & old.Main$Mag_ccnt = new.Main$Mag_ccnt & old.Main$Mag$0$Mag$CraneDown__input = new.Main$Mag$0$Mag$CraneDown__input & old.Main$Mag$0$Mag$CraneOnConveyor__input = new.Main$Mag$0$Mag$CraneOnConveyor__input & old.Main$Mag$0$Mag$CraneOnMagazin__input = new.Main$Mag$0$Mag$CraneOnMagazin__input & old.Main$Mag$0$Mag$CraneSucked__input = new.Main$Mag$0$Mag$CraneSucked__input & old.Main$Mag$0$Mag$CraneUp__input = new.Main$Mag$0$Mag$CraneUp__input & old.Main$Mag$0$Mag$SFCReset__input = new.Main$Mag$0$Mag$SFCReset__input & old.Main$Mag$0$Mag$SliderMovedOut__input = new.Main$Mag$0$Mag$SliderMovedOut__input & old.Main$Mag$0$Mag$SliderNotMovedOut__input = new.Main$Mag$0$Mag$SliderNotMovedOut__input & old.Main$Mag$0$Mag$StartButtonMagazin__input = new.Main$Mag$0$Mag$StartButtonMagazin__input & old.Main$Mag$0$Mag$StartVar__input = new.Main$Mag$0$Mag$StartVar__input & old.Main$Mag$0$Mag$WorkpieceReady__input = new.Main$Mag$0$Mag$WorkpieceReady__input & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mstrategy.kt:279[0m]
+[     0.507] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.508] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:83) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.510] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:91) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.510] (INFO) [37mcheckCache(Main_abstracted,Main_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.510] (INFO) [37mproofBodyEquivalenceSource(Main_abstracted,Main_abstracted):  Frame Main_abstracted is *not* syntactical equivalent to  Main_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.524] (INFO) [37mproofBodyEquivalenceSSA(Main_abstracted,Main_abstracted):  Frame Main_abstracted is equivalent to  Main_abstracted in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     0.524] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Timings: {cache=0, src=0, ssa=14}[0m [[33mstrategy.kt:96[0m]
+[     0.524] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  Proving sub-frames: Crane=Crane, Mag=Mag, TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     0.527] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:196) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.528] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:219) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.528] (INFO) [37mcheckCache(Main.Crane,Main.Crane):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.528] (INFO) [37mproofBodyEquivalenceSource(Main.Crane,Main.Crane):  Frame Main.Crane is *not* syntactical equivalent to  Main.Crane[0m [[33mstrategy.kt:341[0m]
+[     0.550] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane,Main.Crane):  Frame Main.Crane is *not* equivalent to  Main.Crane in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.550] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Proof equivalence of frames Main.Crane and Main.Crane[0m [[33mstrategy.kt:377[0m]
+[     0.550] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.557] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.564] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.565] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Write SMT problem into output_1/Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.565] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Run z3 for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.583] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Result of z3 is false for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.587] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.588] (INFO) [37mFrame Main.Crane_abstracted.0 to Main.Crane_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.588] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.588] (INFO) [37m	Input-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random[0m [[33mstrategy.kt:278[0m]
+[     0.588] (INFO) [37m	Output-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input[0m [[33mstrategy.kt:279[0m]
+[     0.588] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.589] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:190) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.590] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:213) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.590] (INFO) [37mcheckCache(Main.Crane_abstracted,Main.Crane_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.590] (INFO) [37mproofBodyEquivalenceSource(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* syntactical equivalent to  Main.Crane_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.609] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* equivalent to  Main.Crane_abstracted in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.609] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Proof equivalence of frames Main.Crane_abstracted and Main.Crane_abstracted[0m [[33mstrategy.kt:377[0m]
+[     0.609] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.613] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.617] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.618] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Write SMT problem into output_1/Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.618] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Run z3 for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.636] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Result of z3 is false for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.637] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane_abstracted,Main.Crane_abstracted):  declined, recursion protection triggered[0m [[33mstrategy.kt:195[0m]
+[     0.643] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Starting proof: output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv, output_1/Main.Crane_abstracted_Main.Crane_abstracted.log[0m [[33mstrategy.kt:163[0m]
+[     0.653] (INFO) [37mrunNuXmv: Run solver on output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:486[0m]
+[     0.654] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.655] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:819[0m]
+[     1.023] (INFO) [37mrunNuXmv: Solver finished for output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@524f3b3a[0m [[33mstrategy.kt:490[0m]
+[     1.023] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[     1.024] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Timings: {cache=0, cmc=386, mod=0, smt=28, src=0, ssa=19}[0m [[33mstrategy.kt:96[0m]
+[     1.024] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  Proving sub-frames: TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     1.024] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     1.024] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     1.024] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.024] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     1.024] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=0, src=0}[0m [[33mstrategy.kt:96[0m]
+[     1.024] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     1.024] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane,Main.Crane):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     1.024] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Timings: {cache=0, mod=441, smt=33, src=1, ssa=21}[0m [[33mstrategy.kt:96[0m]
+[     1.025] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:114) (Vars: [2] (11) => (3))[0m [[33mstrategy.kt:71[0m]
+[     1.025] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:120) (Vars: [2] (11) => (9))[0m [[33mstrategy.kt:72[0m]
+[     1.025] (INFO) [37mcheckCache(Main.Mag,Main.Mag):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.025] (INFO) [37mproofBodyEquivalenceSource(Main.Mag,Main.Mag):  Frame Main.Mag is *not* syntactical equivalent to  Main.Mag[0m [[33mstrategy.kt:341[0m]
+[     1.036] (INFO) [37mproofBodyEquivalenceSSA(Main.Mag,Main.Mag):  Frame Main.Mag is equivalent to  Main.Mag in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     1.036] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Timings: {cache=0, src=0, ssa=11}[0m [[33mstrategy.kt:96[0m]
+[     1.036] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     1.036] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     1.036] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.037] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     1.037] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=0, src=1}[0m [[33mstrategy.kt:96[0m]
+[     1.037] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     1.037] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     1.037] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=1, mod=545, smt=67, src=0, ssa=48}[0m [[33mstrategy.kt:96[0m]
+[     1.037] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]
+> Task :exec:versionInfo
+> Task :ide:versionInfo
+> Task :aps-rvt:versionInfo
+> Task :exec:processResources
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :exec:startScripts UP-TO-DATE
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :aps-rvt:processResources
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :geteta:versionInfo
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :exec:createStartide UP-TO-DATE
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :lang:versionInfo
+> Task :smv:versionInfo
+> Task :run:versionInfo
+> Task :exec:createStartmod UP-TO-DATE
+> Task :util:compileKotlin UP-TO-DATE
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :util:compileJava NO-SOURCE
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :smt:versionInfo
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :run:processResources
+> Task :lang:processResources
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :geteta:processResources
+> Task :symbex:versionInfo
+> Task :util:versionInfo
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :symbex:processResources
+> Task :util:processResources
+> Task :ide:processResources
+> Task :util:classes
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :xml:compileJava NO-SOURCE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :xml:versionInfo
+> Task :xml:processResources
+> Task :xml:classes
+> Task :smv:compileJava UP-TO-DATE
+> Task :smv:processResources
+> Task :smv:classes
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :util:jar
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:processResources
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :smt:classes
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :xml:jar
+> Task :smv:jar
+> Task :smt:jar
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :symbex:classes
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :run:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :run:classes
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :symbex:jar
+> Task :aps-rvt:jar
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :lang:jar
+> Task :exec:createExecheck
+> Task :exec:createExeflycheck
+> Task :geteta:jar
+> Task :exec:createExegeteta
+> Task :exec:createExegeteta-smt
+> Task :ide:jar
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.001] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.017] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.160] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.209] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.211] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.284] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.311] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.311] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.311] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.311] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.315] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.316] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.316] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.316] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.316] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.316] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.317] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.317] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.317] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.317] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.318] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.318] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.318] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.318] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.319] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.319] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.319] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.319] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.319] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.319] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.319] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.320] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.325] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.329] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.330] (INFO) [37mcheckCache(Main,Main):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.330] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Frame Main is *not* syntactical equivalent to  Main[0m [[33mstrategy.kt:341[0m]
+[     0.381] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Frame Main is *not* equivalent to  Main in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.382] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Proof equivalence of frames Main and Main[0m [[33mstrategy.kt:377[0m]
+[     0.382] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.393] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.399] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.400] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Write SMT problem into output_1/Main_Main_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.400] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Run z3 for Main_Main_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.446] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Result of z3 is false for Main_Main_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.457] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.457] (INFO) [37mFrame Main_abstracted.0 to Main_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.457] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.457] (INFO) [37m	Input-Relation: old.Sensor_CraneDown = new.Sensor_CraneDown & old.Sensor_CraneOnConveyor = new.Sensor_CraneOnConveyor & old.Sensor_CraneOnMagazin = new.Sensor_CraneOnMagazin & old.Sensor_CranePosition = new.Sensor_CranePosition & old.Sensor_CraneSucked = new.Sensor_CraneSucked & old.Sensor_CraneUp = new.Sensor_CraneUp & old.Sensor_MagazinEmergencyStop = new.Sensor_MagazinEmergencyStop & old.Sensor_MagazinSwitchManuellAutomatic = new.Sensor_MagazinSwitchManuellAutomatic & old.Sensor_SliderMovedOut = new.Sensor_SliderMovedOut & old.Sensor_SliderNotMovedOut = new.Sensor_SliderNotMovedOut & old.Sensor_StartButtonMagazin = new.Sensor_StartButtonMagazin & old.Sensor_WorkpieceReady = new.Sensor_WorkpieceReady & old.Main$Crane$0$Crane$CraneLower__random = new.Main$Crane$0$Crane$CraneLower__random & old.Main$Crane$0$Crane$CraneTurnClockwise__random = new.Main$Crane$0$Crane$CraneTurnClockwise__random & old.Main$Crane$0$Crane$CraneTurnCounterclockwise__random = new.Main$Crane$0$Crane$CraneTurnCounterclockwise__random & old.Main$Crane$0$Crane$MagazinVacuumOff__random = new.Main$Crane$0$Crane$MagazinVacuumOff__random & old.Main$Crane$0$Crane$MagazinVacuumOn__random = new.Main$Crane$0$Crane$MagazinVacuumOn__random & old.Main$Crane$0$Crane$StartCommandCrane__random = new.Main$Crane$0$Crane$StartCommandCrane__random & old.Main$Mag$0$Mag$MagazinGreenLamp__random = new.Main$Mag$0$Mag$MagazinGreenLamp__random & old.Main$Mag$0$Mag$MagazinSlider__random = new.Main$Mag$0$Mag$MagazinSlider__random & old.Main$Mag$0$Mag$StartCommandMagazin__random = new.Main$Mag$0$Mag$StartCommandMagazin__random & old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mstrategy.kt:278[0m]
+[     0.458] (INFO) [37m	Output-Relation: old.Actuator_CraneLower = new.Actuator_CraneLower & old.Actuator_CraneTurnClockwise = new.Actuator_CraneTurnClockwise & old.Actuator_CraneTurnCounterclockwise = new.Actuator_CraneTurnCounterclockwise & old.Actuator_MagazinGreenLamp = new.Actuator_MagazinGreenLamp & old.Actuator_MagazinSlider = new.Actuator_MagazinSlider & old.Actuator_MagazinVacuumOff = new.Actuator_MagazinVacuumOff & old.Actuator_MagazinVacuumOn = new.Actuator_MagazinVacuumOn & old.Actuator_MagazinWhiteLamp = new.Actuator_MagazinWhiteLamp & old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Main$Crane$0$Crane$CraneDown__input = new.Main$Crane$0$Crane$CraneDown__input & old.Main$Crane$0$Crane$CraneOnConveyor__input = new.Main$Crane$0$Crane$CraneOnConveyor__input & old.Main$Crane$0$Crane$CraneOnMagazin__input = new.Main$Crane$0$Crane$CraneOnMagazin__input & old.Main$Crane$0$Crane$CraneSucked__input = new.Main$Crane$0$Crane$CraneSucked__input & old.Main$Crane$0$Crane$CraneUp__input = new.Main$Crane$0$Crane$CraneUp__input & old.Main$Crane$0$Crane$SFCReset__input = new.Main$Crane$0$Crane$SFCReset__input & old.Main$Crane$0$Crane$SliderMovedOut__input = new.Main$Crane$0$Crane$SliderMovedOut__input & old.Main$Crane$0$Crane$SliderNotMovedOut__input = new.Main$Crane$0$Crane$SliderNotMovedOut__input & old.Main$Crane$0$Crane$StartButtonMagazin__input = new.Main$Crane$0$Crane$StartButtonMagazin__input & old.Main$Crane$0$Crane$StartVar__input = new.Main$Crane$0$Crane$StartVar__input & old.Main$Crane$0$Crane$WorkpieceReady__input = new.Main$Crane$0$Crane$WorkpieceReady__input & old.Main$Mag_ccnt = new.Main$Mag_ccnt & old.Main$Mag$0$Mag$CraneDown__input = new.Main$Mag$0$Mag$CraneDown__input & old.Main$Mag$0$Mag$CraneOnConveyor__input = new.Main$Mag$0$Mag$CraneOnConveyor__input & old.Main$Mag$0$Mag$CraneOnMagazin__input = new.Main$Mag$0$Mag$CraneOnMagazin__input & old.Main$Mag$0$Mag$CraneSucked__input = new.Main$Mag$0$Mag$CraneSucked__input & old.Main$Mag$0$Mag$CraneUp__input = new.Main$Mag$0$Mag$CraneUp__input & old.Main$Mag$0$Mag$SFCReset__input = new.Main$Mag$0$Mag$SFCReset__input & old.Main$Mag$0$Mag$SliderMovedOut__input = new.Main$Mag$0$Mag$SliderMovedOut__input & old.Main$Mag$0$Mag$SliderNotMovedOut__input = new.Main$Mag$0$Mag$SliderNotMovedOut__input & old.Main$Mag$0$Mag$StartButtonMagazin__input = new.Main$Mag$0$Mag$StartButtonMagazin__input & old.Main$Mag$0$Mag$StartVar__input = new.Main$Mag$0$Mag$StartVar__input & old.Main$Mag$0$Mag$WorkpieceReady__input = new.Main$Mag$0$Mag$WorkpieceReady__input & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mstrategy.kt:279[0m]
+[     0.458] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.459] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:83) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.460] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:91) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.460] (INFO) [37mcheckCache(Main_abstracted,Main_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.460] (INFO) [37mproofBodyEquivalenceSource(Main_abstracted,Main_abstracted):  Frame Main_abstracted is *not* syntactical equivalent to  Main_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.470] (INFO) [37mproofBodyEquivalenceSSA(Main_abstracted,Main_abstracted):  Frame Main_abstracted is equivalent to  Main_abstracted in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     0.471] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Timings: {cache=0, src=0, ssa=10}[0m [[33mstrategy.kt:96[0m]
+[     0.471] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  Proving sub-frames: Crane=Crane, Mag=Mag, TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     0.473] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:196) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.474] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:219) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.474] (INFO) [37mcheckCache(Main.Crane,Main.Crane):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.475] (INFO) [37mproofBodyEquivalenceSource(Main.Crane,Main.Crane):  Frame Main.Crane is *not* syntactical equivalent to  Main.Crane[0m [[33mstrategy.kt:341[0m]
+[     0.505] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane,Main.Crane):  Frame Main.Crane is *not* equivalent to  Main.Crane in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.505] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Proof equivalence of frames Main.Crane and Main.Crane[0m [[33mstrategy.kt:377[0m]
+[     0.506] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.519] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.532] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.532] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Write SMT problem into output_1/Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.533] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Run z3 for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.553] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Result of z3 is false for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.560] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.560] (INFO) [37mFrame Main.Crane_abstracted.0 to Main.Crane_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.560] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.560] (INFO) [37m	Input-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random[0m [[33mstrategy.kt:278[0m]
+[     0.561] (INFO) [37m	Output-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input[0m [[33mstrategy.kt:279[0m]
+[     0.561] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.562] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:190) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.563] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:213) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.563] (INFO) [37mcheckCache(Main.Crane_abstracted,Main.Crane_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.563] (INFO) [37mproofBodyEquivalenceSource(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* syntactical equivalent to  Main.Crane_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.586] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* equivalent to  Main.Crane_abstracted in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.586] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Proof equivalence of frames Main.Crane_abstracted and Main.Crane_abstracted[0m [[33mstrategy.kt:377[0m]
+[     0.586] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.591] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.596] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.597] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Write SMT problem into output_1/Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.597] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Run z3 for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.614] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Result of z3 is false for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.615] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane_abstracted,Main.Crane_abstracted):  declined, recursion protection triggered[0m [[33mstrategy.kt:195[0m]
+[     0.621] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Starting proof: output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv, output_1/Main.Crane_abstracted_Main.Crane_abstracted.log[0m [[33mstrategy.kt:163[0m]
+[     0.630] (INFO) [37mrunNuXmv: Run solver on output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:486[0m]
+[     0.631] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.632] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:819[0m]
+[     0.999] (INFO) [37mrunNuXmv: Solver finished for output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@524f3b3a[0m [[33mstrategy.kt:490[0m]
+[     0.999] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Timings: {cache=0, cmc=384, mod=0, smt=29, src=0, ssa=23}[0m [[33mstrategy.kt:96[0m]
+[     1.000] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  Proving sub-frames: TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     1.000] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     1.001] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=1, src=0}[0m [[33mstrategy.kt:96[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane,Main.Crane):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     1.001] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Timings: {cache=1, mod=448, smt=48, src=0, ssa=30}[0m [[33mstrategy.kt:96[0m]
+[     1.002] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:114) (Vars: [2] (11) => (3))[0m [[33mstrategy.kt:71[0m]
+[     1.002] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:120) (Vars: [2] (11) => (9))[0m [[33mstrategy.kt:72[0m]
+[     1.002] (INFO) [37mcheckCache(Main.Mag,Main.Mag):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.002] (INFO) [37mproofBodyEquivalenceSource(Main.Mag,Main.Mag):  Frame Main.Mag is *not* syntactical equivalent to  Main.Mag[0m [[33mstrategy.kt:341[0m]
+[     1.015] (INFO) [37mproofBodyEquivalenceSSA(Main.Mag,Main.Mag):  Frame Main.Mag is equivalent to  Main.Mag in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     1.016] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Timings: {cache=0, src=0, ssa=13}[0m [[33mstrategy.kt:96[0m]
+[     1.016] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     1.016] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     1.016] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.016] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     1.016] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=0, src=0}[0m [[33mstrategy.kt:96[0m]
+[     1.016] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     1.016] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     1.016] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=0, mod=569, smt=64, src=0, ssa=51}[0m [[33mstrategy.kt:96[0m]
+[     1.016] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]
+> Task :exec:versionInfo
+> Task :smt:generateGrammarSource UP-TO-DATE
+> Task :lang:generateGrammarSource UP-TO-DATE
+> Task :geteta:generateGrammarSource UP-TO-DATE
+> Task :lang:versionInfo
+> Task :aps-rvt:versionInfo
+> Task :smv:generateGrammarSource UP-TO-DATE
+> Task :geteta:versionInfo
+> Task :run:versionInfo
+> Task :smt:versionInfo
+> Task :util:compileKotlin UP-TO-DATE
+> Task :util:compileJava NO-SOURCE
+> Task :lang:processResources
+> Task :smt:processResources
+> Task :ide:versionInfo
+> Task :geteta:processResources
+> Task :run:processResources
+> Task :symbex:versionInfo
+> Task :aps-rvt:processResources
+> Task :util:versionInfo
+> Task :symbex:processResources
+> Task :exec:processResources
+> Task :xml:compileKotlin UP-TO-DATE
+> Task :exec:startScripts UP-TO-DATE
+> Task :xml:compileJava NO-SOURCE
+> Task :util:processResources
+> Task :exec:createStartcheck UP-TO-DATE
+> Task :smt:compileKotlin UP-TO-DATE
+> Task :util:classes
+> Task :util:inspectClassesForKotlinIC UP-TO-DATE
+> Task :ide:processResources
+> Task :exec:createStartflycheck UP-TO-DATE
+> Task :exec:createStartgeteta UP-TO-DATE
+> Task :smv:compileKotlin UP-TO-DATE
+> Task :exec:createStartgeteta-smt UP-TO-DATE
+> Task :xml:versionInfo
+> Task :exec:createStartide UP-TO-DATE
+> Task :exec:createStartkastel-demo UP-TO-DATE
+> Task :exec:createStartmod UP-TO-DATE
+> Task :smv:compileJava UP-TO-DATE
+> Task :exec:createStartreteta UP-TO-DATE
+> Task :xml:processResources
+> Task :xml:classes
+> Task :smv:versionInfo
+> Task :exec:createStartrvt UP-TO-DATE
+> Task :exec:createStartsc11-rev UP-TO-DATE
+> Task :util:jar
+> Task :exec:createStartsc12f UP-TO-DATE
+> Task :smv:processResources
+> Task :smv:classes
+> Task :exec:createStartsmteta UP-TO-DATE
+> Task :smt:compileJava UP-TO-DATE
+> Task :smt:classes
+> Task :xml:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartst2cpp UP-TO-DATE
+> Task :smv:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStarttt-unwind UP-TO-DATE
+> Task :exec:createStartttcov UP-TO-DATE
+> Task :exec:createStartttmonitor UP-TO-DATE
+> Task :smt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:createStartttprint UP-TO-DATE
+> Task :exec:createStartttsynth UP-TO-DATE
+> Task :exec:createStartverifaps-versions UP-TO-DATE
+> Task :exec:createStartxml2st UP-TO-DATE
+> Task :lang:compileKotlin UP-TO-DATE
+> Task :lang:compileJava UP-TO-DATE
+> Task :lang:classes
+> Task :lang:inspectClassesForKotlinIC UP-TO-DATE
+> Task :xml:jar
+> Task :smv:jar
+> Task :smt:jar
+> Task :symbex:compileKotlin UP-TO-DATE
+> Task :symbex:compileJava NO-SOURCE
+> Task :symbex:classes
+> Task :symbex:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:compileKotlin UP-TO-DATE
+> Task :run:compileJava NO-SOURCE
+> Task :run:classes
+> Task :aps-rvt:compileKotlin UP-TO-DATE
+> Task :run:inspectClassesForKotlinIC UP-TO-DATE
+> Task :aps-rvt:compileJava NO-SOURCE
+> Task :aps-rvt:classes
+> Task :aps-rvt:inspectClassesForKotlinIC UP-TO-DATE
+> Task :run:jar
+> Task :geteta:compileKotlin UP-TO-DATE
+> Task :aps-rvt:jar
+> Task :geteta:compileJava UP-TO-DATE
+> Task :geteta:classes
+> Task :geteta:inspectClassesForKotlinIC UP-TO-DATE
+> Task :symbex:jar
+> Task :ide:compileKotlin UP-TO-DATE
+> Task :ide:compileJava NO-SOURCE
+> Task :ide:classes
+> Task :ide:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:compileKotlin UP-TO-DATE
+> Task :exec:compileJava NO-SOURCE
+> Task :exec:classes
+> Task :exec:inspectClassesForKotlinIC UP-TO-DATE
+> Task :exec:jar
+> Task :lang:jar
+> Task :exec:createExecheck
+> Task :exec:createExeflycheck
+> Task :geteta:jar
+> Task :exec:createExegeteta
+> Task :exec:createExegeteta-smt
+> Task :ide:jar
+> Task :exec:createExeide
+> Task :exec:createExekastel-demo
+> Task :exec:createExemod
+> Task :exec:createExereteta
+> Task :exec:createExervt
+> Task :exec:createExesc11-rev
+> Task :exec:createExesc12f
+> Task :exec:createExesmteta
+> Task :exec:createExest2cpp
+> Task :exec:createExett-unwind
+> Task :exec:createExettcov
+> Task :exec:createExettmonitor
+> Task :exec:createExettprint
+> Task :exec:createExettsynth
+> Task :exec:createExeverifaps-versions
+> Task :exec:createExexml2st
+> Task :exec:installDist
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.3/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+105 actionable tasks: 54 executed, 51 up-to-date
+Run... 01_02
+--old Scenario1v0_Final.st
+--new Scenario2v0_Final.st
+-fc Main.Mag.0=Main.Mag.0
+-fc Main.Crane.0=Main.Crane.0
+-fc "Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0"
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin 
+--rel-in Sensor_CranePosition=Sensor_CranePosition 
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked 
+--rel-in Sensor_CraneUp=Sensor_CraneUp 
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop 
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic 
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut 
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut 
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin 
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+[     0.002] (INFO) [37mWrite simplified version of 'old' to output_1/old_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.018] (INFO) [37mMaintain frames in old[0m [[33mmodularization.kt:254[0m]
+[     0.158] (INFO) [37mWrite complete SMV file of 'old' to output_1/old_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.212] (INFO) [37mWrite simplified version of 'new' to output_1/new_Main_simplified.st[0m [[33mmodularization.kt:251[0m]
+[     0.217] (INFO) [37mMaintain frames in new[0m [[33mmodularization.kt:254[0m]
+[     0.312] (INFO) [37mWrite complete SMV file of 'new' to output_1/new_Main_simplified.smv[0m [[33mmodularization.kt:259[0m]
+[     0.341] (INFO) [37mTop level relation: Sensor_CraneDown = Sensor_CraneDown & Sensor_CraneOnConveyor = Sensor_CraneOnConveyor & Sensor_CraneOnMagazin = Sensor_CraneOnMagazin & Sensor_CranePosition = Sensor_CranePosition & Sensor_CraneSucked = Sensor_CraneSucked & Sensor_CraneUp = Sensor_CraneUp & Sensor_MagazinEmergencyStop = Sensor_MagazinEmergencyStop & Sensor_MagazinSwitchManuellAutomatic = Sensor_MagazinSwitchManuellAutomatic & Sensor_SliderMovedOut = Sensor_SliderMovedOut & Sensor_SliderNotMovedOut = Sensor_SliderNotMovedOut & Sensor_StartButtonMagazin = Sensor_StartButtonMagazin & Sensor_WorkpieceReady = Sensor_WorkpieceReady[0m [[33mapp.kt:89[0m]
+[     0.341] (INFO) [37mTop level conditon: SBooleanLiteral(value=true)[0m [[33mapp.kt:90[0m]
+[     0.341] (INFO) [37mProof for perfect equality? true[0m [[33mapp.kt:91[0m]
+[     0.342] (INFO) [37mOnly equalities? true[0m [[33mapp.kt:92[0m]
+[     0.346] (INFO) [37mCall sites for the old program: Main[0m [[33mmodularization.kt:195[0m]
+[     0.346] (INFO) [37mMain.Mag.0 in line @106:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.347] (INFO) [37mMain.Crane.0 in line @264:8, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.347] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @384:24, embedded from null[0m [[33mmodularization.kt:197[0m]
+[     0.347] (INFO) [37mCall sites for the new program: Main[0m [[33mmodularization.kt:199[0m]
+[     0.347] (INFO) [37mMain.Mag.0 in line @117:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.347] (INFO) [37mMain.Crane.0 in line @281:8, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.347] (INFO) [37mMain.Crane.TimeDelay_Timer.0 in line @402:24, embedded from null[0m [[33mmodularization.kt:201[0m]
+[     0.348] (INFO) [37mMatched Main.Crane.0 to Main.Crane.0[0m [[33mmodularization.kt:206[0m]
+[     0.348] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.349] (INFO) [37m	Input-Relation: old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.349] (INFO) [37m	Output-Relation: old.Crane$CraneLower = new.Crane$CraneLower & old.Crane$CraneTurnClockwise = new.Crane$CraneTurnClockwise & old.Crane$CraneTurnCounterclockwise = new.Crane$CraneTurnCounterclockwise & old.Crane$MagazinVacuumOff = new.Crane$MagazinVacuumOff & old.Crane$MagazinVacuumOn = new.Crane$MagazinVacuumOn & old.Crane$StartCommandCrane = new.Crane$StartCommandCrane[0m [[33mmodularization.kt:209[0m]
+[     0.349] (INFO) [37mMatched Main.Mag.0 to Main.Mag.0[0m [[33mmodularization.kt:206[0m]
+[     0.349] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.349] (INFO) [37m	Input-Relation: old.Mag$CraneDown = new.Mag$CraneDown & old.Mag$CraneOnConveyor = new.Mag$CraneOnConveyor & old.Mag$CraneOnMagazin = new.Mag$CraneOnMagazin & old.Mag$CraneSucked = new.Mag$CraneSucked & old.Mag$CraneUp = new.Mag$CraneUp & old.Mag$SFCReset = new.Mag$SFCReset & old.Mag$SliderMovedOut = new.Mag$SliderMovedOut & old.Mag$SliderNotMovedOut = new.Mag$SliderNotMovedOut & old.Mag$StartButtonMagazin = new.Mag$StartButtonMagazin & old.Mag$StartVar = new.Mag$StartVar & old.Mag$WorkpieceReady = new.Mag$WorkpieceReady[0m [[33mmodularization.kt:208[0m]
+[     0.350] (INFO) [37m	Output-Relation: old.Mag$MagazinGreenLamp = new.Mag$MagazinGreenLamp & old.Mag$MagazinSlider = new.Mag$MagazinSlider & old.Mag$StartCommandMagazin = new.Mag$StartCommandMagazin[0m [[33mmodularization.kt:209[0m]
+[     0.350] (INFO) [37mMatched Main.Crane.TimeDelay_Timer.0 to Main.Crane.TimeDelay_Timer.0[0m [[33mmodularization.kt:206[0m]
+[     0.350] (INFO) [37m	Context: TRUE[0m [[33mmodularization.kt:207[0m]
+[     0.350] (INFO) [37m	Input-Relation: old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mmodularization.kt:208[0m]
+[     0.350] (INFO) [37m	Output-Relation: old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mmodularization.kt:209[0m]
+[     0.350] (INFO) [37mOutput folder: output_1[0m [[33mapp.kt:118[0m]
+[     0.350] (INFO) [37mStart with the proof[0m [[33mapp.kt:119[0m]
+[     0.356] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:357) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.360] (INFO) [37mproofEquivalence(Main,Main):  Main.0: (LoC:387) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.360] (INFO) [37mcheckCache(Main,Main):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.361] (INFO) [37mproofBodyEquivalenceSource(Main,Main):  Frame Main is *not* syntactical equivalent to  Main[0m [[33mstrategy.kt:341[0m]
+[     0.402] (INFO) [37mproofBodyEquivalenceSSA(Main,Main):  Frame Main is *not* equivalent to  Main in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.402] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Proof equivalence of frames Main and Main[0m [[33mstrategy.kt:377[0m]
+[     0.402] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.413] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Translate Main to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.419] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.420] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Write SMT problem into output_1/Main_Main_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.420] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Run z3 for Main_Main_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.467] (INFO) [37mproofBodyEquivalenceSMT(Main,Main):  Result of z3 is false for Main_Main_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.477] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.478] (INFO) [37mFrame Main_abstracted.0 to Main_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.478] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.478] (INFO) [37m	Input-Relation: old.Sensor_CraneDown = new.Sensor_CraneDown & old.Sensor_CraneOnConveyor = new.Sensor_CraneOnConveyor & old.Sensor_CraneOnMagazin = new.Sensor_CraneOnMagazin & old.Sensor_CranePosition = new.Sensor_CranePosition & old.Sensor_CraneSucked = new.Sensor_CraneSucked & old.Sensor_CraneUp = new.Sensor_CraneUp & old.Sensor_MagazinEmergencyStop = new.Sensor_MagazinEmergencyStop & old.Sensor_MagazinSwitchManuellAutomatic = new.Sensor_MagazinSwitchManuellAutomatic & old.Sensor_SliderMovedOut = new.Sensor_SliderMovedOut & old.Sensor_SliderNotMovedOut = new.Sensor_SliderNotMovedOut & old.Sensor_StartButtonMagazin = new.Sensor_StartButtonMagazin & old.Sensor_WorkpieceReady = new.Sensor_WorkpieceReady & old.Main$Crane$0$Crane$CraneLower__random = new.Main$Crane$0$Crane$CraneLower__random & old.Main$Crane$0$Crane$CraneTurnClockwise__random = new.Main$Crane$0$Crane$CraneTurnClockwise__random & old.Main$Crane$0$Crane$CraneTurnCounterclockwise__random = new.Main$Crane$0$Crane$CraneTurnCounterclockwise__random & old.Main$Crane$0$Crane$MagazinVacuumOff__random = new.Main$Crane$0$Crane$MagazinVacuumOff__random & old.Main$Crane$0$Crane$MagazinVacuumOn__random = new.Main$Crane$0$Crane$MagazinVacuumOn__random & old.Main$Crane$0$Crane$StartCommandCrane__random = new.Main$Crane$0$Crane$StartCommandCrane__random & old.Main$Mag$0$Mag$MagazinGreenLamp__random = new.Main$Mag$0$Mag$MagazinGreenLamp__random & old.Main$Mag$0$Mag$MagazinSlider__random = new.Main$Mag$0$Mag$MagazinSlider__random & old.Main$Mag$0$Mag$StartCommandMagazin__random = new.Main$Mag$0$Mag$StartCommandMagazin__random & old.Crane$TimeDelay_Timer$ET = new.Crane$TimeDelay_Timer$ET & old.Crane$TimeDelay_Timer$Q = new.Crane$TimeDelay_Timer$Q[0m [[33mstrategy.kt:278[0m]
+[     0.478] (INFO) [37m	Output-Relation: old.Actuator_CraneLower = new.Actuator_CraneLower & old.Actuator_CraneTurnClockwise = new.Actuator_CraneTurnClockwise & old.Actuator_CraneTurnCounterclockwise = new.Actuator_CraneTurnCounterclockwise & old.Actuator_MagazinGreenLamp = new.Actuator_MagazinGreenLamp & old.Actuator_MagazinSlider = new.Actuator_MagazinSlider & old.Actuator_MagazinVacuumOff = new.Actuator_MagazinVacuumOff & old.Actuator_MagazinVacuumOn = new.Actuator_MagazinVacuumOn & old.Actuator_MagazinWhiteLamp = new.Actuator_MagazinWhiteLamp & old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Main$Crane$0$Crane$CraneDown__input = new.Main$Crane$0$Crane$CraneDown__input & old.Main$Crane$0$Crane$CraneOnConveyor__input = new.Main$Crane$0$Crane$CraneOnConveyor__input & old.Main$Crane$0$Crane$CraneOnMagazin__input = new.Main$Crane$0$Crane$CraneOnMagazin__input & old.Main$Crane$0$Crane$CraneSucked__input = new.Main$Crane$0$Crane$CraneSucked__input & old.Main$Crane$0$Crane$CraneUp__input = new.Main$Crane$0$Crane$CraneUp__input & old.Main$Crane$0$Crane$SFCReset__input = new.Main$Crane$0$Crane$SFCReset__input & old.Main$Crane$0$Crane$SliderMovedOut__input = new.Main$Crane$0$Crane$SliderMovedOut__input & old.Main$Crane$0$Crane$SliderNotMovedOut__input = new.Main$Crane$0$Crane$SliderNotMovedOut__input & old.Main$Crane$0$Crane$StartButtonMagazin__input = new.Main$Crane$0$Crane$StartButtonMagazin__input & old.Main$Crane$0$Crane$StartVar__input = new.Main$Crane$0$Crane$StartVar__input & old.Main$Crane$0$Crane$WorkpieceReady__input = new.Main$Crane$0$Crane$WorkpieceReady__input & old.Main$Mag_ccnt = new.Main$Mag_ccnt & old.Main$Mag$0$Mag$CraneDown__input = new.Main$Mag$0$Mag$CraneDown__input & old.Main$Mag$0$Mag$CraneOnConveyor__input = new.Main$Mag$0$Mag$CraneOnConveyor__input & old.Main$Mag$0$Mag$CraneOnMagazin__input = new.Main$Mag$0$Mag$CraneOnMagazin__input & old.Main$Mag$0$Mag$CraneSucked__input = new.Main$Mag$0$Mag$CraneSucked__input & old.Main$Mag$0$Mag$CraneUp__input = new.Main$Mag$0$Mag$CraneUp__input & old.Main$Mag$0$Mag$SFCReset__input = new.Main$Mag$0$Mag$SFCReset__input & old.Main$Mag$0$Mag$SliderMovedOut__input = new.Main$Mag$0$Mag$SliderMovedOut__input & old.Main$Mag$0$Mag$SliderNotMovedOut__input = new.Main$Mag$0$Mag$SliderNotMovedOut__input & old.Main$Mag$0$Mag$StartButtonMagazin__input = new.Main$Mag$0$Mag$StartButtonMagazin__input & old.Main$Mag$0$Mag$StartVar__input = new.Main$Mag$0$Mag$StartVar__input & old.Main$Mag$0$Mag$WorkpieceReady__input = new.Main$Mag$0$Mag$WorkpieceReady__input & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Crane$TimeDelay_Timer$IN = new.Crane$TimeDelay_Timer$IN & old.Crane$TimeDelay_Timer$PT = new.Crane$TimeDelay_Timer$PT[0m [[33mstrategy.kt:279[0m]
+[     0.478] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main,Main):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.479] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:83) (Vars: [41] (12) => (11))[0m [[33mstrategy.kt:71[0m]
+[     0.480] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Main_abstracted.0: (LoC:91) (Vars: [42] (13) => (17))[0m [[33mstrategy.kt:72[0m]
+[     0.481] (INFO) [37mcheckCache(Main_abstracted,Main_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.481] (INFO) [37mproofBodyEquivalenceSource(Main_abstracted,Main_abstracted):  Frame Main_abstracted is *not* syntactical equivalent to  Main_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.490] (INFO) [37mproofBodyEquivalenceSSA(Main_abstracted,Main_abstracted):  Frame Main_abstracted is equivalent to  Main_abstracted in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     0.490] (INFO) [37mproofEquivalence(Main_abstracted,Main_abstracted):  Timings: {cache=1, src=0, ssa=9}[0m [[33mstrategy.kt:96[0m]
+[     0.490] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  Proving sub-frames: Crane=Crane, Mag=Mag, TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     0.492] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:196) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.493] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Main.Crane.0: (LoC:219) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.493] (INFO) [37mcheckCache(Main.Crane,Main.Crane):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.493] (INFO) [37mproofBodyEquivalenceSource(Main.Crane,Main.Crane):  Frame Main.Crane is *not* syntactical equivalent to  Main.Crane[0m [[33mstrategy.kt:341[0m]
+[     0.513] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane,Main.Crane):  Frame Main.Crane is *not* equivalent to  Main.Crane in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.513] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Proof equivalence of frames Main.Crane and Main.Crane[0m [[33mstrategy.kt:377[0m]
+[     0.513] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.523] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Translate Main.Crane to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.530] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.530] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Write SMT problem into output_1/Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.530] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Run z3 for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.548] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane,Main.Crane):  Result of z3 is false for Main.Crane_Main.Crane_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.552] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Add new regression verification contract[0m [[33mstrategy.kt:275[0m]
+[     0.552] (INFO) [37mFrame Main.Crane_abstracted.0 to Main.Crane_abstracted.0[0m [[33mstrategy.kt:276[0m]
+[     0.552] (INFO) [37m	Context: TRUE[0m [[33mstrategy.kt:277[0m]
+[     0.552] (INFO) [37m	Input-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$ET__random & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$Q__random[0m [[33mstrategy.kt:278[0m]
+[     0.553] (INFO) [37m	Output-Relation: old.Main$Crane_ccnt = new.Main$Crane_ccnt & old.Crane$CraneDown = new.Crane$CraneDown & old.Crane$CraneOnConveyor = new.Crane$CraneOnConveyor & old.Crane$CraneOnMagazin = new.Crane$CraneOnMagazin & old.Crane$CraneSucked = new.Crane$CraneSucked & old.Crane$CraneUp = new.Crane$CraneUp & old.Crane$SFCReset = new.Crane$SFCReset & old.Crane$SliderMovedOut = new.Crane$SliderMovedOut & old.Crane$SliderNotMovedOut = new.Crane$SliderNotMovedOut & old.Crane$StartButtonMagazin = new.Crane$StartButtonMagazin & old.Crane$StartVar = new.Crane$StartVar & old.Crane$WorkpieceReady = new.Crane$WorkpieceReady & old.Main$Crane$TimeDelay_Timer_ccnt = new.Main$Crane$TimeDelay_Timer_ccnt & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$IN__input & old.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input = new.Main$Crane$TimeDelay_Timer$0$Crane$TimeDelay_Timer$PT__input[0m [[33mstrategy.kt:279[0m]
+[     0.553] (INFO) [37mproofBodyEquivalenceWithAbstractionBody(Main.Crane,Main.Crane):  Recursion for proofing abstracted body[0m [[33mstrategy.kt:282[0m]
+[     0.553] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:190) (Vars: [8] (11) => (6))[0m [[33mstrategy.kt:71[0m]
+[     0.554] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Main.Crane_abstracted.0: (LoC:213) (Vars: [8] (12) => (6))[0m [[33mstrategy.kt:72[0m]
+[     0.554] (INFO) [37mcheckCache(Main.Crane_abstracted,Main.Crane_abstracted):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.554] (INFO) [37mproofBodyEquivalenceSource(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* syntactical equivalent to  Main.Crane_abstracted[0m [[33mstrategy.kt:341[0m]
+[     0.568] (INFO) [37mproofBodyEquivalenceSSA(Main.Crane_abstracted,Main.Crane_abstracted):  Frame Main.Crane_abstracted is *not* equivalent to  Main.Crane_abstracted in SSA-form[0m [[33mstrategy.kt:367[0m]
+[     0.569] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Proof equivalence of frames Main.Crane_abstracted and Main.Crane_abstracted[0m [[33mstrategy.kt:377[0m]
+[     0.569] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:379[0m]
+[     0.573] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Translate Main.Crane_abstracted to SMT[0m [[33mstrategy.kt:384[0m]
+[     0.577] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Create assertion[0m [[33mstrategy.kt:387[0m]
+[     0.577] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Write SMT problem into output_1/Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:416[0m]
+[     0.578] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Run z3 for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:422[0m]
+[     0.597] (INFO) [37mproofBodyEquivalenceSMT(Main.Crane_abstracted,Main.Crane_abstracted):  Result of z3 is false for Main.Crane_abstracted_Main.Crane_abstracted_equiv.smt[0m [[33mstrategy.kt:425[0m]
+[     0.597] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane_abstracted,Main.Crane_abstracted):  declined, recursion protection triggered[0m [[33mstrategy.kt:195[0m]
+[     0.601] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Starting proof: output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv, output_1/Main.Crane_abstracted_Main.Crane_abstracted.log[0m [[33mstrategy.kt:163[0m]
+[     0.610] (INFO) [37mrunNuXmv: Run solver on output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:486[0m]
+[     0.611] (INFO) [37mCreate nuXmv command file `output_1/ic3.xmv'[0m [[33mstrategy.kt:505[0m]
+[     0.611] (INFO) [37m/home/weigl/share/nuXmv-1.1.1-Linux/bin/nuXmv -int /home/weigl/work/verifaps-lib/aps-rvt/examples/ppumod/01_02/output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv[0m [[33mstrategy.kt:819[0m]
+[     0.983] (INFO) [37mrunNuXmv: Solver finished for output_1/Main.Crane_abstracted_Main.Crane_abstracted.smv with edu.kit.iti.formal.smv.NuXMVOutput$Verified@524f3b3a[0m [[33mstrategy.kt:490[0m]
+[     0.983] (INFO) [37mproofBodyEquivalenceClassic(Main.Crane_abstracted,Main.Crane_abstracted):  Equality proven[0m [[33mstrategy.kt:168[0m]
+[     0.984] (INFO) [37mproofEquivalence(Main.Crane_abstracted,Main.Crane_abstracted):  Timings: {cache=0, cmc=387, mod=0, smt=28, src=0, ssa=15}[0m [[33mstrategy.kt:96[0m]
+[     0.984] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  Proving sub-frames: TimeDelay_Timer=TimeDelay_Timer[0m [[33mstrategy.kt:300[0m]
+[     0.984] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     0.984] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     0.984] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.985] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     0.985] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=1, src=0}[0m [[33mstrategy.kt:96[0m]
+[     0.985] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main.Crane,Main.Crane):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     0.985] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main.Crane,Main.Crane):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     0.985] (INFO) [37mproofEquivalence(Main.Crane,Main.Crane):  Timings: {cache=0, mod=437, smt=35, src=0, ssa=20}[0m [[33mstrategy.kt:96[0m]
+[     0.986] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:114) (Vars: [2] (11) => (3))[0m [[33mstrategy.kt:71[0m]
+[     0.986] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Main.Mag.0: (LoC:120) (Vars: [2] (11) => (9))[0m [[33mstrategy.kt:72[0m]
+[     0.986] (INFO) [37mcheckCache(Main.Mag,Main.Mag):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     0.986] (INFO) [37mproofBodyEquivalenceSource(Main.Mag,Main.Mag):  Frame Main.Mag is *not* syntactical equivalent to  Main.Mag[0m [[33mstrategy.kt:341[0m]
+[     1.000] (INFO) [37mproofBodyEquivalenceSSA(Main.Mag,Main.Mag):  Frame Main.Mag is equivalent to  Main.Mag in SSA-form [0m [[33mstrategy.kt:365[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Mag,Main.Mag):  Timings: {cache=0, src=0, ssa=14}[0m [[33mstrategy.kt:96[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:71[0m]
+[     1.000] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Main.Crane.TimeDelay_Timer.0: (LoC:13) (Vars: [0] (2) => (2))[0m [[33mstrategy.kt:72[0m]
+[     1.001] (INFO) [37mcheckCache(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Cache miss equiv. proof of null with null[0m [[33mstrategy.kt:116[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceSource(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Frame Main.Crane.TimeDelay_Timer is syntactical equivalent to  Main.Crane.TimeDelay_Timer [0m [[33mstrategy.kt:339[0m]
+[     1.001] (INFO) [37mproofEquivalence(Main.Crane.TimeDelay_Timer,Main.Crane.TimeDelay_Timer):  Timings: {cache=0, src=0}[0m [[33mstrategy.kt:96[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceWithAbstractionSubFrames(Main,Main):  proved equality of subframes[0m [[33mstrategy.kt:318[0m]
+[     1.001] (INFO) [37mproofBodyEquivalenceWithAbstraction(Main,Main):  Equality proven[0m [[33mstrategy.kt:221[0m]
+[     1.001] (INFO) [37mproofEquivalence(Main,Main):  Timings: {cache=0, mod=533, smt=65, src=0, ssa=41}[0m [[33mstrategy.kt:96[0m]
+[     1.001] (INFO) [37mProof result: true[0m [[33mmodularization.kt:217[0m]

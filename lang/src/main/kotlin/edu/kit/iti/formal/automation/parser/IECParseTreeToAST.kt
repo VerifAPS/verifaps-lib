@@ -482,6 +482,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         bs.state = ctx.state?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
         bs.input = ctx.input?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
         bs.output = ctx.output?.accept(this) as MutableList<SymbolicReference>? ?: arrayListOf()
+        bs.ruleContext = ctx
         return bs
     }
 

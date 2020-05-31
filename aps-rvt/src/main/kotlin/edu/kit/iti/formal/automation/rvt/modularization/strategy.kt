@@ -25,6 +25,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.math.BigInteger
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 val TYPE_COUNTER = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.LOCAL
 val TYPE_INPUT_FUNCTION_BLOCK = VariableDeclaration.FLAG_COUNTER.get() or VariableDeclaration.OUTPUT
@@ -47,6 +50,8 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     var disableUpdateCache = false
     var disableCheckCache = false
 
+    var assumeAsProven = TreeSet<String>()
+
     val reveContextManager: ReveContextManager = mp.ctxManager
 
     val outputFolder = mp.outputFolder
@@ -63,14 +68,40 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
     /*suspend*/ fun proofEquivalence(old: Frame, new: Frame,
                                      ctx: ReveContext = reveContextManager.get(old, new)): Boolean {
+        val lp = logprfx("proofEquivalence", old, new)
+
+        info("$lp ${old.block.repr()}: ${printStatistic(old)}")
+        info("$lp ${new.block.repr()}: ${printStatistic(new)}")
+
         var equal = false
-        if (!equal) equal = checkCache(old, new, ctx)
-        if (!equal) equal = proofBodyEquivalenceSource(old, new, ctx)
-        if (!equal) equal = proofBodyEquivalenceSSA(old, new, ctx)
-        if (!equal) equal = proofBodyEquivalenceSMT(old, new, ctx)
-        if (!equal) equal = proofBodyEquivalenceWithAbstraction(old, new, ctx)
-        if (!equal) equal = proofBodyEquivalenceClassic(old, new, ctx)
+
+        if (lp.trim() in assumeAsProven) {
+            info("$lp Proven by assumption")
+            equal = true
+        }
+
+        val stat = StopWatch()
+
+        if (!equal) stat.time("cache") { equal = checkCache(old, new, ctx) }
+
+        if (!equal) stat.time("src") {
+            equal = proofBodyEquivalenceSource(old, new, ctx)
+        }
+        if (!equal) stat.time("ssa") {
+            equal = proofBodyEquivalenceSSA(old, new, ctx)
+        }
+        if (!equal) stat.time("smt") {
+            equal = proofBodyEquivalenceSMT(old, new, ctx)
+        }
+        if (!equal) stat.time("mod") {
+            equal = proofBodyEquivalenceWithAbstraction(old, new, ctx)
+        }
+        if (!equal) stat.time("cmc") {
+            equal = proofBodyEquivalenceClassic(old, new, ctx)
+        }
         if (equal) updateCache(old, new, ctx, equal)
+
+        info("$lp Timings: ${stat}")
         return equal
     }
 
@@ -125,8 +156,8 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         }
 
 
-        val oldSmv = smv(old)
-        val newSmv = smv(new)
+        val oldSmv = smv(old, symbex(old, true))
+        val newSmv = smv(new, symbex(new, true))
 
         if (oldSmv.name == newSmv.name) {//name clash!
             oldSmv.name += "old"
@@ -327,7 +358,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
             return false
         }
 
-        if (!ctx.onlyEquivalence) {
+        if (!ctx.isPerfect) {
             info("$lp not suitable for frames ${old.name} and ${new.name}")
             return false
         }
@@ -450,9 +481,11 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         else -> toString()
     }
 
-    private fun symbex(frame: Frame): SymbolicState = smvCache.computeIfAbsent(frame) {
-        SymbExFacade.evaluateStatements(frame.block.statements, frame.scope, useDefinitions = false)
-    }
+    private fun symbex(frame: Frame, useDefs: Boolean = false): SymbolicState =
+            if (!useDefs)
+                smvCache.computeIfAbsent(frame) { SymbExFacade.evaluateStatements(frame.block.statements, frame.scope, false) }
+            else SymbExFacade.evaluateStatements(frame.block.statements, frame.scope, false)
+
 
     private suspend fun runNuXmv(modules: List<SMVModule>, smvFile: File, logFile: File): Boolean {
         smvFile.bufferedWriter().use {
@@ -522,7 +555,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         val inputs = HashMap<BlockStatement, Map<String, String>>()
         val outputs = HashMap<BlockStatement, Map<String, String>>()
 
-        abstractedInvocation.forEach {
+        abstractedInvocation.sortedBy { it.fqName }.forEach {
             val prefix = it.fqName.replace('.', '$')
             val rewriter = InvocationRewriter(prefix, scope, it)
             new.statements = new.statements.accept(rewriter) as StatementList
@@ -540,6 +573,20 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return "$method(${a.name},${b.name}): "
     }
 //endregion
+}
+
+class StopWatch {
+    private val data = TreeMap<String, Long>()
+    fun time(name: String, function: () -> Unit) {
+        val start = System.currentTimeMillis()
+        function()
+        val end = System.currentTimeMillis()
+        data[name] = (end - start)
+    }
+
+    override fun toString(): String {
+        return data.toString()
+    }
 }
 
 private fun List<RelatedVariables>.rewrite(oldMap: Map<String, String>,
@@ -794,4 +841,13 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) {
         }
         return NuXMVOutput.Error()
     }
+}
+
+private fun printStatistic(new: Frame): String {
+    val code = IEC61131Facade.print(new.block, false)
+    val loc = code.count { it == '\n' }
+    val inVars = new.block.input.size
+    val outVars = new.block.output.size
+    val stateVars = new.block.state.size
+    return "(LoC:$loc) (Vars: [$stateVars] ($inVars) => ($outVars))"
 }
