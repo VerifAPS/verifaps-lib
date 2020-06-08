@@ -27,7 +27,6 @@ import com.github.jferard.fastods.tool.FastOds
 import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.st.HccPrinter
-import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -302,19 +301,20 @@ class GetetaSmtApp : CliktCommand() {
         info("Tables found: ${tables.joinToString()}")
 
         //region read program
-        val executable = programOptions.readProgram()
-        val pous = executable.scope.getDefinedPous()
+        val (pous, exec) = IEC61131Facade.readProgramWLNP(
+                programOptions.library, programOptions.program.first())
+        require(pous.isNotEmpty()) { "No program was given" }
+        require(exec != null) { "Could not find any program by ${pous.first()}" }
         //endregion
 
-        val enum = executable.scope.enumValuesToType()
+        val enum = exec.scope.enumValuesToType()
 
         for (table in tables) {
             info("Compute miter and product program for table ${table.name}")
             val automaton = GetetaFacade.constructTable(table)
             val mc = GttMiterConstruction(table, automaton.automaton, enum)
             val miter = mc.constructMiter()
-            val program = ProgMiterConstruction(PouElements(pous.toMutableList()))
-                    .constructMiter()
+            val program = ProgMiterConstruction(pous).constructMiter()
 
             val productProgramBuilder = InvocationBasedProductProgramBuilder()
             productProgramBuilder.add(program)
@@ -326,10 +326,12 @@ class GetetaSmtApp : CliktCommand() {
                 val simplifiedProductProgram = SymbExFacade.simplify(productProgram)
                 val hccprinter = HccPrinter(CodeWriter(out))
                 hccprinter.isPrintComments = true
+                productProgramBuilder.target.functions.forEach {
+                    it.accept(hccprinter)
+                }
                 simplifiedProductProgram.accept(hccprinter)
             }
             info("File: $outputFile written")
-
         }
     }
 }

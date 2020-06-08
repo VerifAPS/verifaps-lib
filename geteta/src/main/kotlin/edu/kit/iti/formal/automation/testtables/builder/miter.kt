@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
@@ -10,6 +11,7 @@ import edu.kit.iti.formal.automation.datatypes.values.VBool
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue.getInit
 import edu.kit.iti.formal.automation.st.HccPrinter
+import edu.kit.iti.formal.automation.st.RefTo
 import edu.kit.iti.formal.automation.st.SpecialCommentFactory
 import edu.kit.iti.formal.automation.st.SpecialCommentMeta
 import edu.kit.iti.formal.automation.st.ast.*
@@ -248,8 +250,8 @@ class ProgMiterConstruction(val exec: PouExecutable) {
 
     fun addFunctionDeclaration(func: FunctionDeclaration) = target.functions.add(func)
 
-    fun addTypeDeclaration(td: TypeDeclarations) {
-        td.forEach { td ->
+    fun addTypeDeclaration(decls: TypeDeclarations) {
+        decls.forEach { td ->
             when (td) {
                 is EnumerationTypeDeclaration -> {
                     td.allowedValues.forEachIndexed { i, value ->
@@ -259,6 +261,19 @@ class ProgMiterConstruction(val exec: PouExecutable) {
                                 SimpleTypeDeclaration(INT, IntegerLit(i)))
                         target.scope.topLevel.add(vd)
                     }
+
+                    val fdecl = FunctionDeclaration("nondet_${td.name.toLowerCase()}",
+                            returnType = RefTo(INT))
+                    fdecl.scope.add(VariableDeclaration("x", VariableDeclaration.LOCAL, INT))
+                    fdecl.stBody = StatementList().also {
+                        val x = SymbolicReference("x")
+                        val assume = td.values.map {
+                            x eq IntegerLit(INT, it.toBigInteger())
+                        }.disjunction()
+                        it.add(SpecialCommentFactory.createHavoc("x", INT))
+                        it.add(SpecialCommentFactory.createAssume(assume))
+                    }
+                    target.functions.add(fdecl)
                 }
                 else -> error("Found unsupported declared type: $td")
             }

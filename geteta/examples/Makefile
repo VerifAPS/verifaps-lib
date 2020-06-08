@@ -109,6 +109,10 @@ MeshedGTT: $(GETETA)
 
 
 ##
+MinMax-smt: $(GETETA)
+	cd MinMax && $(GETETA_SMT) -t MinMax.gtt -c MinMax.st
+	cd MinMax && $(ELDARICA) MinMaxTbl.hcc
+
 MinMax: $(GETETA)
 	cd MinMax && $(GETETA) $(GETETA_DEBUG) -t MinMax.gtt -c MinMax.st
 

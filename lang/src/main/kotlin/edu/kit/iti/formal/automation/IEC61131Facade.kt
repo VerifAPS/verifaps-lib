@@ -193,6 +193,32 @@ object IEC61131Facade {
         return readProgramsWLS(libraryElements, pfiles, selectors)
     }
 
+    fun readProgramWLNP(libraryElements: List<File>,
+                        it: String)
+            : Pair<PouElements, PouExecutable?> {
+        val (name, path) = if ('@' in it) {
+            val a = it.split('@', limit = 2)
+            a[0] to a[1]
+        } else {
+            null to it
+        }
+        val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
+        val selector =
+                if (name == null) selectorByType
+                else selectByName(name)
+        return readProgramWLS(libraryElements, File(path), selector)
+    }
+
+
+    fun readProgramWLS(libraryElements: List<File>,
+                       programs: File,
+                       selectors: (PouElements) -> PouExecutable?)
+            : Pair<PouElements, PouExecutable?> {
+        val (elements, error) = filefr(libraryElements + programs)
+        error.forEach { warn(it.toHuman()) }
+        return elements to selectors(elements)
+    }
+
 
     /**
      *
@@ -268,7 +294,7 @@ object IEC61131Facade {
     fun translateFbd(elements: PouElements) {
         elements.forEach { it.accept(TranslateFbdToSt) }
     }
-    //endregion
+//endregion
 
     object InstructionList {
         /*

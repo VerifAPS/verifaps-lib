@@ -28,6 +28,11 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
 //    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {}
 
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
+
+        super.visit(enumerationTypeDeclaration)
+    }
+
     override fun visit(stringTypeDeclaration: StringTypeDeclaration) {
         sb.printf("string")
     }
