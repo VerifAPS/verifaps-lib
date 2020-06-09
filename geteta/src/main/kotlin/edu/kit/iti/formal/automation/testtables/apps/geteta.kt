@@ -172,8 +172,11 @@ class GetetaApp : CliktCommand(
 
             if (b is NuXMVOutput.Cex) {
                 if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
-                else if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
                 else info("Use `--cexout' to print a cex analysation.")
+
+                if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
+                else info("Use `--cexjson' to print a cex analysation as json.")
+
                 if (cexAnalysation.runAnalyzer) runCexAnalysation(b, tt)
                 else info("Use `--row-map' to print possible row mappings.")
             }
@@ -184,7 +187,9 @@ class GetetaApp : CliktCommand(
         }
     }
 
-    private fun useCounterExamplePrinterJson(outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
+    private fun useCounterExamplePrinterJson(outputFolder: String,
+                                             result: NuXMVOutput.Cex,
+                                             tt: List<SMVConstructionModel>) {
         for (model in tt) {
             val file = File(outputFolder, "cex_${model.testTable.name}.json")
             info("Writing JSON counter example to $file")

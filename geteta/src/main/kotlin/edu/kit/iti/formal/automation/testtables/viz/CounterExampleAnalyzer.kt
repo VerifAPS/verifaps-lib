@@ -101,7 +101,11 @@ class CounterExamplePrinterJson(
                 val fwd = prfx + row.defForward.name
                 val failed = prfx + row.defFailed.name
 
-                val times = activateStates.joinToString(", ") { it.toString() }
+                val times =
+                        if (activateStates.isEmpty())
+                            "[]"
+                        else
+                            activateStates.joinToString(", ", "[", "]") { it.toString() }
 
                 appendJSONObject(
                         "rowId" to "\"${row.id}\"",
@@ -110,7 +114,7 @@ class CounterExamplePrinterJson(
                         "assertion" to boolForHuman(k, assertion),
                         "accept" to boolForHuman(k, fwd),
                         "fail" to boolForHuman(k, failed),
-                        "time" to times.toString(),
+                        "time" to times,
                         "cells" to getFields(row, k)
                 )
             }
@@ -128,7 +132,7 @@ class CounterExamplePrinterJson(
         val v = cex[k, n]
         return when (v) {
             "TRUE" -> "true"
-            "FALSE" -> "true"
+            "FALSE" -> "false"
             else -> "\"undefined\""
         }
     }

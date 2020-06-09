@@ -108,6 +108,15 @@ LinRe: $(GETETA)
 MeshedGTT: $(GETETA)
 
 
+## cex
+Cex: $(GETETA)
+	cd cex && $(GETETA) $(GETETA_DEBUG) $(GETETA_FAIL) --cexjson -t cex.gtt -c cex.st || exit 0
+
+Cex-smt: $(GETETA_SMT)
+	cd MinMax && $(GETETA_SMT) -t cex.gtt -c cex.st
+	cd MinMax && $(ELDARICA) cex.hcc
+##
+
 ##
 MinMax-smt: $(GETETA)
 	cd MinMax && $(GETETA_SMT) -t MinMax.gtt -c MinMax.st

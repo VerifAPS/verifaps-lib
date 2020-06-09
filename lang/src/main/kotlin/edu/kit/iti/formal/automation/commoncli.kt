@@ -78,3 +78,4 @@ fun ParameterHolder.dryRun() =
                 .flag("--dont-model-check", "--dry-run", default = true)
 
 fun ParameterHolder.outputFolder() = option("-o", "--output", help = "Output directory")
+        .default(".")

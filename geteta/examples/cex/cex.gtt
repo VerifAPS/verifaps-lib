@@ -1,0 +1,12 @@
+// author: Suhyun Cha
+
+table cex {
+    var input EN : BOOL
+    var output Ready : BOOL
+    
+    group 11 >=1 {
+        row 22 >=0   { EN: false; Ready: false;}
+        row 33 [2,2] { EN: true; Ready: false;}
+        row 44 >=1   { EN: true; Ready: true;}
+    }
+}
