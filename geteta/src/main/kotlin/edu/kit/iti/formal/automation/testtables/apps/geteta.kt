@@ -177,7 +177,7 @@ class GetetaApp : CliktCommand(
                 if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
                 else info("Use `--cexjson' to print a cex analysation as json.")
 
-                if (cexAnalysation.runAnalyzer) runCexAnalysation(b, tt)
+                if (cexAnalysation.runAnalyzer) createRowMapping(b, tt)
                 else info("Use `--row-map' to print possible row mappings.")
             }
             info("STATUS: $status")
@@ -221,18 +221,17 @@ class GetetaApp : CliktCommand(
             info("Image viewer should open now")
     }
 
-    private fun runCexAnalysation(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
+    private fun createRowMapping(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
         val mappings = tt.map {
             GetetaFacade.analyzeCounterExample(
                     it.automaton, it.testTable, result.counterExample)
         }
 
-        mappings.forEach { mapping ->
-            info("MAPPING: ==========")
-            mapping.forEachIndexed { i, m ->
-                info("{}: {}", i, m.asRowList())
+        mappings.zip(tt).forEach { (m, tt) ->
+            m.forEachIndexed { i, m ->
+                val a = m.asRowList().joinToString(", ", "[", "]")
+                info("Mapping ${tt.testTable.name}#$i:\t$a")
             }
-            info("/End of MAPPING")
         }
 
         when {

@@ -329,7 +329,7 @@ class CounterExampleAnalyzer(
                 .map { automaton.getFirstState(it) as RowState }
                 .map { SearchNode(0, it) }
 
-        val queue = LinkedList<SearchNode>(init)
+        val queue = LinkedList(init)
 
         while (!queue.isEmpty()) {
             val cur = queue.remove()
@@ -356,7 +356,7 @@ class CounterExampleAnalyzer(
             if (getBoolean(cycle, row.fwd)) {
                 //include every outgoing tableRow
                 automaton.transitions.filter { it.from == row }
-                        .forEach { queue.add(cur.jumpTo(it.to)) }
+                        .forEach { queue.add(cur.jumpTo(it.to)) } //TODO exclude error?
             }
 
             val failed =
