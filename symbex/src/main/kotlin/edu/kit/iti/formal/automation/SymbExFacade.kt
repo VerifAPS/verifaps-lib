@@ -1,31 +1,8 @@
 package edu.kit.iti.formal.automation
 
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
- * This program isType free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program isType distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a clone of the GNU General Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
 import edu.kit.iti.formal.automation.cpp.generateHeader
 import edu.kit.iti.formal.automation.cpp.generateRunnableStub
-import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.rvt.LineMap
 import edu.kit.iti.formal.automation.rvt.ModuleBuilder
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
@@ -34,7 +11,7 @@ import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st0.SimplifierPipelineST0
-import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
@@ -44,6 +21,23 @@ import java.io.StringWriter
 import java.math.BigInteger
 import kotlin.math.ceil
 import kotlin.math.log2
+
+/**
+ *
+ */
+const val ASSERTION_PREFIX = "__assert_"
+
+/**
+ *
+ */
+const val ASSUMPTION_PREFIX = "__assume_"
+
+
+/**
+ *
+ */
+const val HAVOC_PREFIX = "__havoc_"
+
 
 /**
  * @author Alexander Weigl
@@ -90,10 +84,6 @@ object SymbExFacade {
         return p
     }
 
-    /*    public static PouElements simplifyOO(PouElements elements) {
-        return simplifyOO(elements, false);
-    }*/
-
     /*
      * Simplify OO code.
      *
@@ -135,7 +125,7 @@ object SymbExFacade {
         val se = SymbolicExecutioner(exec.scope.topLevel)
         a.accept(se)
 
-        val moduleBuilder = ModuleBuilder(exec, se.peek())
+        val moduleBuilder = ModuleBuilder(exec, se.peek(), supportSpecialStatements = true)
         moduleBuilder.run()
         /*//debug
         for (entry in se.lineNumberMap) {
@@ -147,7 +137,7 @@ object SymbExFacade {
     @JvmOverloads
     fun evaluateProgram(elements: PouElements, skipSimplify: Boolean = false): SMVModule {
         val a = if (skipSimplify) elements else simplify(elements)
-        return evaluateProgram(Utils.findProgram(a)
+        return evaluateProgram(a.findFirstProgram()
                 ?: throw IllegalStateException("Could not find any program in the given set of POUs"), skipSimplify)
     }
 
@@ -155,10 +145,10 @@ object SymbExFacade {
         return DefaultTypeTranslator().translate(vd)
     }
 
-    fun evaluateStatements(seq: StatementList, scope: Scope): SymbolicState {
+    fun evaluateStatements(seq: StatementList, scope: Scope, useDefinitions: Boolean = true): SymbolicState {
         val program = ProgramDeclaration(scope = scope, stBody = seq)
         IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(program)))
-        val symbex = SymbolicExecutioner(scope)
+        val symbex = SymbolicExecutioner(scope, useDefinitions)
         symbex.scope = scope
         program.accept(symbex)
         return symbex.peek()
@@ -222,9 +212,14 @@ object SymbExFacade {
         val commandFile = File("cmd.xmv")
         writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
         val p = NuXMVProcess(tmpFile, commandFile)
-        findProgram("nuXmv")?.let {
-            p.executablePath = it.absolutePath
-        }
+        val nuXmv = findProgram("nuXmv")
+        if (nuXmv != null)
+            p.executablePath = nuXmv.absolutePath
+        else
+            System.getenv("NUXMV")?.let {
+                p.executablePath = System.getenv("NUXMV")
+            }
+
         //use BMC because of the complete trace
         //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()

@@ -22,14 +22,20 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
+import edu.kit.iti.formal.automation.ASSERTION_PREFIX
+import edu.kit.iti.formal.automation.ASSUMPTION_PREFIX
+import edu.kit.iti.formal.automation.HAVOC_PREFIX
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.rvt.translators.DefaultValueTranslator
 import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
+import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
 import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
+import edu.kit.iti.formal.smv.ExpressionReplacer
+import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -38,10 +44,10 @@ import edu.kit.iti.formal.util.meta
 import java.util.*
 import kotlin.collections.HashMap
 
+
 public val SVariable.info: SmvVariableInfo
     get() {
-        return meta<SmvVariableInfo>()
-                ?: SmvVariableInfo().also { setMetadata(SmvVariableInfo::class.java, it) }
+        return meta<SmvVariableInfo>() ?: SmvVariableInfo().also { meta<SmvVariableInfo>(it) }
     }
 
 public var SVariable.isInput: Boolean
@@ -93,7 +99,7 @@ class DefinitionReducer(private val module: SMVModule) {
     fun substitute() {
         identifiedTrivialDefinitions()
         findFixpoints()
-        module.accept(ExpressionReplacer(substitutions))
+        module.accept(ExpressionReplacerRecur(substitutions))
         module.definitions.clear()
         module.definitions.addAll(definitionsForSurvival)
     }
@@ -103,31 +109,26 @@ class DefinitionReducer(private val module: SMVModule) {
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
-class ModuleBuilder(val program: PouExecutable,
-                    finalState: SymbolicState,
-                    val reduceDefinitions: Boolean = true) : Runnable {
+class ModuleBuilder(
+        name: String,
+        val scope: Scope,
+        finalState: SymbolicState,
+        val reduceDefinitions: Boolean = true,
+        val supportSpecialStatements: Boolean = false) : Runnable {
+
+    constructor(program: PouExecutable, finalState: SymbolicState, reduceDefinitions: Boolean = true,
+                supportSpecialStatements: Boolean = false)
+            : this(program.name, program.scope, finalState, reduceDefinitions, supportSpecialStatements)
+
     val state = finalState//.unfolded()
-
-
-    val module = SMVModule(program.name)
-    //val vardeps: VariableDependency = VariableDependency(finalState)
-    //private Map<VariableDeclaration, SVariable> vars = new HashMap<>();
-
+    val module = SMVModule(name)
     var typeTranslator: TypeTranslator = DefaultTypeTranslator.INSTANCE
     var valueTranslator = DefaultValueTranslator.INSTANCE
     var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     override fun run() {
-        module.name = program.name
-
-        val outputVars = HashSet(program.scope
-                .filterByFlags(VariableDeclaration.OUTPUT))
-
-        val inputVars = program.scope
-                .filterByFlags(VariableDeclaration.INPUT)
-
-        // TODO fix so this terminates
-        //Set<SVariable> stateVariables = vardeps.dependsOn(outputVars, inputVars);
+        val outputVars = scope.filterByFlags(VariableDeclaration.OUTPUT).toSet()
+        val inputVars = scope.filterByFlags(VariableDeclaration.INPUT)
 
         // Using this workaround instead
         val stateVariables = state.keys
@@ -150,6 +151,25 @@ class ModuleBuilder(val program: PouExecutable,
             val dr = DefinitionReducer(module)
             dr.substitute()
         }
+
+        if (supportSpecialStatements) {
+            module.definitions
+                    .filter { (a, _) -> a.name.startsWith(ASSERTION_PREFIX) }
+                    .forEach { (a, _) ->
+                        module.invariantSpecs.add(a)
+                    }
+            module.definitions
+                    .filter { (a, _) -> a.name.startsWith(ASSUMPTION_PREFIX) }
+                    .forEach { (a, _) ->
+                        module.invariants.add(a)
+                    }
+
+            val havoc = module.definitions
+                    .filter { (a, _) -> a.name.startsWith(HAVOC_PREFIX) }
+            module.definitions.removeAll(havoc)
+            havoc.forEach { (a, _) -> module.moduleParameters.add(a) }
+        }
+
     }
 
     private fun insertDefinitions(definitions: Map<SVariable, SMVExpr>) {
@@ -180,15 +200,17 @@ class ModuleBuilder(val program: PouExecutable,
     }
 
     private fun addInitAssignment(variable: SVariable) {
-        val s = program.scope.getVariable(variable.name)
-        val e: SMVExpr
+        val s = scope.getVariable(variable.name)
+        val initValue = s?.initValue!!
+        val e = valueTranslator.translate(initValue)
+        /*
         if (s!!.init != null) {
             val sv = s.init as Literal?
             e = sv!!.accept(SymbolicExecutioner())!!
         } else {
             e = this.valueTranslator.translate(
                     this.initValueTranslator.getInit(s.dataType!!))
-        }
+        }*/
         val a = SAssignment(variable, e)
         module.initAssignments.add(a)
     }

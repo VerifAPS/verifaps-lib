@@ -50,6 +50,7 @@ interface ITraversal<T> {
     fun traverse(functionDeclaration: FunctionDeclaration)
     fun traverse(forStatement: ForStatement)
     fun traverse(functionBlockDeclaration: FunctionBlockDeclaration)
+
     /**
      * {@inheritDoc}
      */
@@ -76,6 +77,7 @@ interface ITraversal<T> {
     fun traverse(variableDeclaration: VariableDeclaration)
 
     fun traverse(arrayinit: ArrayInitialization)
+
     /**
      * {@inheritDoc}
      */
@@ -115,6 +117,9 @@ interface ITraversal<T> {
     fun traverse(elements: PouElements)
     fun traverse(empty: EMPTY_EXPRESSION)
     fun traverse(namespace: NamespaceDeclaration)
+    fun traverse(blockStatement: BlockStatement)
+    fun traverse(special: SpecialStatement)
+
 }
 
 /**
@@ -401,6 +406,11 @@ open class ImmutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<
             elements.forEach { it.accept(visitor) }
 
     override fun traverse(empty: EMPTY_EXPRESSION) {}
+    override fun traverse(blockStatement: BlockStatement) {
+        blockStatement.statements.accept(visitor)
+    }
+
+    override fun traverse(special: SpecialStatement) {}
 }
 
 /**
@@ -477,7 +487,7 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
         caseStatement.cases.addAll(l)
 
         caseStatement.expression = caseStatement.expression.accept(visitor) as Expression
-        caseStatement.elseCase = caseStatement.elseCase!!.accept(visitor) as StatementList
+        caseStatement.elseCase = caseStatement.elseCase.accept(visitor) as StatementList
     }
 
 
@@ -735,6 +745,11 @@ class MutableTraversal<T>(override var visitor: Visitor<T>) : ITraversal<T> {
     override fun traverse(sfc: SFCImplementation) {}
 
     override fun traverse(transition: SFCTransition) {}
+    override fun traverse(blockStatement: BlockStatement) {
+        blockStatement.statements = (blockStatement.statements.accept(visitor) as StatementList)
+    }
+
+    override fun traverse(special: SpecialStatement) {}
 }
 
 fun <E> MutableCollection<E>.setAll(seq: Collection<E>) {
@@ -749,6 +764,11 @@ open class AstTraversal : DefaultVisitorNN<Unit>() {
 
 abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
     protected var traversalPolicy: ITraversal<T> = ImmutableTraversal(this)
+
+    override fun visit(blockStatement: BlockStatement): T {
+        traversalPolicy.traverse(blockStatement)
+        return super.visit(blockStatement)
+    }
 
     override fun visit(elements: PouElements): T {
         traversalPolicy.traverse(elements)
@@ -1179,5 +1199,13 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun visit(empty: EMPTY_EXPRESSION): EMPTY_EXPRESSION {
         return super.visit(empty) as EMPTY_EXPRESSION
+    }
+
+    override fun visit(blockStatement: BlockStatement): Any {
+        blockStatement.input = blockStatement.input.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.output = blockStatement.output.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.state = blockStatement.state.map { it.accept(this) as SymbolicReference }.toMutableList()
+        blockStatement.statements = blockStatement.statements.accept(this) as StatementList
+        return blockStatement
     }
 }

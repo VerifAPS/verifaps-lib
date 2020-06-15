@@ -5,24 +5,23 @@ import edu.kit.iti.formal.smv.ast.*
 /**Extensions**/
 
 fun Iterable<SMVExpr>.joinToExpr(operator: SBinaryOperator): SMVExpr =
-        this.reduce { a, b -> a.op(operator, b) }
+        reduce { a, b -> a.op(operator, b) }
 
-fun Iterable<SMVExpr>.disjunction(): SMVExpr = this.joinToExpr(SBinaryOperator.OR)
-fun Iterable<SMVExpr>.conjunction(): SMVExpr = this.joinToExpr(SBinaryOperator.AND)
+fun Iterable<SMVExpr>.disjunction(): SMVExpr = joinToExpr(SBinaryOperator.OR)
+fun Iterable<SMVExpr>.conjunction(): SMVExpr = joinToExpr(SBinaryOperator.AND)
 
 fun Collection<SMVExpr>.joinToExpr(operator: SBinaryOperator = SBinaryOperator.AND, default: SMVExpr? = null): SMVExpr =
         if (size > 0 || default == null) {
-            this.reduce { a, b -> a.op(operator, b) }
+            reduce { a, b -> a.op(operator, b) }
         } else {
             default
-
         }
 
 fun Collection<SMVExpr>.disjunction(default: SMVExpr): SMVExpr =
-        this.joinToExpr(SBinaryOperator.OR, default)
+        joinToExpr(SBinaryOperator.OR, default)
 
 fun Collection<SMVExpr>.conjunction(default: SMVExpr): SMVExpr =
-        this.joinToExpr(SBinaryOperator.AND, default)
+        joinToExpr(SBinaryOperator.AND, default)
 
 
 /**
@@ -38,7 +37,7 @@ open class HistoryModuleBuilder(
     val moduleType = ModuleType(name, variables)
 
     init {
-        assert(length > 0)
+        require(length > 0) { "History length should be positive." }
     }
 
     open fun addVariable(v: SVariable) {
@@ -47,7 +46,7 @@ open class HistoryModuleBuilder(
 
         // state variables
         val vars = (1..length).map {
-            SVariable("${v.name}_$$it", v.dataType!!)
+            SVariable("_$$it", v.dataType!!)
         }
         module.stateVars.addAll(vars)
 

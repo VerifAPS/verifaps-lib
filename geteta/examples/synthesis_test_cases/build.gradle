@@ -1,0 +1,42 @@
+plugins {
+    id 'cpp-unit-test'
+}
+
+repositories {
+    maven {
+        url = 'https://repo.gradle.org/gradle/libs-snapshots-local/'
+    }
+}
+
+tasks.withType(CppCompile).configureEach {
+    compilerArgs.addAll toolChain.map { toolChain ->
+        if (toolChain instanceof Gcc || toolChain instanceof Clang) {
+            return ['-std=c++17', '-O0',
+                    //'-Werror', '-fexceptions', '-fasynchronous-unwind-tables',
+                    //'-fpic', '-fpie', '-fstack-clash-protection', '-fstack-protector-strong', '-pipe', '-Wall',
+            ]
+        } else if (toolChain instanceof VisualCpp) {
+            return ['/std:c++17', '/Od',
+                    // set a few options that enforce strict standards compliance while we're at it
+                    '/permissive-', '/Zc:__cplusplus', '/Zc:externConstexpr', '/Zc:inline', '/Zc:throwingNew']
+        } else {
+            return []
+        }
+    }
+}
+
+unitTest {
+    dependencies {
+        implementation 'org.gradle.cpp-samples:googletest:1.9.0-gr4-SNAPSHOT'
+    }
+
+    privateHeaders.from project.layout.projectDirectory.dir('generated')
+    source.from project.layout.projectDirectory.dir('generated'), project.layout.projectDirectory.dir('src')
+
+    binaries.configureEach {
+        if ((toolChain instanceof Gcc || toolChain instanceof Clang)
+                && (targetMachine.operatingSystemFamily.linux || targetMachine.operatingSystemFamily.macOs)) {
+            linkTask.get().linkerArgs.add('-lpthread')
+        }
+    }
+}

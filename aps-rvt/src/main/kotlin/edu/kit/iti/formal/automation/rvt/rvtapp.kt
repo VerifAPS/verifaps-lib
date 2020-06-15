@@ -10,6 +10,7 @@ import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SMVModule
@@ -197,8 +198,8 @@ class RvtApsPipeline(val oldModule: PouExecutable,
             val elements = IEC61131Facade.file(CharStreams.fromString(code))
             elements.addAll(BuiltinLoader.loadDefault())
             val (fst, snd) = separatePrograms(elements)
-            val old = Utils.findProgram(fst)!!
-            val new = Utils.findProgram(snd)!!
+            val old = fst.findFirstProgram()!!
+            val new = snd.findFirstProgram()!!
             val aps = RvtApsPipeline(old, new, { a, b -> RegressionVerification(a, b) })
             return aps
         }

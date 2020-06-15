@@ -12,15 +12,17 @@ import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.TranslationSfcToStOld
 import edu.kit.iti.formal.automation.st.TranslationSfcToStPipeline
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.automation.visitors.findProgram
+import edu.kit.iti.formal.automation.visitors.selectByName
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
 import java.nio.file.Path
-import java.util.*
+import java.util.stream.Collectors
 
 /**
  * IEC61131Facade class.
@@ -139,8 +141,10 @@ object IEC61131Facade {
     }
 
     fun fileResolve(input: List<CharStream>, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
-        val seq = LinkedList<PouElement>()
-        input.parallelStream().forEach { synchronized(seq) { seq.addAll(file(it)) } }
+        val seq = input.parallelStream()
+                .map { file(it) }
+                .flatMap { it.stream() }
+                .collect(Collectors.toList())
         val p = PouElements(seq)
         if (builtins)
             p.addAll(BuiltinLoader.loadDefault())
@@ -180,14 +184,39 @@ object IEC61131Facade {
                 null to it
             }
         }
+        val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
         val pfiles = p.map { (_, a) -> File(a) }
         val selectors = p.map { (name, _) ->
-            if (name == null)
-                { elements: PouElements -> Utils.findProgram(elements) }
-            else
-                { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
+            if (name == null) selectorByType
+            else selectByName(name)
         }
         return readProgramsWLS(libraryElements, pfiles, selectors)
+    }
+
+    fun readProgramWLNP(libraryElements: List<File>,
+                        it: String)
+            : Pair<PouElements, PouExecutable?> {
+        val (name, path) = if ('@' in it) {
+            val a = it.split('@', limit = 2)
+            a[0] to a[1]
+        } else {
+            null to it
+        }
+        val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
+        val selector =
+                if (name == null) selectorByType
+                else selectByName(name)
+        return readProgramWLS(libraryElements, File(path), selector)
+    }
+
+
+    fun readProgramWLS(libraryElements: List<File>,
+                       programs: File,
+                       selectors: (PouElements) -> PouExecutable?)
+            : Pair<PouElements, PouExecutable?> {
+        val (elements, error) = filefr(libraryElements + programs)
+        error.forEach { warn(it.toHuman()) }
+        return elements to selectors(elements)
     }
 
 
@@ -211,8 +240,7 @@ object IEC61131Facade {
      */
     fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
             readProgramsWLS(libraryElements, programs,
-                    programs.map { _ -> Utils::findProgram })
-
+                    programs.map { _ -> ::findProgram })
 
     /**
      *
@@ -241,28 +269,32 @@ object IEC61131Facade {
         ast.accept(stp)
     }
 
+    var useOldSfcTranslator = true
+
     //region translations
     fun translateSfcToSt(scope: Scope, sfc: SFCImplementation,
-                         name: String = "", old: Boolean = false): StatementList {
+                         name: String, old: Boolean = useOldSfcTranslator): Pair<TypeDeclarations, StatementList> {
         val st = StatementList()
+        val td = TypeDeclarations()
         sfc.networks.forEachIndexed { index, network ->
             val element = if (old) TranslationSfcToStOld(network, name, index, scope)
             else TranslationSfcToStPipeline(network, name, index, scope)
+            td.add(element.pipelineData.stateEnumTypeDeclaration)
             st.add(element.call())
         }
-        return st
+        return td to st
     }
 
-    fun translateSfc(elements: PouElements) {
-        elements.forEach { it.accept(TranslateSfcToSt) }
+    fun translateSfcToSt(elements: PouElements) {
+        val t = TranslateSfcToSt()
+        elements.forEach { it.accept(t) }
+        elements.add(t.newTypes)
     }
-
 
     fun translateFbd(elements: PouElements) {
         elements.forEach { it.accept(TranslateFbdToSt) }
     }
-    //endregion
-
+//endregion
 
     object InstructionList {
         /*

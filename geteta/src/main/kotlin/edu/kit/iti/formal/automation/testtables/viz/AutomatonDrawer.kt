@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.testtables.viz
 
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.Region
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
@@ -9,7 +8,10 @@ import edu.kit.iti.formal.automation.testtables.model.automata.Transition
 import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
 import edu.kit.iti.formal.automation.testtables.model.repr
 import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.error
+import edu.kit.iti.formal.util.info
 import java.io.File
+import java.io.IOException
 
 /**
  *
@@ -17,7 +19,7 @@ import java.io.File
  * @version 1 (07.03.18)
  */
 class AutomatonDrawer(val outputFile: File,
-                      val gtt: GeneralizedTestTable,
+                      val regions: List<Region>,
                       val automata: TestTableAutomaton) : Runnable {
 
     var runDot: Boolean = false
@@ -71,7 +73,7 @@ class AutomatonDrawer(val outputFile: File,
                 .println("rankdir=LR;")
 
         if (useCluster)
-            addStates(gtt.region, writer)
+            regions.forEach { addStates(it, writer) }
         else
             automata.rowStates.values.flatMap { it }
                     .joinTo(writer, "\n") {
@@ -115,9 +117,9 @@ class AutomatonDrawer(val outputFile: File,
 
     private fun transition(t: Transition): String {
         val color =
-                when(t.type) {
-                    TransitionType.ACCEPT ->"green"
-                    TransitionType.FAIL->"red"
+                when (t.type) {
+                    TransitionType.ACCEPT -> "green"
+                    TransitionType.FAIL -> "red"
                     else -> "black"
                 }
 
@@ -130,23 +132,31 @@ class AutomatonDrawer(val outputFile: File,
     }
 
 
-    val tmpFile = File.createTempFile(outputFile.nameWithoutExtension, ".pdf")
+    val tmpFile = File.createTempFile("__" + outputFile.nameWithoutExtension, ".pdf")
 
     private fun doDot(): Boolean {
         val pb = ProcessBuilder("dot", "-Tpdf", "-o", tmpFile.absolutePath, outputFile.absolutePath)
                 .inheritIO()
-        println(pb.command())
-        val rt = pb.start()
-                .waitFor()
-        return rt == 0
+        info("Try to run `${pb.command().joinToString(" ")}'.")
+        try {
+            val rt = pb.start().waitFor()
+            return rt == 0
+        } catch (e: IOException) {
+            error("Could not find the dot program: ${e.message}")
+            return false
+        }
     }
 
     private fun doShow(): Boolean {
-        val rt = ProcessBuilder("xdg-open", tmpFile.absolutePath)
-                .inheritIO()
-                .start()
-                .waitFor()
-        return rt == 0
+        try {
+            val rt = ProcessBuilder("xdg-open", tmpFile.absolutePath)
+                    .inheritIO()
+                    .start()
+                    .waitFor()
+            return rt == 0
+        } catch (e: IOException) {
+            error("Could not open the image file ${tmpFile.absoluteFile}: ${e.message}")
+            return false
+        }
     }
-
 }

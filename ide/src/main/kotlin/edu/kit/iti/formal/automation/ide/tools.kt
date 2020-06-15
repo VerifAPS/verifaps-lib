@@ -4,19 +4,24 @@ import bibliothek.gui.dock.common.CLocation
 import bibliothek.gui.dock.common.DefaultSingleCDockable
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.values.Value
+import edu.kit.iti.formal.automation.ide.editors.IECLanguageSupport
+import edu.kit.iti.formal.automation.ide.editors.TestTableLanguageSupport
 import edu.kit.iti.formal.automation.run.ExecutionFacade
 import edu.kit.iti.formal.automation.run.State
 import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.automation.visitors.Utils
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.automation.visitors.findProgram
 import net.miginfocom.layout.CC
 import net.miginfocom.swing.MigLayout
 import org.antlr.v4.runtime.CharStreams
 import java.awt.BorderLayout
 import java.awt.Component
 import java.io.File
+import javax.naming.spi.InitialContextFactory
 import javax.swing.*
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
@@ -72,7 +77,7 @@ class RunnerWindow(val lookup: Lookup, val stEditor: CodeEditor) : ToolPane("run
         try {
             elements = IEC61131Facade.file(CharStreams.fromString(stEditor.code))
             IEC61131Facade.resolveDataTypes(elements)
-            val program = Utils.findProgram(elements)
+            val program = findProgram(elements)
             if (program != null) {
                 inputVars = program.scope.variables
                         .filter { it.isInput }
@@ -259,8 +264,12 @@ class RunnerWindow(val lookup: Lookup, val stEditor: CodeEditor) : ToolPane("run
 
 class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
     val cboStEditor = JComboBox<CodeEditor>()
-    val cboPou = JComboBox<PouExecutable>()
-    val cboTable = JComboBox<CodeEditor>()
+    val cboPou = JComboBox<String>()
+
+    val cboTableFile = JComboBox<CodeEditor>()
+    val cboTable  = JComboBox<String>()
+
+    val btnRun = JButton("Run", IconFontSwing.buildIcon(FontAwesomeRegular.PLAY_CIRCLE, 16f))
 
     init {
         titleText = "Geteta"
@@ -269,35 +278,62 @@ class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
 
         val lblProgram = JLabel("Program: ")
         lblProgram.labelFor = cboStEditor
+
         val lblTable = JLabel("Table: ")
         lblTable.labelFor = cboTable
 
+        val iconRefresh = IconFontSwing.buildIcon(FontAwesomeRegular.DOT_CIRCLE, 16f);
+        val btnRefreshTable = JButton("", iconRefresh)
+        val btnRefreshPou = JButton("", iconRefresh)
+
         add(lblProgram)
         add(cboStEditor)
-        add(cboPou, CC().wrap())
+        add(cboPou)
+        add(btnRefreshPou, CC().wrap())
 
         add(lblTable)
+        add(cboTableFile)
         add(cboTable)
+        add(btnRefreshTable, CC().wrap())
+
+        add(btnRun, CC().alignX("right").spanX(4))
+
+
         lookup.addChangeListener(CodeEditor::class.java, this::updateData)
 
-        cboTable.renderer = object : DefaultListCellRenderer() {
+        cboTableFile.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
-                val a = (value as CodeEditor?)?.titleText
+                val a = (value as? CodeEditor)?.titleText
                 return super.getListCellRendererComponent(list, a, index, isSelected, cellHasFocus)
             }
         }
-
-        cboStEditor.renderer = cboTable.renderer as ListCellRenderer<in CodeEditor>?
-
+        cboStEditor.renderer = cboTableFile.renderer
         cboStEditor.addActionListener {
             updatePouElements()
         }
-
+        cboTableFile.addActionListener { updateTableElements() }
         updateData()
+    }
+
+    private fun updateTableElements() {
+        cboTable.removeAllItems()
+        val ttEditor = cboTableFile.selectedItem as? CodeEditor
+        if (ttEditor != null) {
+            val s = GetetaFacade.parseTableDSL(ttEditor.text)
+            s.forEach { cboPou.addItem(it.name) }
+        }
     }
 
     private fun updatePouElements() {
         cboPou.removeAllItems()
+        val stEditor = cboStEditor.selectedItem as? CodeEditor
+        if (stEditor != null) {
+            val s = IEC61131Facade.file(CharStreams.fromString(stEditor.text))
+            s.filterIsInstance<PouExecutable>().forEach { cboPou.addItem(it.name) }
+            s.findFirstProgram()?.name?.let {
+                cboPou.selectedItem = it // select first program
+            }
+        }
     }
 
     private fun updateData() {
@@ -305,11 +341,14 @@ class GetetaWindow(val lookup: Lookup) : ToolPane("geteta-window") {
         cboTable.removeAllItems()
 
         val editors = lookup.getAll<CodeEditor>()
-        editors.mapNotNull { it as? CodeEditor }
+        editors.filter { it.languageSupport is IECLanguageSupport }
                 .forEach(cboStEditor::addItem)
 
-        editors.mapNotNull { it as? CodeEditor }
-                .forEach(cboTable::addItem)
+        editors.filter { it.languageSupport is TestTableLanguageSupport }
+                .forEach(cboTableFile::addItem)
+
+        updatePouElements()
+        updateTableElements()
     }
 }
 

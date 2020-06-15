@@ -96,7 +96,7 @@ object SMVFacade {
     }
 
     fun expr(s: String): SMVExpr {
-        val ctx = getParser(CharStreams.fromString(s)).expr()
+        val ctx = getParser(CharStreams.fromString(s)).exprEOF()
         return ctx.accept(SMVTransformToAST()) as SMVExpr
     }
 
@@ -133,7 +133,7 @@ object SMVFacade {
         return m.matches()
     }
 
-    fun parseWordLiteral(text: String): SMVExpr {
+    fun parseWordLiteral(text: String): SWordLiteral {
         val m = PATTERN_WORD_LITERAL.matcher(text)
         if (m.matches()) {
             val signed = m.group(1) == "s"

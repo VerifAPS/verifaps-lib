@@ -1,9 +1,0 @@
-set default_trace_plugin 6
-read_model
-flatten_hierarchy
-show_vars
-encode_variables
-build_boolean_model
-check_invar_ic3
-quit
-quit

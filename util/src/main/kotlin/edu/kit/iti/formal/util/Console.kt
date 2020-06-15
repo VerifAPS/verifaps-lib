@@ -28,7 +28,7 @@ fun printConsole(level: Level, message: String, origin: String) {
         Level.FINE -> ConsoleColor.Cyan
         Level.FINER -> ConsoleColor.Cyan
         Level.FINEST -> ConsoleColor.Cyan
-        Level.INFO -> ConsoleColor.Blue
+        Level.INFO -> ConsoleColor.White
         Level.WARNING -> ConsoleColor.Yellow
         Level.SEVERE -> ConsoleColor.Red
         else -> ConsoleColor.Black

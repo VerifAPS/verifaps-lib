@@ -7,35 +7,52 @@ package edu.kit.iti.formal.util
  * @version 1 (28.06.19)
  */
 interface HasMetadata {
-    fun <T> getMetadata(clazz: Class<T>): T?
-    fun <T : Any> setMetadata(clazz: Class<T>, obj: T)
-    fun getAllMetadata(): Collection<Any>
+    fun metadata(create: Boolean = false): Metadata?
+    fun ensureMetadata() = metadata(true)!!
+
+    fun copyMetaFrom(m: HasMetadata) {
+        m.metadata()?.let {
+            ensureMetadata().copyFrom(it)
+        }
+    }
 }
 
-inline fun <reified T> HasMetadata.meta() = getMetadata(T::class.java)
+inline fun <reified T : Any?> HasMetadata.meta() = metadata()?.get(T::class.java)
+
+inline fun <reified T : Any?> HasMetadata.meta(obj: T) {
+    val c = T::class.java
+    ensureMetadata().set(c, obj)
+}
 
 
-/**
- * Default, hash map based implementation of metadata supports.
- *
- * Use by delegation:
- * ```
- *  class A : HasMetadata by HasMetadataImpl()
- * ```
- */
 class HasMetadataImpl : HasMetadata {
-    var metadata: HashMap<Class<*>, Any>? = null
+    private var _metadata: Metadata? = null
+    override fun metadata(create: Boolean): Metadata? {
+        if (create && _metadata == null)
+            _metadata = Metadata()
+        return _metadata
+    }
+}
 
-    override fun <T> getMetadata(clazz: Class<T>): T? = metadata?.get(clazz) as? T
+class Metadata {
+    private var metadata: HashMap<String, Any>? = null
 
-    override fun <T : Any> setMetadata(clazz: Class<T>, obj: T) {
-        if (metadata == null) {
-            metadata = HashMap()
+    fun <T> get(clazz: Class<T>): T? = get(clazz.name)
+    fun <T> get(key: String): T? = metadata?.get(key) as T?
+    fun <T : Any?> set(clazz: Class<T>, obj: T) = set(clazz.name, obj)
+    fun <T : Any?> set(key: String, obj: T) {
+        if (obj == null) {
+            metadata?.remove(key)
+        } else {
+            if (metadata == null) {
+                metadata = HashMap()
+            }
+            metadata?.put(key, obj)
         }
-        metadata!![clazz] = obj
     }
 
-    override fun getAllMetadata(): Collection<Any> {
-        return metadata?.values ?: listOf()
+    fun copyFrom(other: Metadata) {
+        if (!other.metadata.isNullOrEmpty())
+            metadata = HashMap(other.metadata)
     }
 }

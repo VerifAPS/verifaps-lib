@@ -104,7 +104,7 @@ WORD_LITERAL:
     '0' ('u' | 's')? ('b' | 'B' | 'o' | 'O' | '_' | 'd' | 'D' | 'h' | 'H') INT? '_' ('a'..'f' | 'A.' . 'F' | INT)*;
 
 ID:
-	('A'..'Z' | 'a'..'z' | '_' | '$' | '#' | '-' | '.')+;
+	('A'..'Z' | 'a'..'z' | '_' | '$' | '#') ('A'..'Z' | 'a'..'z' | '_' | '$' | '#'| '-' | '.'|'0'..'9')*;
 
 fragment INT: ('0'..'9')+;
 FLOAT: INT '.' INT;
@@ -225,13 +225,14 @@ moduleType :
 	| mod=ID (LPAREN stateExpr ( COMMA  stateExpr)* RPAREN)? #moduleTypeSimple
 	;
 
+exprEOF: expr EOF;
 expr
-    : left=expr op=(AU|EU|U|V|S|T) right=expr #temporalBinExpr
+    : stateExpr #exprStateExpr
+    | LPAREN expr RPAREN #temporalParen
+    | left=expr op=(AU|EU|U|V|S|T) right=expr #temporalBinExpr
     | op=(EG | EX | EF | AG | AX | AF| X  | G | F | Y | Z | H | O) expr #temporalUnaryExpr
     | op=(EBF | ABF | EBG | ABG) NUMBER DOTDOT NUMBER right=expr #temporalUnaryRctlExpr
     | op=(A|E) LBRACKET expr BU NUMBER DOTDOT NUMBER expr RBRACKET #temporalBinRctlExpr
-    | LPAREN expr RPAREN #temporalParen
-    | stateExpr #exprStateExpr
     ;
 
 
@@ -261,9 +262,9 @@ terminalAtom
     | func=(ID|NEXT|INIT|SIGNED|UNSIGNED) LPAREN stateExpr ( COMMA  stateExpr)* RPAREN # functionExpr
     | casesExpr                                                                 # casesExprAtom
     | var=ID                                                                    # variableAccess
-    | var=ID (LBRACKET NUMBER RBRACKET)*                                        # arrayAccess
+    | var=ID (LBRACKET NUMBER RBRACKET)+                                        # arrayAccess
     //| var=ID (LBRACKET expr : expr RBRACKET)*                                        # arrayAccess
-    | value=ID (DOT dotted=terminalAtom | (LBRACKET array+=NUMBER RBRACKET)*)?  # variableDotted
+    | value=ID (DOT dotted=terminalAtom | (LBRACKET array+=NUMBER RBRACKET)*)   # variableDotted
     | value=NUMBER                                                              # integerLiteral
     | value=FLOAT                                                               # floatLiteral
     | value=TRUE                                                                # trueExpr

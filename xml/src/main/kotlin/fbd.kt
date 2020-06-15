@@ -11,6 +11,7 @@ import edu.kit.iti.formal.automation.plcopenxml.operatorSymbol
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.HasMetadata
 import edu.kit.iti.formal.util.HasMetadataImpl
+import edu.kit.iti.formal.util.Metadata
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -46,6 +47,7 @@ class FbdBody(val diagrams: ArrayList<FbDiagram> = ArrayList<FbDiagram>())
         fun fromJson(s: String) = om.readValue<FbdBody>(s, FbdBody::class.java)
     }
 }
+
 
 data class FbDiagram(
         var label: String? = null,

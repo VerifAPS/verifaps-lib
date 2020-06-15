@@ -15,8 +15,10 @@ PROGRAM main
 
 
     a$j := i;
-    a$sum := (a$p + a$sum);
-    a$p := (a$sum / a$p);
+    //! REGION a[a$sum](a$j) => (a$p)
+        a$sum := (a$p + a$sum);
+        a$p := (a$sum / a$p);
+    //! END_REGION
     o := a$p;
 END_PROGRAM
 FUNCTION_BLOCK FB1

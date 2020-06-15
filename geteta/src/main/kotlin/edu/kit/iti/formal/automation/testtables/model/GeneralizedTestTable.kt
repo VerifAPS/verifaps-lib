@@ -18,6 +18,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.math.abs
+import kotlin.math.min
 
 
 enum class ColumnCategory { ASSUME, ASSERT }
@@ -27,9 +28,10 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String) = internalVariable(programRunNames).inModule(tableName)
+    open fun externalVariable(programRunNames: List<String>, tableName: String) :SVariable
+            = internalVariable(programRunNames).inModule(tableName) as SVariable
 
-    open fun internalVariable(programRunNames: List<String>) = SVariable(name, logicType)
+    open fun internalVariable(programRunNames: List<String>):SVariable = SVariable(name, logicType)
 }
 
 abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {
@@ -45,6 +47,8 @@ abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory
         get() = !isAssumption
 
     abstract fun respondTo(name: String, run: Int?): Boolean
+
+    abstract fun clone(): ColumnVariable
 }
 
 data class ProgramVariable(
@@ -71,8 +75,10 @@ data class ProgramVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
+    override fun clone() = copy()
 
     var realName: String = name
+
     /**
      *
      */
@@ -108,6 +114,8 @@ data class ProjectionVariable(
 
 
     override fun respondTo(name: String, run: Int?) = name == this.name
+    override fun clone() = copy()
+
 
     /**
      *
@@ -143,16 +151,15 @@ class ParseContext(
             vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
     fun getReference(variable: SVariable, cycles: Int): SVariable =
-            if (cycles == 0) {
-                variable
-            } else if (cycles > 0) {
-                throw IllegalArgumentException("no future references are allowed.")
-            } else {
-                val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
-                val ref = SVariable(newName, variable.dataType!!)
-                val max = Math.max(refs.getOrDefault(variable, cycles), cycles)
-                refs[variable] = max
-                ref
+            when {
+                cycles == 0 -> variable
+                cycles > 0 -> throw IllegalArgumentException("no future references are allowed.")
+                else -> {
+                    val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
+                    val ref = SVariable(newName, variable.dataType!!)
+                    refs[variable] = min(refs.getOrDefault(variable, cycles), cycles)
+                    ref
+                }
             }
 
     operator fun contains(varText: String) = vars.keys.any { it.name == varText }
@@ -366,6 +373,7 @@ sealed class Duration {
     }
 
     abstract var modifier: DurationModifier
+
     /**
      * returns true, iff the step can be applied arbitrary often (no upper bound)
      * @return
@@ -417,6 +425,8 @@ fun Duration.isOptional(time: Int): Boolean =
 
 
 sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1)) {
+    var gotos: MutableList<GotoTransition> = arrayListOf()
+
     abstract fun count(): Int
     abstract fun flat(): List<TableRow>
     abstract fun depth(): Int
@@ -438,6 +448,14 @@ data class Region(override var id: String,
     }
 }
 
+data class GotoTransition(
+        var tableName: String,
+        var rowId: String,
+        var kind: Kind = Kind.PASS
+) {
+    enum class Kind { PASS, MISS, FAIL }
+}
+
 data class TableRow(override var id: String) : TableNode(id) {
     val rawFields: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
 
@@ -457,6 +475,12 @@ data class TableRow(override var id: String) : TableNode(id) {
     val defForward = SVariable("${id}_fwd", SMVTypes.BOOLEAN)
     val defFailed = SVariable("${id}_fail", SMVTypes.BOOLEAN)
     val defInput = SVariable("${id}_in", SMVTypes.BOOLEAN)
+    val defMiss = SVariable("${id}_miss", SMVTypes.BOOLEAN)
+
+    /**
+     * A list of rows, from which this rows inherits.
+     */
+    val inheritsFromRows = arrayListOf<Pair<String, String>>()
 
     /**
      * The predicate that allows keeping in this state.
@@ -541,7 +565,12 @@ data class TableRow(override var id: String) : TableNode(id) {
         return inputExpr[name] ?: outputExpr[name]
     }
 
-    override fun clone(): TableNode = copy().also { it.duration = duration; it.id = id }
+    override fun clone(): TableNode = copy().also {
+        it.rawFields.putAll(rawFields)
+        it.duration = duration
+        it.gotos = gotos.toMutableList()
+    }
+
     override fun visit(visitor: (TableNode) -> Unit) = visitor(this)
 }
 

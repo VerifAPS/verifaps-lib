@@ -75,7 +75,7 @@ class FunctionBlockEmbedder(private val instanceName: String,
                         expression
                 ))
             } else {
-                TODO("Function block call without parameter name!")
+                error("Function block call without parameter name!")
             }
         }
 
@@ -102,7 +102,7 @@ class FunctionBlockEmbedder(private val instanceName: String,
                 )
                 sl.add(assign)
             } else {
-                TODO("Output parameter in function block call w/o name.")
+                error("Output parameter in function block call w/o name.")
             }
         }
         sl.add(CommentStatement.single("End of call"))

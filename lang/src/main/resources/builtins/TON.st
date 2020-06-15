@@ -3,20 +3,20 @@ FUNCTION_BLOCK TON
 
 VAR_INPUT
     IN : BOOL;
-    PT : USINT;
+    PT : UINT;
 END_VAR
 
 VAR_OUTPUT
     Q  : BOOL;
-    ET : USINT;
+    ET : UINT;
 END_VAR
 
 IF IN THEN
-    Q:= ET = USINT#0;
-    IF ET > USINT#0 THEN
-        ET := ET - USINT#1;
+    Q:= ET = UINT#0;
+    IF ET > UINT#0 THEN
+        ET := ET - UINT#1;
     ELSE
-        ET := USINT#0;
+        ET := UINT#0;
     END_IF
 ELSE
     Q  := FALSE;

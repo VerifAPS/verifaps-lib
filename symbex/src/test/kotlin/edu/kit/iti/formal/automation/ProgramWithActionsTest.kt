@@ -27,23 +27,20 @@ import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.ActionEmbedder
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions
- import org.junit.jupiter.api.Test
-
-import java.io.IOException
+import org.junit.jupiter.api.Test
 
 /**
  * @author Alexander Weigl
  * @version 1 (18.02.18)
  */
-class ProgramWithActionsTest {
+object ProgramWithActionsTest {
     @Test
-    @Throws(IOException::class)
     fun test() {
         val (tle, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(
                 javaClass.getResourceAsStream("program_with_actions.st")
         ))
         val newTle = ActionEmbedder().transform(TransformationState(tle[0] as PouExecutable))
-        val out = IEC61131Facade.print(newTle.stBody,false)
+        val out = IEC61131Facade.print(newTle.stBody, false)
         val exp = """
 IF (i < INT#0) THEN
     s := (s - i);

@@ -23,8 +23,10 @@ val EMBEDDING_PIPELINE = MultiCodeTransformation(arrayListOf(
         FBRemoveInstance()
 ))
 
-
-const val SCOPE_SEPARATOR = "$"
+/**
+ * Seperator between identifier.
+ */
+var SCOPE_SEPARATOR = "$"
 
 class CallEmbedding : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState = EMBEDDING_PIPELINE.transform(state)
@@ -103,19 +105,19 @@ class FBEmbeddParameters : CodeTransformation {
                     }
                 }
 
-                stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
+                //stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
                 stmt += invocation
 
                 //rewrite output variables as trailing assignments.
                 invocation.outputParameters.forEach { (name, _, expression) ->
                     if (name != null) {
-                        invocation.callee.copy(sub = SymbolicReference(name))
-                        stmt += AssignmentStatement(expression as SymbolicReference, SymbolicReference(name))
+                        val out = invocation.callee.copy(sub = SymbolicReference(name))
+                        stmt += AssignmentStatement(expression as SymbolicReference, out)
                     } else {
                         throw IllegalStateException("Output parameter in function block call w/o name.")
                     }
                 }
-                stmt += CommentStatement.single("End of call")
+                //stmt += CommentStatement.single("End of call")
 
                 //clear all parameters
                 invocation.parameters.clear()
@@ -137,7 +139,7 @@ class FBAssignments : CodeTransformation {
             val s = scope.resolveVariable(symbolicReference)
             val dt = s?.dataType
             if (s != null && dt is FunctionBlockDataType && symbolicReference.hasSub()) {
-                return SymbolicReference(symbolicReference.toPath().joinToString("$"))
+                return SymbolicReference(symbolicReference.toPath().joinToString(SCOPE_SEPARATOR))
             }
             return super.visit(symbolicReference)
         }
@@ -147,6 +149,10 @@ class FBAssignments : CodeTransformation {
 class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
     companion object {
         private val bodyCache = hashMapOf<TransformationState, StatementList>()
+        var renaming: (state: TransformationState, statements: StatementList, prefix: (String) -> String) -> StatementList =
+                ::defaultRenaming
+        fun defaultRenaming(state: TransformationState, statements: StatementList, prefix: (String) -> String)
+                = VariableRenamer(state.scope::isGlobalVariable, statements.clone(), prefix).rename()
     }
 
     override fun transform(state: TransformationState): TransformationState {
@@ -154,16 +160,30 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         return state
     }
 
-    fun getBody(prefix: String, state: TransformationState): StatementList {
+    fun getBody(prefix: String, state: TransformationState): BlockStatement {
         if (state !in bodyCache) {
             val istate = TransformationState(
                     state.scope, state.stBody.clone(), SFCImplementation())
             val s = EMBEDDING_BODY_PIPELINE.transform(istate)
             bodyCache[state] = s.stBody
         }
-        val statements = bodyCache[state]!!
-        val renamed =  VariableRenamer(state.scope::isGlobalVariable, statements.clone()) { prefix + SCOPE_SEPARATOR + it }.rename()
-        return renamed
+        val statements = bodyCache[state]!!.clone()
+        val renameFn: (String) -> String = { prefix + SCOPE_SEPARATOR + it }
+        val renamed = renaming(state, statements, renameFn)
+        val block = BlockStatement(prefix)
+        block.input = rewrite(renameFn, state.scope) { it.isInput }
+        block.output = rewrite(renameFn, state.scope) { it.isOutput }
+        block.state = rewrite(renameFn, state.scope) { it.isLocal }
+        block.statements = renamed
+        return block
+    }
+
+    private fun rewrite(renameFn: (String) -> String,
+                        scope: Scope,
+                        filter: (VariableDeclaration) -> Boolean): MutableList<SymbolicReference> {
+        return scope.variables.filter(filter)
+                .map { SymbolicReference(renameFn(it.name)) }
+                .toMutableList()
     }
 
     override fun visit(invocation: InvocationStatement): Statement {
@@ -173,7 +193,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         if (invoked is Invoked.FunctionBlock) {
             val state = TransformationState(invoked.fb)
             val prefix = invocation.callee.toPath().joinToString(SCOPE_SEPARATOR)
-            return getBody(prefix, state)
+            return getBody(prefix, state).also { it.originalInvoked = invoked }
         }
 
         if (invoked is Invoked.Action && invocation.callee.hasSub()) {
@@ -181,7 +201,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
             val fb = action.subList(0, action.lastIndex - 1)
             val prefix = fb.joinToString(SCOPE_SEPARATOR)
             val state = TransformationState(invoked.scope, invoked.action.stBody!!, SFCImplementation())
-            return getBody(prefix, state)
+            return getBody(prefix, state).also { it.originalInvoked = invoked }
         }
 
         if (invoked is Invoked.Function) {

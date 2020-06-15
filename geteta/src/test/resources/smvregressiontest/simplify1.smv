@@ -1,4 +1,4 @@
-MODULE table(code$i, code$o)
+MODULE simplify1(code$i, code$o)
 VAR
     __ERROR__ : boolean;
     __SENTINEL__ : boolean;
@@ -109,4 +109,4 @@ ASSIGN
     next(f_01) := e_01_accept;
     next(g_01) := f_01_accept;
     next(h_01) := g_01_accept;
--- end of module table
+-- end of module simplify1

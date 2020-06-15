@@ -4,7 +4,6 @@ import bibliothek.gui.dock.common.CControl
 import bibliothek.gui.dock.common.CGrid
 import bibliothek.gui.dock.common.intern.CDockable
 import bibliothek.gui.dock.common.intern.DefaultCommonDockable
-import bibliothek.gui.dock.control.focus.DefaultFocusRequest
 import bibliothek.gui.dock.util.Priority
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.ide.editors.STFoldParser
@@ -117,7 +116,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             val file = File(it.file?.parentFile, it.file?.nameWithoutExtension +
                     "_translated." + it.file?.extension)
             val elements = IEC61131Facade.file(CharStreams.fromString(it.text))
-            IEC61131Facade.translateSfc(elements)
+            IEC61131Facade.translateSfcToSt(elements)
             file.bufferedWriter().use {
                 IEC61131Facade.printTo(it, elements, true)
             }
@@ -165,7 +164,6 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     init {
         lookup.register<GetFileChooser>(this)
         lookup.register<FileOpen>(this)
-        lookup.register<ProblemList>(ProblemList())
         lookup.register<JumpService>(this)
         lookup.register<EditingDialogs>(editingDialogs)
 
@@ -253,6 +251,9 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             globalPort.addDockable(overview)
             tools.forEach { globalPort.addDockable(it) }
             globalPort.load("STARTUP")
+            //register editors
+            globalPort.dockables.filterIsInstance<CodeEditor>()
+                    .forEach { lookup.register(it) }
         } else {
             val grid = CGrid(globalPort)
             grid.add(0.0, 0.0, 0.3, 0.5, overview)
@@ -350,7 +351,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
 
     override fun addEditorTab(editor: CodeEditor) {
         val e = globalPort.focusHistory.history.find { it is CodeEditor }
-        lookup.register(editor)
+        lookup.register<CodeEditor>(editor)
         globalPort.addDockable(editor)
         if (e != null)
             editor.setLocationsAside(e)
@@ -394,7 +395,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     override fun addToolTab(window: ToolPane) {
         val otherToolWindow = getDockable { it is ToolPane && it != null }
         globalPort.addDockable(window)
-        lookup.register(window)
+        lookup.register<ToolPane>(window)
     }
 
     override fun jumpTo(editor: CodeEditor, position: Position?) {
@@ -403,6 +404,17 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         )
         if (position != null)
             editor.textArea.caretPosition = position.offset
+    }
+
+    override fun jumpTo(position: Position) {
+        globalPort.dockables
+                .filterIsInstance<CodeEditor>()
+                .find { it.titleText == position.file }
+                ?.let {
+                    globalPort.controller.setFocusedDockable(it.intern(),it.textArea,
+                            true, true,true)
+                    it.textArea.caretPosition = position.offset
+                }
     }
 
     override fun selectInEditor(name: String, start: Int, stop: Int?) {
@@ -434,7 +446,6 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     }
 
     fun showFrame() {
-        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         try {
             val xToolkit = Toolkit.getDefaultToolkit()
             val awtAppClassNameField = xToolkit.javaClass.getDeclaredField("awtAppClassName")
@@ -486,6 +497,10 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+            System.setProperty("swing.aatext", "true")
+            System.setProperty("swing.plaf.metal.controlFont", "Tahoma-Bold-14")
+            //System.setProperty("swing.plaf.metal.userFont", "Tahoma-Bold-14")
+            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             Locale.setDefault(Locale.ENGLISH)
 
             val rootLookup = Lookup()
@@ -505,7 +520,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             rootLookup.register(appConfig)
             rootLookup.register(userConfig)
             rootLookup.register<RecentFilesService>(RecentFilesImpl(rootLookup))
-            rootLookup.register(Colors)
+            rootLookup.register<Colors>(DuneColors)
 
             val dockableFactory = DockableCodeEditorFactory(rootLookup)
             val editorFactory = EditorFactoryImpl(rootLookup, dockableFactory)
@@ -524,6 +539,7 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
                     val f = File(it)
                     ide.open(f)
                 }
+                rootLookup.firePropertyChange()
             }
         }
     }

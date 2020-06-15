@@ -12,7 +12,7 @@ import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
-import me.tomassetti.kanvas.BaseLanguageSupport
+import edu.kit.iti.formal.automation.ide.BaseLanguageSupport
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
 import org.fife.io.DocumentReader
@@ -166,7 +166,7 @@ class STChecker(val codeEditor: CodeEditor, val lookup: Lookup) : AbstractParser
                 result.addNotice(DefaultParserNotice(this, it.message,
                         it.startLine, it.startOffset, it.length))
             }
-            lookup.get<ProblemList>().set(codeEditor, issues)
+            lookup.get<ProblemService>().announceProblems(codeEditor, issues)
         } catch (e: SyntaxErrorReporter.ParserException) {
             e.errors.forEach {
                 result.addNotice(DefaultParserNotice(this, it.msg,

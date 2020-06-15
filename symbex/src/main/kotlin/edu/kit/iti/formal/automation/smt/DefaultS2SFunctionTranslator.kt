@@ -41,11 +41,10 @@ import java.util.*
  */
 class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
 
-    override fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType, rightType: SMVType): SExpr {
+    override fun translateOperator(operator: SBinaryOperator, typeLeft: SMVType?, rightType: SMVType?): SExpr {
         val defaultValue = "not-found-operator-${operator.symbol()}-$typeLeft-$rightType"
 
         val lookup = when (typeLeft) {
-            SMVTypes.BOOLEAN -> logicalOperators
             is SMVWordType -> {
                 val (signed) = typeLeft
                 if (signed) bvsOperators
@@ -53,13 +52,13 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
             }
             is EnumType -> bvuOperators
             SMVTypes.INT -> arithOperators
-            else -> HashMap()
+            else -> logicalOperators
         }
         val value = lookup[operator] ?: defaultValue
         return SSymbol(value)
     }
 
-    override fun translateOperator(operator: SUnaryOperator, type: SMVType): SExpr {
+    override fun translateOperator(operator: SUnaryOperator, type: SMVType?): SExpr {
         val bvneg = SSymbol("bvneg")
         val not = SSymbol("not")
         return when (operator) {
@@ -68,7 +67,8 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
         }
     }
 
-    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr = TODO("translation of various functions")
+    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr
+            = TODO("translation of various functions")
 
     companion object {
         internal var logicalOperators: MutableMap<SBinaryOperator, String> = HashMap()
@@ -87,7 +87,6 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
 
             bvsOperators[SBinaryOperator.MUL] = "bvmul"
             bvsOperators[SBinaryOperator.PLUS] = "bvadd"
-            bvsOperators[SBinaryOperator.MUL] = "bvmull"
             bvsOperators[SBinaryOperator.DIV] = "bvsdiv"
             bvsOperators[SBinaryOperator.XOR] = "bvxor"
             bvsOperators[SBinaryOperator.XNOR] = "bvxnor"

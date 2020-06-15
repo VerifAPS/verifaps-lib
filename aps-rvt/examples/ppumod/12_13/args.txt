@@ -1,0 +1,117 @@
+--old Scenario12_Final.st
+--new Scenario13_Final.st
+
+--disable-proof-body-equivalence-ssa
+
+--assume "proofEquivalence(Main.Stamp_abstracted,Main.Stamp_abstracted):"
+
+-fc "Main.Mag.0=Main.Mag.0#TRUE#Mag$CraneDown=Mag$CraneDown,Mag$CraneOnConveyor=Mag$CraneOnConveyor,Mag$CraneOnMagazin=Mag$CraneOnMagazin,Mag$CraneSucked=Mag$CraneSucked,Mag$CraneUp=Mag$CraneUp,Mag$SFCReset=Mag$SFCReset,Mag$SliderMovedOut=Mag$SliderMovedOut,Mag$SliderNotMovedOut=Mag$SliderNotMovedOut,Mag$StartButtonMagazin=Mag$StartButtonMagazin,Mag$StartVar=Mag$StartVar,Mag$WorkpieceReady=Mag$WorkpieceReady,Mag$CraneOnConveyor=(0sd16_16160<Mag$AnalogCranePosition&Mag$AnalogCranePosition<0sd16_16260),Mag$CraneOnMagazin=(0sd16_24290<Mag$AnalogCranePosition&Mag$AnalogCranePosition<0sd16_24390)"
+-fc "Main.Crane.0=Main.Crane.0#TRUE#Crane$CraneDown=Crane$CraneDown,Crane$CraneSucked=Crane$CraneSucked,Crane$CraneUp=Crane$CraneUp,Crane$MagazinCapacitiveSensor=Crane$MagazinCapacitiveSensor,Crane$MagazinOpticalSensor=Crane$MagazinOpticalSensor,Crane$SFCReset = Crane$SFCReset , Crane$SliderMovedOut = Crane$SliderMovedOut , Crane$SliderNotMovedOut = Crane$SliderNotMovedOut , Crane$StampLowered = Crane$StampLowered , Crane$StampSliderFilled = Crane$StampSliderFilled , Crane$StampSliderSensorMovedOut = Crane$StampSliderSensorMovedOut,Crane$StartButtonMagazin=Crane$StartButtonMagazin,Crane$StartVar=Crane$StartVar,Crane$WorkpieceReady=Crane$WorkpieceReady,Crane$CraneOnConveyor=(0sd16_16160<Crane$AnalogCranePosition&Crane$AnalogCranePosition<0sd16_16260),Crane$CraneOnMagazin=(0sd16_24290<Crane$AnalogCranePosition&Crane$AnalogCranePosition<0sd16_24390),Crane$CranePositionStamp=(0sd16_8160<Crane$AnalogCranePosition&Crane$AnalogCranePosition<0sd16_8260)"
+-fc "Main.Stamp.0=Main.Stamp.0#TRUE#Stamp$CraneDown=Stamp$CraneDown,Stamp$CraneOnConveyor=Stamp$CraneOnConveyor,Stamp$CraneOnConveyor=(0sd16_16160<Stamp$AnalogCranePosition&Stamp$AnalogCranePosition<0sd16_16260),Stamp$CranePositionStamp=(0sd16_8160<Stamp$AnalogCranePosition&Stamp$AnalogCranePosition<0sd16_8260,Stamp$CranePositionStamp=Stamp$CranePositionStamp,Stamp$CraneSucked=Stamp$CraneSucked,Stamp$CraneUp=Stamp$CraneUp,Stamp$SFCReset=Stamp$SFCReset,Stamp$StampLowered=Stamp$StampLowered,Stamp$StampSliderFilled=Stamp$StampSliderFilled,Stamp$StampSliderSensorMovedIn=Stamp$StampSliderSensorMovedIn,Stamp$StampSliderSensorMovedOut=Stamp$StampSliderSensorMovedOut,Stamp$StampStartButton=Stamp$StampStartButton,Stamp$StampUp=Stamp$StampUp,Stamp$StartVar=Stamp$StartVar"
+
+-fc Main.Crane.TimeDelay_Timer.0=Main.Crane.TimeDelay_Timer.0
+-fc Main.Crane.Timer1.0=Main.Crane.Timer1.0
+-fc Main.Crane.Timer1.1=Main.Crane.Timer1.1
+-fc Main.Stamp.Timer.0=Main.Stamp.Timer.0
+-fc Main.Stamp.Timer.1=Main.Stamp.Timer.1
+-fc Main.Conveyor.0=Main.Conveyor.0
+-fc Main.Conveyor.Timer_Conveyor_Test.0=Main.Conveyor.Timer_Conveyor_Test.0
+-fc Main.Conveyor.Timer_Conveyor_Runtime.0=Main.Conveyor.Timer_Conveyor_Runtime.0
+-fc Main.Conveyor.Timer_Conveyor_Test.1=Main.Conveyor.Timer_Conveyor_Test.1
+-fc Main.Conveyor.Timer_Conveyor_Test.2=Main.Conveyor.Timer_Conveyor_Test.2
+-fc Main.Conveyor.Timer_Conveyor_Runtime.1=Main.Conveyor.Timer_Conveyor_Runtime.1
+-fc Main.Conveyor.Timer_Conveyor_Runtime.2=Main.Conveyor.Timer_Conveyor_Runtime.2
+-fc Main.Pusher.0=Main.Pusher.0
+-fc Main.Pusher.Timer2.0=Main.Pusher.Timer2.0
+-fc Main.Pusher.Timer3.0=Main.Pusher.Timer3.0
+-fc Main.Pusher.Timer_Slide2_Black.0=Main.Pusher.Timer_Slide2_Black.0
+-fc Main.Pusher.Timer3.1=Main.Pusher.Timer3.1
+-fc Main.Pusher.Timer3.2=Main.Pusher.Timer3.2
+-fc Main.Pusher.Timer_Slide2_Black.1=Main.Pusher.Timer_Slide2_Black.1
+-fc Main.Pusher.Timer_Slide1_Black.0=Main.Pusher.Timer_Slide1_Black.0
+-fc Main.Pusher.Timer3.3=Main.Pusher.Timer3.3
+-fc Main.Pusher.Timer3.4=Main.Pusher.Timer3.4
+-fc Main.Pusher.Timer_Slide1_Black.1=Main.Pusher.Timer_Slide1_Black.1
+-fc Main.Pusher.Timer_Slide1_White.0=Main.Pusher.Timer_Slide1_White.0
+-fc Main.Pusher.Timer3.5=Main.Pusher.Timer3.5
+-fc Main.Pusher.Timer3.6=Main.Pusher.Timer3.6
+-fc Main.Pusher.Timer_Slide1_White.1=Main.Pusher.Timer_Slide1_White.1
+-fc Main.Pusher.Timer_Slide2_White.0=Main.Pusher.Timer_Slide2_White.0
+-fc Main.Pusher.Timer3.7=Main.Pusher.Timer3.7
+-fc Main.Pusher.Timer3.8=Main.Pusher.Timer3.8
+-fc Main.Pusher.Timer_Slide2_White.1=Main.Pusher.Timer_Slide2_White.1
+-fc Main.Pusher.Timer3.9=Main.Pusher.Timer3.9
+-fc Main.Pusher.Timer3.10=Main.Pusher.Timer3.10
+-fc Main.Pusher.Timer_Slide1_Metal.0=Main.Pusher.Timer_Slide1_Metal.0
+-fc Main.Pusher.Timer3.11=Main.Pusher.Timer3.11
+-fc Main.Pusher.Timer3.12=Main.Pusher.Timer3.12
+-fc Main.Pusher.Timer_Slide1_Metal.1=Main.Pusher.Timer_Slide1_Metal.1
+-fc Main.Pusher.Timer_Slide2_Metal.0=Main.Pusher.Timer_Slide2_Metal.0
+-fc Main.Pusher.Timer3.13=Main.Pusher.Timer3.13
+-fc Main.Pusher.Timer3.14=Main.Pusher.Timer3.14
+-fc Main.Pusher.Timer_Slide2_Metal.1=Main.Pusher.Timer_Slide2_Metal.1
+-fc Main.Pusher.Timer3.15=Main.Pusher.Timer3.15
+-fc Main.Pusher.Timer3.16=Main.Pusher.Timer3.16
+
+--rel-in "Sensor_CraneOnConveyor=(0sd16_16160 < Sensor_AnalogCranePosition & Sensor_AnalogCranePosition < 0sd16_16260)"
+--rel-in "Sensor_CraneOnMagazin=(0sd16_24290 < Sensor_AnalogCranePosition & Sensor_AnalogCranePosition < 0sd16_24390)"
+--rel-in "Sensor_CranePositionStamp=(0sd16_8160 < Sensor_AnalogCranePosition & Sensor_AnalogCranePosition < 0sd16_8260)"
+--rel-in Sensor_CraneOnConveyor=Sensor_CraneOnConveyor
+--rel-in Sensor_CraneOnMagazin=Sensor_CraneOnMagazin
+--rel-in Sensor_CranePosition=Sensor_CranePosition
+--rel-in "Sensor_CranePositionStamp=Sensor_CranePositionStamp"
+--rel-in Sensor_CraneDown=Sensor_CraneDown
+--rel-in Sensor_CraneSucked=Sensor_CraneSucked
+--rel-in Sensor_CraneUp=Sensor_CraneUp
+--rel-in Sensor_MagazinCapacitiveSensor=Sensor_MagazinCapacitiveSensor
+--rel-in Sensor_MagazinEmergencyStop=Sensor_MagazinEmergencyStop
+--rel-in Sensor_MagazinOpticalSensor=Sensor_MagazinOpticalSensor
+--rel-in Sensor_MagazinSwitchManuellAutomatic=Sensor_MagazinSwitchManuellAutomatic
+--rel-in Sensor_SliderMovedOut=Sensor_SliderMovedOut
+--rel-in Sensor_SliderNotMovedOut=Sensor_SliderNotMovedOut
+--rel-in Sensor_SorterCapacitiveSensorPusher1=Sensor_SorterCapacitiveSensorPusher1
+--rel-in Sensor_SorterCapacitiveSensorPusher2=Sensor_SorterCapacitiveSensorPusher2
+--rel-in Sensor_SorterEmergencyStop=Sensor_SorterEmergencyStop
+--rel-in Sensor_SorterLightbarrierCraneInterface=Sensor_SorterLightbarrierCraneInterface
+--rel-in Sensor_SorterLightnessSensorPusher1=Sensor_SorterLightnessSensorPusher1
+--rel-in Sensor_SorterLightnessSensorPusher2=Sensor_SorterLightnessSensorPusher2
+--rel-in Sensor_SorterLightnessSensorPusher3=Sensor_SorterLightnessSensorPusher3
+--rel-in Sensor_SorterLightnesssensorCraneInterfaceInverse=Sensor_SorterLightnesssensorCraneInterfaceInverse
+--rel-in Sensor_SorterPusher1MovedIn=Sensor_SorterPusher1MovedIn
+--rel-in Sensor_SorterPusher1MovedOut=Sensor_SorterPusher1MovedOut
+--rel-in Sensor_SorterPusher2MovedIn=Sensor_SorterPusher2MovedIn
+--rel-in Sensor_SorterPusher2MovedOut=Sensor_SorterPusher2MovedOut
+--rel-in Sensor_SorterStartButton=Sensor_SorterStartButton
+--rel-in Sensor_SorterSwitchManuellAutomatic=Sensor_SorterSwitchManuellAutomatic
+--rel-in Sensor_StampEmergencyStop=Sensor_StampEmergencyStop
+--rel-in Sensor_StampLowered=Sensor_StampLowered
+--rel-in Sensor_StampSliderFilled=Sensor_StampSliderFilled
+--rel-in Sensor_StampSliderSensorMovedIn=Sensor_StampSliderSensorMovedIn
+--rel-in Sensor_StampSliderSensorMovedOut=Sensor_StampSliderSensorMovedOut
+--rel-in Sensor_StampStartButton=Sensor_StampStartButton
+--rel-in Sensor_StampSwitchManuellAutomatic=Sensor_StampSwitchManuellAutomatic
+--rel-in Sensor_StampUp=Sensor_StampUp
+--rel-in Sensor_StartButtonMagazin=Sensor_StartButtonMagazin
+--rel-in Sensor_WorkpieceReady=Sensor_WorkpieceReady
+
+# symbex error? --rel-out Actuator_AnalogCranePressure=Actuator_AnalogCranePressure
+--rel-out Actuator_CraneLower=Actuator_CraneLower
+--rel-out Actuator_CraneTurnClockwise=Actuator_CraneTurnClockwise
+--rel-out Actuator_CraneTurnCounterclockwise=Actuator_CraneTurnCounterclockwise
+--rel-out Actuator_MagazinGreenLamp=Actuator_MagazinGreenLamp
+--rel-out Actuator_MagazinSlider=Actuator_MagazinSlider
+--rel-out Actuator_MagazinVacuumOff=Actuator_MagazinVacuumOff
+--rel-out Actuator_MagazinVacuumOn=Actuator_MagazinVacuumOn
+--rel-out Actuator_MagazinWhiteLamp=Actuator_MagazinWhiteLamp
+--rel-out Actuator_PusherY1=Actuator_PusherY1
+--rel-out Actuator_PusherY2=Actuator_PusherY2
+--rel-out Actuator_SorterConveyorTowardsCrane=Actuator_SorterConveyorTowardsCrane
+--rel-out Actuator_SorterConveyorTowardsStacker=Actuator_SorterConveyorTowardsStacker
+--rel-out Actuator_SorterGreenLampConveyor=Actuator_SorterGreenLampConveyor
+--rel-out Actuator_SorterWhiteLampConveyor=Actuator_SorterWhiteLampConveyor
+--rel-out Actuator_StampGreenLamp=Actuator_StampGreenLamp
+--rel-out Actuator_StampPusher=Actuator_StampPusher
+--rel-out Actuator_StampSliderMovedIn=Actuator_StampSliderMovedIn
+--rel-out Actuator_StampSliderMovedOut=Actuator_StampSliderMovedOut
+--rel-out Actuator_StampWhiteLamp=Actuator_StampWhiteLamp
+

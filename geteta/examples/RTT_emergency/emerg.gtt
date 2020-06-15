@@ -1,0 +1,181 @@
+relational table emerg(o, n, e) {
+	// Emergency Sub-system
+	var input {e}  ManualStampSliderOut, ManualStampSliderIn, CranePressureOn, CranePressureOff: BOOL
+	var output {e} NewCranePressure : INT
+	var output {e} StampSliderIn, StampSliderOut: BOOL
+	
+	//PPU runs
+	var input {n}   Sensor_ManualStampSliderOut, Sensor_ManualStampSliderIn,
+                     Sensor_CranePressureOn, Sensor_CranePressureOff : BOOL;
+
+       var output {o,n} Actuator_AnalogCranePressure : INT
+       var output {o,n} Actuator_CraneLower, Actuator_CraneTurnClockwise,
+                        Actuator_CraneTurnCounterclockwise, Actuator_MagazinGreenLamp,
+                        Actuator_MagazinSlider, Actuator_MagazinVacuumOff, Actuator_MagazinVacuumOn,
+                        Actuator_MagazinWhiteLamp, Actuator_StampGreenLamp, Actuator_StampPusher,
+                        Actuator_StampSliderMovedIn, Actuator_StampSliderMovedOut,
+                        Actuator_StampWhiteLamp : BOOL
+
+       var input {o,n}  Sensor_CraneDown, Sensor_CraneOnConveyor,
+                        Sensor_CraneOnMagazin, Sensor_CranePosition,
+                        Sensor_CranePositionStamp, Sensor_CraneSucked,
+                        Sensor_CraneUp, Sensor_MagazinCapacitiveSensor,
+                        Sensor_MagazinEmergencyStop,
+                        Sensor_MagazinOpticalSensor,
+                        Sensor_MagazinSwitchManuellAutomatic,
+                        Sensor_SliderMovedOut, Sensor_SliderNotMovedOut,
+                        Sensor_StampEmergencyStop, Sensor_StampLowered,
+                        Sensor_StampSliderFilled,
+                        Sensor_StampSliderSensorMovedIn,
+                        Sensor_StampSliderSensorMovedOut,
+                        Sensor_StampStartButton,
+                        Sensor_StampSwitchManuellAutomatic, Sensor_StampUp,
+                        Sensor_StartButtonMagazin, Sensor_WorkpieceReady : BOOL
+
+	group {
+		row equal_o_n >=1 { //equality of $o$ and $n$ if no emerg. stop.
+		     // no emergency stop with Sensor_StampEmergencyStop AND Sensor_MagazinEmergencyStop
+
+                     //inputs
+                     n::Sensor_CraneDown: =o::Sensor_CraneDown
+                     n::Sensor_CraneOnConveyor: =o::Sensor_CraneOnConveyor
+                     n::Sensor_CraneOnMagazin: =o::Sensor_CraneOnMagazin
+                     n::Sensor_CranePosition: =o::Sensor_CranePosition
+                     n::Sensor_CranePositionStamp: =o::Sensor_CranePositionStamp
+                     n::Sensor_CraneSucked: =o::Sensor_CraneSucked
+                     n::Sensor_CraneUp: =o::Sensor_CraneUp
+                     n::Sensor_MagazinCapacitiveSensor: =o::Sensor_MagazinCapacitiveSensor
+                     n::Sensor_MagazinEmergencyStop: =o::Sensor_MagazinEmergencyStop, TRUE
+                     n::Sensor_MagazinOpticalSensor: =o::Sensor_MagazinOpticalSensor
+                     n::Sensor_MagazinSwitchManuellAutomatic: =o::Sensor_MagazinSwitchManuellAutomatic
+                     n::Sensor_SliderMovedOut: =o::Sensor_SliderMovedOut
+                     n::Sensor_SliderNotMovedOut: =o::Sensor_SliderNotMovedOut
+                     n::Sensor_StampEmergencyStop: =o::Sensor_StampEmergencyStop, TRUE
+                     n::Sensor_StampLowered: =o::Sensor_StampLowered
+                     n::Sensor_StampSliderFilled: =o::Sensor_StampSliderFilled
+                     n::Sensor_StampSliderSensorMovedIn: =o::Sensor_StampSliderSensorMovedIn
+                     n::Sensor_StampSliderSensorMovedOut: =o::Sensor_StampSliderSensorMovedOut
+                     n::Sensor_StampStartButton: =o::Sensor_StampStartButton
+                     n::Sensor_StampSwitchManuellAutomatic: =o::Sensor_StampSwitchManuellAutomatic
+                     n::Sensor_StampUp: =o::Sensor_StampUp
+                     n::Sensor_StartButtonMagazin: =o::Sensor_StartButtonMagazin
+                     n::Sensor_WorkpieceReady: =o::Sensor_WorkpieceReady
+                     //outputs
+                     n::Actuator_AnalogCranePressure: =o::Actuator_AnalogCranePressure
+                     n::Actuator_CraneLower: =o::Actuator_CraneLower
+                     n::Actuator_CraneTurnClockwise: =o::Actuator_CraneTurnClockwise
+                     n::Actuator_CraneTurnCounterclockwise: =o::Actuator_CraneTurnCounterclockwise
+                     n::Actuator_MagazinGreenLamp: =o::Actuator_MagazinGreenLamp
+                     n::Actuator_MagazinSlider: =o::Actuator_MagazinSlider
+                     n::Actuator_MagazinVacuumOff: =o::Actuator_MagazinVacuumOff
+                     n::Actuator_MagazinVacuumOn: =o::Actuator_MagazinVacuumOn
+                     n::Actuator_MagazinWhiteLamp: =o::Actuator_MagazinWhiteLamp
+                     n::Actuator_StampGreenLamp: =o::Actuator_StampGreenLamp
+                     n::Actuator_StampPusher: =o::Actuator_StampPusher
+                     n::Actuator_StampSliderMovedIn: =o::Actuator_StampSliderMovedIn
+                     n::Actuator_StampSliderMovedOut: =o::Actuator_StampSliderMovedOut
+                     n::Actuator_StampWhiteLamp: =o::Actuator_StampWhiteLamp
+		}
+		row 1 {
+		    \backward(0): e
+                     //inputs
+                     n::Sensor_CraneDown: =o::Sensor_CraneDown
+                     n::Sensor_CraneOnConveyor: =o::Sensor_CraneOnConveyor
+                     n::Sensor_CraneOnMagazin: =o::Sensor_CraneOnMagazin
+                     n::Sensor_CranePosition: =o::Sensor_CranePosition
+                     n::Sensor_CranePositionStamp: =o::Sensor_CranePositionStamp
+                     n::Sensor_CraneSucked: =o::Sensor_CraneSucked
+                     n::Sensor_CraneUp: =o::Sensor_CraneUp
+                     n::Sensor_MagazinCapacitiveSensor: =o::Sensor_MagazinCapacitiveSensor
+                                                                                      //specify an emergency stop
+                     n::Sensor_MagazinEmergencyStop: =o::Sensor_MagazinEmergencyStop, (!n::Sensor_StampEmergencyStop OR !n::Sensor_MagazinEmergencyStop)
+                     n::Sensor_MagazinOpticalSensor: =o::Sensor_MagazinOpticalSensor
+                     n::Sensor_MagazinSwitchManuellAutomatic: =o::Sensor_MagazinSwitchManuellAutomatic
+                     n::Sensor_SliderMovedOut: =o::Sensor_SliderMovedOut
+                     n::Sensor_SliderNotMovedOut: =o::Sensor_SliderNotMovedOut
+                     n::Sensor_StampEmergencyStop: =o::Sensor_StampEmergencyStop
+                     n::Sensor_StampLowered: =o::Sensor_StampLowered
+                     n::Sensor_StampSliderFilled: =o::Sensor_StampSliderFilled
+                     n::Sensor_StampSliderSensorMovedIn: =o::Sensor_StampSliderSensorMovedIn
+                     n::Sensor_StampSliderSensorMovedOut: =o::Sensor_StampSliderSensorMovedOut
+                     n::Sensor_StampStartButton: =o::Sensor_StampStartButton
+                     n::Sensor_StampSwitchManuellAutomatic: =o::Sensor_StampSwitchManuellAutomatic
+                     n::Sensor_StampUp: =o::Sensor_StampUp
+                     n::Sensor_StartButtonMagazin: =o::Sensor_StartButtonMagazin
+                     n::Sensor_WorkpieceReady: =o::Sensor_WorkpieceReady
+                     //outputs
+                     n::Actuator_AnalogCranePressure: =o::Actuator_AnalogCranePressure
+                     n::Actuator_CraneLower: =o::Actuator_CraneLower
+                     n::Actuator_CraneTurnClockwise: =o::Actuator_CraneTurnClockwise
+                     n::Actuator_CraneTurnCounterclockwise: =o::Actuator_CraneTurnCounterclockwise
+                     n::Actuator_MagazinGreenLamp: =o::Actuator_MagazinGreenLamp
+                     n::Actuator_MagazinSlider: =o::Actuator_MagazinSlider
+                     n::Actuator_MagazinVacuumOff: =o::Actuator_MagazinVacuumOff
+                     n::Actuator_MagazinVacuumOn: =o::Actuator_MagazinVacuumOn
+                     n::Actuator_MagazinWhiteLamp: =o::Actuator_MagazinWhiteLamp
+                     n::Actuator_StampGreenLamp: =o::Actuator_StampGreenLamp
+                     n::Actuator_StampPusher: =o::Actuator_StampPusher
+                     n::Actuator_StampSliderMovedIn: =o::Actuator_StampSliderMovedIn
+                     n::Actuator_StampSliderMovedOut: =o::Actuator_StampSliderMovedOut
+                     n::Actuator_StampWhiteLamp: =o::Actuator_StampWhiteLamp
+		     //equality of n to e
+		     e::NewCranePressure: =n::Actuator_AnalogCranePressure
+		     e::StampSliderIn:    =n::Actuator_StampSliderMovedIn
+		     e::StampSliderOut:   =n::Actuator_StampSliderMovedOut
+                     e::ManualStampSliderOut: =n::Sensor_ManualStampSliderOut
+                     e::ManualStampSliderIn:  =n::Sensor_ManualStampSliderIn
+                     e::CranePressureOn:      =n::Sensor_CranePressureOn
+                     e::CranePressureOff:     =n::Sensor_CranePressureOff
+		}
+		row >=0 {			
+                    //inputs
+                     n::Sensor_CraneDown: =o::Sensor_CraneDown
+                     n::Sensor_CraneOnConveyor: =o::Sensor_CraneOnConveyor
+                     n::Sensor_CraneOnMagazin: =o::Sensor_CraneOnMagazin
+                     n::Sensor_CranePosition: =o::Sensor_CranePosition
+                     n::Sensor_CranePositionStamp: =o::Sensor_CranePositionStamp
+                     n::Sensor_CraneSucked: =o::Sensor_CraneSucked
+                     n::Sensor_CraneUp: =o::Sensor_CraneUp
+                     n::Sensor_MagazinCapacitiveSensor: =o::Sensor_MagazinCapacitiveSensor
+                                                                                      //specify an emergency stop
+                     n::Sensor_MagazinEmergencyStop: =o::Sensor_MagazinEmergencyStop, (!o::Sensor_StampEmergencyStop OR !o::Sensor_MagazinEmergencyStop)
+                     n::Sensor_MagazinOpticalSensor: =o::Sensor_MagazinOpticalSensor
+                     n::Sensor_MagazinSwitchManuellAutomatic: =o::Sensor_MagazinSwitchManuellAutomatic
+                     n::Sensor_SliderMovedOut: =o::Sensor_SliderMovedOut
+                     n::Sensor_SliderNotMovedOut: =o::Sensor_SliderNotMovedOut
+                     n::Sensor_StampEmergencyStop: =o::Sensor_StampEmergencyStop
+                     n::Sensor_StampLowered: =o::Sensor_StampLowered
+                     n::Sensor_StampSliderFilled: =o::Sensor_StampSliderFilled
+                     n::Sensor_StampSliderSensorMovedIn: =o::Sensor_StampSliderSensorMovedIn
+                     n::Sensor_StampSliderSensorMovedOut: =o::Sensor_StampSliderSensorMovedOut
+                     n::Sensor_StampStartButton: =o::Sensor_StampStartButton
+                     n::Sensor_StampSwitchManuellAutomatic: =o::Sensor_StampSwitchManuellAutomatic
+                     n::Sensor_StampUp: =o::Sensor_StampUp
+                     n::Sensor_StartButtonMagazin: =o::Sensor_StartButtonMagazin
+                     n::Sensor_WorkpieceReady: =o::Sensor_WorkpieceReady
+                     //outputs
+                     n::Actuator_AnalogCranePressure: =o::Actuator_AnalogCranePressure
+                     n::Actuator_CraneLower: =o::Actuator_CraneLower
+                     n::Actuator_CraneTurnClockwise: =o::Actuator_CraneTurnClockwise
+                     n::Actuator_CraneTurnCounterclockwise: =o::Actuator_CraneTurnCounterclockwise
+                     n::Actuator_MagazinGreenLamp: =o::Actuator_MagazinGreenLamp
+                     n::Actuator_MagazinSlider: =o::Actuator_MagazinSlider
+                     n::Actuator_MagazinVacuumOff: =o::Actuator_MagazinVacuumOff
+                     n::Actuator_MagazinVacuumOn: =o::Actuator_MagazinVacuumOn
+                     n::Actuator_MagazinWhiteLamp: =o::Actuator_MagazinWhiteLamp
+                     n::Actuator_StampGreenLamp: =o::Actuator_StampGreenLamp
+                     n::Actuator_StampPusher: =o::Actuator_StampPusher
+                     n::Actuator_StampSliderMovedIn: =o::Actuator_StampSliderMovedIn
+                     n::Actuator_StampSliderMovedOut: =o::Actuator_StampSliderMovedOut
+                     n::Actuator_StampWhiteLamp: =o::Actuator_StampWhiteLamp
+		     //equality of n to e
+		     e::NewCranePressure: =n::Actuator_AnalogCranePressure
+		     e::StampSliderIn:    =n::Actuator_StampSliderMovedIn
+		     e::StampSliderOut:   =n::Actuator_StampSliderMovedOut
+                     e::ManualStampSliderOut: =n::Sensor_ManualStampSliderOut
+                     e::ManualStampSliderIn:  =n::Sensor_ManualStampSliderIn
+                     e::CranePressureOn:      =n::Sensor_CranePressureOn
+                     e::CranePressureOff:     =n::Sensor_CranePressureOff
+		}
+	}
+}

@@ -39,6 +39,7 @@ open class DefaultVisitor<T>() : DefaultVisitorNN<T?>() {
 abstract class DefaultVisitorNN<T> : Visitor<T> {
     abstract fun defaultVisit(obj: Any): T
 
+    override fun visit(blockStatement: BlockStatement): T = defaultVisit(blockStatement)
     override fun visit(elements: PouElements): T = defaultVisit(elements)
     override fun visit(location: Location): T = defaultVisit(location)
     override fun visit(initializations: ArrayInitialization): T = defaultVisit(initializations)
@@ -98,4 +99,5 @@ abstract class DefaultVisitorNN<T> : Visitor<T> {
     override fun visit(jump: JumpStatement)  = defaultVisit(jump)
     override fun visit(label: LabelStatement) = defaultVisit(label)
     override fun visit(namespace: NamespaceDeclaration)= defaultVisit(namespace)
+    override fun visit(special: SpecialStatement) = defaultVisit(special)
 }

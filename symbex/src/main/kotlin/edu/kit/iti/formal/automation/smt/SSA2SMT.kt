@@ -40,6 +40,10 @@ class SSA2SMT(val input: SMVModule) : Runnable {
     override fun run() {
         val v = Smv2SmtVisitor(fnTranslator, dtTranslator)
 
+        input.definitions.forEach { (k,expr) ->
+            product.nextDefines[k.name] = expr.accept(v)
+        }
+
         //rewrite initial assignments
         input.initAssignments.forEach { (target, expr) ->
             product.initPredicates[target.name] = expr.accept(v)
@@ -70,10 +74,6 @@ class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
     }
 
     override fun visit(v: SVariable): SExpr {
-        /*SExpr access = newNonAtomicSExpr();
-        access.add(SSymbol(v.getName()));
-        access.add(SSymbol(SMTProgram.STATE_NAME));
-        */
         return SSymbol(statePrefix + v.name)
     }
 
@@ -81,7 +81,7 @@ class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
         val left = be.left.accept(this)
         val right = be.right.accept(this)
         val op = fnTranslator.translateOperator(be.operator,
-                be.left.dataType!!, be.right.dataType!!)
+                be.left.dataType, be.right.dataType)
 
         val call = SList()
         call.add(op)
@@ -92,7 +92,7 @@ class Smv2SmtVisitor(val fnTranslator: S2SFunctionTranslator,
 
     override fun visit(ue: SUnaryExpression): SExpr {
         val right = ue.expr.accept(this)
-        val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType!!)
+        val op = fnTranslator.translateOperator(ue.operator, ue.expr.dataType)
         val call = SList()
         call.add(op)
         call.add(right)

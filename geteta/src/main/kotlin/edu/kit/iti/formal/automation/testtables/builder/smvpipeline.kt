@@ -21,6 +21,7 @@ import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.disjunction
 import edu.kit.iti.formal.util.warn
+import kotlin.math.abs
 
 
 class SmvConstructionPipeline(
@@ -133,6 +134,7 @@ object DefineTransitions : AbstractTransformer<SMVConstructionModel>() {
                         TransitionType.ACCEPT_PROGRESS -> model.getAcceptProgress(t.from as RowState)
                         TransitionType.FAIL -> model.getFail(t.from as RowState)
                         TransitionType.TRUE -> model.getVariable(it)
+                        TransitionType.MISS -> model.getMiss(t.from as RowState)
                     }
                 }?.disjunction() ?: SLiteral.FALSE
         model.tableModule.nextAssignments.add(
@@ -158,7 +160,7 @@ object RegisterDefines : SmvConstructionTransformer {
         // progress indicator
         val progress = if (s.duration.pflag) {
             s.outgoing
-                    .filter { it != model.sentinelState }
+                    //TODO filter the sentinel out: .filter { it != model.sentinelState }
                     .map { it.defInput }
                     .disjunction()
         } else SLiteral.FALSE
@@ -208,8 +210,7 @@ class NameSetterTransformer : SmvConstructionTransformer {
         val mt = model.tableModule
         val gtt = model.testTable
         if (gtt.name.isEmpty()) {
-            warn("No table name given. Aborting")
-        } else {
+            warn("No table name given. Using default name `table'.")
             gtt.name = "table"
         }
         mt.name = gtt.name
@@ -271,12 +272,12 @@ class ManagingGlobalVariables : SmvConstructionTransformer {
 class BackwardsReferencesTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.variableContext.refs.forEach { variable, history ->
-            this.addDelayModule(model, variable, history)
+            this.addDelayModule(model, variable, abs(history))
         }
     }
 
     private fun addDelayModule(model: SMVConstructionModel, variable: SVariable, history: Int) {
-        val b = HistoryModuleBuilder("History_%d_of_%s", listOf(variable), history)
+        val b = HistoryModuleBuilder("History_${history}_of_${variable.name}", listOf(variable), history)
         b.run()
 
         //Add Variable

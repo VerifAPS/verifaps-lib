@@ -17,7 +17,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 public boolean relational = false;
 }
 
-
+INHERIT_FROM:'\\inherit_from';
 DOT:'.';
 SEMICOLON:';';
 OMEGA:'omega';
@@ -76,12 +76,17 @@ NEXT : 'next';
 ASSUME : 'ASSUME' | 'assume';
 ASSERT : 'ASSERT' | 'assert';
 
+GOTO:'\\goto';
+MISS:'\\miss';
+FAIL:'\\fail';
+PASS:'\\pass';
+
 FQ_VARIABLE : (DIGIT+|IDENTIFIER)? ('|>'|'·'|'::') IDENTIFIER?;
 IDENTIFIER:  [a-zA-Z_] [$a-zA-Z0-9_]* | '`' [$a-zA-Z0-9_]* '`';
 
 fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;
-//FLOAT:   '-'? NUMBER '.' NUMBER?;
+FLOAT:   NUMBER '.' NUMBER;
 INTEGER: NUMBER;
 
 WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);

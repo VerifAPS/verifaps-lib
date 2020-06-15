@@ -35,6 +35,8 @@ import java.util.*
 class SMVTransformToAST : SMVBaseVisitor<Any>() {
     private var lastModule: SMVModule? = null
 
+    override fun visitExprEOF(ctx: SMVParser.ExprEOFContext) = ctx.expr().accept(this)
+
     override fun visitModules(ctx: SMVParser.ModulesContext): List<SMVModule> {
         val moduleDeclarations = ArrayList<SMVModule>()
         ctx.module().forEach { c -> moduleDeclarations.add(c.accept(this) as SMVModule) }

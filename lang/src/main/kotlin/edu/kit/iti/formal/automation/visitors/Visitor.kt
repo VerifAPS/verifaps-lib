@@ -70,4 +70,6 @@ interface Visitor<T> {
     fun visit(jump: JumpStatement): T
     fun visit(label: LabelStatement): T
     fun visit(namespace: NamespaceDeclaration): T
+    fun visit(blockStatement: BlockStatement): T
+    fun visit(special: SpecialStatement): T
 }

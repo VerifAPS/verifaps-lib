@@ -1,98 +1,45 @@
 plugins {
     id("application")
-    id 'com.github.johnrengelman.shadow' version "5.0.0"
 }
 
-mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
+/*
+javafx {
+    version = "13"
+    modules = [ 'javafx.controls' ]
+}*/
 
-description = 'Case Studies and Executables of VerifAPS'
+mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
+//mainClassName = "edu.kit.iti.formal.automation.idefx.IdeFx"
 dependencies {
     compile project(':symbex')
     compile project(':geteta')
-    compile project(':modularization')
     compile project(':aps-rvt')
-    compile project(':flycheck')
     compile project(':run')
 
-    // https://mvnrepository.com/artifact/com.fifesoft/autocomplete
-    compile group: 'com.fifesoft', name: 'autocomplete', version: '3.0.0'
+    implementation 'com.github.ajalt:clikt:2.6.0'
 
-    implementation 'com.github.ajalt:clikt:2.1.0'
-
-
-    compile 'me.tomassetti:kolasu:0.2.2'
-    compile group: 'org.javassist', name: 'javassist', version: '3.25.0-GA'
+    compile group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
+    compile group: 'org.javassist', name: 'javassist', version: '3.26.0-GA'
     compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
-    // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.0.3'
-    // https://mvnrepository.com/artifact/com.fifesoft/rstaui
-    compile group: 'com.fifesoft', name: 'rstaui', version: '3.0.0'
-    // https://mvnrepository.com/artifact/com.fifesoft/spellchecker
-    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.0.0'
+    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
+    compile group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
+    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
 
     //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
+    implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1_pre-release_6.1'
 
-    // https://mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-core
     //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
-    //compile 'dk.navicon:vldocking:3.0.4'
     compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
-
-    //compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE802'
     compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
-
-    //implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
 }
 
 repositories {
     maven {
         url = "http://bits.netbeans.org/maven2/"
     }
-}
-
-def mainClasses = [
-        "modularization"     : "edu.kit.iti.formal.automation.modularization.ModApp"
-        , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
-        , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
-        , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
-        , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
-        , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
-        , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
-        , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
-        , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthizer'
-        , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
-        , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
-        , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
-        , 'check'            : "edu.kit.iti.formal.automation.Check"
-        , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
-        , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
-]
-
-
-mainClasses.each { a, b ->
-    def t = task("createStart$a", type: CreateStartScripts) {
-        group = "start-script"
-        applicationName = a
-        //description "Latex Printer for Test Tables"
-        classpath = startScripts.classpath
-        outputDir = startScripts.outputDir
-        mainClassName = b
-        /*startScripts.classpath.files.each {
-            c -> println(c)
-        }*/
-    }
-    applicationDistribution.from(t) { into("bin") }
-    t.dependsOn startScripts
-}
-
-applicationDistribution.into("bin") {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-/*    from(createScriptKastelDemonstrator)
-    from(createScriptSc12f)
-    from(createScriptSc11_rev)*/
-    fileMode = 0755
 }
 

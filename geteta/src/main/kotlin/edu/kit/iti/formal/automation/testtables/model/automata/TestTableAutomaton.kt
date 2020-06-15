@@ -16,19 +16,20 @@ data class Transition(
 )
 
 enum class TransitionType {
-    ACCEPT, ACCEPT_PROGRESS, FAIL, TRUE
+    ACCEPT, ACCEPT_PROGRESS, FAIL, TRUE, MISS
 }
 
-sealed class AutomatonState(open val name: String) {
+sealed class AutomatonState(open var name: String) {
     var optional: Boolean = false
     var progressFlag: Boolean = false
     var strongRepetition: Boolean = false
     var weakRepeat: Boolean = false
 }
 
-data class SpecialState(override val name: String) : AutomatonState(name)
+data class SpecialState(override var name: String) : AutomatonState(name)
 data class RowState(val row: TableRow, val time: Int)
     : AutomatonState("%s_%02d".format(row.id, time)) {
+    val miss = "${name}_miss"
     val fwd = "${name}_accept"
     val fwdprogress = "${name}_acceptp"
     val fail = "${name}_fail"
@@ -99,12 +100,6 @@ data class TestTableAutomaton(
     var stateError: AutomatonState = SpecialState("n/a")
     var stateSentinel: AutomatonState = SpecialState("n/a")
     val initialStates: MutableSet<AutomatonState> = HashSet()
-
-    val mutualExclusiveStates: MutableMap<AutomatonState, Collection<AutomatonState>> = HashMap()
-
-    fun mutexFor(lower: AutomatonState, successor: AutomatonState) {
-        //TODO
-    }
 
 
     fun addTransition(from: AutomatonState, to: AutomatonState, guard: TransitionType) {

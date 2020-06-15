@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Print MinMax" type="JetRunConfigurationType" factoryName="Kotlin" folderName="ttprint">
+    <option name="VM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value="MinMax.tt.txt" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <option name="MAIN_CLASS_NAME" value="edu.kit.iti.formal.automation.testtables.apps.Printer" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$/geteta/examples/MinMax" />
+    <module name="" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

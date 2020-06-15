@@ -1,0 +1,28 @@
+table Ta {
+    var input i : INT
+    var output o : INT
+    var output c : INT
+    
+    
+    
+    group 0 [1, 1] {
+      group [0,1]{
+	        row omega {
+	            i: -
+	            o: i
+	            c: -42
+	        }
+	   }
+     
+        group[0,1]{
+		   row omega {
+	            i: -
+	            o: i
+	            c: 42
+	        }
+        }
+
+        
+    }
+    
+}

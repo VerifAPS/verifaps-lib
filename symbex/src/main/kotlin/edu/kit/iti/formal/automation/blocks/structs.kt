@@ -10,7 +10,6 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 data class BlockProgram(

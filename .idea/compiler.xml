@@ -21,6 +21,7 @@
       <module name="edu.kit.iti.formal.iec61131lang.test" target="1.8" />
       <module name="edu.kit.iti.formal.smv-model.main" target="1.8" />
       <module name="edu.kit.iti.formal.smv-model.test" target="1.8" />
+      <module name="verifaps.modularization" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

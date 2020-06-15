@@ -9,7 +9,7 @@ def antlrOutputDir = file("build/generated-src/antlr")
 repositories { mavenCentral() }
 
 dependencies {
-    antlr 'org.antlr:antlr4:4.7.2'
+    antlr 'org.antlr:antlr4:4.8-1'
     compile project(":util")
 }
 

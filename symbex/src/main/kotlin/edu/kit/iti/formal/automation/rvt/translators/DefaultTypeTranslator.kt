@@ -72,7 +72,7 @@ class DefaultTypeTranslator : TypeTranslator {
                         GroundDataType.SIGNED_WORD :
                         GroundDataType.UNSIGNED_WORD, inttype.getBitLength());
         */
-            return SMVWordType(true, anyInt.bitLength)
+            return SMVWordType(anyInt.isSigned, anyInt.bitLength)
         }
 
         override fun visit(enumerateType: EnumerateType): SMVType {

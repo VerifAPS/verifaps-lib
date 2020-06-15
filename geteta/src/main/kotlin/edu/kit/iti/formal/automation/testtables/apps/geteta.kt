@@ -19,29 +19,28 @@
  */
 package edu.kit.iti.formal.automation.testtables.apps
 
-
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.file
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.option
 import com.github.jferard.fastods.tool.FastOds
-
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.rvt.LineMap
+import edu.kit.iti.formal.automation.st.HccPrinter
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
+import edu.kit.iti.formal.automation.st0.trans.SCOPE_SEPARATOR
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
-import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
-import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
+import edu.kit.iti.formal.automation.testtables.builder.*
+import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
+import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
+import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterJson
 import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
 import edu.kit.iti.formal.smv.NuXMVOutput
-import edu.kit.iti.formal.util.CodeWriter
-import edu.kit.iti.formal.util.findProgram
-import edu.kit.iti.formal.util.info
-import edu.kit.iti.formal.util.warn
+import edu.kit.iti.formal.util.*
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -55,59 +54,27 @@ object Geteta {
 class GetetaApp : CliktCommand(
         epilog = "Geteta -- Tooling for Generalized Test Tables.",
         name = "geteta.sh") {
-    //val xmlModeOutput by option("-x", help = "enable XML mode")
-    //        .flag(default = false)
 
-    val disableSimplify by option("--no-simplify", help = "disable")
-            .flag("--simplify", default = false)
+    val programOptions by ProgramOptions()
+    val tableOptions by TableArguments()
+    val outputFolder by outputFolder()
+    val dryRun by dryRun()
+    val nuxmv by nuxmv()
 
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
-            .file(exists = true, readable = true)
-            .multiple(required = true)
+    val cexAnalysation by CexAnalysationArguments()
 
-    val outputFolder by option("-o", "--output", help = "Output directory")
 
-    val library by option("-L", "--library", help = "library files").file().multiple()
-    val program by option("-P", "--program", "-c", help = "program files").file(exists = true, readable = true).required()
-
-    val nuxmv by option("--nuxmv",
-            help = "Path to nuXmv binary. You can also set the environment variable \$NUXMV",
-            envvar = "NUXMV")
-            .default("nuXmv")
+    val automataOptions by AutomataOptions()
 
     val mode by option("-m", "--mode", help = "Verification Mode")
             .convert { Mode.valueOf(it) }
 
-    val runAnalyzer by option("--row-map", help = "print out a row mapping")
-            .flag("--no-row-map", default = false)
-
-    val odsExport by option("--ods", help = "generate ods counterexample file").file()
-    val odsOpen by option("--ods-open").flag()
-
-    val cexPrinter by option("--cexout", help = "prints an analysation of the counter example and the program")
-            .flag()
-
-    val drawAutomaton by option("--debug-automaton").flag(default = false)
-    val showAutomaton by option("--show-automaton").flag(default = false)
-
-    val verificationTechnique by option("-v", "--technique",
-            help = "verification technique").convert { VerificationTechnique.valueOf(it) }
-            .default(VerificationTechnique.IC3)
-
     override fun run() {
-        val gtts = table.flatMap {
-            info("Use table file ${it.absolutePath}")
-            GetetaFacade.readTables(it)
-        }.map {
-            it.ensureProgramRuns()
-            it.generateSmvExpression()
-            it.simplify()
-        }
+        val gtts = tableOptions.readTables()
 
         //
-        info("Parse program ${program.absolutePath} with libraries ${library}")
-        val code = IEC61131Facade.readProgramsWLP(library, listOf(program)).first()
-                ?: throw IllegalStateException("No program given in $program")
+        info("Parse program ${programOptions.program.first()} with libraries ${programOptions.library}")
+        val code = programOptions.readProgram()
 
         // override mode
         if (mode != null)
@@ -117,7 +84,8 @@ class GetetaApp : CliktCommand(
             info("Mode is ${it.options.mode} for table ${it.name}")
         }
 
-        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code,
+                programOptions.disableSimplify)
         info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
@@ -126,102 +94,168 @@ class GetetaApp : CliktCommand(
         val tt = gtts.map { gtt -> GetetaFacade.constructSMV(gtt, superEnumType) }
         info("SMV for table constructed")
 
-        if (drawAutomaton) {
+        if (automataOptions.drawAutomaton) {
             info("Automaton drawing requested. This may took a while.")
             gtts.zip(tt).forEach { (gtt, tt) ->
-                val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
-                        gtt, tt.automaton)
-                ad.runDot = true
-                ad.show = showAutomaton
-                ad.run()
-                if (showAutomaton)
-                    info("Image viewer should open now")
+                drawAutomaton(gtt, tt)
             }
         } else {
             info("For drawing the automaton use: `--draw-automaton'.")
         }
 
-        info("Constructing final SMV file.")
-        val modTable = tt.map { it.tableModule }
-        val mainModule = MultiModelGluer().apply {
-            val pn = gtts.first().programRuns.first() // only one run in geteta
-            addProgramRun(pn, modCode)
-            tt.forEach {
-                addTable("_" + it.testTable.name, it.ttType!!)
-            }
-        }
-        val modules = arrayListOf(mainModule.product, modCode)
-        modules.addAll(modTable)
-        tt.forEach { modules.addAll(it.helperModules) }
+        val modules =
+                if (tableOptions.enableMesh) {
+                    warn("mesh gtt support is experimental and not well-tested or completely implemented!!!")
+                    warn("YOU HAVE BEEN WARNED.")
+                    val tableJoiner = GetetaFacade.meshTables(tt)
+                    val dummyGtt = GetetaFacade.createMeshedDummy(gtts)
+                    val smv = GetetaFacade.constructSMV(
+                            AutomataTransformerState(dummyGtt, tableJoiner), superEnumType)
 
-        val folder = File(this.table.first().parent,
-                this.table.first().nameWithoutExtension).absolutePath
+                    if (automataOptions.drawAutomaton) {
+                        info("Automaton drawing requested. Drawing the meshed automaton.")
+                        drawAutomaton(tt.map { it.testTable }, tableJoiner)
+                    }
+                    val mainModule = MultiModelGluer().apply {
+                        val pn = gtts.first().programRuns.first() // only one run in geteta
+                        addProgramRun(pn, modCode)
+                        addTable("_" + smv.tableModule.name, smv.ttType!!)
+                    }
+                    val m = arrayListOf(mainModule.product, modCode, smv.tableModule)
+                    m.addAll(smv.helperModules)
+                    m
+                } else {
+                    info("Constructing final SMV file.")
+                    val modTable = tt.map { it.tableModule }
+                    val mainModule = MultiModelGluer().apply {
+                        val pn = gtts.first().programRuns.first() // only one run in geteta
+                        addProgramRun(pn, modCode)
+                        tt.forEach {
+                            addTable("_" + it.testTable.name, it.ttType!!)
+                        }
+                    }
+                    val m = arrayListOf(mainModule.product, modCode)
+                    m.addAll(modTable)
+                    tt.forEach { m.addAll(it.helperModules) }
+                    m
+                }
+
+        val t = this.tableOptions.table.first()
+        val folder = File(t.parent, t.nameWithoutExtension).absolutePath
         val verificationTechnique = gtts.first().options.verificationTechnique
         info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
         val nuxmv = findProgram(nuxmv)
-        if (nuxmv == null) {
-            error("Could not find ${this.nuxmv}.")
-            exitProcess(1)
-            return
+
+        val process =
+                GetetaFacade.createNuXMVProcess(folder, modules, nuxmv?.absolutePath ?: "n/a",
+                        verificationTechnique)
+
+        if (dryRun) {
+            if (nuxmv == null) {
+                error("Could not find ${this.nuxmv}.")
+                exitProcess(1)
+            }
+
+            val b = process.call()
+            val status =
+                    when (b) {
+                        NuXMVOutput.Verified -> "verified"
+                        is NuXMVOutput.Error -> "error"
+                        is NuXMVOutput.Cex -> "not-verified"
+                    }
+
+            val errorLevel =
+                    when (b) {
+                        is NuXMVOutput.Error -> 1
+                        else -> 0
+                    }
+
+            if (b is NuXMVOutput.Cex) {
+                if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
+                else info("Use `--cexout' to print a cex analysation.")
+
+                if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
+                else info("Use `--cexjson' to print a cex analysation as json.")
+
+                if (cexAnalysation.runAnalyzer) createRowMapping(b, tt)
+                else info("Use `--row-map' to print possible row mappings.")
+            }
+            info("STATUS: $status")
+            exitProcess(errorLevel)
+        } else {
+            info("Model checker skipped due to `--dont-model-check` flag.")
         }
-        val b = GetetaFacade.runNuXMV(
-                nuxmv.absolutePath,
-                folder,
-                modules,
-                verificationTechnique)
-
-        val status =
-                when (b) {
-                    NuXMVOutput.Verified -> "verified"
-                    is NuXMVOutput.Error -> "error"
-                    is NuXMVOutput.Cex -> "not-verified"
-                }
-
-        val errorLevel =
-                when (b) {
-                    is NuXMVOutput.Error -> 1
-                    else -> 0
-                }
-
-        if (b is NuXMVOutput.Cex) {
-            if (cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
-            else info("Use `--cexout' to print a cex analysation.")
-            if (runAnalyzer) runCexAnalysation(b, tt)
-            else info("Use `--row-map' to print possible row mappings.")
-        }
-        info("STATUS: $status")
-        exitProcess(errorLevel)
     }
 
-    private fun runCexAnalysation(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
+    private fun useCounterExamplePrinterJson(outputFolder: String,
+                                             result: NuXMVOutput.Cex,
+                                             tt: List<SMVConstructionModel>) {
+        for (model in tt) {
+            val file = File(outputFolder, "cex_${model.testTable.name}.json")
+            info("Writing JSON counter example to $file")
+            val cep = CounterExamplePrinterJson(
+                    automaton = model.automaton,
+                    testTable = model.testTable,
+                    cex = result.counterExample)
+            file.writeText(cep.call())
+        }
+    }
+
+    private fun drawAutomaton(gtt: List<GeneralizedTestTable>, tt: TestTableAutomaton) {
+        val ad = AutomatonDrawer(File(outputFolder, "${gtt.first().name}.dot"),
+                gtt.map { it.region }, tt)
+        ad.runDot = true
+        ad.show = automataOptions.showAutomaton
+        ad.run()
+        if (automataOptions.showAutomaton)
+            info("Image viewer should open now")
+    }
+
+    private fun drawAutomaton(gtt: GeneralizedTestTable, tt: SMVConstructionModel) {
+        val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
+                listOf(gtt.region), tt.automaton)
+        ad.runDot = true
+        ad.show = automataOptions.showAutomaton
+        ad.run()
+        if (automataOptions.showAutomaton)
+            info("Image viewer should open now")
+    }
+
+    private fun createRowMapping(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
         val mappings = tt.map {
             GetetaFacade.analyzeCounterExample(
                     it.automaton, it.testTable, result.counterExample)
         }
 
-        mappings.forEach { mapping ->
-            info("MAPPING: ==========")
-            mapping.forEachIndexed { i, m ->
-                info("{}: {}", i, m.asRowList())
+        mappings.zip(tt).forEach { (m, tt) ->
+            m.forEachIndexed { i, m ->
+                val a = m.asRowList().joinToString(", ", "[", "]")
+                info("Mapping ${tt.testTable.name}#$i:\t$a")
             }
-            info("/End of MAPPING")
         }
 
         when {
             mappings.isEmpty() -> warn("no row mapping found!")
-            odsExport == null -> info("Use `--ods <table.ods>' to generate a counterexample tables.")
-            odsExport != null -> {
+            cexAnalysation.odsExport == null -> info("Use `--ods <table.ods>' to generate a counterexample tables.")
+            cexAnalysation.odsExport != null -> {
                 val w = ODSCounterExampleWriter(result.counterExample)
                 tt.zip(mappings).forEach { (t, m) ->
                     w.addTestTable(t, m)
                 }
                 w.run()
-                w.writer.saveAs(odsExport)
-                FastOds.openFile(odsExport)
+                w.writer.saveAs(cexAnalysation.odsExport)
+                FastOds.openFile(cexAnalysation.odsExport)
             }
         }
     }
 }
+
+internal fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
+        if (tableWhitelist.isNotEmpty())
+            this.filter { it.name in tableWhitelist }
+        else
+            this
+
 
 fun useCounterExamplePrinter(
         outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
@@ -242,3 +276,66 @@ fun useCounterExamplePrinter(
     }
 }
 
+
+object GetetaSmt {
+    @JvmStatic
+    fun main(args: Array<String>) = GetetaSmtApp().main(args)
+}
+
+class GetetaSmtApp : CliktCommand() {
+    val programOptions by ProgramOptions()
+    val tableOptions by TableArguments()
+    val outputFolder by outputFolder()
+
+    override fun run() {
+        SCOPE_SEPARATOR = "___"
+
+        //region read table
+        val tables = tableOptions.table.flatMap {
+            info("Use table file ${it.absolutePath}")
+            GetetaFacade.readTables(it)
+        }.map {
+            it.programRuns = listOf("")
+            it.generateSmvExpression()
+            it.simplify()
+        }.filterByName(tableOptions.tableWhitelist)
+
+
+        //endregion
+        info("Tables found: ${tables.joinToString()}")
+
+        //region read program
+        val (pous, exec) = IEC61131Facade.readProgramWLNP(
+                programOptions.library, programOptions.program.first())
+        require(pous.isNotEmpty()) { "No program was given" }
+        require(exec != null) { "Could not find any program by ${pous.first()}" }
+        //endregion
+
+        val enum = exec.scope.enumValuesToType()
+
+        for (table in tables) {
+            info("Compute miter and product program for table ${table.name}")
+            val automaton = GetetaFacade.constructTable(table)
+            val mc = GttMiterConstruction(table, automaton.automaton, enum)
+            val miter = mc.constructMiter()
+            val program = ProgMiterConstruction(pous).constructMiter()
+
+            val productProgramBuilder = InvocationBasedProductProgramBuilder()
+            productProgramBuilder.add(program)
+            productProgramBuilder.add(miter)
+            val productProgram = productProgramBuilder.build(false)
+
+            val outputFile = File(outputFolder ?: ".", table.name + ".hcc").absoluteFile
+            outputFile.bufferedWriter().use { out ->
+                val simplifiedProductProgram = SymbExFacade.simplify(productProgram)
+                val hccprinter = HccPrinter(CodeWriter(out))
+                hccprinter.isPrintComments = true
+                productProgramBuilder.target.functions.forEach {
+                    it.accept(hccprinter)
+                }
+                simplifiedProductProgram.accept(hccprinter)
+            }
+            info("File: $outputFile written")
+        }
+    }
+}

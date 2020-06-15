@@ -8,7 +8,6 @@ import java.io.File
 import java.util.*
 import javax.swing.Icon
 import javax.swing.JFileChooser
-import kotlin.collections.ArrayList
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -25,6 +24,7 @@ interface Messager {
 
 interface JumpService {
     fun jumpTo(editor: CodeEditor, position: Position? = null)
+    fun jumpTo(position: Position)
     fun selectInEditor(name: String, start: Int, stop: Int?)
     fun changeInEditor(editorName: String, start: Int, stop: Int, newText: String)
 }
@@ -57,10 +57,36 @@ interface StatusService {
 }
 
 
-//https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/
-object Colors {
-    var defaultFont = Font(Font.MONOSPACED, 0, 12)
+abstract class Colors {
+    var defaultFont = Font(Font.MONOSPACED, 0, 14)
+    abstract val background: Color
+    abstract val separators: Style
+    abstract val control: Style
+    abstract val structural: Style
+    abstract val identifier: Style
+    abstract val operators: Style
+    abstract val literal: Style
+    abstract val comment: Style
+    abstract val default: Style
+    abstract val error: Style
+    abstract val types: Style
+    abstract val highLightLine: Color
 
+    companion object {
+        protected fun hsl(h: Int, s: Int, l: Int): Color = Color.getHSBColor(h / 360f, s / 100f, l / 100f)
+    }
+
+    fun style(init: Style.() -> Unit): Style {
+        val style = Style()
+        style.font = defaultFont
+        style.foreground = Color.BLACK
+        init(style)
+        return style
+    }
+}
+
+//https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/
+object DuneColors : Colors() {
     val base00 = Color.decode("#20201d")
     val base01 = Color.decode("#292824")
     val base02 = Color.decode("#6e6b5e")
@@ -89,39 +115,31 @@ object Colors {
 
     private fun hsl(h: Int, s: Int, l: Int): Color = Color.getHSBColor(h / 360f, s / 100f, l / 100f)
 
-    private fun style(init: Style.() -> Unit): Style {
-        val style = Style()
-        style.font = defaultFont
-        style.foreground = Color.BLACK
-        init(style)
-        return style
-    }
+    override val background = base07
 
-    val background = base07
+    override val separators = style { foreground = cyan }
 
-    val separators = style { foreground = cyan }
+    override val control = style { foreground = violet }
 
-    val control = style { foreground = violet }
+    override val structural = style { foreground = orange }
 
-    val structural = style { foreground = orange }
+    override val identifier = style { foreground = red }
 
-    val identifier = style { foreground = red }
+    override val operators: Style = style { foreground = magenta }
 
-    val operators: Style = style { foreground = magenta }
+    override val literal = style { foreground = green }
 
-    val literal = style { foreground = green }
+    override val comment = style { foreground = base05 }
 
-    val comment = style { foreground = base05 }
+    override val default = style {}
 
-    val default = style {}
-
-    val error = style {
+    override val error = style {
         foreground = red
         underline = true
     }
 
-    val types = style { foreground = blue }
-
+    override val types = style { foreground = blue }
+    override val highLightLine: Color = base06
 
     val BLUE = Color(74, 72, 133)
     val LIGHT_BLUE = Color(148, 198, 206)
@@ -129,95 +147,13 @@ object Colors {
     val DARK_VIOLET = Color(107, 8, 114)
     val DARK_GREEN = Color(2, 113, 129)
     val BACKGROUND = Color(200, 200, 200)
-    val HIGHTLIGHT_LINE = base06
     val GREY = Color(109, 109, 109)
 }
 
-/*class Lookup(val parent: Lookup? = null) {
-    private val children = arrayListOf<Lookup>()
+class Lookup {
     private val serviceMap = hashMapOf<Class<*>, LinkedList<Any>>()
-
-    init {
-        parent?.children?.add(this)
-    }
-
-    private fun <T> getList(service: Class<T>): MutableList<T> = serviceMap.computeIfAbsent(service) { LinkedList<Any>() } as MutableList<T>
-
-    fun <T> get(service: Class<T>): T {
-        val t = getList(service)
-        return if (t.isEmpty()) {
-            if (parent != null) parent.get(service)
-            else throw IllegalStateException("Service $service not registered")
-        } else {
-            t.first()
-        }
-    }
-
-    inline fun <reified T> get() = get(T::class.java)
-    fun <T> register(obj: T, service: Class<T>) {
-        getList(service).add(0, obj!!)
-        firePropertyChange(service)
-    }
-
-    fun <T> deregister(obj: T, service: Class<T>) {
-        val b = getList(service).remove(obj)
-        if (b) firePropertyChange(service)
-        parent?.deregister(obj, service)
-    }
-
-    inline fun <reified T> deregister(obj: T) = deregister(obj, T::class.java)
-
-    fun <T> getAll(service: Class<T>): List<T> {
-        val t = ArrayList(getList(service))
-        val p = parent?.getAll(service)
-        if (p != null) t += p
-        return t
-    }
-
-    fun <T : Any> getAllSubtypes(service: Class<T>): Sequence<T> {
-        val seq = parent?.getAllSubtypes(service) ?: emptySequence()
-        val s = serviceMap.values
-                .asSequence()
-                .flatMap { it.asSequence() }
-                .mapNotNull { it as? T }
-        return s + seq
-    }
-
-
-    inline fun <reified T> getAll() = getAll(T::class.java)
-
-    inline fun <reified T> register(obj: T) = register(obj, T::class.java)
-
-    inline fun <reified T> with(): ReadWriteProperty<Any, T> {
-        return object : ReadWriteProperty<Any, T> {
-            override fun getValue(thisRef: Any, property: KProperty<*>): T = get()
-            override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = register(value)
-        }
-    }
-
-    fun dispose() {
-        parent?.children?.remove(this)
-    }
-
-    val propertyListener = hashMapOf<Class<*>, MutableList<() -> Unit>>()
-    fun <T> getListeners(name: Class<T>) = propertyListener.computeIfAbsent(name) { LinkedList() }
-    fun addChangeListener(listener: () -> Unit) = addChangeListener(ALL::class.java, listener)
-    fun <T> addChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).add(listener)
-    fun <T> removeChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).remove(listener)
-    fun removeChangeListener(listener: () -> Unit) = removeChangeListener(ALL::class.java, listener)
-    fun firePropertyChange(name: Class<*>) {
-        getListeners(name).forEach { it() }
-        children.forEach { it.firePropertyChange(name) }
-        getListeners(ALL::class.java).forEach { it() }
-        children.forEach { it.firePropertyChange(ALL::class.java) }
-    }
-
-    private class ALL {}
-}
-*/
-
-class Lookup() {
-    private val serviceMap = hashMapOf<Class<*>, LinkedList<Any>>()
+    private val serviceListener = hashMapOf<Class<*>, MutableList<() -> Unit>>()
+    private val allListener: MutableList<() -> Unit> = LinkedList()
 
     private fun <T> getList(service: Class<T>): MutableList<T> = serviceMap.computeIfAbsent(service) { LinkedList<Any>() } as MutableList<T>
 
@@ -231,10 +167,13 @@ class Lookup() {
     }
 
     inline fun <reified T> get() = get(T::class.java)
+
     fun <T> register(obj: T, service: Class<T>) {
         getList(service).add(0, obj!!)
         firePropertyChange(service)
     }
+
+    inline fun <reified T> register(obj: T) = register(obj, T::class.java)
 
     fun <T> deregister(obj: T, service: Class<T>) {
         val b = getList(service).remove(obj)
@@ -243,10 +182,8 @@ class Lookup() {
 
     inline fun <reified T> deregister(obj: T) = deregister(obj, T::class.java)
 
-    fun <T> getAll(service: Class<T>): List<T> {
-        val t = ArrayList(getList(service))
-        return t
-    }
+    fun <T> getAll(service: Class<T>) = getList(service).toList()
+    inline fun <reified T> getAll() = getAll(T::class.java)
 
     fun <T : Any> getAllSubtypes(service: Class<T>): Sequence<T> {
         val seq = emptySequence<T>()
@@ -257,11 +194,6 @@ class Lookup() {
         return s + seq
     }
 
-
-    inline fun <reified T> getAll() = getAll(T::class.java)
-
-    inline fun <reified T> register(obj: T) = register(obj, T::class.java)
-
     inline fun <reified T> with(): ReadWriteProperty<Any, T> {
         return object : ReadWriteProperty<Any, T> {
             override fun getValue(thisRef: Any, property: KProperty<*>): T = get()
@@ -269,16 +201,23 @@ class Lookup() {
         }
     }
 
-    val propertyListener = hashMapOf<Class<*>, MutableList<() -> Unit>>()
-    fun <T> getListeners(name: Class<T>) = propertyListener.computeIfAbsent(name) { LinkedList() }
-    fun addChangeListener(listener: () -> Unit) = addChangeListener(ALL::class.java, listener)
+
+    fun <T> getListeners(name: Class<T>) = serviceListener.computeIfAbsent(name) { LinkedList() }
+    fun addChangeListener(listener: () -> Unit) = allListener.add(listener)
     fun <T> addChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).add(listener)
     fun <T> removeChangeListener(name: Class<T>, listener: () -> Unit) = getListeners(name).remove(listener)
-    fun removeChangeListener(listener: () -> Unit) = removeChangeListener(ALL::class.java, listener)
+    fun removeChangeListener(listener: () -> Unit) = allListener.remove(listener)
+
     fun firePropertyChange(name: Class<*>) {
         getListeners(name).forEach { it() }
-        getListeners(ALL::class.java).forEach { it() }
+        allListener.forEach { it() }
     }
+
+    fun firePropertyChange() {
+        serviceListener.keys.forEach { getListeners(it).forEach { it() } }
+        allListener.forEach { it() }
+    }
+
 
     private class ALL
 }
