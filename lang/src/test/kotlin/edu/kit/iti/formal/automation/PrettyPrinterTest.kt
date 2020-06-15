@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Assertions
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.min
 
 /**
  * @author Alexander Weigl
@@ -57,11 +58,11 @@ object PrettyPrinterTest {
     @Throws(IOException::class)
     fun testPrettyPrintByEquals(tle: PouElements) {
         val printed = IEC61131Facade.print(tle)
-        println(printed)
+        IEC61131Facade.resolveDataTypes(tle)
         try {
             val newTle = IEC61131Facade.file(CharStreams.fromString(printed))
-            //IEC61131Facade.resolveDataTypes(newTle)
-            for (i in 0 until Math.min(tle.size, newTle.size)) {
+            IEC61131Facade.resolveDataTypes(newTle)
+            for (i in 0 until min(tle.size, newTle.size)) {
                 Assertions.assertEquals(tle[i], newTle[i])
                 //Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
             }

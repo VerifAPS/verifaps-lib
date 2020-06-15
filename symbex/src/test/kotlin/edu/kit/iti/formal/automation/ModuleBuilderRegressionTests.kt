@@ -22,8 +22,7 @@ object ModuleBuilderRegressionTests {
         val mod = SymbExFacade.evaluateProgram(stInput, true)
 
         val actual = mod.repr()
-        println(actual)
-        Assertions.assertEquals(cleanWs(actual), cleanWs(expected))
+        Assertions.assertEquals(cleanWs(expected), cleanWs(actual))
     }
 
     private fun cleanWs(s: String) = s.replace("\\s+".toRegex(), "\n")

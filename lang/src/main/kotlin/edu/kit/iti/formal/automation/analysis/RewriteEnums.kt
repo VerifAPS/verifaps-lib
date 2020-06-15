@@ -29,11 +29,11 @@ object RewriteEnums : AstMutableVisitor() {
             val value = symbolicReference.identifier
             if (scope.resolveVariable(symbolicReference) == null) {
                 val enum0 = scope.resolveEnumByValue(value)
-                if (enum0 != null) return EnumLit(RefTo(enum0), value)
+                if (enum0 != null) return EnumLit(RefTo(enum0), value.toUpperCase())
 
                 val enum1 = scope.resolveEnum(value)
                 if (enum1 != null && symbolicReference.hasSub())
-                    return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier)
+                    return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier.toUpperCase())
             }
         }
         return symbolicReference

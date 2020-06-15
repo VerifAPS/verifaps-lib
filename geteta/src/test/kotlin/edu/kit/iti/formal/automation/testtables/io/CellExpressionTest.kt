@@ -56,12 +56,12 @@ object CellExpressionTest {
         val v = SVariable.create("Q").withSigned(16)
         val e = GetetaFacade.exprToSMV(expr, v, 0, pc)
         println(e.repr())
-        Assertions.assertEquals(exp, e.repr());
+        Assertions.assertEquals(exp, e.repr())
     }
 
     internal fun defaultTestTable(run: Int = 0): GeneralizedTestTable {
         val gtt = GeneralizedTestTable()
-        gtt.options.relational = true;
+        gtt.options.relational = true
         gtt.add(iovar("a", "input", run))
         gtt.add(iovar("a", "input", 1))
         gtt.add(iovar("b", "input", run))
@@ -99,6 +99,8 @@ object CellExpressionTest {
             "0|>a" to "_0\$a = Q",
             "|>a" to "_1\$a = Q",
             "0::a + |>a" to "_0\$a + _1\$a",
+            "|>" to "_1\$Q = Q",
+            "::" to "_1\$Q = Q",
             "·" to "_1\$Q = Q"
     )
 }
