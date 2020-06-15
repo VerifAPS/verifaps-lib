@@ -49,6 +49,9 @@ class ModularizationIntegrationTest {
 
     @Test
     fun testComplexArithmetic() {
+        Assume.assumeNotNull(findProgram("nuXmv"))
+        Assume.assumeNotNull(findProgram("z3"))
+
         val input = File("$base/complex_arithmetic.st").absolutePath
         val args = arrayOf("--old", "WARN_ABOVE@$input", "--new", "WARN_BELOW@$input",
                 "-o", "build/testScenario/simple",

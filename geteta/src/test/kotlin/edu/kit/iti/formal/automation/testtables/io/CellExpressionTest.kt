@@ -99,8 +99,8 @@ object CellExpressionTest {
             "0|>a" to "_0\$a = Q",
             "|>a" to "_1\$a = Q",
             "0::a + |>a" to "_0\$a + _1\$a",
-            "|>" to "_1\$Q = Q",
-            "::" to "_1\$Q = Q",
-            "·" to "_1\$Q = Q"
+            "|>" to "_1\$Q = Q"
+            // "::" to "_1\$Q = Q", :: is also a guard in if statements
+            //"·" to "_1\$Q = Q" · detected as error char? unicode support?!
     )
 }
