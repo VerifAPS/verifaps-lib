@@ -40,10 +40,10 @@ fun printConsole(level: Level, message: String, origin: String) {
             colorizeFg(ConsoleColor.Yellow, origin))
 }
 
-fun debug(msg: String, vararg args: Any?) = printConsole(Level.FINE, String.format(msg, args), getOrigin())
-fun info(msg: String, vararg args: Any?) = printConsole(Level.INFO, String.format(msg, args), getOrigin())
-fun error(msg: String, vararg args: Any?) = printConsole(Level.SEVERE, String.format(msg, args), getOrigin())
-fun warn(msg: String, vararg args: Any?) = printConsole(Level.WARNING, String.format(msg, args), getOrigin())
+fun debug(msg: String, vararg args: Any?) = printConsole(Level.FINE, String.format(msg, *args), getOrigin())
+fun info(msg: String, vararg args: Any?) = printConsole(Level.INFO, String.format(msg, *args), getOrigin())
+fun error(msg: String, vararg args: Any?) = printConsole(Level.SEVERE, String.format(msg, *args), getOrigin())
+fun warn(msg: String, vararg args: Any?) = printConsole(Level.WARNING, String.format(msg, *args), getOrigin())
 fun fail(msg: String, vararg args: Any?): Nothing = throw IllegalStateException(String.format(msg, args))
 
 

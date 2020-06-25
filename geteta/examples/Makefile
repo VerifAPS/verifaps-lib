@@ -6,7 +6,7 @@
 
 
 .EXPORT_ALL_VARIABLES:
-
+.PHONY: MinMax
 
 NUXMV := $(HOME)/share/nuXmv-1.1.1-Linux/bin/nuXmv
 LANG := C
@@ -124,7 +124,7 @@ MinMax-smt: $(GETETA)
 	cd MinMax && $(ELDARICA) MinMaxTbl.hcc
 
 MinMax: $(GETETA)
-	cd MinMax && $(GETETA) $(GETETA_DEBUG) -t MinMax.gtt -c MinMax.st
+	cd MinMax && $(GETETA) $(GETETA_DEBUG) --cexout -t MinMax.gtt -c MinMax.st
 
 MinMax_broken:
 	cd MinMax && $(GETETA) $(GETETA_DEBUG) -t MinMax_Broken.gtt -c MinMax.st
