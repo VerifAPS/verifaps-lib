@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.rvt.translators
 
 import edu.kit.iti.formal.automation.getSMVOperator
 import edu.kit.iti.formal.automation.operators.BinaryOperator
+import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
@@ -36,7 +37,7 @@ import edu.kit.iti.formal.smv.ast.*
  */
 class DefaultOperationMap : OperationMap {
     override fun translateBinaryOperator(left: SMVExpr, operator: BinaryOperator, right: SMVExpr): SMVExpr {
-        if (operator == SBinaryOperator.DIV) {
+        if (operator == Operators.DIV) {
             return div(left, right)
         }
         val op = getSMVOperator(operator)
