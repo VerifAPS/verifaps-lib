@@ -28,6 +28,7 @@ import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
+import java.math.BigInteger
 
 /**
  * Default translation for ST-Operators.
@@ -59,11 +60,12 @@ class DefaultOperationMap : OperationMap {
      * @return
      */
     protected fun div(dividend: SMVExpr, divisor: SMVExpr): SMVExpr {
+        val zero = SGenericLiteral(0.toBigInteger(), divisor.dataType!!)
         return SMVFacade.caseexpr(
                 // if b=0
-                divisor.equal(SGenericLiteral(0, divisor.dataType!!)),
+                divisor.equal(zero),
                 //then 0
-                SGenericLiteral(0, dividend.dataType!!),
+                zero,
                 //else
                 SLiteral.TRUE,
                 //return a/b
