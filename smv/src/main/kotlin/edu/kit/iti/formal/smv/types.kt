@@ -50,6 +50,7 @@ data class SMVWordType(
                         width,
                         value.abs().toString())
             is Long -> format(BigInteger.valueOf(value))
+            is Int -> format(BigInteger.valueOf(value.toLong()))
             else -> error("not implemented for ${value.javaClass}")
         }
     }
