@@ -58,8 +58,7 @@ class AbstractIntEqSfc(val sfcName: String,
         outputFile.bufferedWriter().use {
             diffSfc.toDot(PrintWriter(it))
         }
-
-//        view(diffSfc)
+        //view(diffSfc)
     }
 
     private fun getSfc(file: File): FunctionBlockDeclaration {

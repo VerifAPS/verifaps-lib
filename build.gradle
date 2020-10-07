@@ -8,7 +8,7 @@ plugins {
 }
 
 tasks.named("dokkaHtml") {
-    outputDirectory.set(buildDir.resolve("dokka"))
+    outputDirectory = file("$buildDir/dokka")
 }
 
 
