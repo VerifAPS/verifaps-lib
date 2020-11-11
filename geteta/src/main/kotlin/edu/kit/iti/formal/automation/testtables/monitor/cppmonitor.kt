@@ -34,8 +34,10 @@ val CPP_RESOURCES by lazy { listOf(readResource("monitor.h")) }
  */
 object CppMonitorGenerator : MonitorGeneration {
     override val key: String = "cpp"
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor {
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton,
+                          options: MonitorGenerationOptions): Monitor {
         val impl = CppMonitorGeneratorImpl(gtt, automaton)
+        impl.includes = options.includes
         return impl.call()
     }
 }
@@ -50,6 +52,7 @@ object CppCombinedMonitorGeneration : CombinedMonitorGeneration {
 
 
 class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton) {
+    var includes = listOf<String>()
     val monitor = Monitor(gtt.name, "", "")
     val cw = CodeWriter()
 
@@ -61,7 +64,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 //val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
                 for ((a, b) in gtt.parseContext.refs) {
                     val ref = gtt.parseContext.getReference(a, b)
-                    it.variableReplacement[ref.name] = "_h_${a.name.replace("code\$","")}[$b]"
+                    it.variableReplacement[ref.name] = "_h_${a.name.replace("code\$", "")}[$b]"
                 }
 
                 gtt.programVariables.forEach { pv ->
@@ -103,7 +106,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         cblock("enum class $enumStates {", "};") {
             val states = automaton.getRowStates() +
                     automaton.stateError + automaton.stateSentinel
-            val rows = states.joinToString(",") { it.name }
+            val rows = states.joinToString(", ") { it.name }
             append(rows)
         }
         nl().nl()
@@ -188,6 +191,11 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
         monitor.postamble = CPP_FOOTER
         monitor.preamble = CPP_HEADER
+
+        includes.forEach {
+            monitor.preamble += "#include \"$it\"\n"
+        }
+
         monitor.body = cw.stream.toString()
         return monitor
     }
@@ -434,7 +442,7 @@ private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {
     for ((a, b) in gtt.parseContext.refs) {
         if (b < 0) {
             val dt = TranslateToCppFacade.translate(a.dataType)
-            +"sregister<$dt, ${-b}> _h_${a.name.replace("code\$","")};"
+            +"sregister<$dt, ${-b}> _h_${a.name.replace("code\$", "")};"
         }
     }
 }
@@ -442,7 +450,7 @@ private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {
 private fun CodeWriter.historyValuesUpdate(gtt: GeneralizedTestTable) {
     for ((a, b) in gtt.parseContext.refs) {
         if (b > 0) {
-            +"_h_${a.name}.push(input.${a.name.replace("code\$","")});"
+            +"_h_${a.name}.push(input.${a.name.replace("code\$", "")});"
         }
     }
 }

@@ -3,7 +3,9 @@ package edu.kit.iti.formal.automation.testtables.io
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
@@ -123,7 +125,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     }
 
     override fun visitSignature(ctx: TestTableLanguageParser.SignatureContext) {
-        val dt = scope.resolveDataType(ctx.dt.text)
+        val dt = getDataType(ctx.dt.text)
         val modifier = visit(ctx.var_modifier())
         val type = modifier.category
         val lt = DefaultTypeTranslator.INSTANCE.translate(dt)
@@ -166,6 +168,19 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
                 current.add(v)
             }
         }
+    }
+
+    private fun getDataType(symbol: String): AnyDt {
+        try {
+            return scope.resolveDataType(symbol)
+        } catch (e: DataTypeNotDefinedException) {
+            if (symbol.startsWith("ENUM_")) {
+                return EnumerateType(symbol.substring("ENUM_".length), arrayListOf(""))
+            } else {
+                throw e;
+            }
+        }
+
     }
 
     override fun visitFreeVariable(ctx: TestTableLanguageParser.FreeVariableContext) {
