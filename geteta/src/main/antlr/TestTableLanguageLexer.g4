@@ -17,6 +17,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 public boolean relational = false;
 }
 
+TCONST: 'timeconst';
 INHERIT_FROM:'\\inherit_from';
 DOT:'.';
 SEMICOLON:';';
@@ -88,6 +89,8 @@ fragment DIGIT: '0' .. '9';
 fragment NUMBER: DIGIT+;
 FLOAT:   NUMBER '.' NUMBER;
 INTEGER: NUMBER;
+
+S : '"' ~["]* '"';
 
 WS: (' '|'\n'|'\r'|'\t')+ -> channel(HIDDEN);
 COMMENT      : '/*' -> pushMode(comment), channel(HIDDEN);

@@ -24,7 +24,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 file  : table* EOF;
 table : tableHeader LBRACE
             (inheritance_signature)*
-            (signature | freeVariable | column)*
+            (signature | freeVariable | column | decl_time_const)*
             opts?
             group
             function*
@@ -43,8 +43,10 @@ opts: OPTIONS LBRACE (kv)*  RBRACE;
 kv: key=option_key (EQUALS|COLON) (constant|variable) osem;
 option_key: (intOrId (DOT intOrId)*);
 
-signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem
-;
+signature: VAR var_modifier variableDefinition COLON dt=IDENTIFIER osem;
+
+decl_time_const:
+    TCONST id=IDENTIFIER COLON v=INTEGER osem;
 
 var_modifier:
   (STATE | INPUT | OUTPUT | NEXT | ASSUME | ASSERT)+
@@ -86,12 +88,14 @@ gotoTrans: (PASS|MISS|FAIL) LPAREN tblId=IDENTIFIER COMMA rowId=intOrId RPAREN;
 
 time :
       MINUS (duration_flags)? #timeDontCare
-    | op=(GREATER_EQUALS | GREATER_THAN) INTEGER  (duration_flags)? #timeSingleSided
-    | LBRACKET l=INTEGER COMMA (u=INTEGER) RBRACKET (duration_flags)? #timeClosedInterval
-    | LBRACKET l=INTEGER COMMA MINUS RBRACKET (duration_flags)? #timeOpenInterval
-    | INTEGER #timeFixed
+    | op=(GREATER_EQUALS | GREATER_THAN) intOrConst  (duration_flags)? #timeSingleSided
+    | LBRACKET l=intOrConst COMMA (u=intOrConst) RBRACKET (duration_flags)? #timeClosedInterval
+    | LBRACKET l=intOrConst COMMA MINUS RBRACKET (duration_flags)? #timeOpenInterval
+    | intOrConst #timeFixed
     | omega=OMEGA #timeOmega
 ;
+
+intOrConst: INTEGER | IDENTIFIER;
 
 duration_flags:
       PFLAG INPUT?
@@ -130,6 +134,7 @@ constant :
       i  #constantInt
     | T  #constantTrue
     | F  #constantFalse
+    | S  #constantString
     ;
 
 // >6 , <2, =6, >=6

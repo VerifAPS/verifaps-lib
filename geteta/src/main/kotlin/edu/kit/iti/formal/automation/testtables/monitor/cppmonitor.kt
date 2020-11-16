@@ -79,8 +79,8 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 it.rewritingFunction = { it -> it.replace("code$", "input.") }
             }
 
-    val resetTrigger = gtt.options.monitor.resetTrigger?.let {
-        val e = GetetaFacade.exprToSMV(it, EMPTY_COLUMN, 0, gtt.parseContext)
+    private val resetTrigger = gtt.options.monitor.resetTrigger?.let {
+        val e = GetetaFacade.exprToSMV(it.trim('"'), EMPTY_COLUMN, 0, gtt.parseContext)
         e.accept(cppRewriter)
     }
 

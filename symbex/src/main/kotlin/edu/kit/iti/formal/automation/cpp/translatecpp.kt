@@ -65,6 +65,8 @@ object TranslateToCppFacade {
             is EnumerateType -> "enum ${any.name}"
             is RecordType -> "struct " + any.name
             is PointerType -> dataType(any.of) + "*"
+            is AnyReal.REAL -> "float"
+            is AnyReal.LREAL -> "double"
             else -> "/* datatype: $any is not supported */"
         }
     }

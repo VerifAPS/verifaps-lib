@@ -52,6 +52,18 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
 
     val includes by option("-I").multiple()
 
+    val timeConstants: Map<String, Int> by option("-T")
+            .splitPair("=")
+            .convert{ it.first to it.second.toInt()}
+            .multiple()
+            .toMap()
+
+
+    private fun translateTimeConstant(it: String) {
+        val (n, v) = it.split(":")
+
+    }
+
     override fun run() {
         info("Files: $table")
         info("Filter: $filter")
@@ -64,7 +76,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             }
         }
 
-        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
+        val gtts = table.flatMap { GetetaFacade.readTables(it, timeConstants) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it

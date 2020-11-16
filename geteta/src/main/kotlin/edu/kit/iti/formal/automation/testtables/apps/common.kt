@@ -1,20 +1,11 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
-import com.github.ajalt.clikt.core.ParameterHolder
 import com.github.ajalt.clikt.parameters.groups.OptionGroup
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.multiple
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
-import edu.kit.iti.formal.util.currentDebugLevel
 import edu.kit.iti.formal.util.info
-import kotlin.system.exitProcess
-
 
 
 class CexAnalysationArguments() : OptionGroup() {
@@ -48,6 +39,12 @@ class TableArguments() : OptionGroup() {
         }.filterByName(tableWhitelist)
 
     }
+
+    val timeConstants: Map<String, Int> by option("-T")
+            .splitPair("=")
+            .convert{ it.first to it.second.toInt()}
+            .multiple()
+            .toMap()
 
     val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
             .file(exists = true, readable = true)

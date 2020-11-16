@@ -23,8 +23,10 @@ import org.antlr.v4.runtime.tree.TerminalNode
  * @author Alexander Weigl
  * @version 1 (06.07.18)
  */
-class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
+class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : TestTableLanguageParserBaseVisitor<Unit>() {
     val testTables = arrayListOf<GeneralizedTestTable>()
+    private val timeConstants: MutableMap<String, Int> = HashMap(preDefinedTimeConstants)
+
     private lateinit var current: GeneralizedTestTable
     private val scope = Scope.defaultScope()
 
@@ -45,6 +47,14 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
         current = GeneralizedTestTable()
         testTables += current
         visitChildren(ctx)
+    }
+
+    override fun visitDecl_time_const(ctx: TestTableLanguageParser.Decl_time_constContext) {
+        val name = ctx.id.text
+        val defaultValue = ctx.v.text.toInt()
+        if (name !in timeConstants) {
+            timeConstants[name] = defaultValue
+        }
     }
 
     override fun visitInheritance_signature(ctx: TestTableLanguageParser.Inheritance_signatureContext) {
@@ -73,7 +83,7 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
     }
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext) {
-        current.region = ctx.accept(RegionVisitor(current, testTables)) as Region
+        current.region = ctx.accept(RegionVisitor(current, testTables, timeConstants)) as Region
         val nodeIds = mutableSetOf<String>()
         current.region.visit { node ->
             if (node.id in nodeIds) {
@@ -201,8 +211,10 @@ class TestTableLanguageBuilder() : TestTableLanguageParserBaseVisitor<Unit>() {
 }
 
 class RegionVisitor(private val gtt: GeneralizedTestTable,
-                    private val tables: List<GeneralizedTestTable>) : TestTableLanguageParserBaseVisitor<TableNode>() {
-    var currentId = 0
+                    private val tables: List<GeneralizedTestTable>,
+                    timeConstants: Map<String, Int>) : TestTableLanguageParserBaseVisitor<TableNode>() {
+    private var currentId = 0
+    private val timeParser = TimeParser(timeConstants)
 
     private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
         val idx = gtt.programRuns.indexOf(it.id.text)
@@ -217,8 +229,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
         }
         val id = ctx.id?.text ?: "g" + (ctx.idi?.text?.toInt() ?: ++currentId)
         val r = Region(id)
-        if (ctx.time() != null)
-            r.duration = ctx.time().accept(TimeParser())
+        if (ctx.time() != null) {
+            r.duration = ctx.time().accept(timeParser)
+        }
 
         ctx.children.forEach {
             val tn = it.accept(this)
@@ -237,7 +250,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): TableRow {
         val id = rowId(ctx.intOrId())
         currentRow = TableRow(id)
-        currentRow.duration = ctx.time()?.accept(TimeParser()) ?: Duration.ClosedInterval(1, 1)
+        currentRow.duration = ctx.time()?.accept(timeParser) ?: Duration.ClosedInterval(1, 1)
 
         ctx.rowInherit().forEach { it.accept(this) }
 
@@ -333,40 +346,49 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
     }
 }
 
-class TimeParser : TestTableLanguageParserBaseVisitor<Duration>() {
+class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserBaseVisitor<Duration>() {
+
+    fun accept(ctx: TestTableLanguageParser.IntOrConstContext): Int {
+        if (ctx.INTEGER() != null) {
+            return ctx.INTEGER().text.toInt()
+        }
+
+        val id = ctx.IDENTIFIER().text!!
+
+        return timeConstants[id]
+                ?: error("Error used time constant $id is not given. (no default or command option)")
+    }
+
     override fun visitTimeSingleSided(ctx: TestTableLanguageParser.TimeSingleSidedContext): Duration {
-        val lower =
-                ctx.INTEGER().text.toInt() +
-                        if (ctx.op.text == ">") 1 else 0
-        return Duration.OpenInterval(
-                lower, accept(ctx.duration_flags()))
+        val lower = accept(ctx.intOrConst()) + if (ctx.op.text == ">") 1 else 0
+        return Duration.OpenInterval(lower, accept(ctx.duration_flags()))
     }
 
     private fun accept(flags: TestTableLanguageParser.Duration_flagsContext?): DurationModifier {
         if (flags == null) return DurationModifier.NONE
-        return if (flags.PFLAG() != null)
+        return if (flags.PFLAG() != null) {
             if (flags.INPUT() != null) DurationModifier.PFLAG_I
             else DurationModifier.PFLAG_IO
-        else if (flags.INPUT() != null)
+        } else if (flags.INPUT() != null) {
             DurationModifier.HFLAG_I
-        else
+        } else {
             DurationModifier.HFLAG_IO
-
+        }
     }
 
     override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration {
         return Duration.ClosedInterval(
-                ctx.l.text.toInt(),
-                ctx.u.text.toInt(),
+                accept(ctx.l),
+                accept(ctx.u),
                 accept(ctx.duration_flags()))
     }
 
     override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration {
-        return Duration.OpenInterval(ctx.l.text.toInt(), accept(ctx.duration_flags()))
+        return Duration.OpenInterval(accept(ctx.l), accept(ctx.duration_flags()))
     }
 
     override fun visitTimeFixed(ctx: TestTableLanguageParser.TimeFixedContext): Duration {
-        val i = ctx.INTEGER().text.toInt()
+        val i = accept(ctx.intOrConst())
         return Duration.ClosedInterval(i, i)
     }
 
