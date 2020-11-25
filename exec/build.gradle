@@ -19,7 +19,7 @@ dependencies {
 
 
 def mainClasses = [
-        "mod"     : "edu.kit.iti.formal.automation.rvt.modularization.ModApp"
+        "mod"                : "edu.kit.iti.formal.automation.rvt.modularization.ModApp"
         , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
         , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
         , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
@@ -28,13 +28,14 @@ def mainClasses = [
         , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
         , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
         , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthesis'
-        , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
         , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
+        , "ttcsv"            : "edu.kit.iti.formal.automation.testtables.apps.Csv"
+        , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
+        , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
         , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
         , 'check'            : "edu.kit.iti.formal.automation.Check"
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
-        , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
         , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
         , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
         , "geteta-smt"       : "edu.kit.iti.formal.automation.testtables.apps.GetetaSmt"

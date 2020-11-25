@@ -26,6 +26,9 @@ dependencies {
     antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
     compile 'com.github.jferard:fastods:0.7.2'
     implementation 'com.github.ajalt:clikt:2.8.0'
+
+    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'
+
     //compile 'io.github.config4k:config4k:0.4.1'
 
     //compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
