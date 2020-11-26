@@ -68,7 +68,7 @@ data class ProgramVariable(
                 isNext && isState && category == ColumnCategory.ASSUME -> "state' assume"
                 isNext && isState && category == ColumnCategory.ASSERT -> "state' assert"
                 isNext && !isState && category == ColumnCategory.ASSERT -> "output"
-                !isNext && isState && category == ColumnCategory.ASSUME -> "input"
+                //!isNext && isState && category == ColumnCategory.ASSUME -> "input"
                 else -> ""
             }
         }
@@ -146,8 +146,8 @@ class ParseContext(
         val functions: MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
         val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
-    public fun isVariable(v: String) = v in this
-    public fun getSMVVariable(v: Variable) =
+    fun isVariable(v: String) = v in this
+    fun getSMVVariable(v: Variable) =
             vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
     fun getReference(variable: SVariable, cycles: Int): SVariable =
@@ -314,19 +314,19 @@ enum class DurationModifier {
     HFLAG_I;
 
     fun repr(): String = when (this) {
-        DurationModifier.NONE -> ""
-        DurationModifier.PFLAG_IO -> "progress"
-        DurationModifier.HFLAG_IO -> "hold"
-        DurationModifier.PFLAG_I -> "progress input"
-        DurationModifier.HFLAG_I -> "hold input"
+        NONE -> ""
+        PFLAG_IO -> "progress"
+        HFLAG_IO -> "hold"
+        PFLAG_I -> "progress input"
+        HFLAG_I -> "hold input"
     }
 
     fun latex(): String = when (this) {
-        DurationModifier.NONE -> ""
-        DurationModifier.PFLAG_IO -> "\\progress"
-        DurationModifier.HFLAG_IO -> "\\hold"
-        DurationModifier.PFLAG_I -> "\\progressinput"
-        DurationModifier.HFLAG_I -> "\\holdinput"
+        NONE -> ""
+        PFLAG_IO -> "\\progress"
+        HFLAG_IO -> "\\hold"
+        PFLAG_I -> "\\progressinput"
+        HFLAG_I -> "\\holdinput"
     }
 
 }
@@ -440,7 +440,7 @@ data class Region(override var id: String,
 
     override fun count(): Int = this.children.sumBy { it.count() }
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
-    override fun depth() = 1 + (this.children.maxBy { it.depth() }?.depth() ?: 0)
+    override fun depth() = 1 + (this.children.maxByOrNull { it.depth() }?.depth() ?: 0)
     override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }
     override fun visit(visitor: (TableNode) -> Unit) {
         visitor(this)

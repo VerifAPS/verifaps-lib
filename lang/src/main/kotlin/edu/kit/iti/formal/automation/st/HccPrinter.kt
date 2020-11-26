@@ -26,8 +26,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.print("/* empty expression */")
     }
 
-//    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) {}
-
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
 
         super.visit(enumerationTypeDeclaration)
@@ -69,10 +67,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
     override fun visit(assignmentStatement: AssignmentStatement) {
         sb.nl()
         assignmentStatement.location.accept(this)
-        if (assignmentStatement.isAssignmentAttempt)
-            sb.printf(" = ")
-        else
-            sb.printf(" = ")
+        sb.printf(" = ")
         assignmentStatement.expression.accept(this)
         sb.printf(";")
     }
@@ -232,8 +227,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
     }
 
-//    override fun visit(actionDeclaration: ActionDeclaration) {}
-
     override fun visit(aCase: Case) {
         sb.nl()
         sb.printf("case ")
@@ -243,7 +236,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             aCase.statements.accept(this@HccPrinter)
         }
     }
-
 
     override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration) {
         if (simpleTypeDeclaration.baseType.obj is AnyBit.BOOL) {
@@ -258,10 +250,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         }
 
     }
-
-//    override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {}
-//    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration) {}
-
 
     override fun visit(commentStatement: CommentStatement) {
         if (isPrintComments) {
@@ -295,8 +283,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
     override fun visit(literal: Literal) {
         fun print(prefix: Any?, suffix: Any) = "$suffix"
-//                (if (prefix != null) "$prefix#" else "") + suffix
-
         sb.printf(when (literal) {
             is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
             is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
@@ -350,7 +336,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
                     val vars = v.toMutableList()
                     vars.sortWith(compareBy { it.name })
 
-                    //By { a, b -> a.compareTo(b) }
                     sb.nl().printf("/* VAR")
 
                     if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
@@ -384,9 +369,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
     override fun print(vd: VariableDeclaration) {
         sb.nl()
         variableDataType(vd)
-        if (vd.dataType != null) {
-            var vdspec = vd.dataType!!.name
-        }
         sb.printf(" ").printf(vd.name)
 
         when {

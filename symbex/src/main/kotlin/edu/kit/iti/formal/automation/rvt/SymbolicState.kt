@@ -22,7 +22,6 @@ package edu.kit.iti.formal.automation.rvt
  * #L%
  */
 
-import edu.kit.iti.formal.smv.ExpressionReplacer
 import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.SMVAstVisitor
 import edu.kit.iti.formal.smv.ast.SMVAst
@@ -111,11 +110,7 @@ data class SymbolicState(
             getCurrentValues().any { it == value }
 
     override fun get(key: SVariable): SMVExpr? =
-            variables[key]?.let {
-                if (useDefinitions) it.value
-                else it.value
-            }
-
+            variables[key]?.value
 
     override fun isEmpty(): Boolean = variables.isEmpty()
 
@@ -175,7 +170,7 @@ data class SymbolicState(
      * Get an representation of this state without any use of definitions.
      */
     fun unfolded(): Map<SVariable, SMVExpr> {
-        var m = variables.map { (a, b) -> a to b.value!! }.toMap()
+        var m = variables.map { (a, b) -> a to b.value }.toMap()
         val defs = getAllDefinitions()
         val r = ExpressionReplacerRecur(defs)
         while (true) {
@@ -201,9 +196,5 @@ data class SymbolicState(
 
         return defs
     }
-
-    /*private val auxVariables = HashSet<SVariable>()
-    fun markAsAuxiliary(key: SVariable) = auxVariables.add(key)
-    fun isAuxiliary(key: SVariable) = key in auxVariables*/
 }
 
