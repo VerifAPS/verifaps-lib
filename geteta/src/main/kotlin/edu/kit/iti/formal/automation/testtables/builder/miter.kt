@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit

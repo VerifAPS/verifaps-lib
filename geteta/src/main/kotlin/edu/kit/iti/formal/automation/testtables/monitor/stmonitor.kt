@@ -32,8 +32,7 @@ import java.math.BigInteger
  */
 object MonitorGenerationST : MonitorGeneration {
     override val key: String = "st"
-
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor {
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton, options: MonitorGenerationOptions): Monitor {
         val mg = MonitorGenerationSTImpl(gtt, automaton)
         val elements = mg.call()
         return Monitor(body = IEC61131Facade.print(elements, true))

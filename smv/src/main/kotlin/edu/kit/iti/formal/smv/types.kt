@@ -17,6 +17,7 @@ interface SMVType {
     fun read(str: String): Any
     fun valueOf(str: String): SLiteral
     fun repr(): String
+    fun allowedValue(obj: Any): Boolean
 }
 
 data class SMVWordType(
@@ -41,6 +42,10 @@ data class SMVWordType(
                 else "unsigned", width)
     }
 
+    override fun allowedValue(obj: Any): Boolean {
+        return obj is BigInteger
+    }
+
     override fun format(value: Any): String {
         return when (value) {
             is BigInteger ->
@@ -50,6 +55,7 @@ data class SMVWordType(
                         width,
                         value.abs().toString())
             is Long -> format(BigInteger.valueOf(value))
+            is Int -> format(BigInteger.valueOf(value.toLong()))
             else -> error("not implemented for ${value.javaClass}")
         }
     }
@@ -63,6 +69,7 @@ object SMVTypes {
         override fun format(value: Any): String = value.toString()
         override fun read(str: String): Any = BigInteger(str)
         override fun repr(): String = "int"
+        override fun allowedValue(obj: Any): Boolean = obj is BigInteger
     }
 
     object FLOAT : SMVType {
@@ -70,6 +77,7 @@ object SMVTypes {
         override fun format(value: Any) = value.toString()
         override fun read(str: String) = BigDecimal(str)
         override fun repr(): String = "real"
+        override fun allowedValue(obj: Any): Boolean = obj is BigDecimal
     }
 
     object BOOLEAN : SMVType {
@@ -77,6 +85,7 @@ object SMVTypes {
         override fun format(value: Any): String = value.toString().toUpperCase()
         override fun read(str: String): Any = str.equals("TRUE", true)
         override fun repr(): String = "boolean"
+        override fun allowedValue(obj: Any): Boolean = obj is Boolean
     }
 
     @JvmStatic
@@ -126,6 +135,8 @@ data class EnumType(var values: List<String>) : SMVType {
     override fun read(str: String): String = str
     override fun repr(): String = toString()
 
+    override fun allowedValue(obj: Any): Boolean = obj is String
+
     override fun valueOf(value: String): SLiteral {
         if (!values.contains(value)) {
             throw IllegalArgumentException()
@@ -146,6 +157,8 @@ data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>
     override fun read(str: String): Any = error("not implemented")
     override fun valueOf(str: String): SLiteral = error("not implemented")
     override fun repr(): String = toString()
+
+    override fun allowedValue(obj: Any): Boolean = obj is String
 
     constructor(name: String, vararg variables: SVariable) :
             this(name, Arrays.asList<SVariable>(*variables))

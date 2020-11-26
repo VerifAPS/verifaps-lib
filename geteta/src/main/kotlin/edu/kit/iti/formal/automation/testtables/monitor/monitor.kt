@@ -3,9 +3,14 @@ package edu.kit.iti.formal.automation.testtables.monitor
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 
+data class MonitorGenerationOptions(
+        val includes : List<String> = listOf()
+)
+
 interface MonitorGeneration {
     val key: String
-    fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor
+    fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton,
+                 options : MonitorGenerationOptions = MonitorGenerationOptions()): Monitor
 }
 
 interface CombinedMonitorGeneration {

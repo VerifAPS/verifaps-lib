@@ -83,8 +83,8 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
         val commands = arrayOf(executablePath, "-int", moduleFile.absolutePath)
         try {
             info(commands.joinToString(" "))
-            info("Working Directory: %s", workingDirectory)
-            info("Result in %s", outputFile)
+            info("nuXmv working dir=\"$workingDirectory\"")
+            info("nuXmv: results=\"$outputFile\"")
             val pr = ProcessRunner(commands,
                     commandFile,
                     workingDirectory,

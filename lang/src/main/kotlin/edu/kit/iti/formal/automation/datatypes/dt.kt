@@ -386,13 +386,12 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
  */
 class EnumerateType(name: String = "ENUM",
                     var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap()) : AnyDt(name) {
+    lateinit var defValue: String
 
     val bitlength: Int
         get() {
             return ceil(ln(allowedValues.size.toDouble())).toInt()
         }
-
-    lateinit var defValue: String
 
     constructor(name: String, allowedValues: MutableList<String>,
                 defValue: String = allowedValues[0]) : this(name) {

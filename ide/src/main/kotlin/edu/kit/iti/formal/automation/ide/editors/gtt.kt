@@ -207,7 +207,7 @@ class TTParser(val textArea: CodeEditor, val lookup: Lookup) : AbstractParser() 
         //parser.errorReporter.isPrint = true
         try {
             val ctx = parser.file()
-            val gtt = GetetaFacade.parseTableDSL(ctx)
+            val gtt = GetetaFacade.parseTableDSL(ctx, )
             parser.errorReporter.throwException()
             val node = TTOverviewTransformer(textArea).create(ctx)
             previewService.render(gtt)

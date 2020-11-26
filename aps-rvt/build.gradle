@@ -7,7 +7,7 @@ dependencies {
     compile project(':smv')
     compile project(':xml')
     compile project(':symbex')
-    implementation 'com.github.ajalt:clikt:2.6.0'
+    implementation 'com.github.ajalt:clikt:2.8.0'
 }
 
 /*

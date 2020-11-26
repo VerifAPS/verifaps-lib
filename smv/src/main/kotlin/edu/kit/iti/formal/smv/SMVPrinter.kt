@@ -237,10 +237,10 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
 
         fun quoted(name: String) :String {
-            return regex.replace(name) {
+            /*return regex.replace(name) {
                 "\"${it.value}\""
-            }
-            //if (name in RESERVED_KEYWORDS) "\"$name\"" else name
+            }*/
+            return if (name in RESERVED_KEYWORDS) "\"$name\"" else name
         }
 
         @JvmStatic

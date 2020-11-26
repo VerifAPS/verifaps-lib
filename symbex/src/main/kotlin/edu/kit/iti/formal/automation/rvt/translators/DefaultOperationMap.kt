@@ -24,9 +24,11 @@ package edu.kit.iti.formal.automation.rvt.translators
 
 import edu.kit.iti.formal.automation.getSMVOperator
 import edu.kit.iti.formal.automation.operators.BinaryOperator
+import edu.kit.iti.formal.automation.operators.Operators
 import edu.kit.iti.formal.automation.operators.UnaryOperator
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.*
+import java.math.BigInteger
 
 /**
  * Default translation for ST-Operators.
@@ -36,7 +38,7 @@ import edu.kit.iti.formal.smv.ast.*
  */
 class DefaultOperationMap : OperationMap {
     override fun translateBinaryOperator(left: SMVExpr, operator: BinaryOperator, right: SMVExpr): SMVExpr {
-        if (operator == SBinaryOperator.DIV) {
+        if (operator == Operators.DIV) {
             return div(left, right)
         }
         val op = getSMVOperator(operator)
@@ -58,11 +60,12 @@ class DefaultOperationMap : OperationMap {
      * @return
      */
     protected fun div(dividend: SMVExpr, divisor: SMVExpr): SMVExpr {
+        val zero = SGenericLiteral(0.toBigInteger(), divisor.dataType!!)
         return SMVFacade.caseexpr(
                 // if b=0
-                divisor.equal(SGenericLiteral(0, divisor.dataType!!)),
+                divisor.equal(zero),
                 //then 0
-                SGenericLiteral(0, dividend.dataType!!),
+                zero,
                 //else
                 SLiteral.TRUE,
                 //return a/b

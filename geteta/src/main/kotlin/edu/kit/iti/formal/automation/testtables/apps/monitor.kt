@@ -50,6 +50,20 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
 
     val disableCombinedMonitor by option("--disable-combined").flag("--combined")
 
+    val includes by option("-I").multiple()
+
+    val timeConstants: Map<String, Int> by option("-T")
+            .splitPair("=")
+            .convert{ it.first to it.second.toInt()}
+            .multiple()
+            .toMap()
+
+
+    private fun translateTimeConstant(it: String) {
+        val (n, v) = it.split(":")
+
+    }
+
     override fun run() {
         info("Files: $table")
         info("Filter: $filter")
@@ -62,7 +76,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             }
         }
 
-        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
+        val gtts = table.flatMap { GetetaFacade.readTables(it, timeConstants) }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
             it
@@ -72,6 +86,8 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
 
         val pairs = gtts.map { it to GetetaFacade.constructTable(it).automaton }
 
+        val options = MonitorGenerationOptions(includes = includes)
+
         val output =
                 if (gtts.size == 1 || disableCombinedMonitor) {
                     val monitor = Monitor()
@@ -80,7 +96,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
                             CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
                             CodeOutput.ESTEREL -> TODO()
                             CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
-                            CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton)
+                            CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton, options)
                         }
                         monitor.preamble = m.preamble
                         monitor.types += m.types

@@ -94,12 +94,12 @@ object GetetaFacade {
         }
     }
 
-    fun parseDuration(duration: String): Duration {
+    fun parseDuration(duration: String, timeConstants: Map<String, Int> = hashMapOf()): Duration {
         if (duration == "wait")//old attributes
             return Duration.OpenInterval(0)
         val parser = createParser(duration)
         val p = parser.time()
-        return p.accept(TimeParser())
+        return p.accept(TimeParser(timeConstants))
     }
 
     @Deprecated("use external/internalVariable")
@@ -129,21 +129,24 @@ object GetetaFacade {
     }
 
     val DEFAULT_PROGRAM_RUN_NAME = { it: Int -> "_$it$" }
-    @JvmStatic
-    fun parseTableDSL(input: String) = parseTableDSL(CharStreams.fromString(input))
 
     @JvmStatic
-    fun parseTableDSL(input: File) = parseTableDSL(CharStreams.fromFileName(input.absolutePath))
+    fun parseTableDSL(input: String, timeConstants: Map<String, Int> = hashMapOf()) = parseTableDSL(CharStreams.fromString(input), timeConstants)
 
     @JvmStatic
-    fun parseTableDSL(input: CharStream): List<GeneralizedTestTable> {
+    fun parseTableDSL(input: File, timeConstants: Map<String, Int> = hashMapOf()) = parseTableDSL(CharStreams.fromFileName(input.absolutePath), timeConstants)
+
+    @JvmStatic
+    fun parseTableDSL(input: CharStream,
+                      timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
         val parser = createParser(input)
-        return parseTableDSL(parser.file())
+        return parseTableDSL(parser.file(), timeConstants)
     }
 
     @JvmStatic
-    fun parseTableDSL(ctx: TestTableLanguageParser.FileContext): List<GeneralizedTestTable> {
-        val ttlb = TestTableLanguageBuilder()
+    fun parseTableDSL(ctx: TestTableLanguageParser.FileContext,
+                      timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
+        val ttlb = TestTableLanguageBuilder(preDefinedTimeConstants = timeConstants)
         ctx.accept(ttlb)
         return ttlb.testTables
     }
@@ -159,11 +162,6 @@ object GetetaFacade {
         }
     }.toMap()
 
-
-    /*
-    fun runNuXMV(folder: String, technique: VerificationTechnique, vararg modules: SMVModule): NuXMVOutput {
-        return runNuXMV(folder, Arrays.asList(*modules), technique)
-    }*/
 
     fun getHistoryName(variable: SVariable, cycles: Int): String {
         return getHistoryName(variable) + "._$" + cycles
@@ -236,8 +234,8 @@ object GetetaFacade {
         return s.toString()
     }
 
-    fun readTables(file: File): List<GeneralizedTestTable> {
-        return parseTableDSL(file)
+    fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
+        return parseTableDSL(file, timeConstants)
     }
 
     fun constructTable(table: GeneralizedTestTable) =
@@ -321,11 +319,11 @@ object GetetaFacade {
         }
 
         fun findTarget(gt: GotoTransition) =
-            when {
-                gt.tableName=="eog" -> automaton.stateSentinel
-                gt.tableName=="err" -> automaton.stateError
-                else -> jumpMap[gt.tableName to gt.rowId]
-            } ?: error("Could not find the table row ${gt.rowId} in table ${gt.tableName}.")
+                when {
+                    gt.tableName == "eog" -> automaton.stateSentinel
+                    gt.tableName == "err" -> automaton.stateError
+                    else -> jumpMap[gt.tableName to gt.rowId]
+                } ?: error("Could not find the table row ${gt.rowId} in table ${gt.tableName}.")
 
 
         //add goto commands into the table
@@ -350,7 +348,7 @@ object GetetaFacade {
                 }
             }
         }
-        
+
         return automaton
     }
 

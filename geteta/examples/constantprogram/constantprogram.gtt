@@ -1,7 +1,7 @@
 table Ta {
     var input i : INT
     var output o : INT
-    var output c : INT
+    var output c : ENUM
     
     
     

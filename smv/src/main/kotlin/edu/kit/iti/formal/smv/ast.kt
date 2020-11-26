@@ -219,6 +219,7 @@ data class SFunction(
 }
 
 sealed class SLiteral(open val value: Any, override val dataType: SMVType) : SMVExpr() {
+
     override fun <T> accept(visitor: SMVAstVisitor<T>): T = visitor.visit(this)
 
     abstract override fun clone(): SLiteral
@@ -298,6 +299,11 @@ data class SEnumLiteral(override var value: String,
 data class SGenericLiteral(override var value: Any,
                            override var dataType: SMVType)
     : SLiteral(value, dataType) {
+    init {
+        require(dataType.allowedValue(value)) {
+            "Value $value is not allowed for $dataType"
+        }
+    }
     override fun prefix(prefix: String): SMVExpr = SGenericLiteral(value, dataType)
     override fun clone() = copy()
 }

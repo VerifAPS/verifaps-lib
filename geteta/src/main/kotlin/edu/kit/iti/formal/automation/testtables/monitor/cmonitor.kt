@@ -22,8 +22,7 @@ import java.util.concurrent.Callable
 
 object CMonitorGenerator : MonitorGeneration {
     override val key = "c"
-
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton): Monitor {
+    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton, options: MonitorGenerationOptions): Monitor {
         val impl = CMonitorGeneratorImpl(gtt, automaton)
         return impl.call()
     }
