@@ -25,7 +25,7 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths:
-            - "*/build/*"
+            - "**/build/**"
             - "build/*"
 
       - save_cache:
@@ -97,7 +97,7 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: ./gradlew --continue --build-cache check
+      - run: ./gradlew --continue --build-cache check jacocoTestReport
 
       - run:
           name: Save test results
@@ -139,14 +139,13 @@ jobs:
       #      - run: ./gradlew --continue --build-cache check jacocoTestReport
       - run: |
           set -o errexit
-          ./gradlew --continue --build-cache jacocoTestReport sonarqube \
+          ./gradlew --continue --build-cache sonarqube \
              -Dsonar.projectKey=VerifAPS_verifaps-lib\
              -Dsonar.branch.name=${CIRCLE_BRANCH}\
              -Dsonar.organization=verifaps \
              -Dsonar.host.url=https://sonarcloud.io \
              -Dsonar.login=$SONAR_TOKEN
           exit 0
-
 
   integration-tests:
     docker:
@@ -253,9 +252,6 @@ jobs:
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 
-
-
-
 workflows:
   version: 2
   build_and_test:
@@ -286,5 +282,5 @@ workflows:
             - ttsynth-test
           filters:
             branches:
-              only: master
+              only: disabled
 
