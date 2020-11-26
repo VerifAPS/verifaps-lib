@@ -97,9 +97,9 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-#      - run: ./gradlew --continue --build-cache check
+#      - run: ./gradlew --continue --build-cache check jacocoTestReport
       - run: |
-          ./gradlew --continue --build-cache check jacocoTestReport sonarqube \
+          ./gradlew --continue --build-cache check sonarqube \
                  -Dsonar.projectKey=VerifAPS_verifaps-lib\
                  -Dsonar.branch.name=${CIRCLE_BRANCH}\
                  -Dsonar.organization=verifaps \
