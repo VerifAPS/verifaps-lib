@@ -15,7 +15,7 @@ tasks.named("dokkaHtml") {
 allprojects {
     apply plugin: 'idea'
     group = 'edu.kit.iti.formal.automation'
-    version "0.11.0"
+    version "0.12.0"
 
     idea {
         module {
