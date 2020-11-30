@@ -1,12 +1,13 @@
 plugins {
     id("application")
+    id 'org.openjfx.javafxplugin' version '0.0.9'
 }
 
-/*
+
 javafx {
-    version = "13"
-    modules = [ 'javafx.controls' ]
-}*/
+    version = "15.0.1"
+    modules = ['javafx.controls']
+}
 
 mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 //mainClassName = "edu.kit.iti.formal.automation.idefx.IdeFx"
@@ -35,9 +36,15 @@ dependencies {
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
     compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
+
+    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
 }
 
 repositories {
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+
     maven {
         url = "http://bits.netbeans.org/maven2/"
     }
