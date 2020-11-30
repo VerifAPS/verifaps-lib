@@ -1,11 +1,10 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.*
-import com.github.ajalt.clikt.parameters.types.file
-
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.SymbExFacade
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
+import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import edu.kit.iti.formal.automation.st0.TransformationState
@@ -19,10 +18,12 @@ import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
 import edu.kit.iti.formal.automation.testtables.viz.CounterExampleTablePrinter
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.ast.SMVModule
-import edu.kit.iti.formal.util.*
+import edu.kit.iti.formal.util.CodeWriter
+import edu.kit.iti.formal.util.fail
+import edu.kit.iti.formal.util.info
+import edu.kit.iti.formal.util.warn
 import java.io.File
 import java.util.*
-import kotlin.error
 import kotlin.system.exitProcess
 
 object RetetaApp {
@@ -41,58 +42,29 @@ class Reteta : CliktCommand(
         epilog = "Reteta -- Tooling for Relational Test Tables.",
         name = "reteta") {
 
-    val verbose by option("--verbose", "-v", help = "verbose output").counted()
-
-    val invokeModelChecker by option("--model-check", help = "the model checker is invoked when set [default:true]")
-            .flag("--dont-model-check", default = true)
+    val common by CommonArguments()
+    val tableOptions by TableArguments()
+    val programOptions by ProgramOptions()
+    val outputFolder by outputFolder()
+    val nuxmv by nuxmv()
+    val dryRun by dryRun()
+    val automatonOptions by AutomataOptions()
 
     val printAugmentedPrograms by option(help = "prints the augmented programs into files: <name>.st").flag()
 
-    val disableSimplify by option("--no-simplify", help = "disable")
-            .flag(default = false)
-
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
-            .file()
-            .multiple(required = true)
-
-    val outputFolder by option("-o", "--output", help = "Output directory")
-            .defaultLazy { table.first().nameWithoutExtension }
-
-    val library by option("-L", "--lib", help = "program files")
-            .convert { File(it) }
-            .multiple()
-
-    val verificationTechnique by option("--technique",
-            help = "verification technique")
-
-    val programs by option("-P", "--program", metavar = "NAME")
-            //.convert { File(it) }
-            .multiple(required = true)
-
-    val nuxmv by option("--nuxmv", help = "Path to nuXmv binary.", envvar = "NUXMV")
-            .file(exists = true)
-
-    val drawAutomaton by option("--debug-automaton").flag(default = false)
-    val showAutomaton by option("--show-automaton").flag(default = false)
-
     override fun run() {
-        currentDebugLevel = verbose
+        common.enableVerbosity()
 
-        if (table.isEmpty() || programs.isEmpty()) {
+        if (tableOptions.table.isEmpty() || programOptions.program.isEmpty()) {
             fail("No code or table file given.")
         }
+
         //read program
         val programs = readPrograms()
-
-
         val superEnumType = GetetaFacade.createSuperEnum(programs.map { it.scope })
 
-        /*val programRunNames = programs.mapIndexed { index, it ->
-            "${it.name.toLowerCase()}$$index"
-        }*/
-
         //read table
-        val gtts = table.flatMap { GetetaFacade.readTables(it) }.map {
+        val gtts = tableOptions.table.flatMap { GetetaFacade.readTables(it) }.map {
             it.simplify()
         }
 
@@ -124,14 +96,14 @@ class Reteta : CliktCommand(
 
             val tt = GetetaFacade.constructSMV(table, superEnumType)
 
-            if (drawAutomaton) {
+            if (automatonOptions.drawAutomaton) {
                 info("Automaton drawing requested. This may took a while.")
                 val ad = AutomatonDrawer(File(outputFolder, "${table.name}.dot"),
                         listOf(table.region), tt.automaton)
                 ad.runDot = true
-                ad.show = showAutomaton
+                ad.show = automatonOptions.showAutomaton
                 ad.run()
-                if (showAutomaton)
+                if (automatonOptions.showAutomaton)
                     info("Image viewer should open now")
             } else {
                 info("For drawing the automaton use: `--draw-automaton'.")
@@ -154,9 +126,9 @@ class Reteta : CliktCommand(
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
             val pNuxmv = GetetaFacade.createNuXMVProcess(
-                    outputFolder, modules, nuxmv?.absolutePath ?: "nuxmv",
+                    outputFolder, modules, nuxmv ?: "nuxmv",
                     table.options.verificationTechnique)
-            if (invokeModelChecker) {
+            if (dryRun) {
                 val b = pNuxmv.call()
                 when (b) {
                     NuXMVOutput.Verified -> {
@@ -187,12 +159,12 @@ class Reteta : CliktCommand(
     }
 
     fun readPrograms(): List<PouExecutable> {
-        info("Provided library code: $library")
-        info("Reading programs (in order): $programs")
-        val programs = IEC61131Facade.readProgramsWLPN(library, programs)
+        info("Provided library code: ${programOptions.library}")
+        info("Reading programs (in order): ${programOptions.program}")
+        val programs = IEC61131Facade.readProgramsWLPN(programOptions.library, programOptions.program)
         val nullIndex = programs.indexOf(null)
         if (nullIndex >= 0) {
-            fail("Could not find an executable pou in '${this.programs[nullIndex]}'.")
+            fail("Could not find an executable pou in '${programOptions.program[nullIndex]}'.")
         } else {
             return programs.filterNotNull().toMutableList()
         }

@@ -1,16 +1,13 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.arguments.argument
-import com.github.ajalt.clikt.parameters.arguments.multiple
+import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.monitor.*
-import edu.kit.iti.formal.automation.testtables.monitor.Monitor
 import edu.kit.iti.formal.util.info
 import java.io.File
 
@@ -25,20 +22,17 @@ object Monitor {
 }
 
 enum class CodeOutput {
-    STRCUTURED_TEXT, ESTEREL, CPP, C
+    /*STRCUTURED_TEXT, ESTEREL, */CPP//, C
 }
 
 class MonitorApp : CliktCommand(name = "ttmonitor",
         help = "Construction of monitors from test tables for Runtime Verification") {
-    val table by argument(help = "table file", name = "FILE")
-            .file(exists = true, readable = true)
-            .multiple(required = true)
 
-    val output by option("--output", "-o", help = "destination to write output files")
+    val tableOptions by TableArguments()
+
+    val output by option("--output", "-o", help = "destination of the output file")
             .file()
             .default(File("output.cpp"))
-
-    val filter by option("--monitor", "-m", help = "manually select the gtts").multiple()
 
     val writeHeader by option("--write-header", help = "Write the 'monitor.h' header file.")
             .flag("--dont-write-header", default = false)
@@ -48,25 +42,14 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .convert { CodeOutput.valueOf(it.toUpperCase()) }
             .default(CodeOutput.CPP)
 
-    val disableCombinedMonitor by option("--disable-combined").flag("--combined")
+    val disableCombinedMonitor by option("--disable-combined",
+            help="Generate a combined monitored or single monitors of given tables").flag("--combined")
 
-    val includes by option("-I").multiple()
-
-    val timeConstants: Map<String, Int> by option("-T")
-            .splitPair("=")
-            .convert{ it.first to it.second.toInt()}
-            .multiple()
-            .toMap()
-
-
-    private fun translateTimeConstant(it: String) {
-        val (n, v) = it.split(":")
-
-    }
+    val includes by option("-I", help="give header files to be included").multiple()
 
     override fun run() {
-        info("Files: $table")
-        info("Filter: $filter")
+        info("Files: ${tableOptions.table}")
+        info("Filter: ${tableOptions.tableWhitelist}")
 
         if (writeHeader && format == CodeOutput.CPP) {
             output.absoluteFile.parentFile.mkdirs()
@@ -76,11 +59,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             }
         }
 
-        val gtts = table.flatMap { GetetaFacade.readTables(it, timeConstants) }.map {
-            it.ensureProgramRuns()
-            it.generateSmvExpression()
-            it
-        }.filter { filter.isEmpty() || it.name in filter }
+        val gtts = tableOptions.readTables()
         info("Tables: ${gtts.joinToString { it.name }}")
 
 
@@ -93,9 +72,9 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
                     val monitor = Monitor()
                     for ((gtt, automaton) in pairs) {
                         val m = when (format) {
-                            CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
-                            CodeOutput.ESTEREL -> TODO()
-                            CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
+                            //CodeOutput.STRCUTURED_TEXT -> MonitorGenerationST.generate(gtt, automaton)
+                            // CodeOutput.ESTEREL -> TODO()
+                            //CodeOutput.C -> CMonitorGenerator.generate(gtt, automaton)
                             CodeOutput.CPP -> CppMonitorGenerator.generate(gtt, automaton, options)
                         }
                         monitor.preamble = m.preamble
@@ -107,7 +86,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
                 } else {
                     when (format) {
                         CodeOutput.CPP -> CppCombinedMonitorGeneration.generate("mcombined", pairs)
-                        else -> TODO()
+                        //else -> TODO()
                     }
                 }
         this.output.bufferedWriter().use {
@@ -125,9 +104,11 @@ fun bindsConstraintVariable(ctx: TestTableLanguageParser.CellContext?, fvar: Con
         val ss = chunk.getChild(0)
         when (ss) {
             is TestTableLanguageParser.SinglesidedContext -> {
-                val e = ss.expr() as? TestTableLanguageParser.VariableContext
-                if (e == null || ss.relational_operator().text == "=") false
-                else e.IDENTIFIER().equals(fvar.name)
+                val expr = ss.expr()
+                val e = expr as? TestTableLanguageParser.BvariableContext
+                val v = e?.variable()?.IDENTIFIER()
+                if (v == null || ss.relational_operator().text == "=") false
+                else v.equals(fvar.name)
             }
             is TestTableLanguageParser.CvariableContext -> {
                 ss.variable().IDENTIFIER().text == fvar.name

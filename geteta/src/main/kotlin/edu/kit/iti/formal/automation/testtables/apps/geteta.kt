@@ -53,7 +53,7 @@ object Geteta {
 
 class GetetaApp : CliktCommand(
         epilog = "Geteta -- Tooling for Generalized Test Tables.",
-        name = "geteta.sh") {
+        name = "geteta") {
 
     val programOptions by ProgramOptions()
     val tableOptions by TableArguments()
@@ -63,10 +63,9 @@ class GetetaApp : CliktCommand(
 
     val cexAnalysation by CexAnalysationArguments()
 
-
     val automataOptions by AutomataOptions()
 
-    val mode by option("-m", "--mode", help = "Verification Mode")
+    val mode by option("-m", "--mode", help = "verification mode")
             .convert { Mode.valueOf(it) }
 
     override fun run() {

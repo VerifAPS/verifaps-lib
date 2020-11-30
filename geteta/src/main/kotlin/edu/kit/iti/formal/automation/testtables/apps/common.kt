@@ -9,29 +9,30 @@ import edu.kit.iti.formal.util.info
 
 
 class CexAnalysationArguments() : OptionGroup() {
-    val cexJson by option("--cexjson", help = "exports an analysation of the counter example in json").flag()
+    val cexJson by option("--cexjson", help = "exports an analysis of the counter example in json").flag()
 
-    val runAnalyzer by option("--row-map", help = "print out a row mapping")
+    val runAnalyzer by option("--row-map", help = "print out a mapping between table rows and states")
             .flag("--no-row-map", default = false)
 
-    val odsExport by option("--ods", help = "generate ods counterexample file").file()
+    val odsExport by option("--ods", help = "generate ods counter-example file").file()
     val odsOpen by option("--ods-open").flag()
 
-    val cexPrinter by option("--cexout", help = "prints an analysation of the counter example and the program")
+    val cexPrinter by option("--cexout", help = "prints an analyis of the counter example and the program")
             .flag()
 
 }
 
 class AutomataOptions : OptionGroup() {
-    val drawAutomaton by option("--debug-automaton").flag(default = false)
-    val showAutomaton by option("--show-automaton").flag(default = false)
+    val drawAutomaton by option("--debug-automaton", help="generate a dot file, showing the generated automaton").flag(default = false)
+    val showAutomaton by option("--show-automaton", help="run dot and show the image of the automaton").flag(default = false)
 }
 
 class TableArguments() : OptionGroup() {
     fun readTables(): List<GeneralizedTestTable> {
         return table.flatMap {
             info("Use table file ${it.absolutePath}")
-            GetetaFacade.readTables(it)
+            info("Time constants: $timeConstants")
+            GetetaFacade.readTables(it, timeConstants)
         }.map {
             it.ensureProgramRuns()
             it.generateSmvExpression()
@@ -40,17 +41,18 @@ class TableArguments() : OptionGroup() {
 
     }
 
-    val timeConstants: Map<String, Int> by option("-T")
+    val timeConstants: Map<String, Int> by option("-T", help = "setting a time constant")
             .splitPair("=")
             .convert{ it.first to it.second.toInt()}
             .multiple()
             .toMap()
 
-    val table by option("-t", "--table", help = "the xml file of the table", metavar = "FILE")
+    val table by option("-t", "--table", help = "test table file", metavar = "FILE")
             .file(exists = true, readable = true)
             .multiple(required = true)
     val tableWhitelist by option("--select-table", metavar = "TABLE_NAME",
-            help = "specify tables which should be considered")
+            help = "specify table by name, which should be used from the given file")
             .multiple()
-    val enableMesh by option("--meshed").flag("-M", default = false)
+    val enableMesh by option("--meshed", help="enable experimental meshed tables")
+            .flag("-M", default = false)
 }

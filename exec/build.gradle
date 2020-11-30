@@ -23,22 +23,31 @@ def mainClasses = [
         , 'kastel-demo'      : "edu.kit.iti.formal.automation.KastelDemonstrator"
         , 'sc12f'            : "edu.kit.iti.formal.automation.Sc12f"
         , 'sc11-rev'         : "edu.kit.iti.formal.automation.SC11_rev"
-        , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
-        , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
+
+        //legacy name
         , 'reteta'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
+        , "geteta"           : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
+        , "geteta-smt"       : "edu.kit.iti.formal.automation.testtables.apps.GetetaSmt"
+
+        , "ttver"            : "edu.kit.iti.formal.automation.testtables.apps.Geteta"
+        , "ttver-c"          : "edu.kit.iti.formal.automation.testtables.apps.GetetaSmt"
+        , 'rttver'           : 'edu.kit.iti.formal.automation.testtables.apps.RetetaApp'
+        , 'ttprint'          : 'edu.kit.iti.formal.automation.testtables.apps.Printer'
         , 'ttmonitor'        : 'edu.kit.iti.formal.automation.testtables.apps.Monitor'
         , 'ttsynth'          : 'edu.kit.iti.formal.automation.testtables.apps.Synthesis'
-        , 'tt-unwind'        : "edu.kit.iti.formal.automation.rvt"
+        , 'ttunwind'         : "edu.kit.iti.formal.automation.testtables.apps.UnwindODSApp"
         , "ttcsv"            : "edu.kit.iti.formal.automation.testtables.apps.Csv"
         , "ttcov"            : "edu.kit.iti.formal.automation.testtables.apps.Coverage"
+
         , 'rvt'              : "edu.kit.iti.formal.automation.rvt.RvtAps"
+
         , 'flycheck'         : "edu.kit.iti.formal.automation.Flycheck"
         , 'check'            : "edu.kit.iti.formal.automation.Check"
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
+
         , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
-        , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
-        , "geteta-smt"       : "edu.kit.iti.formal.automation.testtables.apps.GetetaSmt"
+//        , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
         , "xml2st"           : "edu.kit.iti.formal.automation.Xml2TxtApp"
 ]
 
