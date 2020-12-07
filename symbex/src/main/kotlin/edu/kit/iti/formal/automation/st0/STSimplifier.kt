@@ -22,12 +22,16 @@ package edu.kit.iti.formal.automation.st0
  * #L%
  */
 
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.fbd.FbdBody
+import edu.kit.iti.formal.automation.il.IlBody
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.SFCImplementation
 import edu.kit.iti.formal.automation.st.ast.StatementList
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import edu.kit.iti.formal.automation.st0.trans.*
+import edu.kit.iti.formal.util.CodeWriter
 
 open class MultiCodeTransformation(val transformations: MutableList<CodeTransformation> = arrayListOf())
     : CodeTransformation {
@@ -45,17 +49,22 @@ class SimplifierPipelineST0 : CodeTransformation {
     val pipeline = MultiCodeTransformation()
 
     fun add(ct: CodeTransformation) = also { pipeline.transformations += ct }
-    fun addGlobalVariableListEmbedding() = add(GlobalVariableListEmbedding())
 
+    fun addGlobalVariableListEmbedding() = add(GlobalVariableListEmbedding())
     fun addCallEmbedding() = add(CallEmbedding())
     fun addLoopUnwinding() = add(LoopUnwinding())
     fun addTimerToCounter() = add(TimerSimplifier())
     fun addArrayEmbedding() = add(ArrayEmbedder())
     fun addStructEmbedding() = add(StructEmbedding)
     fun addSFCResetHandling() = add(SFCResetReplacer())
+
     //fun addRemoveAction() = add(RemoveActionsFromProgram())
     //fun funConstantEmbedding() = add(ConstantEmbedding())  // EXPERIMENTAL
     fun addTrivialBranchReducer() = add(TrivialBranchReducer())
+
+    fun addSfc2St() = add(Sfc2St)
+    fun addFbd2St() = add(Fbd2St)
+    fun addIl2St() = add(Il2St)
 
     fun transform(exec: PouExecutable): PouExecutable {
         val state = TransformationState(exec)
@@ -70,14 +79,70 @@ class SimplifierPipelineST0 : CodeTransformation {
             pipeline.transform(state)
 }
 
+private object Sfc2St : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.sfcBody?.let {
+            if (state.stBody.isEmpty())
+                IEC61131Facade.translateSfcToSt(state.scope, it, "")
+        }
+        return state
+    }
+}
+
+private object Il2St : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.ilBody?.let {
+            if (state.stBody.isEmpty())
+                state.stBody = IEC61131Facade.translateIl(it)
+        }
+        return state
+    }
+}
+
+private object Fbd2St : CodeTransformation {
+    override fun transform(state: TransformationState): TransformationState {
+        state.fbdBody?.let {
+            if (state.stBody.isEmpty())
+                state.stBody = it.asSt()
+        }
+        return state
+    }
+
+    private fun FbdBody.asSt(): StatementList {
+        val out = CodeWriter()
+        asStructuredText(out)
+        return IEC61131Facade.statements(out.stream.toString())
+        /*
+        fbDiagram.label?.let { lbl -> body.add(LabelStatement(lbl)) }
+        fbDiagram.topsorted().forEach {
+            when (it) {
+                is FbdNode.Jump -> {
+                    fbDiagram.findOutputForInput(it.inputSlots.first())?.let { (n, slot) ->
+                        val cond = n.getOutputValue(fbDiagram, slot)
+                        body.add(Statements.ifthen(cond, JumpStatement(it.target)))
+                    }
+                }
+                is FbdNode.Execute -> {
+                    fbDiagram.findOutputForInput(it.inputSlots.first())?.also { (n, slot) ->
+                        val cond = n.getOutputValue(fbDiagram, slot)
+                        "IF $cond THEN", "END_IF") { body }
+                    }
+                }
+            }
+        }*/
+    }
+}
+
+
 val PROGRAM_VARIABLE = VariableDeclaration.FLAG_COUNTER.get()
 
 data class TransformationState(
         var scope: Scope,
         var stBody: StatementList = StatementList(),
-        var sfcBody: SFCImplementation = SFCImplementation()
-) {
-    constructor(exec: PouExecutable) : this(exec.scope, exec.stBody ?: StatementList(), exec.sfcBody
-            ?: SFCImplementation())
-
+        var sfcBody: SFCImplementation? = null,
+        var fbdBody: FbdBody? = null,
+        var ilBody: IlBody? = null) {
+    constructor(exec: PouExecutable) : this(exec.scope,
+            exec.stBody ?: StatementList(),
+            exec.sfcBody, exec.fbBody, exec.ilBody)
 }

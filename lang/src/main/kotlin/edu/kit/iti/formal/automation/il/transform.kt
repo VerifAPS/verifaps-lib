@@ -80,9 +80,9 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
                                 else /*
                 SimpleOperand.S1 -> shortcall("S1")
                 SimpleOperand.R1 -> ()
-                SimpleOperand.CLK ->TODO()
+                SimpleOperand.CLK -> ???()
                 SimpleOperand.CU -> ()
-                SimpleOperand.CD -> ODO()
+                SimpleOperand.CD -> ???()
                 SimpleOperand.PV -> ()
                 SimpleOperand.IN -> ()
                 SimpleOperand.PT -> */ ->
@@ -155,9 +155,6 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
 
 /**
  * Uses Table 68, from IEC61131-3 norm:
- *
- *
- *
  */
 class IlStatementFactory(val accumulator: Accumulator) {
     /**
