@@ -20,29 +20,36 @@ dependencies {
     implementation 'com.github.ajalt:clikt:2.8.0'
 
     compile group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
-    //compile group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
-    //compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
     compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
     compile group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
     compile group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
 
-    //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
-    implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1'
+    //implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1'
 
-    //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
 
     compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
+    compile group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
+
     compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
-
     compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
 
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
+    compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.10'
+
+    compile 'org.kordamp.ikonli:ikonli-antdesignicons-pack:12.0.0'
+    compile 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
+    compile 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
+    compile 'com.moandjiezana.toml:toml4j:0.7.2'
 }
 
 repositories {
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
+
+    maven {
+        url "https://dl.bintray.com/kordamp/maven"
     }
 
     maven {
