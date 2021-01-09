@@ -119,9 +119,11 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
         }
 
         //assume
-        val constraints = gtt.constraintVariables.map {
+        val constraints = gtt.constraintVariables
+            .filter{ it.constraint != null}
+            .map {
             GetetaFacade.exprToSMV(it.constraint!!, SVariable(it.name), 0, gtt.parseContext)
-        }
+            }
         val combinedConstraints = constraints.conjunction(SLiteral.TRUE).translateToSt()
         target.init += SpecialCommentFactory.createAssume(combinedConstraints)
     }

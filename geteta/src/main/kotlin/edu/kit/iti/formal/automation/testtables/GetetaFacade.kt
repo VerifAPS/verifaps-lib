@@ -1,12 +1,14 @@
 package edu.kit.iti.formal.automation.testtables
 
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.rvt.translators.DefaultTypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
+import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.automation.testtables.builder.AutomataTransformerState
 import edu.kit.iti.formal.automation.testtables.builder.AutomatonBuilderPipeline
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
@@ -262,6 +264,7 @@ object GetetaFacade {
     }
 
     fun functionToSmv(fd: FunctionDeclaration): SmvFunctionDefinition {
+        IEC61131Facade.resolveDataTypes(PouElements(arrayListOf(fd)))
         val parameters = fd.scope.variables.filter { it.isInput }
                 .map { DefaultTypeTranslator.INSTANCE.translate(it) }
         val body = SymbExFacade.evaluateFunction(fd, parameters)

@@ -34,6 +34,9 @@ interface TypeTranslator {
     fun translate(datatype: AnyDt): SMVType
 
     open fun translate(vdecl: VariableDeclaration): SVariable {
+        require(vdecl.dataType!=null) {
+            "$vdecl has no data type set."
+        }
         return SVariable.create(vdecl.name).with(translate(vdecl.dataType!!))
     }
 
