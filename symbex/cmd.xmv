@@ -1,0 +1,10 @@
+set default_trace_plugin 6
+read_model
+flatten_hierarchy
+show_vars
+encode_variables
+build_boolean_model
+bmc_setup
+check_invar_bmc -a een-sorensson
+quit
+quit

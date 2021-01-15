@@ -15,6 +15,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
     init {
         if (!noPreamble) {
             sb.print("""
+                #define usint int
                 int nondet_int() { int i; return i; }
                 int nondet_bool() { return nondet_int()?0:1; }
                 int nondet_enum() { return nondet_int(); }
@@ -121,7 +122,8 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
         for (c in caseStatement.cases) {
             c.accept(this)
-            sb.nl() //TODO "break;" ?
+            sb.nl()
+            sb.write("break;")
         }
 
         if (caseStatement.elseCase.size > 0) {
@@ -374,11 +376,44 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
                     sb.increaseIndent()
                     for (vd in vars) {
-                        print(vd)
+                        if(vd.isGlobal)
+                            printDefine(vd)
+                        else
+                            print(vd)
+
                     }
                     sb.decreaseIndent().nl().printf("/* END_VAR */")
                     sb.nl()
                 }
+    }
+
+    private fun printDefine(vd: VariableDeclaration) {
+        sb.write("\n#define ${vd.name} ")
+        when {
+            vd.initValue != null -> {
+                val (dt, v) = vd.initValue as Value<*, *>
+
+                when (dt) {
+                    is AnyBit.BOOL -> {
+                        if (v == true) {
+                            sb.printf("1")
+                        } else if (v == false) {
+                            sb.printf("0")
+                        }
+                    }
+                    is EnumerateType -> {
+                        sb.printf("${dt.name}__${v}")
+
+
+                    }
+                    else -> sb.printf(v.toString())
+                }
+            }
+            vd.init != null -> {
+                vd.init!!.accept(this)
+            }
+        }
+        sb.write("\n")
     }
 
     override fun print(vd: VariableDeclaration) {

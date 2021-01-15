@@ -1,0 +1,161 @@
+MODULE main
+IVAR
+    code$$A : signed word[16];
+    code$$B : signed word[16];
+    code$$C : signed word[16];
+-- end of IVAR
+VAR
+    _BA_beispiel : BA_beispiel(code$."A", code$.B, code$.C, next(code$."X"), next(code$."Y"), next(code$."Z"));
+    code$ : ba_bsp(code$$A, code$$B, code$$C);
+-- end of VAR
+DEFINE
+
+-- end of module main
+MODULE ba_bsp("A", B, C)
+VAR
+    "X" : signed word[16];
+    "Y" : signed word[16];
+    "Z" : signed word[16];
+-- end of VAR
+DEFINE
+    X$00007 := 0sd16_2 * B;
+    X$00009 := 0sd16_0;
+    X$15 := case
+        "A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0 : "X"; 
+        B = C : X$00007; 
+        TRUE : X$00009; 
+    esac;
+    Y$00008 := 0sd16_2 * B;
+    Y$00010 := "Y" + 0sd16_1;
+    Y$16 := case
+        "A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0 : "Y"; 
+        B = C : Y$00008; 
+        TRUE : Y$00010; 
+    esac;
+    Z$00006 := 0sd16_1;
+    Z$17 := case
+        "A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0 : Z$00006; 
+        B = C : "Z"; 
+        TRUE : Y$00010; 
+    esac;
+    bc_015_015_ := TRUE & "A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0;
+    bc_015_018_ := TRUE & !("A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0) & B = C;
+    bc_015_000_ := TRUE & !("A" = 0sd16_1 & B = 0sd16_1 & C = 0sd16_2 & "Z" = 0sd16_0) & !(B = C);
+ASSIGN
+    init("X") := 0sd16_0;
+    init("Y") := 0sd16_0;
+    init("Z") := 0sd16_0;
+    next("X") := X$15;
+    next("Y") := Y$16;
+    next("Z") := Z$17;
+-- end of module ba_bsp
+MODULE BA_beispiel(code$A, code$B, code$C, code$X, code$Y, code$Z)
+FROZENVAR
+    p : signed word[16];
+-- end of FROZENVAR
+VAR
+    __ERROR__ : boolean;
+    __SENTINEL__ : boolean;
+    code$Y__history : History_1_of_code$Y(code$Y);
+    code$Z__history : History_1_of_code$Z(code$Z);
+    r01_01 : boolean;
+    r02_01 : boolean;
+    r02_02 : boolean;
+    r02_03 : boolean;
+    r02_04 : boolean;
+    r02_05 : boolean;
+    r02_06 : boolean;
+    r03_01 : boolean;
+-- end of VAR
+DEFINE
+    r01_out_code$Y := 0sd16_0 = code$Y;
+    r01_out_code$Z := TRUE;
+    r01_out_code$X := 0sd16_0 = code$X;
+    r01_out := r01_out_code$Y & r01_out_code$Z & r01_out_code$X;
+    r01_in_code$A := 0sd16_1 = code$A;
+    r01_in_code$B := 0sd16_1 = code$B;
+    r01_in_code$C := 0sd16_2 = code$C;
+    r01_in := r01_in_code$A & r01_in_code$B & r01_in_code$C;
+    r01_progress := r01_fwd & !FALSE;
+    r01_fail := r01_in & !r01_out;
+    r01_fwd := r01_in & r01_out;
+    r02_out_code$Y := code$X = code$Y;
+    r02_out_code$Z := code$Z__history._$1 = code$Z;
+    r02_out_code$X := code$X = 0sd16_2 * p;
+    r02_out := r02_out_code$Y & r02_out_code$Z & r02_out_code$X;
+    r02_in_code$A := TRUE;
+    r02_in_code$B := p = code$B;
+    r02_in_code$C := p = code$C;
+    r02_in := r02_in_code$A & r02_in_code$B & r02_in_code$C;
+    r02_progress := r02_fwd & !FALSE;
+    r02_fail := r02_in & !r02_out;
+    r02_fwd := r02_in & r02_out;
+    r03_out_code$Y := code$Y > code$Y__history._$1;
+    r03_out_code$Z := 0sd16_2 * code$Z > code$Y;
+    r03_out_code$X := 0sd16_0 <= code$X & code$X <= p;
+    r03_out := r03_out_code$Y & r03_out_code$Z & r03_out_code$X;
+    r03_in_code$A := TRUE;
+    r03_in_code$B := code$B = p + 0sd16_1;
+    r03_in_code$C := TRUE;
+    r03_in := r03_in_code$A & r03_in_code$B & r03_in_code$C;
+    r03_progress := r03_fwd & !FALSE;
+    r03_fail := r03_in & !r03_out;
+    r03_fwd := r03_in & r03_out;
+    r01_01_accept := r01_01 & r01_fwd;
+    r01_01_fail := r01_01 & r01_fail;
+    r01_01_acceptp := r01_01_accept & !r01_progress;
+    r03_01_accept := r03_01 & r03_fwd;
+    r03_01_fail := r03_01 & r03_fail;
+    r03_01_acceptp := r03_01_accept & !r03_progress;
+    r02_01_accept := r02_01 & r02_fwd;
+    r02_01_fail := r02_01 & r02_fail;
+    r02_01_acceptp := r02_01_accept & !r02_progress;
+    r02_02_accept := r02_02 & r02_fwd;
+    r02_02_fail := r02_02 & r02_fail;
+    r02_02_acceptp := r02_02_accept & !r02_progress;
+    r02_03_accept := r02_03 & r02_fwd;
+    r02_03_fail := r02_03 & r02_fail;
+    r02_03_acceptp := r02_03_accept & !r02_progress;
+    r02_04_accept := r02_04 & r02_fwd;
+    r02_04_fail := r02_04 & r02_fail;
+    r02_04_acceptp := r02_04_accept & !r02_progress;
+    r02_05_accept := r02_05 & r02_fwd;
+    r02_05_fail := r02_05 & r02_fail;
+    r02_05_acceptp := r02_05_accept & !r02_progress;
+    r02_06_accept := r02_06 & r02_fwd;
+    r02_06_fail := r02_06 & r02_fail;
+    r02_06_acceptp := r02_06_accept & !r02_progress;
+
+INVARSPEC
+    __ERROR__ -> r01_01 | r03_01 | r02_01 | r02_02 | r02_03 | r02_04 | r02_05 | r02_06 | __SENTINEL__
+
+INIT
+    r01_01 & !r03_01 & !r02_01 & !r02_02 & !r02_03 & !r02_04 & !r02_05 & !r02_06 & !__ERROR__ & !__SENTINEL__ & p >= 0sd16_0;
+ASSIGN
+    next(__ERROR__) := r01_01_fail | r02_01_fail | r02_02_fail | r02_03_fail | r02_04_fail | r02_05_fail | r02_06_fail | r03_01_fail;
+    next(__SENTINEL__) := __SENTINEL__;
+    next(r01_01) := FALSE;
+    next(r02_01) := r01_01_accept;
+    next(r02_02) := r02_01_accept;
+    next(r02_03) := r02_02_accept;
+    next(r02_04) := r02_03_accept;
+    next(r02_05) := r02_04_accept;
+    next(r02_06) := r02_05_accept | r02_06_accept;
+    next(r03_01) := r02_06_accept | r03_01_accept;
+-- end of module BA_beispiel
+MODULE History_1_of_code$Y(code$Y_$0)
+VAR
+    _$1 : signed word[16];
+-- end of VAR
+DEFINE
+ASSIGN
+    next(_$1) := code$Y_$0;
+-- end of module History_1_of_code$Y
+MODULE History_1_of_code$Z(code$Z_$0)
+VAR
+    _$1 : signed word[16];
+-- end of VAR
+DEFINE
+ASSIGN
+    next(_$1) := code$Z_$0;
+-- end of module History_1_of_code$Z

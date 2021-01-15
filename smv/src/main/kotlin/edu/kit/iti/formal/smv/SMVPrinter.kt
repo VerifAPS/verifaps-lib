@@ -85,7 +85,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
     override fun visit(m: SMVModule) {
         stream.print("MODULE ")
-        stream.print(m.name)
+        stream.print(quoted(m.name))
         if (!m.moduleParameters.isEmpty()) {
             stream.print("(");
             m.moduleParameters.forEachIndexed { index, sVariable ->
@@ -222,12 +222,12 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     override fun visit(v: SVariable) = printQuoted(v.name)
 
     fun printQuoted(name: String) {
-        stream.print(quoted(name))
+        stream.print(name.split(".").joinToString(".") { quoted(it) })
     }
 
     companion object {
         private val RESERVED_KEYWORDS = hashSetOf("A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
-                "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
+                "next", "init", "TRUE", "FALSE", "in", "IN", "mod", "union", "process", "AU", "EU", "U", "V", "S",
                 "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
 
         private val regex by lazy {

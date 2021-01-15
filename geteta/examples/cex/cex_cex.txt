@@ -1,0 +1,138 @@
+PROGRAM p
+    VAR_INPUT  
+        EN : BOOL := FALSE;
+    END_VAR
+    
+    VAR CONSTANT  
+        MINIMUM_EN_SIG : INT := INT#3;// MINIMUM_EN_SIG = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        Ready : BOOL := FALSE;// Ready = FALSE
+        
+    END_VAR
+    
+    VAR  
+        counter : INT := INT#0;// counter = 0sd16_0
+        
+        oldEN : BOOL := FALSE;// oldEN = FALSE
+        
+    END_VAR
+    
+    
+    Ready := FALSE; // Ready = FALSE
+    IF ((counter < MINIMUM_EN_SIG) AND EN) THEN // bc_016_016_ = TRUE
+        counter := (counter + INT#1); // counter = 0sd16_1
+    ELSIF ((counter >= MINIMUM_EN_SIG) AND EN) THEN // bc_016_018_ = FALSE
+        Ready := TRUE; // Ready = TRUE
+    ELSIF NOT EN THEN // bc_016_020_ = FALSE
+        counter := INT#0; // counter = 0sd16_0
+    END_IF
+END_PROGRAM
+// MINIMUM_EN_SIG = 0sd16_3
+// Ready = FALSE
+// counter = 0sd16_1
+// oldEN = FALSE
+(*******************************************************************************
+ * Table rows:
+ *     ✔ Row g11_1_r22 ✗ --> ✔: ✗ (Time: 1)
+ *     ✔ Row g11_1_r33 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row g11_1_r44 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row g11_2_r22 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row g11_2_r33 ✔ --> ✔: ✔ (Time: )
+ *     ✗ Row g11_2_r44 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM p
+    VAR_INPUT  
+        EN : BOOL := FALSE;
+    END_VAR
+    
+    VAR CONSTANT  
+        MINIMUM_EN_SIG : INT := INT#3;// MINIMUM_EN_SIG = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        Ready : BOOL := FALSE;// Ready = FALSE
+        
+    END_VAR
+    
+    VAR  
+        counter : INT := INT#0;// counter = 0sd16_1
+        
+        oldEN : BOOL := FALSE;// oldEN = FALSE
+        
+    END_VAR
+    
+    
+    Ready := FALSE; // Ready = FALSE
+    IF ((counter < MINIMUM_EN_SIG) AND EN) THEN // bc_016_016_ = TRUE
+        counter := (counter + INT#1); // counter = 0sd16_2
+    ELSIF ((counter >= MINIMUM_EN_SIG) AND EN) THEN // bc_016_018_ = FALSE
+        Ready := TRUE; // Ready = TRUE
+    ELSIF NOT EN THEN // bc_016_020_ = FALSE
+        counter := INT#0; // counter = 0sd16_0
+    END_IF
+END_PROGRAM
+// MINIMUM_EN_SIG = 0sd16_3
+// Ready = FALSE
+// counter = 0sd16_2
+// oldEN = FALSE
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row g11_1_r22 ✗ --> ✔: ✗ (Time: )
+ *     ✔ Row g11_1_r33 ✔ --> ✔: ✔ (Time: 2)
+ *     ✗ Row g11_1_r44 ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row g11_2_r22 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row g11_2_r33 ✔ --> ✔: ✔ (Time: )
+ *     ✗ Row g11_2_r44 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM p
+    VAR_INPUT  
+        EN : BOOL := FALSE;
+    END_VAR
+    
+    VAR CONSTANT  
+        MINIMUM_EN_SIG : INT := INT#3;// MINIMUM_EN_SIG = 0sd16_3
+        
+    END_VAR
+    
+    VAR_OUTPUT  
+        Ready : BOOL := FALSE;// Ready = FALSE
+        
+    END_VAR
+    
+    VAR  
+        counter : INT := INT#0;// counter = 0sd16_2
+        
+        oldEN : BOOL := FALSE;// oldEN = FALSE
+        
+    END_VAR
+    
+    
+    Ready := FALSE; // Ready = FALSE
+    IF ((counter < MINIMUM_EN_SIG) AND EN) THEN // bc_016_016_ = TRUE
+        counter := (counter + INT#1); // counter = 0sd16_3
+    ELSIF ((counter >= MINIMUM_EN_SIG) AND EN) THEN // bc_016_018_ = FALSE
+        Ready := TRUE; // Ready = TRUE
+    ELSIF NOT EN THEN // bc_016_020_ = FALSE
+        counter := INT#0; // counter = 0sd16_0
+    END_IF
+END_PROGRAM
+// MINIMUM_EN_SIG = 0sd16_3
+// Ready = FALSE
+// counter = 0sd16_3
+// oldEN = FALSE
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row g11_1_r22 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row g11_1_r33 ✔ --> ✔: ✔ (Time: )
+ *     ✔ Row g11_1_r44 ✔ --> ✗: ✗ (Time: 1)
+ *     ✗ Row g11_2_r22 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row g11_2_r33 ✔ --> ✔: ✔ (Time: )
+ *     ✗ Row g11_2_r44 ✔ --> ✗: ✗ (Time: )
+
+*******************************************************************************)

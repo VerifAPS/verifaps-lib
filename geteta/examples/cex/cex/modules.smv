@@ -1,0 +1,125 @@
+MODULE main
+IVAR
+    code$$EN : boolean;
+-- end of IVAR
+VAR
+    _cex : cex(code$.EN, next(code$.Ready));
+    code$ : p(code$$EN);
+-- end of VAR
+DEFINE
+
+-- end of module main
+MODULE p(EN)
+VAR
+    MINIMUM_EN_SIG : signed word[16];
+    Ready : boolean;
+    counter : signed word[16];
+    oldEN : boolean;
+-- end of VAR
+DEFINE
+    bc_016_020_ := TRUE & !(counter < MINIMUM_EN_SIG & EN) & !(counter >= MINIMUM_EN_SIG & EN) & !EN;
+    Ready$00009 := case
+        counter < MINIMUM_EN_SIG & EN : Ready$00005; 
+        counter >= MINIMUM_EN_SIG & EN : Ready$00007; 
+        !EN | TRUE : Ready$00005; 
+    esac;
+    counter$00006 := counter + 0sd16_1;
+    counter$00012 := case
+        counter < MINIMUM_EN_SIG & EN : counter$00006; 
+        counter >= MINIMUM_EN_SIG & EN : counter; 
+        !EN : counter$00008; 
+        TRUE : counter; 
+    esac;
+    bc_016_018_ := TRUE & !(counter < MINIMUM_EN_SIG & EN) & counter >= MINIMUM_EN_SIG & EN;
+    bc_016_016_ := TRUE & counter < MINIMUM_EN_SIG & EN;
+    Ready$00005 := FALSE;
+    bc_016_000_ := TRUE & !(counter < MINIMUM_EN_SIG & EN) & !(counter >= MINIMUM_EN_SIG & EN) & !!EN;
+    Ready$00007 := TRUE;
+    counter$00008 := 0sd16_0;
+ASSIGN
+    init(MINIMUM_EN_SIG) := 0sd16_3;
+    init(Ready) := FALSE;
+    init(counter) := 0sd16_0;
+    init(oldEN) := FALSE;
+    next(MINIMUM_EN_SIG) := MINIMUM_EN_SIG;
+    next(Ready) := Ready$00009;
+    next(counter) := counter$00012;
+    next(oldEN) := oldEN;
+-- end of module p
+MODULE cex(code$EN, code$Ready)
+VAR
+    __ERROR__ : boolean;
+    __SENTINEL__ : boolean;
+    g11_1_r22_01 : boolean;
+    g11_1_r33_01 : boolean;
+    g11_1_r33_02 : boolean;
+    g11_1_r44_01 : boolean;
+    g11_2_r22_01 : boolean;
+    g11_2_r33_01 : boolean;
+    g11_2_r33_02 : boolean;
+    g11_2_r44_01 : boolean;
+-- end of VAR
+DEFINE
+    r22_out_code$Ready := FALSE = code$Ready;
+    r22_out := r22_out_code$Ready;
+    r22_in_code$EN := FALSE = code$EN;
+    r22_in := r22_in_code$EN;
+    r22_progress := r22_fwd & !FALSE;
+    r22_fail := r22_in & !r22_out;
+    r22_fwd := r22_in & r22_out;
+    r33_out_code$Ready := FALSE = code$Ready;
+    r33_out := r33_out_code$Ready;
+    r33_in_code$EN := TRUE = code$EN;
+    r33_in := r33_in_code$EN;
+    r33_progress := r33_fwd & !FALSE;
+    r33_fail := r33_in & !r33_out;
+    r33_fwd := r33_in & r33_out;
+    r44_out_code$Ready := TRUE = code$Ready;
+    r44_out := r44_out_code$Ready;
+    r44_in_code$EN := TRUE = code$EN;
+    r44_in := r44_in_code$EN;
+    r44_progress := r44_fwd & !FALSE;
+    r44_fail := r44_in & !r44_out;
+    r44_fwd := r44_in & r44_out;
+    g11_2_r22_01_accept := g11_2_r22_01 & r22_fwd;
+    g11_2_r22_01_fail := g11_2_r22_01 & r22_fail;
+    g11_2_r22_01_acceptp := g11_2_r22_01_accept & !r22_progress;
+    g11_2_r33_01_accept := g11_2_r33_01 & r33_fwd;
+    g11_2_r33_01_fail := g11_2_r33_01 & r33_fail;
+    g11_2_r33_01_acceptp := g11_2_r33_01_accept & !r33_progress;
+    g11_2_r33_02_accept := g11_2_r33_02 & r33_fwd;
+    g11_2_r33_02_fail := g11_2_r33_02 & r33_fail;
+    g11_2_r33_02_acceptp := g11_2_r33_02_accept & !r33_progress;
+    g11_2_r44_01_accept := g11_2_r44_01 & r44_fwd;
+    g11_2_r44_01_fail := g11_2_r44_01 & r44_fail;
+    g11_2_r44_01_acceptp := g11_2_r44_01_accept & !r44_progress;
+    g11_1_r22_01_accept := g11_1_r22_01 & r22_fwd;
+    g11_1_r22_01_fail := g11_1_r22_01 & r22_fail;
+    g11_1_r22_01_acceptp := g11_1_r22_01_accept & !r22_progress;
+    g11_1_r33_01_accept := g11_1_r33_01 & r33_fwd;
+    g11_1_r33_01_fail := g11_1_r33_01 & r33_fail;
+    g11_1_r33_01_acceptp := g11_1_r33_01_accept & !r33_progress;
+    g11_1_r33_02_accept := g11_1_r33_02 & r33_fwd;
+    g11_1_r33_02_fail := g11_1_r33_02 & r33_fail;
+    g11_1_r33_02_acceptp := g11_1_r33_02_accept & !r33_progress;
+    g11_1_r44_01_accept := g11_1_r44_01 & r44_fwd;
+    g11_1_r44_01_fail := g11_1_r44_01 & r44_fail;
+    g11_1_r44_01_acceptp := g11_1_r44_01_accept & !r44_progress;
+
+INVARSPEC
+    __ERROR__ -> g11_2_r22_01 | g11_2_r33_01 | g11_2_r33_02 | g11_2_r44_01 | g11_1_r22_01 | g11_1_r33_01 | g11_1_r33_02 | g11_1_r44_01 | __SENTINEL__
+
+INIT
+    !g11_2_r22_01 & !g11_2_r33_01 & !g11_2_r33_02 & !g11_2_r44_01 & g11_1_r22_01 & g11_1_r33_01 & !g11_1_r33_02 & !g11_1_r44_01 & !__ERROR__ & !__SENTINEL__;
+ASSIGN
+    next(__ERROR__) := g11_1_r22_01_fail | g11_1_r33_01_fail | g11_1_r33_02_fail | g11_1_r44_01_fail | g11_2_r22_01_fail | g11_2_r33_01_fail | g11_2_r33_02_fail | g11_2_r44_01_fail;
+    next(__SENTINEL__) := g11_2_r44_01_accept | g11_1_r44_01_accept | __SENTINEL__;
+    next(g11_1_r22_01) := g11_1_r22_01_accept;
+    next(g11_1_r33_01) := g11_1_r22_01_accept;
+    next(g11_1_r33_02) := g11_1_r33_01_accept;
+    next(g11_1_r44_01) := g11_1_r33_02_accept | g11_1_r44_01_accept;
+    next(g11_2_r22_01) := g11_1_r44_01_accept | g11_2_r44_01_accept | g11_2_r22_01_accept;
+    next(g11_2_r33_01) := g11_1_r44_01_accept | g11_2_r22_01_accept | g11_2_r44_01_accept;
+    next(g11_2_r33_02) := g11_2_r33_01_accept;
+    next(g11_2_r44_01) := g11_2_r33_02_accept | g11_2_r44_01_accept;
+-- end of module cex

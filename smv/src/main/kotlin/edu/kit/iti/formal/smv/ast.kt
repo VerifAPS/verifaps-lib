@@ -548,22 +548,22 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
     /**
      *
      */
-    LESS_THAN("<", 12),
+    LESS_THAN("<", 13),
 
     /**
      *
      */
-    LESS_EQUAL("<=", 12),
+    LESS_EQUAL("<=", 13),
 
     /**
      *
      */
-    GREATER_THAN(">", 12),
+    GREATER_THAN(">", 13),
 
     /**
      *
      */
-    GREATER_EQUAL(">=", 12),
+    GREATER_EQUAL(">=", 13),
 
     /**
      *

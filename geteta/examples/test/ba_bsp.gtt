@@ -1,0 +1,41 @@
+table BA_beispiel {
+    var input A : INT
+    var input B : INT
+    var input C : INT
+    var output X : INT
+    var output Y : INT
+    var output Z : INT
+    
+    gvar p : INT with >= 0
+    
+    
+    group 0 [1,1] {
+        row 1 [1,1] {
+            A: 1
+            B: 1
+            C: 2
+            X: 0
+            Y: 0
+            Z: -
+        }
+        row 2 >= 6{
+            A: -
+            B: p
+            C: p
+            X: =2*p
+            Y: X
+            Z: Z[-1]
+        }
+        row 3 omega{
+            A: -
+            B: =p+1
+            C: -
+            X: [0,p]
+            Y: >Y[-1]
+            Z: 2*Z>Y
+        }
+        
+        
+        
+    }
+}

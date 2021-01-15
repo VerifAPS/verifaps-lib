@@ -1,0 +1,492 @@
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_0
+        
+        W : BOOL := FALSE;// W = FALSE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_3
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_32766
+        
+        upper : INT := INT#-32767;// upper = -0sd16_32767
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = FALSE
+        IF learn THEN // bc_065_065_ = FALSE
+            lower := MIN(lower, I); // lower = 0sd16_32766
+            upper := MAX(upper, I); // upper = 0sd16_32766
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = TRUE
+        IF (upper < lower) THEN // bc_072_072_ = TRUE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = FALSE
+            Q := MIN(upper, MAX(lower, I)); // Q = -0sd16_32767
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_2
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = FALSE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_0
+// W = TRUE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_3
+// cntQuench = 0sd16_3
+// lower = 0sd16_32766
+// upper = -0sd16_32767
+(*******************************************************************************
+ * Table rows:
+ *     ✔ Row I ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row L_1_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row A1 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row AHigh ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row AHighError ✔ --> ✔: ✔ (Time: )
+
+*******************************************************************************)
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_0
+        
+        W : BOOL := FALSE;// W = TRUE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_3
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_32766
+        
+        upper : INT := INT#-32767;// upper = -0sd16_32767
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = TRUE
+        IF learn THEN // bc_065_065_ = FALSE
+            lower := MIN(lower, I); // lower = 0sd16_0
+            upper := MAX(upper, I); // upper = 0sd16_0
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = FALSE
+        IF (upper < lower) THEN // bc_072_072_ = TRUE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = FALSE
+            Q := MIN(upper, MAX(lower, I)); // Q = -0sd16_32767
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_2
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = FALSE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_0
+// W = FALSE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_3
+// cntQuench = 0sd16_3
+// lower = 0sd16_32766
+// upper = -0sd16_32767
+(*******************************************************************************
+ * Table rows:
+ *     ✔ Row I ✗ --> ✗: ✗ (Time: 1)
+ *     ✔ Row L_1_r02 ✔ --> ✔: ✔ (Time: 1)
+ *     ✗ Row L_1_r03 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row L_2_r02 ✔ --> ✔: ✔ (Time: )
+ *     ✗ Row L_2_r03 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row A1 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row AHigh ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row AHighError ✗ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_0
+        
+        W : BOOL := FALSE;// W = FALSE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_3
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_32766
+        
+        upper : INT := INT#-32767;// upper = -0sd16_32767
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = TRUE
+        IF learn THEN // bc_065_065_ = TRUE
+            lower := MIN(lower, I); // lower = 0sd16_1
+            upper := MAX(upper, I); // upper = 0sd16_1
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = FALSE
+        IF (upper < lower) THEN // bc_072_072_ = TRUE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = FALSE
+            Q := MIN(upper, MAX(lower, I)); // Q = -0sd16_32767
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_2
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = FALSE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_0
+// W = FALSE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_3
+// cntQuench = 0sd16_3
+// lower = 0sd16_1
+// upper = 0sd16_1
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row I ✗ --> ✗: ✗ (Time: )
+ *     ✔ Row L_1_r02 ✗ --> ✔: ✗ (Time: 1)
+ *     ✔ Row L_1_r03 ✗ --> ✔: ✗ (Time: 1)
+ *     ✗ Row L_2_r02 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row L_2_r03 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row A1 ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row AHigh ✗ --> ✔: ✗ (Time: )
+ *     ✗ Row AHighError ✗ --> ✗: ✗ (Time: )
+
+*******************************************************************************)
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_0
+        
+        W : BOOL := FALSE;// W = FALSE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_3
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_1
+        
+        upper : INT := INT#-32767;// upper = 0sd16_1
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = FALSE
+        IF learn THEN // bc_065_065_ = FALSE
+            lower := MIN(lower, I); // lower = 0sd16_0
+            upper := MAX(upper, I); // upper = 0sd16_1
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = TRUE
+        IF (upper < lower) THEN // bc_072_072_ = FALSE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = TRUE
+            Q := MIN(upper, MAX(lower, I)); // Q = 0sd16_1
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_2
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = FALSE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_1
+// W = FALSE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_2
+// cntQuench = 0sd16_3
+// lower = 0sd16_1
+// upper = 0sd16_1
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row I ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✔ Row L_1_r03 ✗ --> ✗: ✗ (Time: 1)
+ *     ✔ Row L_2_r02 ✗ --> ✗: ✗ (Time: 1)
+ *     ✗ Row L_2_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✔ Row A1 ✔ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHigh ✗ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHighError ✗ --> ✗: ✗ (Time: 1)
+
+*******************************************************************************)
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_1
+        
+        W : BOOL := FALSE;// W = FALSE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_2
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_1
+        
+        upper : INT := INT#-32767;// upper = 0sd16_1
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = FALSE
+        IF learn THEN // bc_065_065_ = FALSE
+            lower := MIN(lower, I); // lower = 0sd16_0
+            upper := MAX(upper, I); // upper = 0sd16_1
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = TRUE
+        IF (upper < lower) THEN // bc_072_072_ = FALSE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = TRUE
+            Q := MIN(upper, MAX(lower, I)); // Q = 0sd16_1
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_1
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = FALSE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_1
+// W = FALSE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_1
+// cntQuench = 0sd16_3
+// lower = 0sd16_1
+// upper = 0sd16_1
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row I ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✔ Row A1 ✔ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHigh ✗ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHighError ✗ --> ✗: ✗ (Time: 1)
+
+*******************************************************************************)
+PROGRAM MinMax
+    VAR_INPUT  
+        I : INT := INT#0;
+        learn : BOOL := FALSE;
+        mode : OperationMode := OperationMode#LEARN;
+    END_VAR
+    
+    VAR_OUTPUT  
+        Q : INT := INT#0;// Q = 0sd16_1
+        
+        W : BOOL := FALSE;// W = FALSE
+        
+    END_VAR
+    
+    VAR CONSTANT  
+        WAIT_AFTER_WARNING : INT := INT#3;// WAIT_AFTER_WARNING = 0sd16_3
+        
+        WAIT_BEFORE_WARNING : INT := INT#3;// WAIT_BEFORE_WARNING = 0sd16_3
+        
+    END_VAR
+    
+    VAR  
+        cntHeat : INT := INT#3;// cntHeat = 0sd16_1
+        
+        cntQuench : INT := INT#3;// cntQuench = 0sd16_3
+        
+        lower : INT := INT#32766;// lower = 0sd16_1
+        
+        upper : INT := INT#-32767;// upper = 0sd16_1
+        
+    END_VAR
+    
+    
+    IF (mode = OperationMode#LEARN) THEN // bc_064_064_ = FALSE
+        IF learn THEN // bc_065_065_ = FALSE
+            lower := MIN(lower, I); // lower = 0sd16_0
+            upper := MAX(upper, I); // upper = 0sd16_1
+        END_IF
+        Q := INT#0; // Q = 0sd16_0
+        W := FALSE; // W = FALSE
+    ELSE // bc_064_000_ = TRUE
+        IF (upper < lower) THEN // bc_072_072_ = FALSE
+            Q := INT#0; // Q = 0sd16_0
+            W := TRUE; // W = TRUE
+        ELSE // bc_072_000_ = TRUE
+            Q := MIN(upper, MAX(lower, I)); // Q = 0sd16_1
+            IF (I <> Q) THEN // bc_077_077_ = TRUE
+                cntHeat := (cntHeat - INT#1); // cntHeat = 0sd16_0
+                cntQuench := WAIT_AFTER_WARNING;
+                IF (cntHeat = INT#0) THEN // bc_080_080_ = TRUE
+                    W := TRUE; // W = TRUE
+                END_IF
+            ELSE // bc_077_000_ = FALSE
+                cntQuench := (cntQuench - INT#1); // cntQuench = 0sd16_2
+                cntHeat := WAIT_BEFORE_WARNING;
+                IF (cntQuench = INT#0) THEN // bc_086_086_ = FALSE
+                    W := FALSE; // W = FALSE
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+END_PROGRAM
+// Q = 0sd16_1
+// W = TRUE
+// WAIT_AFTER_WARNING = 0sd16_3
+// WAIT_BEFORE_WARNING = 0sd16_3
+// cntHeat = 0sd16_0
+// cntQuench = 0sd16_3
+// lower = 0sd16_1
+// upper = 0sd16_1
+(*******************************************************************************
+ * Table rows:
+ *     ✗ Row I ✔ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_1_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r02 ✗ --> ✗: ✗ (Time: )
+ *     ✗ Row L_2_r03 ✗ --> ✗: ✗ (Time: )
+ *     ✔ Row A1 ✔ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHigh ✗ --> ✗: ✗ (Time: 1)
+ *     ✔ Row AHighError ✗ --> ✗: ✗ (Time: 1)
+
+*******************************************************************************)
