@@ -1,0 +1,15 @@
+table TP {
+  var input IN : BOOL
+  var input PT : INT
+  var output IN : BOOL
+  var output ET : INT
+
+  group G1 omega {
+        row r1 [1,-] { IN: FALSE, PT: -;       ET: 0; Q: FALSE}
+        row r2 [1,-] { IN: TRUE,  PT: >=1;     ET: >=ET[-1],<PT ; Q: TRUE}
+        row r3 [0,-] {            PT: =PT[-1]; ET: >=ET[-1],<PT ; Q: TRUE}
+        row r4 [1,1] {            PT: -;       ET: PT; Q: -}
+        row r5 [1,-] {            PT: -;       ET: PT; Q: FALSE}
+        
+  }
+}
