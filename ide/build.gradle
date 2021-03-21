@@ -9,8 +9,8 @@ javafx {
     modules = ['javafx.controls']
 }
 
-mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
-//mainClassName = "edu.kit.iti.formal.automation.idefx.IdeFx"
+//mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
+mainClassName = "edu.kit.iti.formal.automation.fx.FxKt"
 dependencies {
     compile project(':symbex')
     compile project(':geteta')
@@ -18,29 +18,11 @@ dependencies {
     compile project(':run')
 
     implementation 'com.github.ajalt:clikt:2.8.0'
-
-    compile group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
-    compile group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
-    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
-
-    //implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1'
-
-
-    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
+    implementation("no.tornado:tornadofx:1.7.20")
     compile group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
-
-    compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
-            "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
-    compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
-
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
-    compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.10'
-
-    compile 'org.kordamp.ikonli:ikonli-antdesignicons-pack:12.0.0'
     compile 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
     compile 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
-    compile 'com.moandjiezana.toml:toml4j:0.7.2'
 }
 
 repositories {

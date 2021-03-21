@@ -27,18 +27,6 @@ accel = "Ctrl+w"
 name = "New"
 accel = "Ctrl+n"
 icon = "far-file"
-[actions.editor-move-left]
-name = "Move editor to the left"
-accel = "Ctrl+LEFT"
-#icon=
-[actions.editor-move-right]
-name = "Move editor to the right"
-accel = "Ctrl+RIGHT"
-#icon=
-[actions.run]
-name="Run"
-#icon
-#accel
 [actions.tree-open-file]
 name="Open file"
 icon="far-edit"

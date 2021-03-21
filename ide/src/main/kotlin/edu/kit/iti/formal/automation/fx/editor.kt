@@ -1,22 +1,41 @@
 package edu.kit.iti.formal.automation.fx
 
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.analysis.ReportCategory
+import edu.kit.iti.formal.automation.analysis.ReportLevel
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer.*
+import edu.kit.iti.formal.automation.st.ast.Position
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.smt.SmtLibv2Lexer
 import edu.kit.iti.formal.smv.parser.SMVLexer
+import javafx.beans.InvalidationListener
 import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
+import javafx.stage.Popup
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
+import org.antlr.v4.runtime.Token
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
+import org.fxmisc.richtext.event.MouseOverTextEvent
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
+import org.reactfx.EventStreams
+import tornadofx.*
+import tornadofx.EventBus.RunOn.ApplicationThread
 import java.io.File
+import java.time.Duration
 import java.util.*
+
+
+object NewIssues : FXEvent(ApplicationThread)
+
 
 object Editors {
     fun getLanguageForFilename(file: File) = getEditorForSuffix(file.extension)
@@ -31,41 +50,103 @@ object Editors {
 }
 
 
-open class Editor : Controller {
-    override val ui = CodeArea("")
-    val dirty = SimpleBooleanProperty(this, "dirty", false)
-    val filename = SimpleObjectProperty<File>(this, "filename", null)
-    val language = SimpleObjectProperty<Language>(this, "language", null)
+open class Editor : View() {
+    override val root = CodeArea("")
+    val dirtyProperty = SimpleBooleanProperty(this, "dirty", false)
+    val dirty by dirtyProperty
+    val filenameProperty = SimpleObjectProperty<File>(this, "filename", null)
+    val filename by filenameProperty
+    val languageProperty = SimpleObjectProperty<Language>(this, "language", null)
+    val language by languageProperty
+    val issuesProperty = SimpleListProperty<Problem>(this, "issues", FXCollections.observableArrayList())
+    val issues by issuesProperty
 
-    val title = Bindings.createStringBinding(
-        { -> (filename.value?.name ?: "unknown") + (if (dirty.value) "*" else "") },
-        dirty,
-        filename
+    val editorTitle = Bindings.createStringBinding(
+        { -> (filenameProperty.value?.name ?: "unknown") + (if (dirtyProperty.value) "*" else "") },
+        dirtyProperty,
+        filenameProperty
     )
 
+
     init {
-        ui.paragraphGraphicFactory = LineNumberFactory.get(ui) //{ String.format("%03d", it) }
-        ui.isLineHighlighterOn = true
-        ui.textProperty().addListener { _, _, newText: String ->
-            language.value?.also {
-                ui.setStyleSpans(0, computeHighlighting(it))
+        root.paragraphGraphicFactory = LineNumberFactory.get(root)
+        root.isLineHighlighterOn = true
+
+        EventStreams.changesOf(root.textProperty())
+            .subscribe {
+                languageProperty.value?.also {
+                    reHighlight()
+                }
             }
-        }
-        filename.addListener { _, _, new ->
-            language.value = Editors.getLanguageForFilename(new)
+
+        EventStreams.changesOf(root.textProperty())
+            .forgetful()
+            .successionEnds(Duration.ofMillis(500))
+            .subscribe { runLinter() }
+
+        issuesProperty.addListener(InvalidationListener { _ -> reHighlight() })
+
+        filenameProperty.addListener { _, _, new ->
+            languageProperty.value = Editors.getLanguageForFilename(new)
         }
 
-        language.addListener { _, _, new ->
+        languageProperty.addListener { _, _, new ->
             new?.also {
-                if(ui.text.isNotEmpty())
-                    ui.setStyleSpans(0, computeHighlighting(it))
+                if (root.text.isNotEmpty()) {
+                    reHighlight()
+                }
+            }
+        }
+
+        root.mouseOverTextDelay = Duration.ofMillis(200)
+        val popup = Popup()
+        root.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_BEGIN) { e ->
+            val chIdx = e.characterIndex
+            issues.find { it.startOffset <= chIdx && chIdx <= it.endOffset }?.let { issue ->
+                val popupMsg = label(issue.message) {
+                    style {
+                        backgroundColor += c("black")
+                        fill = c("white")
+                        paddingAll = 5
+                    }
+                }
+                popup.content.add(popupMsg)
+                val pos = e.screenPosition
+                popup.show(currentWindow, pos.x, pos.y + 10)
+            }
+        }
+        root.addEventHandler(MouseOverTextEvent.MOUSE_OVER_TEXT_END) { e -> popup.hide() }
+    }
+
+    private fun runLinter() {
+        val text = root.text
+        language?.parseFile(CharStreams.fromString(text))?.let {
+            issues.setAll(it)
+        }
+    }
+
+    private fun reHighlight() {
+        language?.let {
+            try {
+                root.setStyleSpans(0, computeHighlighting(it))
+            } catch (e: Exception) {/*ignore*/
+            }
+
+            try {
+                issues.forEach {
+                    root.setStyle(
+                        it.startOffset, it.endOffset + 1,
+                        Collections.singleton("error")
+                    )
+                }
+            } catch (e: Exception) {/*ignore*/
             }
         }
     }
 
 
     fun computeHighlighting(language: Language): StyleSpans<Collection<String>>? {
-        val text = ui.text
+        val text = root.text
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
         val lexer = language.lexerFactory(CharStreams.fromString(text))
         do {
@@ -109,12 +190,18 @@ abstract class Language {
                 ""
             }
         }
+
+    abstract fun parseFile(fromString: CharStream): List<Problem>?
 }
 
 object StLanguage : Language() {
     override val name: String = "StructuredText"
 
     override fun lexerFactory(input: CharStream): Lexer = IEC61131Lexer(input)
+    override fun parseFile(fromString: CharStream): List<Problem> {
+        val (pous, errors) = IEC61131Facade.fileResolve(fromString, true)
+        return errors
+    }
 
     private fun MutableSet<Int>.addAll(vararg items: Int) {
         items.forEach { add(it) }
@@ -221,6 +308,22 @@ object TTLanguage : Language() {
     override val name: String = "TestTables"
 
     override fun lexerFactory(input: CharStream): Lexer = TestTableLanguageLexer(input)
+    override fun parseFile(fromString: CharStream): List<Problem>? {
+        val p = GetetaFacade.createParser(fromString)
+        p.file()
+        return p.errorReporter.errors.map {
+            val tok = it.offendingSymbol as Token
+            Problem(
+                tok.tokenSource.sourceName ?: "",
+                it.msg ?: "syntax error",
+                Position.start(tok),
+                Position.end(tok),
+                ReportCategory.SYNTAX,
+                ReportLevel.ERROR,
+            )
+        }
+
+    }
 
     init {
         structural = setOf(
@@ -267,11 +370,14 @@ object SmvLanguage : Language() {
     override val name: String = "Symbolic Model Verifier"
 
     override fun lexerFactory(input: CharStream): Lexer = SMVLexer(input)
+    override fun parseFile(fromString: CharStream): List<Problem>? = null
+
 }
 
 object SmtLanguage : Language() {
     override val name: String = "SMT"
     override fun lexerFactory(input: CharStream): Lexer = SmtLibv2Lexer(input)
+    override fun parseFile(fromString: CharStream): List<Problem>? = null
 }
 
 enum class StyleNames {

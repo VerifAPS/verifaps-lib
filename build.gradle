@@ -1,9 +1,9 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.4.20" apply false
-    id("org.jetbrains.dokka") version "1.4.10.2"
-    id "org.sonarqube" version "3.0"
+    id "org.jetbrains.kotlin.jvm" version "1.4.31" apply false
+    id("org.jetbrains.dokka") version "1.4.30"
+    id "org.sonarqube" version "3.1.1"
     id "com.github.ben-manes.versions" version "0.29.0"
 }
 
@@ -51,24 +51,19 @@ subprojects {
 
     ext.kotlin_version = '1.4.0'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 13
+    targetCompatibility = 13
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
             suppressWarnings = true
-            jvmTarget = "11"
+            jvmTarget = "13"
         }
     }
 
     test {
-        useJUnitPlatform {
-            //excludeTag 'edu.kit.iti.formal.automation.tests.CategoryNonCI'
-        }
-
-        jacoco {
-
-        }
+        useJUnitPlatform {}
+        jacoco {}
     }
 
     jacoco {
