@@ -44,7 +44,7 @@ class Xml2Txt : CliktCommand() {
         val out = output?.bufferedWriter() ?: OutputStreamWriter(System.out)
 
         if (!noSfc && !noFbd) {
-            out.write(text)
+            out.use { out.write(text) }
             return
         }
 
