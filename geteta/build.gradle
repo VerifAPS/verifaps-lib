@@ -15,16 +15,12 @@ def antlrOutputDir = file("${project.buildDir}/generated-src/antlr/main/edu/kit/
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url "http://formal.iti.kit.edu/maven2" }
-    maven { url 'https://jitpack.io' }
-    maven { url "http://repo.maven.apache.org/maven2" }
-//    maven { url "https://dl.bintray.com/ajalt/maven" }
 }
 
 dependencies {
-    compile project(':symbex')
+    implementation project(':symbex')
     antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
-    compile 'com.github.jferard:fastods:0.7.2'
+    implementation 'com.github.jferard:fastods:0.7.2'
     implementation 'com.github.ajalt:clikt:2.8.0'
 
     implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'

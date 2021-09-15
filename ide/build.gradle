@@ -11,35 +11,36 @@ javafx {
 mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 //mainClassName = "edu.kit.iti.formal.automation.idefx.IdeFx"
 dependencies {
-    compile project(':symbex')
-    compile project(':geteta')
-    compile project(':aps-rvt')
-    compile project(':run')
+    implementation project(':symbex')
+    implementation project(':geteta')
+    implementation project(':aps-rvt')
+    implementation project(':run')
 
     implementation 'com.github.ajalt:clikt:2.8.0'
 
-    compile group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
+    implementation group: 'com.fifesoft', name: 'autocomplete', version: '3.1.0'
     //compile group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     //compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
-    compile group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
-    compile group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
-    compile group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
+    implementation group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.1.1'
+    implementation group: 'com.fifesoft', name: 'rstaui', version: '3.1.0'
+    implementation group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
 
     //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
     implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.1'
 
     //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
 
-    compile group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
-    compile files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
+    implementation group: 'com.miglayout', name: 'miglayout-swing', version: '5.2'
+    implementation files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
-    compile group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
+    implementation group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
 }
 
 repositories {
     maven {
-        url = "http://bits.netbeans.org/maven2/"
+        //url = "http://bits.netbeans.org/maven2/"
+        url ="https://netbeans.apidesign.org/maven2"
     }
 }
 

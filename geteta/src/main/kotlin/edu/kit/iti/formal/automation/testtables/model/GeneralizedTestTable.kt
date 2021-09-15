@@ -278,7 +278,7 @@ class GeneralizedTestTable(
     val maxProgramRun: Int
         get() = programVariables
                 .filterIsInstance(ProgramVariable::class.java)
-                .map { it.programRun }.maxBy { it } ?: 0
+                .map { it.programRun }.maxByOrNull { it } ?: 0
 
     fun getProgramVariables(name: String, run: Int?): ColumnVariable {
         val pv = programVariables.find { it.respondTo(name, run) }
@@ -440,7 +440,7 @@ data class Region(override var id: String,
 
     override fun count(): Int = this.children.sumBy { it.count() }
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
-    override fun depth() = 1 + (this.children.maxBy { it.depth() }?.depth() ?: 0)
+    override fun depth() = 1 + (this.children.maxByOrNull { it.depth() }?.depth() ?: 0)
     override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }
     override fun visit(visitor: (TableNode) -> Unit) {
         visitor(this)

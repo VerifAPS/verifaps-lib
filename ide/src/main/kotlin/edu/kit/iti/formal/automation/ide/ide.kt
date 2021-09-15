@@ -499,17 +499,9 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
         fun main(args: Array<String>) {
             System.setProperty("swing.aatext", "true")
             System.setProperty("swing.plaf.metal.controlFont", "Tahoma-Bold-14")
-            //System.setProperty("swing.plaf.metal.userFont", "Tahoma-Bold-14")
-            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
             Locale.setDefault(Locale.ENGLISH)
 
             val rootLookup = Lookup()
-
-            Runtime.getRuntime().addShutdownHook(Thread() {
-                val c = rootLookup.get<ConfigurationPaths>().configuration
-                rootLookup.get<ApplicationConfiguration>().save(c)
-            })
-
 
             val configPaths = ConfigurationPaths
             val appConfig = ApplicationConfiguration
@@ -521,6 +513,11 @@ class Ide(val lookup: Lookup, vararg initialFiles: File) : JFrame(),
             rootLookup.register(userConfig)
             rootLookup.register<RecentFilesService>(RecentFilesImpl(rootLookup))
             rootLookup.register<Colors>(DuneColors)
+
+            Runtime.getRuntime().addShutdownHook(Thread {
+                val c = rootLookup.get<ConfigurationPaths>().configuration
+                rootLookup.get<ApplicationConfiguration>().save(c)
+            })
 
             val dockableFactory = DockableCodeEditorFactory(rootLookup)
             val editorFactory = EditorFactoryImpl(rootLookup, dockableFactory)

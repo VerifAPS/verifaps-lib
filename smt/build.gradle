@@ -10,7 +10,7 @@ repositories { mavenCentral() }
 
 dependencies {
     antlr 'org.antlr:antlr4:4.8-1'
-    compile project(":util")
+    implementation project(":util")
 }
 
 sourceSets {

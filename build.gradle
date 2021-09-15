@@ -24,7 +24,7 @@ allprojects {
         }
     }
 
-    repositories{
+    repositories {
         mavenCentral()
         jcenter()
     }
@@ -47,18 +47,25 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
     apply plugin: 'kotlin'
-    apply plugin: 'maven'
+    //apply plugin: 'maven'
     apply plugin: 'jacoco'
 
     ext.kotlin_version = '1.5.30'
 
-    sourceCompatibility = 11
-    targetCompatibility = 11
+    sourceCompatibility = 8
+    targetCompatibility = 8
+
+    compileKotlin {
+        kotlinOptions {
+            suppressWarnings = true
+            jvmTarget = "1.8"
+        }
+    }
 
     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         kotlinOptions {
             suppressWarnings = true
-            jvmTarget = "11"
+            jvmTarget = "1.8"
         }
     }
 
@@ -90,13 +97,6 @@ subprojects {
         from sourceSets.test.resources
     }
 
-    compileKotlin {
-        kotlinOptions {
-            suppressWarnings = true
-            jvmTarget = "1.8"
-        }
-    }
-
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
@@ -109,20 +109,20 @@ subprojects {
 
     dependencies {
         implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0-RC'
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        compile group: 'org.jetbrains', name: 'annotations', version: '20.1.0'
-        compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
-        compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
-        testCompile 'com.google.truth:truth:1.0.1'
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        implementation group: 'org.jetbrains', name: 'annotations', version: '20.1.0'
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
+        implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
+        testImplementation 'com.google.truth:truth:1.0.1'
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
-        testCompile 'org.junit.jupiter:junit-jupiter-params:5.7.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.7.1'
 
-        testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.5.0'
+        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.5.0'
 
-        testCompile project(':utils-test')
+        testImplementation project(':utils-test')
     }
 
     test {
@@ -130,22 +130,22 @@ subprojects {
     }
 
     task versionInfo(type: WriteProperties) {
-            outputFile = new java.io.File(sourceSets.main.resources.srcDirs.first(), "META-INF/version.property")
-            def gitversion = "1"//"git describe --tags".execute()
-            //gitversion.waitFor()
-            def gv = "1.0" //gitversion.in.readLines().get(0)
+        outputFile = new java.io.File(sourceSets.main.resources.srcDirs.first(), "META-INF/version.property")
+        def gitversion = "1"//"git describe --tags".execute()
+        //gitversion.waitFor()
+        def gv = "1.0" //gitversion.in.readLines().get(0)
 
-            setProperties([
-                    "project-name"   : project.name ?: "",
-                    "project-version": project.version ?: "0",
-                    "description"    : description ?: "",
-                    'built-by'       : System.properties['user.name'],
-                    'build-timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
-                    'build-revision' : gv,
-                    'created-by'     : "Gradle ${gradle.gradleVersion}",
-                    'build-jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
-                    'build-os'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
-            ])
+        setProperties([
+                "project-name"   : project.name ?: "",
+                "project-version": project.version ?: "0",
+                "description"    : description ?: "",
+                'built-by'       : System.properties['user.name'],
+                'build-timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'build-revision' : gv,
+                'created-by'     : "Gradle ${gradle.gradleVersion}",
+                'build-jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'build-os'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+        ])
     }
 
     processResources.dependsOn << versionInfo

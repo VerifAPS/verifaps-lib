@@ -117,7 +117,7 @@ object ApplicationConfiguration : Configuration() {
 object UserConfiguration : Configuration() {
     init {
         load(javaClass.getResource("/ide.properties"))
-        load(Paths.get(System.getenv()["user.home"], ".verifaps-ide.properties"))
+        load(Paths.get(System.getenv()["user.home"] ?: ".", ".verifaps-ide.properties"))
         load(Paths.get("verifaps-ide.properties"))
     }
 
