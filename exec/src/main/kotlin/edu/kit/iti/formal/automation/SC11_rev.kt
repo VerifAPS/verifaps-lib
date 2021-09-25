@@ -4,12 +4,9 @@ import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.findProgram
 import org.antlr.v4.runtime.CharStreams
-import org.jdom2.JDOMException
 import java.io.File
-import java.io.IOException
 
 /**
  * @author Alexander Weigl
@@ -18,7 +15,6 @@ import java.io.IOException
 object SC11_rev {
     private val typeDecls = TypeDeclarations()
 
-    @Throws(JDOMException::class, IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
         val start = System.currentTimeMillis()

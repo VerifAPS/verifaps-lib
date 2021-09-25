@@ -1,6 +1,6 @@
 plugins {
     id("application")
-    id "edu.sc.seis.launch4j" version "2.4.6"
+//buggy    id "edu.sc.seis.launch4j" version "2.5.1"
 }
 
 mainClassName = "empty"
@@ -42,10 +42,10 @@ def mainClasses = [
         , "xml2st"           : "edu.kit.iti.formal.automation.Xml2TxtApp"
 ]
 
-launch4j {
+/*launch4j {
     copyConfigurable = project.copySpec { exclude('**') }
     // do not copy anything to lib/
-}
+}*/
 
 mainClasses.each { a, b ->
     def t = task("createStart$a", type: CreateStartScripts) {
@@ -62,7 +62,7 @@ mainClasses.each { a, b ->
     t.dependsOn startScripts
 
 
-    def exe = task("createExe$a", type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
+    /*def exe = task("createExe$a", type: edu.sc.seis.launch4j.tasks.Launch4jLibraryTask) {
         group "start-script"
         copyConfigurable = [] // do not copy anything to lib/
         productName = a
@@ -76,6 +76,7 @@ mainClasses.each { a, b ->
     }
     applicationDistribution.from(exe) { into("bin") exclude("lib/") }
     exe.dependsOn startScripts
+     */
 }
 
 applicationDistribution.into("bin") {

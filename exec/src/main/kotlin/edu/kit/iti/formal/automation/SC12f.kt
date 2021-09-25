@@ -5,9 +5,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.sfclang.SFC2ST
 import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.CharStreams
-import org.jdom2.JDOMException
 import java.io.File
-import java.io.IOException
 
 /**
  * @author Alexander Weigl
@@ -16,7 +14,6 @@ import java.io.IOException
 object Sc12f {
     private val typeDecls = TypeDeclarations()
 
-    @Throws(JDOMException::class, IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
         val start = System.currentTimeMillis()
@@ -40,7 +37,7 @@ object Sc12f {
             }
         }
 
-        tles.add(0, typeDecls);
+        tles.add(0, typeDecls)
         File("SC12f.st").writer().use {
             it.write(IEC61131Facade.print(tles))
         }
