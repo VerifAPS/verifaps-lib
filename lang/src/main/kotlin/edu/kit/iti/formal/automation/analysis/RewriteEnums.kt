@@ -17,9 +17,7 @@ object RewriteEnums : AstMutableVisitor() {
     }
 
     override fun visit(literal: Literal): Expression {
-        when (literal) {
-            is EnumLit -> literal.value = literal.value.toUpperCase()
-        }
+        if (literal is EnumLit) literal.value = literal.value.toUpperCase()
         return literal
     }
 

@@ -340,7 +340,7 @@ class ContractAutomata(
     }
 
     val parseContext: ParseContext by lazy {
-        val vc = ParseContext(options.relational, 1)
+        val vc = ParseContext(options.relational, listOf("_run"))
         constraintVariables.forEach {
             vc.getSMVVariable(it)
         }
@@ -364,10 +364,6 @@ class ContractAutomata(
         val pv = programVariables.find { it.respondTo(name, run) }
         return pv ?: throw IllegalStateException("Could not find variable: $run|>$name.")
     }
-
-    fun getTableRow(rowId: String) = region.flat().find { it.id == rowId }
-    fun isProgramVariable(variable: String): Boolean = programVariables.any { it.name == variable }
-    fun isConstraintVariable(variable: String): Boolean = constraintVariables.any { it.name == variable }
 }
 
 data class ContractAutomataStates(

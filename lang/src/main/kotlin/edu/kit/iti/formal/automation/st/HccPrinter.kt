@@ -280,6 +280,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
                 //sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
                 sb.printf(meta.variable).printf(" = ").printf(haveocName)
             }
+            null -> {}
         }
     }
 

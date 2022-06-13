@@ -52,15 +52,13 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
     }
 
     override fun visit(recordType: RecordType): Boolean {
-        when (expected) {
-            is RecordType -> {
-                expected.fields.forEach { required ->
-                    val f = recordType.fields.get(required.name) ?: return false
-                    required.dataType?.let {
-                        //TODO: recursion on this visitor
-                        if (f.dataType?.isAssignableTo(it) == false)
-                            return false
-                    }
+        if (expected is RecordType) {
+            expected.fields.forEach { required ->
+                val f = recordType.fields.get(required.name) ?: return false
+                required.dataType?.let {
+                    //TODO: recursion on this visitor
+                    if (f.dataType?.isAssignableTo(it) == false)
+                        return false
                 }
             }
         }

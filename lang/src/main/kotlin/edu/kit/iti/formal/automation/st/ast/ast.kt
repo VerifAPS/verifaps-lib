@@ -449,7 +449,7 @@ data class CaseStatement(
         c.ruleContext = ruleContext
         c.expression = expression.clone()
         cases.forEach { cs -> c.addCase(cs.clone()) }
-        c.elseCase = elseCase?.clone()
+        c.elseCase = elseCase.clone()
         return c
     }
 }
@@ -1608,7 +1608,7 @@ data class Position(
                 val newlines = text.count { it == '\n' }
                 Position(token.line + newlines,
                         text.length - Math.max(0, text.lastIndexOf('\n')),
-                        token.stopIndex, token?.tokenSource.sourceName ?: "")
+                        token.stopIndex, token.tokenSource.sourceName ?: "")
             }
         }
     }

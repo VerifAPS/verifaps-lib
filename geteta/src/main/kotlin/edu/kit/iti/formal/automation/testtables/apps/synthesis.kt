@@ -49,11 +49,11 @@ class SynthesisApp : CliktCommand(
         name = "ttsynth") {
 
     private val tableFiles by argument("FILE", help = "Test table DSL file")
-            .file(exists = true, folderOkay = false, readable = true)
+            .file(mustExist = true, canBeDir = false, mustBeReadable = true)
             .multiple(required = true)
 
     private val outputFolder by option("-o", "--output-dir", help = "Output directory")
-            .file(exists = true, fileOkay = false, writable = true)
+            .file(mustExist = true, canBeFile = false, mustBeWritable = true)
             .defaultLazy { Paths.get("").toAbsolutePath().toFile() }
 
     private val pythonExecutable by option("--python", help = "Path to python with omega",

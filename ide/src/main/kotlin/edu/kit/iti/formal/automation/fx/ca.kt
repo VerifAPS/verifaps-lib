@@ -18,7 +18,6 @@ class ContractAutomataEditor : View() {
     val nodes = arrayListOf<State>()
 
     init {
-        nodes.add()
     }
 }
 

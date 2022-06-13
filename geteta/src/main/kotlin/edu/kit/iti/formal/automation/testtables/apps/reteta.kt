@@ -84,7 +84,7 @@ class Reteta : CliktCommand(
                     info("Write augmented program into $out.")
                 }
 
-                SymbExFacade.evaluateProgram(p, true)?.also {
+                SymbExFacade.evaluateProgram(p, true).also {
                     it.name = "${it.name}_${idx}" // rename module, otherwise clash on self-compositions
                 }
             }
@@ -126,7 +126,7 @@ class Reteta : CliktCommand(
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
             val pNuxmv = GetetaFacade.createNuXMVProcess(
-                    outputFolder, modules, nuxmv ?: "nuxmv",
+                    outputFolder, modules, nuxmv,
                     table.options.verificationTechnique)
             if (dryRun) {
                 val b = pNuxmv.call()

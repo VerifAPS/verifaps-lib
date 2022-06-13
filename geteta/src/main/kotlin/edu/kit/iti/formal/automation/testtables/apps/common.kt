@@ -48,7 +48,7 @@ class TableArguments() : OptionGroup() {
             .toMap()
 
     val table by option("-t", "--table", help = "test table file", metavar = "FILE")
-            .file(exists = true, readable = true)
+            .file(mustExist = true, mustBeReadable = true)
             .multiple(required = true)
     val tableWhitelist by option("--select-table", metavar = "TABLE_NAME",
             help = "specify table by name, which should be used from the given file")

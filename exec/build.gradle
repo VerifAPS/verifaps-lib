@@ -14,7 +14,7 @@ dependencies {
     implementation project(':run')
     implementation project(':ide')
 
-    implementation 'com.github.ajalt:clikt:2.8.0'
+    implementation 'com.github.ajalt.clikt:clikt:3.5.0'
 }
 
 
