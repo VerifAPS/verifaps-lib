@@ -57,6 +57,7 @@ subprojects {
         kotlinOptions {
             suppressWarnings = true
             jvmTarget = "17"
+            freeCompilerArgs = ["-Xuse-k2"]
         }
     }
 
