@@ -607,12 +607,12 @@ private operator fun Interval.minus(ri: Interval): Interval {
 private operator fun Interval.times(ri: Interval): Interval {
     //[x_1, x_2] \cdot [y_1, y_2] = [\min(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2), \max(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2)]
     val s = listOf(a * ri.a, a * ri.b, b * ri.a, b * ri.b)
-    return Interval(s.min()!!, s.max()!!)
+    return Interval(s.minOrNull()!!, s.maxOrNull()!!)
 }
 
 private fun Interval.power(ri: Interval): Interval {
     val s = listOf(a.pow(ri.a), a.pow(ri.b), b.pow(ri.a), b.pow(ri.b))
-    return Interval(floor(s.min()!!).toInt(), ceil(s.max()!!).toInt())
+    return Interval(floor(s.minOrNull()!!).toInt(), ceil(s.maxOrNull()!!).toInt())
 }
 
 private fun Int.pow(a: Int): Double = Math.pow(this.toDouble(), a.toDouble())
@@ -624,8 +624,8 @@ private operator fun Interval.div(ri: Interval): Interval {
     val x = 1.0 / ri.b
     val y = 1.0 / ri.a
     val s = listOf(a * x, a * y, b * x, b * y)
-    val mi = floor(s.min()!!).toInt()
-    val ma = ceil(s.max()!!).toInt()
+    val mi = floor(s.minOrNull()!!).toInt()
+    val ma = ceil(s.maxOrNull()!!).toInt()
     return Interval(mi, ma)
 }
 

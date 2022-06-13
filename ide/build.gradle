@@ -1,41 +1,33 @@
 plugins {
     id("application")
-    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
 
 javafx {
-    version = "15.0.1"
-    modules = ['javafx.controls']
+    version = "17"
+    modules = ["javafx.controls", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
 //mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
 mainClassName = "edu.kit.iti.formal.automation.fx.FxKt"
 dependencies {
-    compile project(':symbex')
-    compile project(':geteta')
-    compile project(':aps-rvt')
-    compile project(':run')
+    implementation project(':symbex')
+    implementation project(':geteta')
+    implementation project(':aps-rvt')
+    implementation project(':run')
 
     implementation 'com.github.ajalt:clikt:2.8.0'
     implementation("no.tornado:tornadofx:1.7.20")
-    compile group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
-    compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
-    compile 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
-    compile 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
+    implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
+    implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
+    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
 }
 
 repositories {
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-
-    maven {
-        url "https://dl.bintray.com/kordamp/maven"
-    }
-
-    maven {
-        url = "http://bits.netbeans.org/maven2/"
     }
 }
 

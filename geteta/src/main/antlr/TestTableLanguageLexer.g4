@@ -17,6 +17,8 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 public boolean relational = false;
 }
 
+CONTRACT: 'contract';
+AUTOMATON: 'automaton';
 TCONST: 'timeconst';
 INHERIT_FROM:'\\inherit_from';
 DOT:'.';

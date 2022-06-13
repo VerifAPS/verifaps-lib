@@ -249,7 +249,7 @@ class GridPrinter(
             val cells = grid.map { it[c] }
             val width = cells.asSequence()
                     .map { options.spacePadding * 2 + if (it.width < 0) it.content.length else it.width }
-                    .max() ?: options.columnMinWidth
+                    .maxOrNull() ?: options.columnMinWidth
             cells.forEach { it.width = Math.max(options.columnMinWidth, width) }
         }
     }
