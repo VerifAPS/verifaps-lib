@@ -1,0 +1,74 @@
+[actions]
+[actions.save]
+name = "Save"
+accel = "Ctrl+s"
+icon = "far-save"
+[actions.save-as]
+name = "Save As"
+accel = "Ctrl+Shift+s"
+icon = "fas-save"
+[actions.open]
+name = "Open"
+accel = "Ctrl+o"
+icon = "fas-folder-open"
+[actions.incr-font-size]
+name = "Larger texts"
+accel = "Ctrl+PLUS"
+icon = "fas-folder-open"
+[actions.decr-font-size]
+name = "Smaller texts"
+accel = "Ctrl+MINUS"
+icon = "fas-folder-open"
+[actions.close]
+name = "Close"
+accel = "Ctrl+w"
+#icon = "fas-folder-open"
+[actions.new]
+name = "New"
+accel = "Ctrl+n"
+icon = "far-file"
+[actions.tree-open-file]
+name="Open file"
+icon="far-edit"
+accel="ENTER"
+[actions.tree-new-file]
+name="New file"
+#icon=""
+accel="INS"
+[actions.tree-new-directory]
+name="New directory"
+#icon=""
+accel="Alt+INS"
+[actions.tree-rename-file]
+name="Rename file"
+#icon=""
+accel="F2"
+[actions.tree-delete-file]
+name="Delete file"
+#icon=""
+accel="DEL"
+[actions.go-up]
+name="Go up"
+#icon=""
+#accel=""
+[actions.go-into]
+name="Go into"
+#icon=""
+#accel=""
+[actions.refresh]
+name="Refresh"
+#icon=""
+#accel=""
+[actions.expand-tree]
+name="Expand tree"
+#icon=""
+#accel=""
+[actions.open-in-explorer]
+name="Show in Explorer"
+#icon=""
+#accel=""
+[actions.xdg-open]
+name="Open with System"
+#icon=""
+#accel=""
+

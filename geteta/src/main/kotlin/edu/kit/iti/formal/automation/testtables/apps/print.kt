@@ -25,7 +25,7 @@ object Printer {
     fun main(args: Array<String>) = PrinterApp().main(args)
 }
 
-class PrinterApp : CliktCommand() {
+class PrinterApp : CliktCommand(name="ttprint", help = "generate print files for rtt/gtt ") {
     enum class Format { HTML, LATEX, TEXT }
 
     val format by option("-f", "--format")

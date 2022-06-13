@@ -42,14 +42,13 @@ class CoverageApp : CliktCommand(
     val programOptions by ProgramOptions()
     val library = programOptions.library
     val program =programOptions.program
-    val disableSimplify = programOptions.disableSimplify
 
     override fun run() {
         common()
 
         val gtts = tableArguments.readTables()
         val code = programOptions.readProgram()
-        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, programOptions.disableSimplify)
         info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))

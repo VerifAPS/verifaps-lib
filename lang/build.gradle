@@ -5,7 +5,7 @@ apply plugin: 'antlr'
 description = 'iec61131lang'
 
 dependencies {
-    implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.8-1'
+    api group: 'org.antlr', name: 'antlr4-runtime', version: '4.8-1'
     antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
 
     api project(':util')

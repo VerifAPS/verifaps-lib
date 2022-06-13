@@ -2,10 +2,7 @@ package edu.kit.iti.formal.automation
 
 import com.github.ajalt.clikt.core.ParameterHolder
 import com.github.ajalt.clikt.parameters.groups.OptionGroup
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.multiple
-import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.util.currentDebugLevel
@@ -33,12 +30,12 @@ class ProgramOptions : OptionGroup("options for handling programs") {
         return pous.filterNotNull()
     }
 
-    val library by option("-L", "--library", help = "library files").file().multiple()
+    val library by option("-L", "--library", help = "Library files to include in the namespace").file().multiple()
 
-    val program by option("-P", "--program", "-c", help = "program files")
+    val program by option("-P", "--program", "-c", help = "File containing the main program")
             .multiple(required = true)
 
-    val disableSimplify by option("--no-simplify", help = "disable")
+    val disableSimplify by option("--no-simplify", help = "Disable the simplification to ST0")
             .flag("--simplify", default = false)
 }
 
@@ -63,8 +60,8 @@ class CommonArguments() : OptionGroup() {
         showVersion()
     }
 
-    val verbose by option("--verbose").flag()
-    val version by option("--version").flag()
+    val verbose by option("--verbose", help="enable detailed output message").flag()
+    val version by option("--version", help="show current version").flag()
 }
 
 fun ParameterHolder.nuxmv() =

@@ -12,7 +12,7 @@ import java.io.File
 class AutomataDrawerTest {
     @Test
     fun testSimple() =
-            renderAndShow("examples/NewFile.tt.txt")
+            renderAndShow("examples/NewFile.gtt")
 
     @Test
     fun testMinMax() = renderAndShow("examples/MinMax/MinMax.tt.txt")

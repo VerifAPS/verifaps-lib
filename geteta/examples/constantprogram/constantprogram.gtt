@@ -3,8 +3,6 @@ table Ta {
     var output o : INT
     var output c : ENUM
     
-    
-    
     group 0 [1, 1] {
         row 1 >= 10{
             i: -

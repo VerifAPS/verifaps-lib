@@ -5,6 +5,7 @@ description = 'Regression Verification Frontend'
 dependencies {
     implementation project(':lang')
     implementation project(':smv')
+    implementation project(':smt')
     implementation project(':xml')
     implementation project(':symbex')
     implementation 'com.github.ajalt:clikt:2.8.0'
