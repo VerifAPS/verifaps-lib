@@ -70,7 +70,7 @@ class Reteta : CliktCommand(
 
         gtts.forEach { table ->
             val chapterMarks = table.chapterMarksForProgramRuns
-            val augmentedPrograms = programs.mapIndexed { idx, exec ->
+            val augmentedPrograms: List<SMVModule> = programs.mapIndexed { idx, exec ->
                 val rttPipeline = RTTCodeAugmentation(false, chapterMarks[idx]!!)
                 val s = rttPipeline.transform(TransformationState(exec))
                 val p = ProgramDeclaration(exec.name, s.scope, s.stBody)
@@ -84,7 +84,7 @@ class Reteta : CliktCommand(
                     info("Write augmented program into $out.")
                 }
 
-                SymbExFacade.evaluateProgram(p, true)?.also {
+                SymbExFacade.evaluateProgram(p, true).also {
                     it.name = "${it.name}_${idx}" // rename module, otherwise clash on self-compositions
                 }
             }

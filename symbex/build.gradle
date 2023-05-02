@@ -1,6 +1,6 @@
 description = 'iec-symbex'
 dependencies {
-    compile project(':lang')
-    compile project(':smv')
-    compile project(':smt')
+    api project(':lang')
+    api project(':smv')
+    api project(':smt')
 }

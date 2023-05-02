@@ -15,19 +15,16 @@ def antlrOutputDir = file("${project.buildDir}/generated-src/antlr/main/edu/kit/
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url "http://formal.iti.kit.edu/maven2" }
     maven { url 'https://jitpack.io' }
-    maven { url "http://repo.maven.apache.org/maven2" }
-//    maven { url "https://dl.bintray.com/ajalt/maven" }
 }
 
 dependencies {
-    compile project(':symbex')
+    api project(':symbex')
     antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
-    compile 'com.github.jferard:fastods:0.7.2'
-    implementation 'com.github.ajalt:clikt:2.8.0'
+    api 'com.github.jferard:fastods:0.7.2'
+    api 'com.github.ajalt:clikt:2.8.0'
 
-    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'
+    api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'
 
     //compile 'io.github.config4k:config4k:0.4.1'
 
@@ -67,6 +64,9 @@ generateGrammarSource {
 
 compileJava.dependsOn generateGrammarSource
 compileKotlin.dependsOn generateGrammarSource
+
+compileTestKotlin.dependsOn generateTestGrammarSource
+
 
 /*
 license {
