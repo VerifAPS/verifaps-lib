@@ -8,12 +8,11 @@ mainClassName = "empty"
 description = 'Case Studies and Executables of VerifAPS'
 
 dependencies {
-    compile project(':symbex')
-    compile project(':geteta')
-    compile project(':aps-rvt')
-    compile project(':run')
-    compile project(':ide')
-
+    implementation project(':symbex')
+    implementation project(':geteta')
+    implementation project(':aps-rvt')
+    implementation project(':run')
+    implementation project(':ide')
     implementation 'com.github.ajalt:clikt:2.8.0'
 }
 

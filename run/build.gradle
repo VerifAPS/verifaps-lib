@@ -1,7 +1,7 @@
 description = 'Interpreter for StructuredText'
 dependencies {
-    compile project(':lang')
-    compile project(':smv')
-    compile project(':xml')
-    compile project(':symbex')
+    implementation project(':lang')
+    implementation project(':smv')
+    implementation project(':xml')
+    implementation project(':symbex')
 }
