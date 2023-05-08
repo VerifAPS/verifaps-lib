@@ -34,7 +34,7 @@ dependencies {
     implementation files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
-    implementation group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE112'
+    implementation group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE731'
 }
 
 repositories {
