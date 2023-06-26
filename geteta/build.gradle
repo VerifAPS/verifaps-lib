@@ -21,7 +21,7 @@ repositories {
 dependencies {
     api project(':symbex')
     antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
-    api 'com.github.jferard:fastods:0.7.2'
+    api 'com.github.jferard:fastods:0.8.1'
     api 'com.github.ajalt:clikt:2.8.0'
 
     api 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'
