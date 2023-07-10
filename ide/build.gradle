@@ -23,7 +23,7 @@ dependencies {
     //compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
     implementation group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.3.3'
     implementation group: 'com.fifesoft', name: 'rstaui', version: '3.3.1'
-    implementation group: 'com.fifesoft', name: 'spellchecker', version: '3.1.0'
+    implementation group: 'com.fifesoft', name: 'spellchecker', version: '3.3.1'
 
     //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
     implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.4'
