@@ -8,8 +8,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.13.0'
-    antlr group: 'org.antlr', name: 'antlr4', version: '4.13.0'
+    implementation group: 'org.antlr', name: 'antlr4-runtime', version: '4.13.1'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.13.1'
 
     api project(':util')
     api project(':xml')
