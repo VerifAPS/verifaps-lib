@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     api project(':symbex')
-    antlr group: 'org.antlr', name: 'antlr4', version: '4.13.0'
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.13.1'
     api 'com.github.jferard:fastods:0.8.1'
     api 'com.github.ajalt:clikt:3.5.2'
 
