@@ -30,7 +30,7 @@ dependencies {
 
     //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
 
-    implementation group: 'com.miglayout', name: 'miglayout-swing', version: '11.1'
+    implementation group: 'com.miglayout', name: 'miglayout-swing', version: '11.2'
     implementation files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
             "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
 
