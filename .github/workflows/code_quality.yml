@@ -16,6 +16,11 @@ jobs:
       pull-requests: write
       checks: write
     steps:
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
