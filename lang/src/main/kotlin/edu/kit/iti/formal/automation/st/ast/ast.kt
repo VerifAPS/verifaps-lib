@@ -2055,7 +2055,7 @@ data class SFCActionQualifier(
 
     companion object {
         fun fromName(qName: String): SFCActionQualifier? {
-            val qualifier = Qualifier.values().find { it.symbol == qName }
+            val qualifier = Qualifier.entries.find { it.symbol == qName }
             if (qualifier != null) return SFCActionQualifier(qualifier)
             else return null
         }

@@ -101,7 +101,7 @@ class None(input: CharStream?) : Lexer(input) {
         }
     }
 
-    @Deprecated("")
+    @Deprecated("just do not use it")
     override fun getTokenNames(): Array<String> {
         return Companion.tokenNames
     }

@@ -29,3 +29,45 @@ projectJDK: 21 #(Applied in CI/CD pipeline)
 
 #Specify Qodana linter for analysis (Applied in CI/CD pipeline)
 linter: jetbrains/qodana-jvm-community:latest
+
+include:
+  - name: KotlinDeprecation
+  - name: ClassName
+  - name: LocalVariableName
+  - name: PropertyName
+  - name: CanBeParameter
+  - name: RemoveCurlyBracesFromTemplate
+  - name: RedundantModalityModifier
+  - name: RedundantNullableReturnType
+  - name: RemoveRedundantQualifierName
+  - name: RedundantSemicolon
+  - name: RedundantVisibilityModifier
+  - name: RemoveEmptyClassBody
+  - name: UnnecessaryVariable
+  - name: KotlinUnusedImport
+  - name: UnusedSymbol
+  - name: CopyWithoutNamedArguments
+  - name: ReplacePutWithAssignment
+  - name: ProtectedInFinal
+  - name: SimplifiableCallChain
+  - name: MemberVisibilityCanBePrivate
+  - name: JavaMapForEach
+  - name: ReplaceJavaStaticMethodWithKotlinAnalog
+  - name: MoveLambdaOutsideParentheses
+  - name: SimplifiableCall
+  - name: MayBeConstant
+  - name: NestedLambdaShadowedImplicitParameter
+  - name: ReplaceManualRangeWithIndicesCalls
+  - name: ReplaceMapIndexedWithListGenerator
+  - name: LiftReturnOrAssignment
+  - name: ConvertToStringTemplate
+  - name: MoveVariableDeclarationIntoWhen
+  - name: VerboseNullabilityAndEmptiness
+
+
+exclude:
+  - name: All
+    paths:
+      - share/**
+
+

@@ -366,7 +366,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         val oldSmv = symbex(old)
         val newSmv = symbex(new)
 
-        val commonOutput = old.block.output.intersect(new.block.output)
+        val commonOutput = old.block.output.intersect(new.block.output.toSet())
         val outVars = commonOutput.map { it.identifier to it.identifier }.toMap()
         val r = oldSmv.equal(newSmv, outVars)
         if (r)

@@ -1059,7 +1059,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
         val q = ctx.actionQualifier().IDENTIFIER().text
         qualifier.qualifier = SFCActionQualifier.Qualifier.NON_STORED
-        for (qual in SFCActionQualifier.Qualifier.values()) {
+        for (qual in SFCActionQualifier.Qualifier.entries) {
             if (qual.symbol.equals(q, ignoreCase = true)) qualifier.qualifier = qual
         }
         currentStep.addAction(qualifier, ctx.actionName.text)
