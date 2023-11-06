@@ -49,7 +49,7 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'jacoco'
 
-    ext.kotlin_version = '1.9.10'
+    ext.kotlin_version = '1.9.20'
 
     sourceCompatibility = 17
     targetCompatibility = 17
