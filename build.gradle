@@ -120,7 +120,7 @@ subprojects {
         testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.1'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
 
-        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.9.10'
+        testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '1.9.20'
         testImplementation project(':utils-test')
     }
 
