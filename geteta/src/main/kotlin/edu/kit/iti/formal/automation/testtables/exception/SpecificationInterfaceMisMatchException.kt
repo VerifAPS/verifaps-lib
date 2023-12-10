@@ -68,7 +68,7 @@ class SpecificationInterfaceMisMatchException : GetetaException {
             var computed: MutableMap<String, Int> = HashMap()
 
             init {
-                this.reference = name.toLowerCase()
+                this.reference = name.lowercase(Locale.getDefault())
             }
 
 
@@ -79,8 +79,13 @@ class SpecificationInterfaceMisMatchException : GetetaException {
             }
 
             private fun getLevenstheinToRef(o1: String): Int {
-                val k = o1.toLowerCase()
-                return (computed as java.util.Map<String, Int>).computeIfAbsent(k) { s -> levenshteinDistance(reference, s) }
+                val k = o1.lowercase(Locale.getDefault())
+                return (computed as java.util.Map<String, Int>).computeIfAbsent(k) { s ->
+                    levenshteinDistance(
+                        reference,
+                        s
+                    )
+                }
             }
 
             /**

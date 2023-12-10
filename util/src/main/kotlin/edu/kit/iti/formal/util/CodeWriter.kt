@@ -2,6 +2,7 @@ package edu.kit.iti.formal.util
 
 import java.io.StringWriter
 import java.io.Writer
+import java.util.*
 
 /**
  * CodeWriter class.
@@ -39,7 +40,7 @@ open class CodeWriter(var stream: Writer = StringWriter())
     }
 
     open fun keyword(keyword: String): CodeWriter {
-        return printf(if (uppercaseKeywords) keyword.toUpperCase() else keyword.toLowerCase())
+        return printf(if (uppercaseKeywords) keyword.uppercase(Locale.getDefault()) else keyword.lowercase(Locale.getDefault()))
     }
 
     fun nl(): CodeWriter {

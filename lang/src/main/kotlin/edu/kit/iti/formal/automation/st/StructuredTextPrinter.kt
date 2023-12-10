@@ -227,7 +227,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     val QUOTED_IDENTIFIER = listOf("STEP", "END_STEP", "TRANSITION", "END_TRANSITION", "INITIAL_STEP", "FROM")
     private fun quoteIdentifier(identifier: String): String {
-        return if (identifier.toUpperCase() in QUOTED_IDENTIFIER) {
+        return if (identifier.uppercase(Locale.getDefault()) in QUOTED_IDENTIFIER) {
             "`$identifier`"
         } else {
             identifier
@@ -587,37 +587,44 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         fun print(prefix: Any?, suffix: Any) =
                 (if (prefix != null) "$prefix#" else "") + suffix
 
-        sb.printf(when (literal) {
-            is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
-            is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
-            is EnumLit -> print(literal.dataType.obj?.name, literal.value)
-            is ToDLit -> {
-                val (h, m, s, ms) = literal.value
-                print(literal.dataType().name, "$h:$m:$s.$ms")
-            }
-            is DateLit -> {
-                val (y, m, d) = literal.value
-                print(literal.dataType().name, "$y-$m-$d")
-            }
-            is DateAndTimeLit -> {
-                val (y, mo, d) = literal.value.date
-                val (h, m, s, ms) = literal.value.tod
-                print(literal.dataType().name, "$y-$mo-$d-$h:$m:$s.$ms")
-            }
-            is StringLit -> {
-                if (literal.dataType() is IECString.WSTRING) "\"${literal.value}\""
-                else "'${literal.value}'"
-            }
-            is NullLit -> "null"
-            is TimeLit -> {
-                print(literal.dataType().name, "${literal.value.milliseconds}ms")
-            }
-            is BooleanLit -> literal.value.toString().toUpperCase()
-            is BitLit -> {
-                print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
-            }
-            is UnindentifiedLit -> literal.value
-        })
+        sb.printf(
+            when (literal) {
+                is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
+                is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
+                is EnumLit -> print(literal.dataType.obj?.name, literal.value)
+                is ToDLit -> {
+                    val (h, m, s, ms) = literal.value
+                    print(literal.dataType().name, "$h:$m:$s.$ms")
+                }
+
+                is DateLit -> {
+                    val (y, m, d) = literal.value
+                    print(literal.dataType().name, "$y-$m-$d")
+                }
+
+                is DateAndTimeLit -> {
+                    val (y, mo, d) = literal.value.date
+                    val (h, m, s, ms) = literal.value.tod
+                    print(literal.dataType().name, "$y-$mo-$d-$h:$m:$s.$ms")
+                }
+
+                is StringLit -> {
+                    if (literal.dataType() is IECString.WSTRING) "\"${literal.value}\""
+                    else "'${literal.value}'"
+                }
+
+                is NullLit -> "null"
+                is TimeLit -> {
+                    print(literal.dataType().name, "${literal.value.milliseconds}ms")
+                }
+
+                is BooleanLit -> literal.value.toString().uppercase(Locale.getDefault())
+                is BitLit -> {
+                    print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
+                }
+
+                is UnindentifiedLit -> literal.value
+            })
     }
 
     override fun visit(arrayinit: ArrayInitialization) {

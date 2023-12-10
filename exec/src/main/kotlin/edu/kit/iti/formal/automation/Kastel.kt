@@ -111,7 +111,7 @@ object KastelDemonstrator {
 object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
     override fun transform(stBody: StatementList): StatementList = stBody.accept(this) as StatementList
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
-        if ((assignmentStatement.location as SymbolicReference).identifier == "dScratch") {
+        if (assignmentStatement.location.identifier == "dScratch") {
             return StatementList()
         }
         return assignmentStatement
@@ -322,7 +322,7 @@ object SeqParamsActiveStep : CodeTransformation, AstMutableVisitor() {
                 if (sub.identifier == "Sequence" && sub.sub?.identifier == "iActStep") {
                     return SymbolicReference("ActStep", symbolicReference.sub)
                 }
-            } catch (e: ClassCastException) {
+            } catch (_: ClassCastException) {
 
             }
         }
@@ -361,7 +361,7 @@ object RemoveVSObj : STCodeTransformation, AstMutableVisitor() {
     override fun transform(stBody: StatementList) = stBody.accept(this) as StatementList
 
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
-        val ident = (assignmentStatement.location as SymbolicReference).identifier
+        val ident = assignmentStatement.location.identifier
         return if (ident == "VSObj_McFaultDescription")
             return StatementList()
         else assignmentStatement

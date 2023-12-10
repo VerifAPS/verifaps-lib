@@ -19,6 +19,7 @@ import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.error
 import edu.kit.iti.formal.util.joinInto
 import edu.kit.iti.formal.util.warn
+import java.util.*
 
 val EMPTY_COLUMN = SVariable("ERROR", SMVTypes.BOOLEAN)
 
@@ -435,7 +436,7 @@ class CppCombinedMonitorGenerationImpl(
     }
 
     private val Monitor.instanceName: String
-        get() = "_" + this.name.toLowerCase()
+        get() = "_" + this.name.lowercase(Locale.getDefault())
 }
 
 private fun CodeWriter.historyValuesDeclaration(gtt: GeneralizedTestTable) {

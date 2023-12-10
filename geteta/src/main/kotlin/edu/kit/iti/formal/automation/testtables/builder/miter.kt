@@ -31,6 +31,9 @@ import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.meta
 import java.io.File
 import java.io.PrintWriter
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.abs
 
 data class ReactiveProgram(
@@ -52,7 +55,7 @@ private fun createNext(t: Transition): SMVExpr {
     } else {
 
         val inputExpr = (t.from as RowState).row.inputExpr.values.conjunction(SLiteral.TRUE)
-        val outputExpr = (t.from as RowState).row.outputExpr.values.conjunction(SLiteral.TRUE)
+        val outputExpr = t.from.row.outputExpr.values.conjunction(SLiteral.TRUE)
 
         when (t.type) {
             TransitionType.ACCEPT ->
@@ -152,7 +155,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
                 .or(SVariable(err.name, SMVTypes.BOOLEAN).not())
         target.body.add("__INV__" assignTo invAssign.translateToSt())
         val assert = SpecialCommentFactory
-                .createAssert(SymbolicReference("__INV__"));
+                .createAssert(SymbolicReference("__INV__"))
         target.body.add(assert)
     }
 
@@ -255,19 +258,20 @@ class ProgMiterConstruction(val exec: PouExecutable) {
                 is EnumerationTypeDeclaration -> {
                     td.allowedValues.forEachIndexed { i, value ->
                         val vd = VariableDeclaration(
-                                "${td.name}__${value.text.toUpperCase()}",
+                            "${td.name}__${value.text.uppercase()}",
                                 VariableDeclaration.CONSTANT,
                                 SimpleTypeDeclaration(INT, IntegerLit(i)))
                         target.scope.topLevel.add(vd)
                     }
 
-                    val fdecl = FunctionDeclaration("nondet_${td.name.toLowerCase()}",
+                    val fdecl = FunctionDeclaration(
+                        "nondet_${td.name.lowercase()}",
                             returnType = RefTo(INT))
                     fdecl.scope.add(VariableDeclaration("x", VariableDeclaration.LOCAL, INT))
                     fdecl.stBody = StatementList().also {
                         val x = SymbolicReference("x")
-                        val assume = td.values.map {
-                            x eq IntegerLit(INT, it.toBigInteger())
+                        val assume = td.values.map { int ->
+                            x eq IntegerLit(INT, int.toBigInteger())
                         }.disjunction()
                         it.add(SpecialCommentFactory.createHavoc("x", INT))
                         it.add(SpecialCommentFactory.createAssume(assume))
@@ -307,8 +311,8 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
             is SMVTypes.BOOLEAN -> BooleanLit(l.value == true)
             is SMVWordType -> IntegerLit(INT, l.value.toString().toBigInteger())
             is EnumType -> {
-                val et = enumValues[l.value.toString().toUpperCase()]
-                        ?: error("No enum defined which contains ${l.value}. Defined values: ${enumValues.keys}")
+                val et = enumValues[l.value.toString().uppercase(Locale.getDefault())]
+                    ?: error("No enum defined which contains ${l.value}. Defined values: ${enumValues.keys}")
                 EnumLit(et, l.value.toString())
             }
             else -> error("Literals of type '${l.javaClass} are not supported")
@@ -391,7 +395,11 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
     }
 
     private fun createInstance(p: ReactiveProgram, fbd: FunctionBlockDeclaration): VariableDeclaration {
-        val vd = VariableDeclaration(p.name.toLowerCase(), VariableDeclaration.LOCAL, FunctionBlockDataType(fbd))
+        val vd = VariableDeclaration(
+            p.name.lowercase(Locale.getDefault()),
+            VariableDeclaration.LOCAL,
+            FunctionBlockDataType(fbd)
+        )
         target.scope.add(vd)
         return vd
 

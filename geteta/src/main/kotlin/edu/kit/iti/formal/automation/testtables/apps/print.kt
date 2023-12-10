@@ -14,6 +14,7 @@ import edu.kit.iti.formal.automation.testtables.print.LatexTablePrinter
 import edu.kit.iti.formal.automation.testtables.print.TextTablePrinter
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.OutputStreamWriter
+import java.util.*
 
 /**
  *
@@ -29,7 +30,7 @@ class PrinterApp : CliktCommand(name="ttprint", help = "generate print files for
     enum class Format { HTML, LATEX, TEXT }
 
     val format by option("-f", "--format")
-            .convert { Format.valueOf(it.toUpperCase()) }
+            .convert { Format.valueOf(it.uppercase(Locale.getDefault())) }
             .default(Format.LATEX)
 
     val output by option("--output",

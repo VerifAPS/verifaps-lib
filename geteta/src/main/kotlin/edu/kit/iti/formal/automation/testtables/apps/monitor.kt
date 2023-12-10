@@ -10,6 +10,7 @@ import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.monitor.*
 import edu.kit.iti.formal.util.info
 import java.io.File
+import java.util.*
 
 /**
  *
@@ -39,7 +40,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
 
     val format by option("--format", "-f", help = "code format, possible values: " +
             CodeOutput.entries.joinToString(",") { it.name })
-            .convert { CodeOutput.valueOf(it.toUpperCase()) }
+            .convert { CodeOutput.valueOf(it.uppercase(Locale.getDefault())) }
             .default(CodeOutput.CPP)
 
     val disableCombinedMonitor by option("--disable-combined",

@@ -13,13 +13,14 @@ import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.View
 import tornadofx.contextmenu
-import tornadofx.item as titem
 import tornadofx.separator
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.name
+import tornadofx.item as titem
 
 /**
  *
@@ -166,6 +167,10 @@ fun ContextMenu.item(name: String, key: String? = null, ikon: String? = null, ev
 }
 
 class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
+    private val pathComparator: Comparator<TreeItem<Path>> = java.util.Comparator.comparingInt<TreeItem<Path>?> {
+        if (Files.isDirectory(it.value)) 0 else 1
+    }.thenComparing { it -> it.value.name }
+
     private var isFirstTimeChildren = true
     private var isFirstTimeLeaf = true
     private var isLeaf = false
@@ -194,7 +199,7 @@ class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
             Files.list(f).forEach {
                 children.add(SimpleFileTreeItem(it))
             }
-            return children
+            return children.sorted(pathComparator)
         }
         return FXCollections.emptyObservableList()
     }

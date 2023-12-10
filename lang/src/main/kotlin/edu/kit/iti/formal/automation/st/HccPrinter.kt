@@ -10,6 +10,7 @@ import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
 import edu.kit.iti.formal.util.meta
+import java.util.*
 
 open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false) : StructuredTextPrinter(sb) {
     init {
@@ -169,7 +170,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
         val returnType = functionDeclaration.returnType.identifier
         if (!(returnType == null || returnType.isEmpty()))
-            sb.printf(returnType.toLowerCase()).printf(" ${functionDeclaration.name}( ")
+            sb.printf(returnType.lowercase(Locale.getDefault())).printf(" ${functionDeclaration.name}( ")
         functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEachIndexed { i, it ->
             if (i != 0) {
                 sb.printf(", ")
@@ -245,7 +246,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         } else if (simpleTypeDeclaration.baseType.obj is UINT) {
             sb.printf("unsigned int")
         } else {
-            sb.printf(simpleTypeDeclaration.baseType.identifier!!.toLowerCase())
+            sb.printf(simpleTypeDeclaration.baseType.identifier!!.lowercase(Locale.getDefault()))
 
         }
 
@@ -274,7 +275,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             }
             is SpecialCommentMeta.HavocComment -> {
                 sb.nl()
-                val haveocName = "nondet_${meta.dataType.name.toLowerCase()}();"
+                val haveocName = "nondet_${meta.dataType.name.lowercase(Locale.getDefault())}();"
                 //sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
                 sb.printf(meta.variable).printf(" = ").printf(haveocName)
             }

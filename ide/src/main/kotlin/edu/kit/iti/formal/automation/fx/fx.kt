@@ -3,11 +3,13 @@ package edu.kit.iti.formal.automation.fx
 import edu.kit.iti.formal.util.info
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.geometry.Side
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.Menu
+import javafx.scene.control.MenuItem
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.input.KeyCombination
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
@@ -18,14 +20,13 @@ import tornadofx.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
 
 
 fun main(args: Array<String>) {
     launch<IdeFx>(*args)
 }
 
-class IdeStyle : tornadofx.Stylesheet() {
+class IdeStyle : Stylesheet() {
     companion object {
         val styleTextArea by cssclass("styled-text-area")
         val text by cssclass()
@@ -215,7 +216,7 @@ class IdeView : View("VERIFAPS IDE") {
         //if (appData.lastNavigatorPath.value != null)
         //    fileNavigator.rootFile.value = Paths.get(appData.lastNavigatorPath.value)
         subscribe<StatusMessage> { publishMessage(it.text, it.graphic) }
-        open(File("../geteta/examples/NewFile.gtt").absoluteFile)
+        open(File("geteta/examples/NewFile.gtt").absoluteFile)
     }
 
     fun publishMessage(status: String, graphic: Node? = null) {

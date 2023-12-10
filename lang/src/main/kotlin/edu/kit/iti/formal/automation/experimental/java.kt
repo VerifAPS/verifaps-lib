@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.st.util.AstVisitor
 import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.StringWriter
+import java.util.*
 
 /**
  *
@@ -159,7 +160,7 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
         override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
             cw.nl().cblock("public enum ${enumerationTypeDeclaration.name} {", "}") {
                 val v = enumerationTypeDeclaration.allowedValues
-                        .joinToString(", ", "", ";") { it.text.toUpperCase() }
+                        .joinToString(", ", "", ";") { it.text.uppercase(Locale.getDefault()) }
                 cw.write(v)
             }
             cw.nl()
@@ -264,7 +265,7 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
         }
 
         override fun visit(enumeration: CaseCondition.Enumeration) {
-            val n = (enumeration.start).value.toUpperCase()
+            val n = (enumeration.start).value.uppercase(Locale.getDefault())
             cw.nl().write("case $n:")
         }
 
@@ -390,7 +391,7 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
                     a.milliseconds.toString()
                 }
                 is EnumLit -> {
-                    literal.dataType.identifier!! + "." + literal.value.toUpperCase()
+                    literal.dataType.identifier!! + "." + literal.value.uppercase(Locale.getDefault())
                 }
                 else -> td?.toString() ?: ""
             }

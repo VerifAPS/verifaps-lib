@@ -6,7 +6,6 @@ import edu.kit.iti.formal.automation.st.Identifiable
 import edu.kit.iti.formal.automation.st.LookupList
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.grammar.IteLanguageParser.ExprContext
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.options.TableOptions
@@ -16,6 +15,8 @@ import edu.kit.iti.formal.smv.VariableReplacer
 import edu.kit.iti.formal.smv.ast.SMVExpr
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -27,10 +28,10 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String): SVariable =
-        internalVariable(programRunNames).inModule(tableName) as SVariable
+    open fun externalVariable(programRunNames: List<String>, tableName: String) :SVariable
+            = internalVariable(programRunNames).inModule(tableName) as SVariable
 
-    open fun internalVariable(programRunNames: List<String>): SVariable = SVariable(name, logicType)
+    open fun internalVariable(programRunNames: List<String>):SVariable = SVariable(name, logicType)
 }
 
 abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {
@@ -57,8 +58,7 @@ data class ProgramVariable(
     override var category: ColumnCategory = ColumnCategory.ASSUME,
     var isState: Boolean = false,
     var isNext: Boolean = false,
-    var programRun: Int = 0
-) : ColumnVariable(category) {
+    var programRun: Int = 0) : ColumnVariable(category) {
 
     override val humanCategory: String
         get() {
@@ -88,24 +88,23 @@ data class ProgramVariable(
     /**
      *
      */
-    override fun internalVariable(programRunNames: List<String>): SVariable =
-        SVariable("${programRunNames[programRun]}$realName", logicType)
+    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$realName", logicType)
 }
 
 data class ConstraintVariable(
     override var name: String,
     override var dataType: AnyDt,
     override var logicType: SMVType,
-    var constraint: TestTableLanguageParser.CellContext? = null
-) : Variable()
+    var constraint: TestTableLanguageParser.CellContext? = null)
+    : Variable()
 
 data class ProjectionVariable(
     override var name: String,
     override var dataType: AnyDt,
     override var logicType: SMVType,
     override var category: ColumnCategory = ColumnCategory.ASSUME,
-    var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf()
-) : ColumnVariable(category) {
+    var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf())
+    : ColumnVariable(category) {
 
     val arity: Int
         get() = constraint.size
@@ -145,8 +144,7 @@ class ParseContext(
     val vars: MutableMap<Variable, SVariable> = hashMapOf(),
     val refs: MutableMap<SVariable, Int> = hashMapOf(),
     val functions: MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
-    val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()
-) {
+    val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
 
     fun isVariable(v: String) = v in this
     fun getSMVVariable(v: Variable) =
@@ -174,10 +172,8 @@ class ParseContext(
 
         val va = if (programRun != null)
             vars.keys.find { it.name == v && (it as? ProgramVariable)?.programRun == programRun }
-                ?: throw IllegalArgumentException(
-                    "Could not find a variable for $programRun|>$v in signature. " +
-                            "Signature is ${vars.keys.joinToString { it.name }}"
-                )
+                ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature. " +
+                        "Signature is ${vars.keys.joinToString { it.name }}")
         else
             vars.keys.find { it.name == v }
                 ?: throw IllegalArgumentException("Could not find a variable for $v in signature.")
@@ -282,7 +278,7 @@ class GeneralizedTestTable(
     val maxProgramRun: Int
         get() = programVariables
             .filterIsInstance(ProgramVariable::class.java)
-            .map { it.programRun }.maxByOrNull { it } ?: 0
+            .map { it.programRun }.maxBy { it } ?: 0
 
     fun getProgramVariables(name: String, run: Int?): ColumnVariable {
         val pv = programVariables.find { it.respondTo(name, run) }
@@ -306,105 +302,6 @@ class GeneralizedTestTable(
     fun isProgramVariable(variable: String): Boolean = programVariables.any { it.name == variable }
     fun isConstraintVariable(variable: String): Boolean = constraintVariables.any { it.name == variable }
 }
-
-class ContractAutomata(
-    var name: String = "anonym",
-    val programVariables: MutableList<ColumnVariable> = ArrayList(),
-    val constraintVariables: MutableList<ConstraintVariable> = ArrayList(),
-    var properties: MutableMap<String, String> = HashMap(),
-    var states: MutableList<ContractAutomataStates> = ArrayList(),
-    val functions: LookupList<FunctionDeclaration> = ArrayLookupList(),
-//    var programRuns: List<String> = arrayListOf()
-) {
-    val options: TableOptions by lazy {
-        TableOptions(properties)
-    }
-
-    fun add(v: ColumnVariable) {
-        programVariables += v
-    }
-
-    fun add(v: ConstraintVariable) = {
-        constraintVariables += v
-    }
-
-    fun addOption(key: String, value: String) {
-        properties[key] = value
-    }
-
-    val DEFAULT_CELL_CONTENT = "-"
-
-    fun generateSmvExpression(): ParseContext {
-        states.forEach { s -> s.contracts.forEach { c -> c.generateSmvExpression(parseContext) } }
-        return parseContext
-    }
-
-    val parseContext: ParseContext by lazy {
-        val vc = ParseContext(options.relational, 1)
-        constraintVariables.forEach {
-            vc.getSMVVariable(it)
-        }
-        programVariables.forEach {
-            vc.getSMVVariable(it)
-            vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT).cell()
-        }
-
-        functions.forEach { fd ->
-            vc.functions[fd.name] = GetetaFacade.functionToSmv(fd)
-        }
-
-        vc
-    }
-    val maxProgramRun: Int
-        get() = programVariables
-            .filterIsInstance(ProgramVariable::class.java)
-            .map { it.programRun }.maxByOrNull { it } ?: 0
-
-    fun getProgramVariables(name: String, run: Int?): ColumnVariable {
-        val pv = programVariables.find { it.respondTo(name, run) }
-        return pv ?: throw IllegalStateException("Could not find variable: $run|>$name.")
-    }
-    
-    fun getTableRow(rowId: String) = region.flat().find { it.id == rowId }
-    fun isProgramVariable(variable: String): Boolean = programVariables.any { it.name == variable }
-    fun isConstraintVariable(variable: String): Boolean = constraintVariables.any { it.name == variable }
-}
-
-data class ContractAutomataStates(
-    var id: String,
-    var contracts: ArrayList<ContractAutomataContract> = arrayListOf(),
-    var gotos: MutableList<GotoTransition> = arrayListOf()
-)
-
-interface ContractAutomataContract {
-    var id: String
-    val assume: SMVExpr?
-    val assert: SMVExpr?
-    fun generateSmvExpression(ctx: ParseContext)
-}
-
-class AssumeAssertContract(
-    override var id: String, val rawAssume: ExprContext, val rawAssert: ExprContext
-) : ContractAutomataContract {
-    override var assume: SMVExpr? = null
-    override var assert: SMVExpr? = null
-
-    override fun generateSmvExpression(ctx: ParseContext) {
-        TODO("Not yet implemented")
-    }
-}
-
-class FieldwiseContract(override var id: String) : ContractAutomataContract {
-    val rawFields: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext?> = linkedMapOf()
-    override var assume: SMVExpr? = null
-    override var assert: SMVExpr? = null
-
-    override fun generateSmvExpression(ctx: ParseContext) {
-        TODO("Not yet implemented")
-    }
-
-}
-
 
 operator fun <T : Identifiable> Iterable<T>.get(text: String) = find { it.name == text }
 operator fun <T : Identifiable> Iterable<T>.contains(text: String) = this[text] != null
@@ -449,8 +346,7 @@ sealed class Duration {
             get() = true
     }
 
-    data class OpenInterval(val lower: Int, override var modifier: DurationModifier = DurationModifier.NONE) :
-        Duration() {
+    data class OpenInterval(val lower: Int, override var modifier: DurationModifier = DurationModifier.NONE) : Duration() {
         override fun contains(cycles: Int): Boolean = lower <= cycles
 
         override val isUnbounded: Boolean
@@ -463,11 +359,7 @@ sealed class Duration {
             get() = true
     }
 
-    data class ClosedInterval(
-        val lower: Int,
-        val upper: Int,
-        override var modifier: DurationModifier = DurationModifier.NONE
-    ) : Duration() {
+    data class ClosedInterval(val lower: Int, val upper: Int, override var modifier: DurationModifier = DurationModifier.NONE) : Duration() {
         override fun contains(cycles: Int): Boolean = cycles in lower..upper
 
         override val isUnbounded: Boolean
@@ -542,10 +434,8 @@ sealed class TableNode(open var id: String, var duration: Duration = Duration.Cl
     abstract fun visit(visitor: (TableNode) -> Unit)
 }
 
-data class Region(
-    override var id: String,
-    var children: MutableList<TableNode> = arrayListOf()
-) : TableNode(id) {
+data class Region(override var id: String,
+                  var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
     constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumBy { it.count() }
