@@ -5,7 +5,7 @@ plugins {
 
 
 javafx {
-    version = "17"
+    version = "21"
     modules = ["javafx.controls", "javafx.controls", "javafx.fxml", "javafx.graphics"]
 }
 
@@ -17,7 +17,8 @@ dependencies {
     implementation project(':aps-rvt')
     implementation project(':run')
 
-    implementation 'com.github.ajalt:clikt:2.8.0'
+    implementation 'com.github.ajalt.clikt:clikt:4.2.1'
+
     implementation("no.tornado:tornadofx:1.7.20")
     implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
     implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'

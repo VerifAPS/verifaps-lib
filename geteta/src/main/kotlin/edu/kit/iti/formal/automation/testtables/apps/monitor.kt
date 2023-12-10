@@ -38,7 +38,7 @@ class MonitorApp : CliktCommand(name = "ttmonitor",
             .flag("--dont-write-header", default = false)
 
     val format by option("--format", "-f", help = "code format, possible values: " +
-            CodeOutput.values().joinToString(",") { it.name })
+            CodeOutput.entries.joinToString(",") { it.name })
             .convert { CodeOutput.valueOf(it.toUpperCase()) }
             .default(CodeOutput.CPP)
 

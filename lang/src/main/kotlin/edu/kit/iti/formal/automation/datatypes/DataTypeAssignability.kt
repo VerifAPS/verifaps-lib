@@ -63,6 +63,7 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
                     }
                 }
             }
+            else -> {}
         }
         return false
     }

@@ -49,13 +49,13 @@ private class ProblemModel : ProblemService {
 
     override fun clearProblems(identity: Any) {
         map.remove(identity)?.let {
-            allCurrentProblems.removeAll(it)
+            allCurrentProblems.removeAll(it.toSet())
         }
         listeners.forEach { it() }
     }
 
     override fun announceProblems(identity: Any, problems: Iterable<Problem>) {
-        map.remove(identity)?.let { allCurrentProblems.removeAll(it) }
+        map.remove(identity)?.let { allCurrentProblems.removeAll(it.toSet()) }
         val s = problems.toList()
         map[identity] = s
         allCurrentProblems.addAll(s)

@@ -181,13 +181,13 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
     }
 
     private fun getDataType(symbol: String): AnyDt {
-        try {
-            return scope.resolveDataType(symbol)
+        return try {
+            scope.resolveDataType(symbol)
         } catch (e: DataTypeNotDefinedException) {
             if (symbol.startsWith("ENUM_")) {
-                return EnumerateType(symbol.substring("ENUM_".length), arrayListOf(""))
+                EnumerateType(symbol.substring("ENUM_".length), arrayListOf(""))
             } else {
-                throw e;
+                throw e
             }
         }
 
@@ -227,7 +227,7 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
         if (ctx.goto_().isNotEmpty()) {
             info("Handling of goto commands in regions currently not supported")
         }
-        val id = ctx.id?.text ?: "g" + (ctx.idi?.text?.toInt() ?: ++currentId)
+        val id = ctx.id?.text ?: ("g" + (ctx.idi?.text?.toInt() ?: ++currentId))
         val r = Region(id)
         if (ctx.time() != null) {
             r.duration = ctx.time().accept(timeParser)

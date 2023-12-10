@@ -1,0 +1,73 @@
+#-------------------------------------------------------------------------------#
+#               Qodana analysis is configured by qodana.yaml file               #
+#             https://www.jetbrains.com/help/qodana/qodana-yaml.html            #
+#-------------------------------------------------------------------------------#
+version: "1.0"
+
+#Specify inspection profile for code analysis
+profile:
+  name: qodana.starter
+
+#Enable inspections
+#include:
+#  - name: <SomeEnabledInspectionId>
+
+#Disable inspections
+#exclude:
+#  - name: <SomeDisabledInspectionId>
+#    paths:
+#      - <path/where/not/run/inspection>
+
+projectJDK: 21 #(Applied in CI/CD pipeline)
+
+#Execute shell command before Qodana execution (Applied in CI/CD pipeline)
+#bootstrap: sh ./prepare-qodana.sh
+
+#Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
+#plugins:
+#  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
+
+#Specify Qodana linter for analysis (Applied in CI/CD pipeline)
+linter: jetbrains/qodana-jvm-community:latest
+
+include:
+  - name: KotlinDeprecation
+  - name: ClassName
+  - name: LocalVariableName
+  - name: PropertyName
+  - name: CanBeParameter
+  - name: RemoveCurlyBracesFromTemplate
+  - name: RedundantModalityModifier
+  - name: RedundantNullableReturnType
+  - name: RemoveRedundantQualifierName
+  - name: RedundantSemicolon
+  - name: RedundantVisibilityModifier
+  - name: RemoveEmptyClassBody
+  - name: UnnecessaryVariable
+  - name: KotlinUnusedImport
+  - name: UnusedSymbol
+  - name: CopyWithoutNamedArguments
+  - name: ReplacePutWithAssignment
+  - name: ProtectedInFinal
+  - name: SimplifiableCallChain
+  - name: MemberVisibilityCanBePrivate
+  - name: JavaMapForEach
+  - name: ReplaceJavaStaticMethodWithKotlinAnalog
+  - name: MoveLambdaOutsideParentheses
+  - name: SimplifiableCall
+  - name: MayBeConstant
+  - name: NestedLambdaShadowedImplicitParameter
+  - name: ReplaceManualRangeWithIndicesCalls
+  - name: ReplaceMapIndexedWithListGenerator
+  - name: LiftReturnOrAssignment
+  - name: ConvertToStringTemplate
+  - name: MoveVariableDeclarationIntoWhen
+  - name: VerboseNullabilityAndEmptiness
+
+
+exclude:
+  - name: All
+    paths:
+      - share/**
+
+

@@ -120,7 +120,7 @@ class DSLTablePrinter(val stream: CodeWriter) {
                 stream.printf("row ${r.id} ")
                 print(r.duration)
                 stream.printf("{").increaseIndent()
-                val play = (gtt.programRuns.indices) - r.pauseProgramRuns
+                val play = (gtt.programRuns.indices) - r.pauseProgramRuns.toSet()
                 stream.nl().printf("\\play: %s", play.joinToString(", "))
                 if (r.pauseProgramRuns.isNotEmpty())
                     stream.nl().printf("\\pause: %s", r.pauseProgramRuns.joinToString(", "))

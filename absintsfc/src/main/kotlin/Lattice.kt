@@ -22,7 +22,7 @@ abstract class Lattice<T>(
 
 enum class TaintEq { EQUAL, NOT_EQUAL }
 
-class TaintEqLattice : Lattice<TaintEq>(TaintEq.values().toSet()) {
+class TaintEqLattice : Lattice<TaintEq>(TaintEq.entries.toSet()) {
     override fun cup(a: TaintEq, b: TaintEq): TaintEq {
         return when {
             a == TaintEq.NOT_EQUAL || b == TaintEq.NOT_EQUAL ->

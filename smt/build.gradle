@@ -9,7 +9,7 @@ def antlrOutputDir = file("build/generated-src/antlr")
 repositories { mavenCentral() }
 
 dependencies {
-    antlr 'org.antlr:antlr4:4.8-1'
+    antlr 'org.antlr:antlr4:4.13.1'
     implementation project(":util")
 }
 
@@ -40,3 +40,4 @@ generateGrammarSource {
 
 compileJava.dependsOn generateGrammarSource
 compileKotlin.dependsOn generateGrammarSource
+compileTestKotlin.dependsOn generateTestGrammarSource

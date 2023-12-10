@@ -71,10 +71,10 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
             = TODO("translation of various functions")
 
     companion object {
-        internal var logicalOperators: MutableMap<SBinaryOperator, String> = HashMap()
-        internal var bvuOperators: MutableMap<SBinaryOperator, String> = HashMap()
-        internal var bvsOperators: MutableMap<SBinaryOperator, String> = HashMap()
-        internal var arithOperators: MutableMap<SBinaryOperator, String> = HashMap()
+        internal var logicalOperators: MutableMap<SBinaryOperator, String> = EnumMap(SBinaryOperator::class.java)
+        internal var bvuOperators: MutableMap<SBinaryOperator, String> = EnumMap(SBinaryOperator::class.java)
+        internal var bvsOperators: MutableMap<SBinaryOperator, String> = EnumMap(SBinaryOperator::class.java)
+        internal var arithOperators: MutableMap<SBinaryOperator, String> = EnumMap(SBinaryOperator::class.java)
 
         init {
             logicalOperators[SBinaryOperator.AND] = "and"

@@ -623,7 +623,7 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
     companion object {
 
         fun findBySymbol(symbol: String): SBinaryOperator? {
-            for (op in values()) {
+            for (op in entries) {
                 if (op.symbol.equals(symbol, ignoreCase = true)) {
                     return op
                 }

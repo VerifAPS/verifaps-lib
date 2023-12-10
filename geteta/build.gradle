@@ -16,26 +16,24 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://jitpack.io' }
-    maven { url "https://repo.maven.apache.org/maven2" }
-//    maven { url "https://dl.bintray.com/ajalt/maven" }
 }
 
 dependencies {
-    implementation project(':symbex')
-    antlr group: 'org.antlr', name: 'antlr4', version: '4.8-1'
-    implementation 'com.github.jferard:fastods:0.7.2'
-    implementation 'com.github.ajalt:clikt:2.8.0'
+    api project(':symbex')
+    antlr group: 'org.antlr', name: 'antlr4', version: '4.13.1'
+    api 'com.github.jferard:fastods:0.8.1'
+    api 'com.github.ajalt.clikt:clikt:4.2.1'
 
-    implementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.13.0'
+    api 'com.github.doyaaaaaken:kotlin-csv-jvm:1.9.2'
 
-    //implementation 'io.github.config4k:config4k:0.4.1'
+    //compile 'io.github.config4k:config4k:0.4.1'
 
-    //implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
-    //implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.4.0-b180830.0438'
-    //implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
+    //compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+    //compile group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.4.0-b180830.0438'
+    //compile group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
 
-    //implementation group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.0-beta-1', ext: 'pom'
-    //implementation group: 'org.jetbrains.kotlin', name: 'kotlin-compiler', version: '1.3.31'
+    //compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.0-beta-1', ext: 'pom'
+    //compile group: 'org.jetbrains.kotlin', name: 'kotlin-compiler', version: '1.3.31'
 }
 
 sourceSets {
@@ -66,6 +64,9 @@ generateGrammarSource {
 
 compileJava.dependsOn generateGrammarSource
 compileKotlin.dependsOn generateGrammarSource
+
+compileTestKotlin.dependsOn generateTestGrammarSource
+
 
 /*
 license {

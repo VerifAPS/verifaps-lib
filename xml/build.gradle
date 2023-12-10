@@ -1,7 +1,7 @@
 description = "PCLOpenXML"
 dependencies {
-    implementation project(':util')
-    implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6'
-    implementation group: 'jaxen', name: 'jaxen', version: '1.2.0'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
+    api project(':util')
+    api group: 'org.jdom', name: 'jdom2', version: '2.0.6.1'
+    api group: 'jaxen', name: 'jaxen', version: '2.0.0'
+    api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.0'
 }

@@ -449,7 +449,7 @@ data class CaseStatement(
         c.ruleContext = ruleContext
         c.expression = expression.clone()
         cases.forEach { cs -> c.addCase(cs.clone()) }
-        c.elseCase = elseCase?.clone()
+        c.elseCase = elseCase.clone()
         return c
     }
 }
@@ -963,9 +963,10 @@ interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
  *
  */
 data class SimpleTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
-        override var initialization: Initialization? = null
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),
+    override var initialization: Initialization? = null
 ) : TypeDeclaration, Top() {
     constructor(dt: AnyDt, init: Initialization?) : this(baseType = RefTo(dt), initialization = init)
 
@@ -985,10 +986,11 @@ data class SimpleTypeDeclaration(
 }
 
 data class StructureTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
-        override var initialization: StructureInitialization? = null,
-        var fields: VariableScope = VariableScope()
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),
+    override var initialization: StructureInitialization? = null,
+    var fields: VariableScope = VariableScope()
 ) : TypeDeclaration, Top() {
     override fun setInit(init: Initialization?) {
         initialization = init as StructureInitialization?
@@ -1019,10 +1021,11 @@ data class StructureTypeDeclaration(
 }
 
 data class SubRangeTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type DECLARATION
-        override var initialization: IntegerLit? = null,
-        var range: Range? = null)
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type DECLARATION
+    override var initialization: IntegerLit? = null,
+    var range: Range? = null)
     : TypeDeclaration, Top() {
 
     override fun setInit(init: Initialization?) {
@@ -1050,9 +1053,10 @@ data class SubRangeTypeDeclaration(
 }
 
 data class EnumerationTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
-        override var initialization: IdentifierInitializer? = null
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),
+    override var initialization: IdentifierInitializer? = null
 ) : TypeDeclaration, Top() {
     override fun clone(): EnumerationTypeDeclaration {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -1124,6 +1128,7 @@ data class ArrayTypeDeclaration(
         override var initialization: ArrayInitialization? = null,
         val ranges: MutableList<Range> = arrayListOf())
     : TypeDeclaration, Top() {
+    @Deprecated("should be an type DECLARATION")
     override var baseType = RefTo<AnyDt>()
 
     override fun setInit(init: Initialization?) {
@@ -1159,10 +1164,11 @@ data class ArrayTypeDeclaration(
 }
 
 class StringTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
-        var size: Literal? = null,
-        override var initialization: Literal? = null)
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),
+    var size: Literal? = null,
+    override var initialization: Literal? = null)
     : TypeDeclaration, Top() {
 
     override fun setInit(init: Initialization?) {
@@ -1182,9 +1188,10 @@ class StringTypeDeclaration(
 }
 
 class PointerTypeDeclaration(
-        override var name: String = ANONYM,
-        override var baseType: RefTo<AnyDt> = RefTo(),
-        override var initialization: Literal? = null)
+    override var name: String = ANONYM,
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = RefTo(),
+    override var initialization: Literal? = null)
     : TypeDeclaration, Top() {
 
     override fun setInit(init: Initialization?) {
@@ -1196,9 +1203,10 @@ class PointerTypeDeclaration(
 }
 
 data class ReferenceTypeDeclaration(
-        override var name: String = ANONYM,
-        var refTo: SimpleTypeDeclaration = SimpleTypeDeclaration(),
-        override var baseType: RefTo<AnyDt> = refTo.baseType)
+    override var name: String = ANONYM,
+    var refTo: SimpleTypeDeclaration = SimpleTypeDeclaration(),
+    @Deprecated("should be an type DECLARATION")
+    override var baseType: RefTo<AnyDt> = refTo.baseType)
     : TypeDeclaration, Top() {
     override var initialization: Literal? = null
 
@@ -1608,7 +1616,7 @@ data class Position(
                 val newlines = text.count { it == '\n' }
                 Position(token.line + newlines,
                         text.length - Math.max(0, text.lastIndexOf('\n')),
-                        token.stopIndex, token?.tokenSource.sourceName ?: "")
+                        token.stopIndex, token?.tokenSource?.sourceName ?: "")
             }
         }
     }
@@ -2047,7 +2055,7 @@ data class SFCActionQualifier(
 
     companion object {
         fun fromName(qName: String): SFCActionQualifier? {
-            val qualifier = Qualifier.values().find { it.symbol == qName }
+            val qualifier = Qualifier.entries.find { it.symbol == qName }
             if (qualifier != null) return SFCActionQualifier(qualifier)
             else return null
         }

@@ -41,7 +41,7 @@ class PrinterApp : CliktCommand(name="ttprint", help = "generate print files for
             .flag(default = true)
 
     val file by argument(help = "test table")
-            .file(exists = true, readable = true).multiple()
+            .file(mustExist = true, mustBeReadable = true).multiple()
 
     override fun run() {
         val gtts = file.flatMap { GetetaFacade.readTables(it) }.map {

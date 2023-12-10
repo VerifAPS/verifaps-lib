@@ -19,7 +19,7 @@ import java.util.*
 object St2Cpp : CliktCommand() {
     //val verbose by option().flag("-V", default = false)
     //val comments by option().flag("C", default = true)
-    val files by argument("FILES").file(readable = true).multiple()
+    val files by argument("FILES").file(mustBeReadable = true).multiple()
     val st0 by option("-s").flag("-S", default = false)
     val builtins by option("-b").flag("-B", default = true)
     val output by option("-o").file().default(File("out.c"))

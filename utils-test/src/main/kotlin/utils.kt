@@ -51,7 +51,7 @@ object LoadHelp {
             return File(dirURL.toURI()).listFiles().map { it.toPath() }
         }
 
-        if (dirURL == null) {
+        if (dirURL === null) {
             /*
              * In case of a jar file, we can't actually find a directory.
              * Have to assume the same jar as clazz.
@@ -75,23 +75,14 @@ object LoadHelp {
 
 
     fun getResource(path: String, clazz: Class<*> = LoadHelp::class.java): Path? {
-        var dirURL = clazz.classLoader.getResource(path)
-        if (dirURL == null) return null
+        val dirURL = clazz.classLoader.getResource(path)
+        if (dirURL === null) return null
 
-        if (dirURL != null && dirURL.protocol.equals("file")) {
+        if (dirURL.protocol.equals("file")) {
             return File(dirURL.toURI()).toPath()
         }
 
-        if (dirURL == null) {
-            /*
-             * In case of a jar file, we can't actually find a directory.
-             * Have to assume the same jar as clazz.
-             */
-            val me = clazz.name.replace(".", "/") + ".class"
-            dirURL = clazz.classLoader.getResource(me)
-        }
-
-        if (dirURL!!.protocol.equals("jar")) {
+        if (dirURL.protocol.equals("jar")) {
             /* A JAR path */
             //strip out only the JAR file
             var jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
@@ -105,9 +96,9 @@ object LoadHelp {
     }
 
 
-    fun getPrograms() = LoadHelp.getResources("edu/kit/iti/formal/automation/st/programs")
-    fun getStatements() = LoadHelp.getResources("edu/kit/iti/formal/automation/st/statements")
-    fun getTypes() = LoadHelp.getResources("edu/kit/iti/formal/automation/st/types")
+    fun getPrograms() = getResources("edu/kit/iti/formal/automation/st/programs")
+    fun getStatements() = getResources("edu/kit/iti/formal/automation/st/statements")
+    fun getTypes() = getResources("edu/kit/iti/formal/automation/st/types")
 }
 
 /**

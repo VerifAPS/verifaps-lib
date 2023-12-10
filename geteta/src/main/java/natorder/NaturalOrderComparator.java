@@ -57,7 +57,7 @@ public class NaturalOrderComparator implements Comparator
                 if (ca < cb) {
                     bias = -1;
                 } else if (ca > cb) {
-                    bias = +1;
+                    bias = 1;
                 }
             }
         }

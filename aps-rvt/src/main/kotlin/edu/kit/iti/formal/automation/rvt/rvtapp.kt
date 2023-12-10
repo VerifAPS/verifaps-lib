@@ -44,12 +44,12 @@ class RvtApsApp : CliktCommand(
 
     val oldVersion by option("--old",
             help = "old version of the plc software", metavar = "FILE")
-            .file(readable = true)
+            .file(mustBeReadable = true)
             .default(File("old.st"))
 
     val newVersion by option("--new",
             help = "new version of the plc software", metavar = "FILE")
-            .file(readable = true)
+            .file(mustBeReadable = true)
             .default(File("new.st"))
 
     val disableST0Pipeline by option("-P", help = "disable ST0 pipeline")

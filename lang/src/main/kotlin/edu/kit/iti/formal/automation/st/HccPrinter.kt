@@ -278,6 +278,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
                 //sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
                 sb.printf(meta.variable).printf(" = ").printf(haveocName)
             }
+            else -> {}
         }
     }
 
@@ -466,7 +467,7 @@ object SpecialCommentFactory {
 }
 
 sealed class SpecialCommentMeta {
-    class AssertComment(var expr: Expression) : SpecialCommentMeta()
-    class AssumeComment(var expr: Expression) : SpecialCommentMeta()
-    class HavocComment(var variable: String, val dataType: AnyDt) : SpecialCommentMeta()
+    final class AssertComment(var expr: Expression) : SpecialCommentMeta()
+    final class AssumeComment(var expr: Expression) : SpecialCommentMeta()
+    final class HavocComment(var variable: String, val dataType: AnyDt) : SpecialCommentMeta()
 }

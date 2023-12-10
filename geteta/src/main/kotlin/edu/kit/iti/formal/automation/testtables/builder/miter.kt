@@ -483,6 +483,7 @@ class SpecialCommentRenamer(val isGlobal: (SymbolicReference) -> Boolean,
                     meta.variable = newName(meta.variable)
                 }
             }
+            null -> TODO()
         }
         return commentStatement
     }

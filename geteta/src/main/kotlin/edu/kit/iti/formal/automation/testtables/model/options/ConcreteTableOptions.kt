@@ -34,16 +34,4 @@ class ConcreteTableOptions(val properties: MutableMap<String, String>) {
             is Duration.ClosedInterval -> (defaultValue.lower + defaultValue.upper) / 2
         }
     }
-
-    init {
-        /*val nslength = namespace.length + 1
-        for ((key1, value) in p) {
-            val key = key1.toString()
-            if (key.startsWith(namespace)) {
-                val step = key.substring(nslength)
-                val count = Integer.parseInt(value.toString())
-                stepCounter[step] = count
-            }
-        }*/
-    }
 }
