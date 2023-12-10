@@ -41,7 +41,7 @@ object Editors {
     fun getLanguageForFilename(file: File) = getEditorForSuffix(file.extension)
     fun getEditorForSuffix(suffix: String): Language? =
         when (suffix) {
-            ".tt", ".gtt" -> TTLanguage
+            "tt", "gtt" -> TTLanguage
             "st", "iec" -> StLanguage
             "smv" -> SmvLanguage
             "smt" -> SmtLanguage
@@ -51,7 +51,7 @@ object Editors {
 
 
 open class Editor : View() {
-    override val root = CodeArea("")
+    final override val root = CodeArea("")
     val dirtyProperty = SimpleBooleanProperty(this, "dirty", false)
     val dirty by dirtyProperty
     val filenameProperty = SimpleObjectProperty<File>(this, "filename", null)
@@ -153,7 +153,7 @@ open class Editor : View() {
             val tok = lexer.nextToken()
             if (tok.type == -1) break
             val typ = language.getStyleClass(tok.type)// lexer.vocabulary.getSymbolicName(tok.type)
-            spansBuilder.add(Collections.singleton(typ), tok.text.length);
+            spansBuilder.add(Collections.singleton(typ), tok.text.length)
         } while (tok.type != -1)
         return spansBuilder.create()
     }
@@ -199,7 +199,7 @@ object StLanguage : Language() {
 
     override fun lexerFactory(input: CharStream): Lexer = IEC61131Lexer(input)
     override fun parseFile(fromString: CharStream): List<Problem> {
-        val (pous, errors) = IEC61131Facade.fileResolve(fromString, true)
+        val (_, errors) = IEC61131Facade.fileResolve(fromString, true)
         return errors
     }
 
@@ -224,7 +224,7 @@ object StLanguage : Language() {
             END_CONFIGURATION,
             END_FUNCTION_BLOCK,
             FUNCTION_BLOCK,
-            IEC61131Lexer.FUNCTION,
+            FUNCTION,
             END_FUNCTION,
             END_INTERFACE,
             END_METHOD,
@@ -308,7 +308,7 @@ object TTLanguage : Language() {
     override val name: String = "TestTables"
 
     override fun lexerFactory(input: CharStream): Lexer = TestTableLanguageLexer(input)
-    override fun parseFile(fromString: CharStream): List<Problem>? {
+    override fun parseFile(fromString: CharStream): List<Problem> {
         val p = GetetaFacade.createParser(fromString)
         p.file()
         return p.errorReporter.errors.map {
@@ -378,8 +378,4 @@ object SmtLanguage : Language() {
     override val name: String = "SMT"
     override fun lexerFactory(input: CharStream): Lexer = SmtLibv2Lexer(input)
     override fun parseFile(fromString: CharStream): List<Problem>? = null
-}
-
-enum class StyleNames {
-
 }

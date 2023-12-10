@@ -5,20 +5,28 @@ import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.scene.input.KeyCombination
+import javafx.scene.paint.Color.*
 import javafx.util.StringConverter
+import org.kordamp.ikonli.Ikon
+import org.kordamp.ikonli.Ikonli
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.View
 import tornadofx.contextmenu
 import tornadofx.separator
+import java.awt.Color
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.extension
+import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import tornadofx.item as titem
 
@@ -42,32 +50,36 @@ class FileNavigator(main: IdeView) : View("Navigator") {
 
 
     val contextMenu: ContextMenu = contextmenu {
-        item("tree-open-file", "ENTER", null) {
+        item("Open file", "ENTER", null) {
             markFolderUnderMouse(it)
             treeFile.selectionModel.selectedItem?.let {
                 main.open(it.value.toFile())
             }
         }
-        item("refresh") {}
-        item("expand-tree") {
-            markFolderUnderMouse(it)
-        }
-        separator()
-        item("go-up") {
-            markFolderUnderMouse(it)
-            (treeFile.root.value as? Path)?.let { file ->
-                treeFile.root = SimpleFileTreeItem(file.parent.toAbsolutePath())
-                treeFile.root.isExpanded = true
-            }
-        }
-        item("go-into") {
+
+        item("Open in explorer") {
             markFolderUnderMouse(it)
             (treeFile.selectionModel.selectedItem)?.let { file ->
-                treeFile.root = SimpleFileTreeItem(file.value.toAbsolutePath())
-                treeFile.root.isExpanded = true
+                try {
+                    Desktop.getDesktop()?.browseFileDirectory(file.value.toFile())
+                } catch (e: UnsupportedOperationException) {
+                    ProcessBuilder("explorer", "/select,${file.value}").start()
+                }
             }
         }
+        item("System open") {
+            markFolderUnderMouse(it)
+            (treeFile.selectionModel.selectedItem)?.let { file ->
+                try {
+                    Desktop.getDesktop()?.open(file.value.toFile())
+                } catch (e: UnsupportedOperationException) {
+                    ProcessBuilder("explorer", "/select,${file.value}").start()
+                }
+            }
+        }
+
         separator()
+
         item("tree-new-file") {
             markFolderUnderMouse(it)
             treeFile.selectionModel.selectedItem?.let { item ->
@@ -110,29 +122,38 @@ class FileNavigator(main: IdeView) : View("Navigator") {
                 }
             }
         }
-        item("tree-rename-file") { }
-        item("tree-delete-file") {}
         separator()
-        item("open-in-explorer") {
+
+
+        item("Refresh") {}
+
+        item("Expand Tree") {
             markFolderUnderMouse(it)
-            (treeFile.selectionModel.selectedItem)?.let { file ->
-                try {
-                    Desktop.getDesktop()?.browseFileDirectory(file.value.toFile())
-                } catch (e: UnsupportedOperationException) {
-                    ProcessBuilder("explorer", "/select,${file.value}").start()
-                }
+        }
+
+        separator()
+
+        item("Go up") {
+            markFolderUnderMouse(it)
+            treeFile.root.value?.let { file ->
+                treeFile.root = SimpleFileTreeItem(file.parent.toAbsolutePath())
+                treeFile.root.isExpanded = true
             }
         }
-        item("xdg-open") {
+        item("Go into") {
             markFolderUnderMouse(it)
             (treeFile.selectionModel.selectedItem)?.let { file ->
-                try {
-                    Desktop.getDesktop()?.open(file.value.toFile())
-                } catch (e: UnsupportedOperationException) {
-                    ProcessBuilder("explorer", "/select,${file.value}").start()
-                }
+                treeFile.root = SimpleFileTreeItem(file.value.toAbsolutePath())
+                treeFile.root.isExpanded = true
             }
         }
+
+        separator()
+
+        item("Rename file") { }
+        item("Delete file") {}
+
+        separator()
     }
 
     fun refresh(): Unit {
@@ -175,6 +196,10 @@ class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
     private var isFirstTimeLeaf = true
     private var isLeaf = false
 
+    init {
+        graphic = NavigationIconFinder.find(f)
+    }
+
     override fun getChildren(): ObservableList<TreeItem<Path>> {
         if (isFirstTimeChildren) {
             isFirstTimeChildren = false
@@ -202,5 +227,29 @@ class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
             return children.sorted(pathComparator)
         }
         return FXCollections.emptyObservableList()
+    }
+}
+
+object NavigationIconFinder {
+    private val resolver = IkonResolver.getInstance()
+    private val DIRECTORY = FontAwesomeSolid.FOLDER
+    private val FILE = FontAwesomeSolid.FILE
+    private val FILE_CODE = FontAwesomeSolid.FILE_CODE
+
+    private fun get(ref: String): FontIcon? {
+        return resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }!!
+    }
+
+    fun find(p: Path): Node? {
+        if (p.isDirectory()) {
+            return FontIcon(DIRECTORY)
+        }
+
+        return when (p.extension) {
+            "gtt", "rtt", "st" -> FontIcon(FILE_CODE)
+            else -> FontIcon(FILE).also {
+                it.iconColor = LIGHTGREY
+            }
+        }
     }
 }

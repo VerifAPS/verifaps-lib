@@ -14,6 +14,9 @@ import javafx.scene.input.KeyCombination
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.FileChooser
+import javafx.stage.Stage
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.Style
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.*
@@ -116,11 +119,16 @@ class IdeStyle : Stylesheet() {
 
 
 class IdeFx : App(IdeView::class, IdeStyle::class) {
-    //override val configBasePath = Paths.get("/etc/myapp/conf")
-
     init {
-        reloadStylesheetsOnFocus()
-        dumpStylesheets()
+        //reloadStylesheetsOnFocus()
+        //dumpStylesheets()
+
+    }
+
+    override fun start(stage: Stage) {
+        super.start(stage)
+        val jMetro = JMetro(Style.LIGHT)
+        jMetro.scene = stage.scene
     }
 }
 
