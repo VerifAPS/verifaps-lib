@@ -113,7 +113,7 @@ subprojects {
         implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
         implementation group: 'org.jetbrains', name: 'annotations', version: '24.1.0'
         implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.9'
-        implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.9'
+        implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.10'
         testImplementation 'com.google.truth:truth:1.2.0'
 
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
