@@ -469,7 +469,7 @@ class ODSDebugTable(
             unwinding.size * 2, categories.size * 2)
     var currentRow = 1
     val headerRows: Int
-        get() = (categories.minBy { it.group.size })?.group?.size ?: 0
+        get() = (categories.minByOrNull { it.group.size })?.group?.size ?: 0
 
     override fun run() {
         writeHeader()

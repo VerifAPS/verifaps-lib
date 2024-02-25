@@ -1,15 +1,16 @@
 plugins {
     id("application")
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
-/*
-javafx {
-    version = "13"
-    modules = [ 'javafx.controls' ]
-}*/
 
-mainClassName = "edu.kit.iti.formal.automation.ide.Ide"
-//mainClassName = "edu.kit.iti.formal.automation.idefx.IdeFx"
+javafx {
+    version = "21"
+    modules = ["javafx.controls", "javafx.controls", "javafx.fxml", "javafx.graphics"]
+}
+
+mainClassName = "edu.kit.iti.formal.automation.fx.FxKt"
+
 dependencies {
     implementation project(':symbex')
     implementation project(':geteta')
@@ -18,28 +19,17 @@ dependencies {
 
     implementation 'com.github.ajalt.clikt:clikt:4.2.2'
 
-    implementation group: 'com.fifesoft', name: 'autocomplete', version: '3.3.1'
-    //compile group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
-    //compile 'me.tomassetti.antlr4c3:antlr4-c3-kotlin:0.1.0'
-    implementation group: 'com.fifesoft', name: 'rsyntaxtextarea', version: '3.4.0'
-    implementation group: 'com.fifesoft', name: 'rstaui', version: '3.3.1'
-    implementation group: 'com.fifesoft', name: 'spellchecker', version: '3.3.1'
-
-    //compile group: 'de.sciss', name: 'weblaf', version: '2.1.4'
-    implementation 'io.github.vincenzopalazzo:material-ui-swing:1.1.4'
-
-    //compile group: 'org.xhtmlrenderer', name: 'flying-saucer-core', version: '9.1.18'
-
-    implementation group: 'com.miglayout', name: 'miglayout-swing', version: '11.3'
-    implementation files("lib/docking-frames-common.jar", "lib/docking-frames-core.jar",
-            "lib/docking-frames-ext-toolbar.jar", "lib/docking-frames-ext-toolbar-common.jar")
-
-    implementation group: 'org.netbeans.api', name: 'org-netbeans-swing-outline', version: 'RELEASE731'
+    implementation("no.tornado:tornadofx:1.7.20")
+    implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '5.2'
+    implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.10.5'
+    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.0.0'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.0.0'
+    implementation 'com.pixelduke:fxribbon:1.2.2'
 }
 
 repositories {
     maven {
-        url = "https://bits.netbeans.org/maven2/"
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
 }
 

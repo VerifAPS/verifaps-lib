@@ -4,6 +4,7 @@ import edu.kit.iti.formal.util.CodeWriter
 import java.io.*
 import java.net.URL
 import java.nio.file.Path
+import java.util.*
 
 /**
  * @author Alexander Weigl
@@ -33,7 +34,7 @@ object IECXMLFacade {
 
     val SFC_KEYWORDS = setOf("step", "end_step", "transition", "end_transition")
     fun quoteVariable(name: String): String =
-            if(name.toLowerCase() in SFC_KEYWORDS) "`$name`" else name
+        if (name.lowercase(Locale.getDefault()) in SFC_KEYWORDS) "`$name`" else name
 
     fun quoteStBody(body: String): String {
         return body.replace("\\b\\w+\\b".toRegex()) {

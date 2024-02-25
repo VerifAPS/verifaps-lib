@@ -12,6 +12,7 @@ import edu.kit.iti.formal.automation.st.ast.BooleanLit.Companion.LTRUE
 import edu.kit.iti.formal.automation.st.ast.SFCActionQualifier.Qualifier.*
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
 import org.antlr.v4.runtime.CommonToken
+import java.util.*
 import java.util.concurrent.Callable
 
 private val SFCStep.onEntry: String?
@@ -518,11 +519,13 @@ object Falling : ActionQualifierHandler(FALLING) {
     }
 }
 
-data class PipelineData(val network: SFCNetwork, val name: String, val index: Int, val scope: Scope,
-                        val finalScan: Boolean, val sfcFlags: Boolean, val maxNeededTokens: TokenAmount) {
+data class PipelineData(
+    val network: SFCNetwork, val name: String, val index: Int, val scope: Scope,
+    val finalScan: Boolean, val sfcFlags: Boolean, val maxNeededTokens: TokenAmount
+) {
     val tokenIsBoundedTo1: Boolean = maxNeededTokens is TokenAmount.Bounded && maxNeededTokens.max == 1
     val transitions: Map<MutableSet<SFCStep>, List<SFCTransition>> = network.steps.flatMap { it.outgoing }.distinct()
-            .sortedByDescending { it.priority }.groupBy { it.from }
+        .sortedByDescending { it.priority }.groupBy { it.from }
     val actions: MutableMap<String, ActionInfo> = mutableMapOf()
 
     val specialResetStatements: StatementList = StatementList()
@@ -541,20 +544,20 @@ data class PipelineData(val network: SFCNetwork, val name: String, val index: In
 
     val stateName = SymbolicReference(if (index <= 0) "_state" else "_${index}_state")
     val enumName =
-            (if (index <= 0) "STATES_$name" else "STATES_$name\$${index}").toUpperCase()
+        (if (index <= 0) "STATES_$name" else "STATES_$name\$${index}").uppercase(Locale.getDefault())
     val stateEnumType =
-            createEnumerationTypeForSfc(enumName, network, this::enumStepName)
+        createEnumerationTypeForSfc(enumName, network, this::enumStepName)
 
     val stateEnumTypeDeclaration by lazy {
         val enumType = EnumerationTypeDeclaration(enumName)
         val et = stateEnumType
         enumType.addValue(CommonToken(IEC61131Lexer.IDENTIFIER, enumStepName(stepName(et.defValue))))
         et.allowedValues
-                .map { it.key }
-                .filter { it != et.defValue }
-                .forEach {
-                    enumType.addValue(CommonToken(IEC61131Lexer.IDENTIFIER, enumStepName(stepName(it))))
-                }
+            .map { it.key }
+            .filter { it != et.defValue }
+            .forEach {
+                enumType.addValue(CommonToken(IEC61131Lexer.IDENTIFIER, enumStepName(stepName(it))))
+            }
         //enumType.initialization = IdentifierInitializer(value = enumStepName(network.initialStep!!.name))
         //scope.dataTypes.register(enumName, enumType)
         //specialResetStatements += enumName.assignTo(enumType.initialization!!.value!!)
@@ -577,13 +580,13 @@ data class PipelineData(val network: SFCNetwork, val name: String, val index: In
     fun enumValue(step: SFCStep) = EnumLit(stateEnumType, enumStepName(stepName(step.name)))
 
     fun stepName(stepName: String, idx: Int = index, sfcName: String = name): String =
-            if (idx <= 0) stepName else "_${idx}_$stepName"
+        if (idx <= 0) stepName else "_${idx}_$stepName"
 
     //0 -> "$sfcName$stepName"
     //else -> "$sfcName${idx}_$stepName"
 
     fun enumStepName(stepName: String) =
-            if (index <= 0) stepName else "_${index}_$stepName"
+        if (index <= 0) stepName else "_${index}_$stepName"
 
     fun addToScope(name: String, dt: AnyDt, type: Int = 0): VariableDeclaration {
         return if (!scope.variables.contains(name)) {
@@ -594,20 +597,30 @@ data class PipelineData(val network: SFCNetwork, val name: String, val index: In
     fun addToScope(names: List<String>, dt: AnyDt, type: Int = 0) = names.map { addToScope(it, dt, type) }
 
     fun moduleTON(name: String, input: Expression, pt: Expression) {
-        specialResetStatements += InvocationStatement(SymbolicReference(name), mutableListOf(InvocationParameter("IN",
-                false, LFALSE), InvocationParameter("PT", false, TimeLit(TimeData()))))
+        specialResetStatements += InvocationStatement(
+            SymbolicReference(name), mutableListOf(
+                InvocationParameter(
+                    "IN",
+                    false, LFALSE
+                ), InvocationParameter("PT", false, TimeLit(TimeData()))
+            )
+        )
         moduleFB(name, "TON", listOf(Pair("IN", input), Pair("PT", pt)))
     }
 
     fun moduleRS(name: String, set: Expression, reset1: Expression) {
-        specialResetStatements += InvocationStatement(SymbolicReference(name),
-                mutableListOf(InvocationParameter("R", false, LTRUE)))
+        specialResetStatements += InvocationStatement(
+            SymbolicReference(name),
+            mutableListOf(InvocationParameter("R", false, LTRUE))
+        )
         moduleFB(name, "RS", listOf(Pair("SET", set), Pair("RESET1", reset1)))
     }
 
     fun moduleTRIG(name: String, clk: Expression, type: String = "R_TRIG") {
-        specialResetStatements += InvocationStatement(SymbolicReference(name),
-                mutableListOf(InvocationParameter("CLK", false, LFALSE)))
+        specialResetStatements += InvocationStatement(
+            SymbolicReference(name),
+            mutableListOf(InvocationParameter("CLK", false, LFALSE))
+        )
         moduleFB(name, type, listOf(Pair("CLK", clk)))
     }
 

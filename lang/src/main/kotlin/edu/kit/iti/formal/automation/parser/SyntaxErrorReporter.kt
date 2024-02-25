@@ -11,7 +11,7 @@ import java.util.function.Supplier
  */
 class SyntaxErrorReporter : BaseErrorListener() {
     var isPrint = true
-    private val errors = ArrayList<SyntaxError>()
+    val errors = ArrayList<SyntaxError>()
 
     override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
                              charPositionInLine: Int, msg: String?, e: RecognitionException?) {

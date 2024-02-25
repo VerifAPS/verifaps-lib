@@ -77,7 +77,7 @@ data class FbDiagram(
         do {
             fixpt = true
             for (node in nodes) {
-                val predOrder = (pred[node]?.map { it.executionOrder }?.max() ?: 0) + 1
+                val predOrder = (pred[node]?.map { it.executionOrder }?.maxOrNull() ?: 0) + 1
                 if (node.executionOrder != predOrder) {
                     fixpt = false
                     node.executionOrder = predOrder

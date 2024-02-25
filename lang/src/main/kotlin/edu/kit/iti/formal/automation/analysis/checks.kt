@@ -13,6 +13,8 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
 import edu.kit.iti.formal.util.dlevenshtein
 import org.antlr.v4.runtime.Token
 import java.lang.Throwable
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.ceil
 import kotlin.math.log
 
@@ -23,7 +25,7 @@ fun getCheckers(reporter: Reporter) = listOf(CheckForTypes(reporter), CheckForLi
  * Percentage of changed characters.
  */
 fun variableSimilarity(expected: String, defined: String): Double =
-        dlevenshtein(expected.toLowerCase(), defined.toLowerCase()).toDouble() / expected.length
+    dlevenshtein(expected.lowercase(Locale.getDefault()), defined.lowercase(Locale.getDefault())).toDouble() / expected.length
 
 fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) =
         this.map { it to variableSimilarity(reference, it) }

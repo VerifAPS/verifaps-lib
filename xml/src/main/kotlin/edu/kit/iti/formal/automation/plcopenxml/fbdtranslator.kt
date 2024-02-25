@@ -7,25 +7,26 @@ import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 import org.jdom2.filter.Filters
 import org.jdom2.xpath.XPathFactory
+import java.util.*
 
 private val xpathFactory = XPathFactory.instance()
 
 
 internal fun getVariables(block: Element, child: String) =
-        block.getChild(child)?.children?.map { BlockVariable(it) } ?: listOf()
+    block.getChild(child)?.children?.map { BlockVariable(it) } ?: listOf()
 
 internal fun operatorSymbol(name: String) =
-        when (name.toLowerCase()) {
-            "eq" -> " = "
-            "sub" -> " - "
-            "add" -> " + "
-            "div" -> " / "
-            "mult" -> " * "
-            "and" -> " AND "
-            "or" -> " OR "
-            "xor" -> " ^ "
-            else -> "/*!! UNKNOWN OP: $name !!*/"
-        }
+    when (name.lowercase(Locale.getDefault())) {
+        "eq" -> " = "
+        "sub" -> " - "
+        "add" -> " + "
+        "div" -> " / "
+        "mult" -> " * "
+        "and" -> " AND "
+        "or" -> " OR "
+        "xor" -> " ^ "
+        else -> "/*!! UNKNOWN OP: $name !!*/"
+    }
 
 //TODO: Edges could be negated
 //TODO: Storage modifier (S=, R=)
@@ -145,6 +146,7 @@ class FBDTranslator(val fbd: Element, val writer: CodeWriter) {
             println("Vendor Elements not supported in FBDs.")
             null
         }
+
         else -> throw IllegalStateException("Xml element: ${block.name}")
     }
 
@@ -204,11 +206,11 @@ sealed class FbdNode(val block: Element, val network: FBDTranslator) {
 class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     val type: String by lazy { block.getAttributeValue("typeName") }
     val instanceName: String by lazy {
-        block.getAttributeValue("instanceName") ?: this.type.toLowerCase()
+        block.getAttributeValue("instanceName") ?: this.type.lowercase(Locale.getDefault())
     }
 
     val callType: FBDCallType by lazy {
-        when (type.toLowerCase()) {
+        when (type.lowercase(Locale.getDefault())) {
             "mux" -> FBDCallType.FUNCTION
             "add" -> FBDCallType.OPERATOR
             else -> {
@@ -277,6 +279,7 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
             FBDCallType.EXECUTE -> {
                 Execute(executeBody ?: "//NO BODY WAS FOUND!")
             }
+
             FBDCallType.OPERATOR -> Operator(instanceName)
             FBDCallType.FUNCTION -> Function(instanceName)
             FBDCallType.UNKNOWN -> FunctionBlock(instanceName)

@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.st.ast.*
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.util.*
 
 /**
  * Created by weigl on 11.06.14.
@@ -111,7 +112,7 @@ class VTimeOfDay(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME
     override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo ToDLit(value))
 }
 
-class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v.toUpperCase()) {
+class VAnyEnum(dt: EnumerateType, v: String) : Value<EnumerateType, String>(dt, v.uppercase(Locale.getDefault())) {
     override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo EnumLit(dataType, value))
 }
 

@@ -17,7 +17,7 @@ import kotlin.math.ln
 sealed class AnyDt(override var name: String = "ANY") : Identifiable {
 
     constructor() : this("") {
-        name = javaClass.getSimpleName().toUpperCase()
+        name = javaClass.getSimpleName().uppercase(Locale.getDefault())
     }
 
     abstract fun repr(obj: Any): String
@@ -66,7 +66,7 @@ open class AnyNum : AnyDt("ANY_NUM") {
 abstract class AnyReal : AnyNum() {
     override fun repr(obj: Any): String {
         val d = obj as BigDecimal
-        return name.toUpperCase() + "#" + d
+        return name.uppercase(Locale.getDefault()) + "#" + d
     }
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
@@ -102,7 +102,7 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
     override fun repr(obj: Any): String {
         if (obj is Bits)
             if (obj.register > 0)
-                return (name.toUpperCase() + "#2#" + java.lang.Long.toBinaryString(obj.register))
+                return (name.uppercase(Locale.getDefault()) + "#2#" + java.lang.Long.toBinaryString(obj.register))
         return ""
     }
 
@@ -329,7 +329,7 @@ abstract class IECString : AnyDt() {
             val pattern = Pattern.compile("[\$]([\"'NLRTnlrt]|[0-9]{$bytes})")
             val m = pattern.matcher(str)
             while (m.find()) {
-                val replacement = when (m.group(1).toUpperCase()) {
+                val replacement = when (m.group(1).uppercase(Locale.getDefault())) {
                     "$" -> "$"
                     "'" -> "'"
                     "\"" -> "\""
@@ -393,8 +393,10 @@ class EnumerateType(name: String = "ENUM",
             return ceil(ln(allowedValues.size.toDouble())).toInt()
         }
 
-    constructor(name: String, allowedValues: MutableList<String>,
-                defValue: String = allowedValues[0]) : this(name) {
+    constructor(
+        name: String, allowedValues: MutableList<String>,
+        defValue: String = allowedValues[0]
+    ) : this(name) {
         allowedValues.forEachIndexed { index, s -> this.allowedValues[s] = index }
         this.defValue = defValue
     }
@@ -402,9 +404,9 @@ class EnumerateType(name: String = "ENUM",
     constructor(etd: EnumerationTypeDeclaration) : this() {
         name = etd.name
         etd.allowedValues.zip(etd.values).forEach { (a, b) ->
-            allowedValues.put(a.text!!.toUpperCase(), b)
+            allowedValues.put(a.text!!.uppercase(Locale.getDefault()), b)
         }
-        defValue = etd.allowedValues[0].text.toUpperCase()
+        defValue = etd.allowedValues[0].text.uppercase(Locale.getDefault())
     }
 
     override fun repr(obj: Any): String {
@@ -414,7 +416,7 @@ class EnumerateType(name: String = "ENUM",
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 
     fun isAllowedValue(value: String) = this.allowedValues.contains(value)
-    operator fun contains(textValue: String) = textValue.toUpperCase() in allowedValues
+    operator fun contains(textValue: String) = textValue.uppercase(Locale.getDefault()) in allowedValues
 
     override fun toString(): String = "ENUM $name"
 
@@ -452,7 +454,7 @@ class EnumerateType(name: String = "ENUM",
 
 open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) : AnyNum() {
     init {
-        name = javaClass.getSimpleName().toUpperCase()
+        name = javaClass.getSimpleName().uppercase(Locale.getDefault())
     }
 
     open val upperBound: BigInteger
@@ -474,7 +476,7 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
 
 
     override fun repr(obj: Any): String {
-        return javaClass.getSimpleName().toUpperCase() + "#" + obj
+        return javaClass.getSimpleName().uppercase(Locale.getDefault()) + "#" + obj
     }
 
     open fun next(): AnyInt? = null

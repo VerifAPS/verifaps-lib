@@ -24,6 +24,7 @@ package edu.kit.iti.formal.automation.operators
 
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.AnyNum
+import java.util.*
 
 /**
  * Facade.
@@ -82,10 +83,10 @@ object Operators {
     }
 
     fun lookup(operator: String): Operator {
-        if (operator.toUpperCase() !in TABLE) {
+        if (operator.uppercase(Locale.getDefault()) !in TABLE) {
             throw IllegalArgumentException("Operator $operator is not defined")
         }
-        return TABLE[operator.toUpperCase()]!!
+        return TABLE[operator.uppercase(Locale.getDefault())]!!
     }
 
     fun register(op: Operator) = register(op.symbol, op)

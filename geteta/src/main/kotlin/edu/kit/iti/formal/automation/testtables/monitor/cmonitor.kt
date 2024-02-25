@@ -34,8 +34,8 @@ private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton
     val monitor = Monitor()
     val stream = StringWriter()
     val writer = CodeWriter(stream)
-    val state_t = "state_${gtt.name.toLowerCase()}_t"
-    val inout_t = "inout_${gtt.name.toLowerCase()}_t"
+    val state_t = "state_${gtt.name.lowercase(Locale.getDefault())}_t"
+    val inout_t = "inout_${gtt.name.lowercase(Locale.getDefault())}_t"
 
     val userReset = "FORCE_RST"
     val error = "ERROR"

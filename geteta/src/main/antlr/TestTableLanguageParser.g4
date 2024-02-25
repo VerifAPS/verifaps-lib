@@ -21,7 +21,8 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 }
 
 //structure level
-file  : table* EOF;
+file  : (ca | table)* EOF;
+
 table : tableHeader LBRACE
             (inheritance_signature)*
             (signature | freeVariable | column | decl_time_const)*
@@ -30,6 +31,41 @@ table : tableHeader LBRACE
             function*
          RBRACE
 ;
+
+ca: CONTRACT AUTOMATON name=IDENTIFIER
+    LBRACE
+    (inheritance_signature)*
+    (signature | freeVariable | column | decl_time_const)*
+    opts?
+    contract*
+    state*
+    function*
+    RBRACE
+;
+
+state:
+  STATE LBRACE contract* RBRACE
+;
+
+contract: CONTRACT
+  ( name=intOrId
+  | LBRACE
+    ( ASSUME (EQUALS|COLON) valuesOrFormula
+    | ASSERT (EQUALS|COLON) valuesOrFormula
+    )
+    goto_*
+    RBRACE
+  )
+;
+
+valuesOrFormula:
+    expr
+  | LBRACE
+    (kc osem)*
+    RBRACE
+;
+
+
 
 tableHeader:
                {relational=false;} TABLE name=IDENTIFIER                     #tableHeaderFunctional

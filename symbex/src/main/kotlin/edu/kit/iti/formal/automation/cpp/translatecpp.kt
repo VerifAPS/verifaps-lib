@@ -296,7 +296,12 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     override fun visit(programDeclaration: ProgramDeclaration) {
         visit(programDeclaration as PouExecutable, programDeclaration.actions)
         val rt = RecordType(programDeclaration.name, programDeclaration.scope.variables)
-        out.println("struct ${programDeclaration.name}_t ${programDeclaration.name.toUpperCase()} = ${value(DefaultInitValue.getInit(rt))};")
+        out.println(
+            "struct ${programDeclaration.name}_t ${programDeclaration.name.uppercase(Locale.getDefault())} = ${
+                value(
+                    DefaultInitValue.getInit(rt)
+                )
+            };")
     }
 
     fun visit(pd: PouExecutable, actions: LookupList<ActionDeclaration>) {
@@ -483,8 +488,8 @@ fun generateRunnableStub(cw: CodeWriter, main: PouElements) {
             main.elements.forEach { p ->
                 if (p is ProgramDeclaration) {
                     val inputs = p.scope.filterByFlags(VariableDeclaration.INPUT, VariableDeclaration.INOUT)
-                    inputs.forEach { print("havoc(&${p.name.toUpperCase()}.${it.name});").nl() }
-                    print("${p.name}(& ${p.name.toUpperCase()});").nl()
+                    inputs.forEach { print("havoc(&${p.name.uppercase(Locale.getDefault())}.${it.name});").nl() }
+                    print("${p.name}(& ${p.name.uppercase(Locale.getDefault())});").nl()
                 }
             }
         }

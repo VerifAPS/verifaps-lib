@@ -27,7 +27,7 @@ data class SMVWordType(
     override fun valueOf(str: String) = SWordLiteral(read(str), this)
 
     override fun read(str: String): BigInteger {
-        val re = Pattern.compile("(?<sign>-)?0(?<t>s|u)d(?<w>\\d+)_(?<v>\\d+)")
+        val re = Pattern.compile("(?<sign>-)?0(?<t>[su])d(?<w>\\d+)_(?<v>\\d+)")
         val m = re.matcher(str)
         if (m.matches()) {
             val word = SMVFacade.parseWordLiteral(str)
@@ -82,7 +82,7 @@ object SMVTypes {
 
     object BOOLEAN : SMVType {
         override fun valueOf(str: String) = if (str.equals("true", true)) SLiteral.TRUE else SLiteral.FALSE
-        override fun format(value: Any): String = value.toString().toUpperCase()
+        override fun format(value: Any): String = value.toString().uppercase(Locale.getDefault())
         override fun read(str: String): Any = str.equals("TRUE", true)
         override fun repr(): String = "boolean"
         override fun allowedValue(obj: Any): Boolean = obj is Boolean

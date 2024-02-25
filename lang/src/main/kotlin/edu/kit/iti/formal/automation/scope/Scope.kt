@@ -189,8 +189,11 @@ data class Scope(val variables: VariableScope = VariableScope())
     fun resolveFunctionBlock(key: String) = functionBlocks.lookup(key)
     fun resolveFunction(key: String) = functions.lookup(key)
 
-    fun registerProgram(programDeclaration: ProgramDeclaration) = programs.register(programDeclaration.name!!, programDeclaration)
-    fun registerFunction(functionDeclaration: FunctionDeclaration) = functions.register(functionDeclaration.name, functionDeclaration)
+    fun registerProgram(programDeclaration: ProgramDeclaration) =
+        programs.register(programDeclaration.name!!, programDeclaration)
+
+    fun registerFunction(functionDeclaration: FunctionDeclaration) =
+        functions.register(functionDeclaration.name, functionDeclaration)
 
 
     fun registerFunctionBlock(fblock: FunctionBlockDeclaration) = functionBlocks.register(fblock.name, fblock)
@@ -200,8 +203,8 @@ data class Scope(val variables: VariableScope = VariableScope())
         if (dt is EnumerationTypeDeclaration) {
             val edt = dt.getDataType(this)
             dt.allowedValues
-                    .map { it.text!! }
-                    .forEach { allowedEnumValues[it.toUpperCase()] = edt }
+                .map { it.text!! }
+                .forEach { allowedEnumValues[it.uppercase(Locale.getDefault())] = edt }
         }
     }
 
@@ -218,8 +221,8 @@ data class Scope(val variables: VariableScope = VariableScope())
 
         //if (a && b || a && c || b && c) {
         val ambigue = arrayListOf(a, b, c, d)
-                .map { if (it != null) 1 else 0 }
-                .sum() > 1
+            .map { if (it != null) 1 else 0 }
+            .sum() > 1
 
         if (ambigue) {
             System.err.println("Ambiguity in Name Resolution for: $name")
@@ -269,11 +272,11 @@ data class Scope(val variables: VariableScope = VariableScope())
 
 
     fun registerClass(clazz: ClassDeclaration) =
-            classes.register(clazz.name, clazz)
+        classes.register(clazz.name, clazz)
 
     fun resolveClass(key: String) = classes.lookup(key)
     fun registerInterface(interfaceDeclaration: InterfaceDeclaration) =
-            interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
+        interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
 
     fun registerMethod(md: MethodDeclaration) = methods.register(md.name, md)
     fun resolveInterface(key: String) = interfaces.lookup(key)
@@ -338,9 +341,9 @@ data class Scope(val variables: VariableScope = VariableScope())
     }
 
     fun resolveEnumByValue(value: String): EnumerateType? =
-            value.toUpperCase().let {
-                this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
-            }
+        value.uppercase(Locale.getDefault()).let {
+            this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
+        }
 
     /**
      * Construct a complete map of values to EnumerationType
@@ -354,11 +357,11 @@ data class Scope(val variables: VariableScope = VariableScope())
     //region call resolver
     fun resolveInvocation(callee: SymbolicReference): Invoked? {
         val resolvers = listOf(
-                this::resolveProgramInvocation,
-                this::resolveActionInvocation,
-                this::resolveFunctionBlockInvocation,
-                this::resolveFunctionInvocation
-                //,                this::resolveMethodInvocation
+            this::resolveProgramInvocation,
+            this::resolveActionInvocation,
+            this::resolveFunctionBlockInvocation,
+            this::resolveFunctionInvocation
+            //,                this::resolveMethodInvocation
         )
 
         val resolved = resolvers.map { it(callee) }.filter { it != null }

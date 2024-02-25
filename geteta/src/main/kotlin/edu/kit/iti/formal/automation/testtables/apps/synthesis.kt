@@ -29,6 +29,8 @@ import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.nio.file.Paths
+import java.util.*
+import kotlin.collections.HashMap
 import kotlin.math.max
 
 /**
@@ -65,7 +67,7 @@ class SynthesisApp : CliktCommand(
 
     private val outputFunctionStrategy by option("--row-selection-strategy",
             help = "Strategy for choosing output function when multiple rows are active")
-            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.toLowerCase() })
+            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.lowercase(Locale.getDefault()) })
             .default(OutputFunctionStrategy.ASSUME_ORTHOGONAL)
 
     override fun run() {
@@ -881,11 +883,11 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
                 "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
 
         override fun visitExpr(ctx: IteLanguageParser.ExprContext): String =
-                ctx.iteExpr()?.accept(this)
-                        ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
-                        ?: ctx.identifier()?.accept(this)
-                        ?: ctx.BOOLEAN()?.text?.toLowerCase()
-                        ?: ctx.INTEGER()!!.text
+            ctx.iteExpr()?.accept(this)
+                ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
+                ?: ctx.identifier()?.accept(this)
+                ?: ctx.BOOLEAN()?.text?.lowercase(Locale.getDefault())
+                ?: ctx.INTEGER()!!.text
 
         override fun visitIteExpr(ctx: IteLanguageParser.IteExprContext): String =
                 iteExprCache.getOrPut(

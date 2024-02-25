@@ -194,7 +194,7 @@ class TblLanguageToSmv(private val columnVariable: SVariable,
             if (isReference)
                 throw IllegalExpressionException("You referenced a variable $varText, " +
                         "but it is not found as a defined program variable.")
-            SEnumLiteral(varText.toUpperCase())
+            SEnumLiteral(varText.uppercase(Locale.getDefault()))
         }
     }
 

@@ -7,6 +7,7 @@ import edu.kit.iti.formal.automation.st.ast.Expression
 import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.SymbolicReference
 import edu.kit.iti.formal.automation.st.util.AstMutableVisitor
+import java.util.*
 
 object RewriteEnums : AstMutableVisitor() {
     private var lastScope: Scope? = null
@@ -18,7 +19,7 @@ object RewriteEnums : AstMutableVisitor() {
 
     override fun visit(literal: Literal): Expression {
         when (literal) {
-            is EnumLit -> literal.value = literal.value.toUpperCase()
+            is EnumLit -> literal.value = literal.value.uppercase(Locale.getDefault())
             else -> {}
         }
         return literal
@@ -30,11 +31,11 @@ object RewriteEnums : AstMutableVisitor() {
             val value = symbolicReference.identifier
             if (scope.resolveVariable(symbolicReference) == null) {
                 val enum0 = scope.resolveEnumByValue(value)
-                if (enum0 != null) return EnumLit(RefTo(enum0), value.toUpperCase())
+                if (enum0 != null) return EnumLit(RefTo(enum0), value.uppercase(Locale.getDefault()))
 
                 val enum1 = scope.resolveEnum(value)
                 if (enum1 != null && symbolicReference.hasSub())
-                    return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier.toUpperCase())
+                    return EnumLit(RefTo(enum1), symbolicReference.sub!!.identifier.uppercase(Locale.getDefault()))
             }
         }
         return symbolicReference
