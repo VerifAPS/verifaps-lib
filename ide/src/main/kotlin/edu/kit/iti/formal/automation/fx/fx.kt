@@ -1,11 +1,16 @@
 package edu.kit.iti.formal.automation.fx
 
+import com.pixelduke.control.Ribbon
+import com.pixelduke.control.ribbon.RibbonGroup
+import com.pixelduke.control.ribbon.RibbonTab
 import edu.kit.iti.formal.util.info
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
+import javafx.event.EventTarget
 import javafx.geometry.Side
 import javafx.scene.Node
+import javafx.scene.control.Button
 import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.Tab
@@ -15,8 +20,6 @@ import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import jfxtras.styles.jmetro.JMetro
-import jfxtras.styles.jmetro.Style
 import org.kordamp.ikonli.javafx.FontIcon
 import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.*
@@ -125,11 +128,6 @@ class IdeFx : App(IdeView::class, IdeStyle::class) {
 
     }
 
-    override fun start(stage: Stage) {
-        super.start(stage)
-        val jMetro = JMetro(Style.LIGHT)
-        jMetro.scene = stage.scene
-    }
 }
 
 object ConfigurationPaths {
@@ -153,9 +151,11 @@ object ConfigurationPaths {
                 val version = System.getProperty("os.version")
                 Paths.get(System.getenv("APPDATA"), applicationName)
             }
+
             "lin" -> {
                 Paths.get(home, ".config", applicationName)
             }
+
             else -> Paths.get(applicationName)
         }
         Files.createDirectories(p)
@@ -224,7 +224,7 @@ class IdeView : View("VERIFAPS IDE") {
         //if (appData.lastNavigatorPath.value != null)
         //    fileNavigator.rootFile.value = Paths.get(appData.lastNavigatorPath.value)
         subscribe<StatusMessage> { publishMessage(it.text, it.graphic) }
-        open(File("geteta/examples/NewFile.gtt").absoluteFile)
+        open(File("../geteta/examples/NewFile.gtt").absoluteFile)
     }
 
     fun publishMessage(status: String, graphic: Node? = null) {
@@ -321,28 +321,30 @@ class StatusMessage(val text: String, val graphic: Node? = null) : FXEvent()
 class IdeMenu(val ide: IdeView) : View() {
     lateinit var recentFiles: MenuItem
 
-    override val root = menubar {
-        menu("File") {
-            item("New", "ctrl-n", null, ide::createCodeEditor)
-            item("Open", "ctrl-o", "fas-folder-open", ide::open)
-            val recentFiles = item("Recent files")
-            separator()
-            item("Save", "ctrl-s", "far-save", ide::save)
-            item("Save As...", "ctrl-shift-s", "fas-save", ide::saveAs)
-            separator()
-            item("Close", null, null, ide::close)
-        }
-        menu("Edit") {}
-        menu("View") {
-            item("Larger texts", "ctrl-PLUS", "fas-folder-open") {}
-            item("Smaller texts", "ctrl-MINUS", "fas-folder-open") {}
-            separator()
-            item("Editor to Left", "ctrl-LEFT", null, ide::editorToTheLeft)
-            item("Editor to Right", "ctrl-RIGHT", null, ide::editorToTheRight)
-        }
-        menu("Tools") {
-            item("Translate SFC to ST", null, null) {
-                /*currentEditor?.also {
+    override val root =
+        vbox {
+            menubar {
+                menu("File") {
+                    item("New", "ctrl-n", null, ide::createCodeEditor)
+                    item("Open", "ctrl-o", "fas-folder-open", ide::open)
+                    val recentFiles = item("Recent files")
+                    separator()
+                    item("Save", "ctrl-s", "far-save", ide::save)
+                    item("Save As...", "ctrl-shift-s", "fas-save", ide::saveAs)
+                    separator()
+                    item("Close", null, null, ide::close)
+                }
+                menu("Edit") {}
+                menu("View") {
+                    item("Larger texts", "ctrl-PLUS", "fas-folder-open") {}
+                    item("Smaller texts", "ctrl-MINUS", "fas-folder-open") {}
+                    separator()
+                    item("Editor to Left", "ctrl-LEFT", null, ide::editorToTheLeft)
+                    item("Editor to Right", "ctrl-RIGHT", null, ide::editorToTheRight)
+                }
+                menu("Tools") {
+                    item("Translate SFC to ST", null, null) {
+                        /*currentEditor?.also {
                     val file = File(
                         it.file?.parentFile, it.file?.nameWithoutExtension +
                                 "_translated." + it.file?.extension
@@ -353,9 +355,45 @@ class IdeMenu(val ide: IdeView) : View() {
                         IEC61131Facade.printTo(it, elements, true)
                     }
                     open(file)*/
+                    }
+                }
+            }
+
+            ribbon {
+                tab("test") {
+                    group("File") {
+                        item("New", "ctrl-n", null, ide::createCodeEditor)
+                        item("Open", "ctrl-o", "fas-folder-open", ide::open)
+                        //val recentFiles = item("Recent files")
+                        item("Save", "ctrl-s", "far-save", ide::save)
+                        item("Save As...", "ctrl-shift-s", "fas-save", ide::saveAs)
+                        item("Close", null, null, ide::close)
+                    }
+                    group("Edit") {}
+                    group("View") {
+                        item("Larger texts", "ctrl-PLUS", "fas-folder-open") {}
+                        item("Smaller texts", "ctrl-MINUS", "fas-folder-open") {}
+                        item("Editor to Left", "ctrl-LEFT", null, ide::editorToTheLeft)
+                        item("Editor to Right", "ctrl-RIGHT", null, ide::editorToTheRight)
+                    }
+                    group("Tools") {
+                        item("Translate SFC to ST", null, null) {
+                            /*currentEditor?.also {
+                        val file = File(
+                            it.file?.parentFile, it.file?.nameWithoutExtension +
+                                    "_translated." + it.file?.extension
+                        )
+                        val elements = IEC61131Facade.file(CharStreams.fromString(it.text))
+                        IEC61131Facade.translateSfcToSt(elements)
+                        file.bufferedWriter().use {
+                            IEC61131Facade.printTo(it, elements, true)
+                        }
+                        open(file)*/
+                        }
+                    }
+                }
             }
         }
-    }
 }
 
 fun Menu.item(name: String, key: String?, ikon: String? = null, event: () -> Unit) {
@@ -368,3 +406,31 @@ fun Menu.item(name: String, key: String?, ikon: String? = null, event: () -> Uni
     }
 }
 
+fun EventTarget.ribbon(op: Ribbon.() -> Unit = {}) = Ribbon().attachTo(this, op)
+
+fun Ribbon.tab(title: String = "", op: RibbonTab.() -> Unit = {}) = RibbonTab(title).also {
+    op(it)
+    this.tabs.add(it)
+}
+
+fun RibbonTab.group(title:String="",op: RibbonGroup.() -> Unit = {}) = RibbonGroup().also {
+    it.title = title
+    op(it)
+    this.ribbonGroups.add(it)
+}
+
+fun RibbonGroup.item(name: String, key: String?, ikon: String? = null, event: () -> Unit) {
+    val icon = ikon?.let { ref ->
+        val resolver = IkonResolver.getInstance()
+        resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }
+    }
+
+    val k = key?.let { KeyCombination.keyCombination(it) }
+
+    val item = Button(name, graphic).also {
+        //it.accelerator = k
+        it.graphic = icon
+        it.onAction = EventHandler { _ -> event() }
+    }
+    this.nodes.add(item)
+}
