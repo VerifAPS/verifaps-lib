@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 plugins {
     id "org.jetbrains.kotlin.jvm" version "2.0.0-Beta4" apply false
-    id("org.jetbrains.dokka") version "1.9.10"
+    id("org.jetbrains.dokka") version "1.9.20"
     id "org.sonarqube" version "4.4.1.3373"
     id "com.github.ben-manes.versions" version "0.51.0"
 }
