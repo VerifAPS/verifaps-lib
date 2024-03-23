@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.view;
 
-import com.sun.javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -15,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.logging.LogManager;
 
 /**
  * Provides static methods for view operations.
@@ -30,12 +27,9 @@ public class ViewUtils {
     private static Method columnToFitMethod;
 
     static {
-        try {
-            columnToFitMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
-            columnToFitMethod.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        //TODO
+        //columnToFitMethod = TableViewSkin.class.getDeclaredMethod("resizeColumnToFitContent", TableColumn.class, int.class);
+        //columnToFitMethod.setAccessible(true);
     }
 
     /**

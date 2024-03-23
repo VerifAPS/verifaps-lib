@@ -1,15 +1,8 @@
 package edu.kit.iti.formal.stvs.model.code;
 
+import edu.kit.iti.formal.automation.IEC61131Facade;
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
-import edu.kit.iti.formal.automation.parser.IEC61131Parser;
-import edu.kit.iti.formal.automation.parser.IECParseTreeToAST;
-import edu.kit.iti.formal.automation.st.ast.EnumerationTypeDeclaration;
-import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration;
-import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration;
-import edu.kit.iti.formal.automation.st.ast.Top;
-import edu.kit.iti.formal.automation.st.ast.TopLevelElements;
-import edu.kit.iti.formal.automation.st.ast.TypeDeclarations;
-import edu.kit.iti.formal.automation.st.ast.VariableDeclaration;
+import edu.kit.iti.formal.automation.st.ast.*;
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor;
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
 import edu.kit.iti.formal.stvs.model.common.VariableCategory;
@@ -25,9 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 
 /**
  * Represents the formal model of source code (extracted from {@link Code}).
@@ -56,7 +47,7 @@ public class ParsedCode {
     @Override
     public Void visit(EnumerationTypeDeclaration enumType) {
       if (!enumType.getAllowedValues().isEmpty()) {
-        TypeEnum type = new TypeEnum(enumType.getTypeName(),
+        TypeEnum type = new TypeEnum(enumType.getName(),
                 enumType.getAllowedValues().stream().map(Token::getText).collect(Collectors.toList()));
         this.definedTypes.add(type);
       }
@@ -78,14 +69,13 @@ public class ParsedCode {
 
     @Override
     public Void visit(ProgramDeclaration program) {
-      program.getLocalScope().getLocalVariables().entrySet().forEach(variableEntry -> {
+      program.getScope().getVariables().forEach(variableEntry -> {
         // String varName = variableEntry.getKey();
-        VariableDeclaration varDecl = variableEntry.getValue();
-        Optional<VariableCategory> category = getCategoryFromDeclaration(varDecl);
-        Optional<String> dataTypeName = Optional.ofNullable(varDecl.getDataTypeName());
+        Optional<VariableCategory> category = getCategoryFromDeclaration(variableEntry);
+        Optional<String> dataTypeName = Optional.ofNullable(variableEntry.getDataType().getName());
         if (category.isPresent() && dataTypeName.isPresent()) {
           this.definedVariables
-              .add(new CodeIoVariable(category.get(), dataTypeName.get(), varDecl.getName()));
+              .add(new CodeIoVariable(category.get(), dataTypeName.get(), variableEntry.getName()));
         }
       });
       return null;
@@ -96,18 +86,12 @@ public class ParsedCode {
         return Optional.empty();
 
       }
-      switch (varDecl.getType()) {
-        case VariableDeclaration.INPUT:
-          return Optional.of(VariableCategory.INPUT);
-        case VariableDeclaration.OUTPUT:
-          return Optional.of(VariableCategory.OUTPUT);
-        case VariableDeclaration.LOCAL:
-          return Optional.of(VariableCategory.LOCAL);
-        case VariableDeclaration.INOUT:
-          return Optional.of(VariableCategory.INOUT);
-        default:
-          return Optional.empty();
-      }
+      if(varDecl.isInput()) return Optional.of(VariableCategory.INPUT);
+      if(varDecl.isOutput()) return Optional.of(VariableCategory.OUTPUT);
+      if(varDecl.isLocal()) return Optional.of(VariableCategory.LOCAL);
+      if(varDecl.isInternal()) return Optional.of(VariableCategory.LOCAL);
+      if(varDecl.isInOut()) return Optional.of(VariableCategory.INOUT);
+      return  Optional.empty();
     }
 
     public List<CodeIoVariable> getDefinedVariables() {
@@ -180,9 +164,9 @@ public class ParsedCode {
       ParsedSyntaxErrorHandler syntaxErrorsListener, ParsedCodeHandler parsedCodeListener) {
     SyntaxErrorListener syntaxErrorListener = new SyntaxErrorListener();
 
-    IEC61131Lexer lexer = lex(input, parsedTokenHandler, syntaxErrorListener);
-
-    TopLevelElements ast = parse(new CommonTokenStream(lexer), syntaxErrorListener);
+    var stream = CharStreams.fromString(input); //, parsedTokenHandler, syntaxErrorListener);
+    //TODO parsedTokenHandler?
+    var ast = parse(stream, syntaxErrorListener);
 
     syntaxErrorsListener.accept(syntaxErrorListener.getSyntaxErrors());
 
@@ -208,17 +192,13 @@ public class ParsedCode {
 
   /**
    * Parses a token stream.
-   * @param tokenStream The token stream to parse
+   *
+   * @param tokenStream         The token stream to parse
    * @param syntaxErrorListener The listener to invoke on syntax errors
    * @return The AST constructed from the token stream
    */
-  private static TopLevelElements parse(CommonTokenStream tokenStream, SyntaxErrorListener
-      syntaxErrorListener) {
-    IEC61131Parser parser = new IEC61131Parser(tokenStream);
-    parser.removeErrorListeners();
-    parser.addErrorListener(syntaxErrorListener);
-
-    return (TopLevelElements) parser.start().accept(new IECParseTreeToAST());
+  private static PouElements parse(CharStream tokenStream, SyntaxErrorListener syntaxErrorListener) {
+    return IEC61131Facade.INSTANCE.file(tokenStream);
   }
 
   /**

@@ -1,20 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.io._1.ObjectFactory;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlConstraintSpecExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionExporter;
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaExporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
 import edu.kit.iti.formal.stvs.model.config.History;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -69,12 +60,10 @@ public class ExporterFacade {
    */
   public static ByteArrayOutputStream exportConfig(GlobalConfig config, ExportFormat format)
       throws ExportException {
-    switch (format) {
-      case XML:
-        return new XmlConfigExporter().export(config);
-      default:
-        throw new ExportException("Unsupported export format");
-    }
+      return switch (format) {
+          case XML -> new XmlConfigExporter().export(config);
+          default -> throw new ExportException("Unsupported export format");
+      };
   }
 
   /**
@@ -124,7 +113,7 @@ public class ExporterFacade {
   }
 
   /**
-   * Exports a {@link Code} to the file specified in {@link Code#filename}.
+   * Exports a {@link Code} to the file specified in {@link Code#getFilename()}.
    *
    * @param code The code to export
    * @param escapeVariables Specifies if variables should be escaped
@@ -167,8 +156,7 @@ public class ExporterFacade {
       throws ExportException, JAXBException, IOException {
     switch (format) {
       case XML:
-        edu.kit.iti.formal.stvs.io._1.History exportHistory =
-            new ObjectFactory().createHistory();
+        edu.kit.iti.formal.stvs.io._1.History exportHistory = new ObjectFactory().createHistory();
         for (String filename : history.getFilenames()) {
           exportHistory.getFilename().add(filename);
         }
@@ -193,16 +181,10 @@ public class ExporterFacade {
    */
   private static void writeToFile(ByteArrayOutputStream outputStream, File file)
       throws IOException {
-    FileOutputStream fostream = null;
-    try {
-      fostream = new FileOutputStream(file);
-      outputStream.writeTo(fostream);
-      fostream.close();
-    } finally { // Ensure that the outputstream is always closed
-      if (fostream != null) {
-        fostream.close();
-      }
-    }
+      try (FileOutputStream fostream = new FileOutputStream(file)) {
+          outputStream.writeTo(fostream);
+          fostream.close();
+      } // Ensure that the outputstream is always closed
   }
 
   public enum ExportFormat {

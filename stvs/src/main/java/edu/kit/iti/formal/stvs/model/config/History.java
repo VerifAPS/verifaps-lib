@@ -12,8 +12,6 @@ import java.util.Collection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.xml.bind.JAXBException;
-
 /**
  * Contains information about recently opened code and spec files.
  *
@@ -87,7 +85,7 @@ public class History {
         new File(GlobalConfig.CONFIG_DIRPATH + File.separator + AUTOLOAD_HISTORY_FILENAME);
     try {
       return ImporterFacade.importHistory(historyFile, ImporterFacade.ImportFormat.XML);
-    } catch (JAXBException | ImportException e) {
+    } catch (ImportException e) {
       return new History();
     }
   }
@@ -97,10 +95,9 @@ public class History {
    * {@link GlobalConfig#CONFIG_DIRPATH}/{@link #AUTOLOAD_HISTORY_FILENAME}.
    *
    * @throws IOException if the directories to the default path or the file could not be created
-   * @throws JAXBException if the history could not be exported to xml
    * @throws ExportException if the history could not be written to the file
    */
-  public void autosaveHistory() throws IOException, JAXBException, ExportException {
+  public void autosaveHistory() throws IOException, ExportException {
     File configDir = new File(GlobalConfig.CONFIG_DIRPATH);
     if (!configDir.isDirectory() || !configDir.exists()) {
       if (!configDir.mkdirs()) {

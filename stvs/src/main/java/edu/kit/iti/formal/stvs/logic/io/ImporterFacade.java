@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.io;
 
-import edu.kit.iti.formal.stvs.logic.io.xml.*;
-import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter;
 import edu.kit.iti.formal.stvs.model.StvsRootModel;
 import edu.kit.iti.formal.stvs.model.code.Code;
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
@@ -26,7 +24,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import edu.kit.iti.formal.stvs.io._1.*;
 
 /**
  * Facade class for facilitating the import of different objects from different formats.
@@ -250,8 +247,7 @@ public class ImporterFacade {
    * @throws JAXBException if an error occured while unmarshalling
    * @throws ImportException if an error occured while importing
    */
-  public static History importHistory(File chosenFile, ImportFormat format)
-      throws JAXBException, ImportException {
+  public static History importHistory(File chosenFile, ImportFormat format)  {
     switch (format) {
       case XML:
         JAXBContext context = JAXBContext.newInstance(edu.kit.iti.formal.stvs.io._1.ObjectFactory.class);

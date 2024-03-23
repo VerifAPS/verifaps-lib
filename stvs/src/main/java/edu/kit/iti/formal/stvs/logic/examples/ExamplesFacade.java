@@ -18,5 +18,4 @@ public class ExamplesFacade {
         loader.iterator().forEachRemaining(list::add);
         return list;
     }
-
 }

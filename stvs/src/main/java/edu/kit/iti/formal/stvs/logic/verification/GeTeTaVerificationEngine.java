@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.verification;
 
+import edu.kit.iti.formal.automation.testtables.GetetaFacade;
+import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique;
 import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
 import edu.kit.iti.formal.stvs.model.common.NullableProperty;
@@ -80,20 +81,17 @@ public class GeTeTaVerificationEngine implements VerificationEngine {
     // Write ConstraintSpecification and Code to temporary input files for GeTeTa
     File tempSpecFile = File.createTempFile("verification-spec", ".xml");
     File tempCodeFile = File.createTempFile("verification-code", ".st");
-    ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.GETETA, tempSpecFile);
-    //weigl set escapeVariables to false, due to bug with enum constant
-    ExporterFacade.exportCode(scenario.getCode(), tempCodeFile, false);
-    String getetaCommand =
-        config.getGetetaCommand().replace("${code}", tempCodeFile.getAbsolutePath())
-            .replace("${spec}", tempSpecFile.getAbsolutePath());
 
-    LOGGER.info("Geteta command: {}", getetaCommand);
-
+    var process = GetetaFacade.createNuXMVProcess(
+            folder, modules, nuXmv, VerificationTechnique.IC3
+    );
+    var output = process.call();
 
     // Start verification engine in new child process
     if (getetaProcess != null) {
       cancelVerification();
     }
+
     ProcessBuilder processBuilder = new ProcessBuilder(getetaCommand.split(" "));
     System.out.println(getetaCommand);
     processBuilder.environment().put("NUXMV", config.getNuxmvFilename());
