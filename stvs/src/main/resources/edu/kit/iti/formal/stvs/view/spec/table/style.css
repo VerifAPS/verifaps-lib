@@ -1,0 +1,78 @@
+.spec-cell-problem.spec-cell.cell.table-cell {
+  -fx-background-insets: 1 1 1 1;
+  -fx-background-color: #db5751AA;
+}
+
+.spec-cell.cell.table-cell {
+  -fx-content-display: bottom;
+  -fx-font-family: monospace;
+}
+
+.spec-counterexample.label {
+  -fx-text-fill: red;
+}
+
+.spec-column-problem.spec-column-header {
+  -fx-background-color: #db5751AA;
+}
+
+/* These are table rows that are highlighted by mouse-over on the timing diagram: */
+.table-row-cell.highlighted {
+  -fx-background-color: #0002; /* almost */
+}
+
+.table-column.highlighted {
+  /* holy shit thats ugly */
+  -fx-background-color: #0002;
+}
+
+.spec-column-header {
+  -fx-background-insets: 1 1 1 1;
+  -fx-padding: 2px;
+  -fx-text-alignment: center;
+}
+
+.spec-column-header.category-label.label.output {
+  -fx-text-fill: purple;
+}
+
+.spec-column-header.category-label.label.input {
+  -fx-text-fill: darkgreen;
+}
+
+.spec-column-header.category-label.label.local {
+  -fx-text-fill: coral;
+}
+
+
+.spec-column-header.category-label.label.inout {
+  -fx-text-fill: darkturquoise;
+}
+
+.spec-column-header.category-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+  -fx-font-weight: normal;
+  -fx-font-size: 8pt;
+}
+
+.spec-column-header.name-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+}
+
+.spec-column-header.type-label.label {
+  -fx-text-alignment: center;
+  -fx-font-family: monospace;
+  -fx-text-fill: darkblue;
+}
+
+.spec-column-header.problem-tooltip {
+  -fx-font-family: monospace;
+  -fx-font-weight: normal;
+  -fx-padding: 8px;
+}
+
+.spec-header {
+  -fx-font-weight: bold;
+}

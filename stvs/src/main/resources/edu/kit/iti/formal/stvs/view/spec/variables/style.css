@@ -1,0 +1,21 @@
+/* the h-box for one variable with the label, field, combobox and remove button */
+.freevar.variable-container {
+}
+
+/* the v-box for all the variables */
+.freevar.collection {
+}
+
+.freevar.freevar-problem.cell.table-cell {
+    -fx-background-insets: 1 1 1 1;
+    -fx-background-color: #db5751AA;
+}
+
+.freevar.cell.table-cell {
+    -fx-font-family: monospace;
+}
+
+.freevar.overview-label.label {
+    -fx-font-size: 10pt;
+    -fx-font-weight: bold;
+}

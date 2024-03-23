@@ -1,0 +1,64 @@
+.keyword {
+    -fx-fill: purple;
+    -fx-font-weight: bold;
+}
+
+.type {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
+.syntax-error {
+    -fx-underline: true;
+    -fx-fill: red;
+    -fx-font-weight: bold;
+}
+
+.vardef {
+    -fx-fill: darkgreen;
+    -fx-font-weight: bold;
+}
+
+.operation {
+    -fx-fill: chocolate;
+    -fx-font-weight: bold;
+}
+
+.semicolon {
+    -fx-font-weight: bold;
+}
+
+.parens {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.bracket {
+}
+
+.brace {
+    -fx-fill: teal;
+    -fx-font-weight: bold;
+}
+
+.string {
+    -fx-fill: darkgreen;
+}
+
+.number {
+    -fx-fill: blue;
+}
+
+.comment {
+	-fx-fill: cadetblue;
+}
+
+.unsupported {
+    -fx-fill: darkred;
+    -fx-font-weight: bold;
+}
+
+
+.paragraph-box:has-caret {
+    -fx-background-color: #f2f9fc;
+}

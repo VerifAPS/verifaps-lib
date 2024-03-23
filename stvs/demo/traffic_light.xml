@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+<code>
+<plaintext>TYPE
+	TrafficLight : (Red, Green);
+END_TYPE
+
+PROGRAM PedestrianTrafficLight
+
+VAR_INPUT
+	pedBtnPress : BOOL;
+END_VAR
+
+VAR_OUTPUT
+    carLight : TrafficLight;
+    pedLight : TrafficLight;
+    counter : INT;
+END_VAR
+
+VAR
+    buttonPressedBefore : BOOL;
+END_VAR
+
+
+    IF (NOT buttonPressedBefore) AND pedBtnPress THEN
+        carLight := TrafficLight#Red;
+    END_IF
+
+    IF counter = 10 THEN
+        pedLight := TrafficLight#Green;
+    ELSIF counter = 40 THEN
+        pedLight := TrafficLight#Red;
+    ELSIF counter = 50 THEN
+        carLight := TrafficLight#Green;
+    END_IF
+
+    IF carLight = TrafficLight#Red THEN
+        counter := counter + 1;
+    ELSE
+        counter := 0;
+    END_IF
+
+    buttonPressedBefore := pedBtnPress;
+
+
+END_PROGRAM
+        </plaintext>
+</code>
+<tabs>
+<tab id="0" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+</row>
+</rows>
+</specification>
+</tab>
+<tab id="1" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedestrianButtonPressed"/>
+<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStateCar"/>
+<ioVariable colwidth="100" data-type="TrafficLight" io="output" name="lightStatePedestrian"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows/>
+</specification>
+</tab>
+<tab id="2" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="155" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="189" data-type="TrafficLight" io="output" name="carLight"/>
+<ioVariable colwidth="192" data-type="TrafficLight" io="output" name="pedLight"/>
+<ioVariable colwidth="118" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>[1,10]</duration>
+<cell>FALSE</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</row>
+<row comment="">
+<duration>1</duration>
+<cell>TRUE</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[8,9]</duration>
+<cell>-</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[29,30]</duration>
+<cell>-</cell>
+<cell>Red</cell>
+<cell>Green</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[9,10]</duration>
+<cell>-</cell>
+<cell>Red</cell>
+<cell>Red</cell>
+<cell>= counter[-1]+1</cell>
+</row>
+<row comment="">
+<duration>[1,-]</duration>
+<cell>-</cell>
+<cell>Green</cell>
+<cell>Red</cell>
+<cell>0</cell>
+</row>
+</rows>
+</specification>
+</tab>
+<tab id="3" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="BOOL" io="input" name="pedBtnPress"/>
+<ioVariable colwidth="290" data-type="TrafficLight" io="output" name="carLight"/>
+<ioVariable colwidth="302" data-type="TrafficLight" io="output" name="pedLight"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="counter"/>
+</variables>
+<rows>
+<row comment="">
+<duration>1</duration>
+<cell>-</cell>
+<cell>-</cell>
+<cell>-</cell>
+<cell>-</cell>
+</row>
+</rows>
+</specification>
+</tab>
+</tabs>
+</session>

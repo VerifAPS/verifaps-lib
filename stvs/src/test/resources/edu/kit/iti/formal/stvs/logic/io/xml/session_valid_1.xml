@@ -1,0 +1,162 @@
+<?xml version="1.0" standalone="no"?>
+
+<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../session.xsd">
+    <code>
+        <plaintext>TYPE
+            enumD : (literalOne, literalTwo);
+            END_TYPE
+
+            PROGRAM constantprogram
+            VAR_INPUT
+            A : INT;
+            B : BOOL;
+            END_VAR
+
+            VAR_OUTPUT
+            C : INT;
+            D : enumD;
+            END_VAR
+
+            C := 52;
+            END_PROGRAM
+        </plaintext>
+    </code>
+    <tabs>
+        <tab id="0" open="false" readOnly="false">
+            <specification isConcrete="false" comment="I am a table comment!">
+                <variables>
+                    <ioVariable io="input" name="A" data-type="INT" colwidth="10"></ioVariable>
+                    <ioVariable io="input" name="B" data-type="BOOL"
+                                comment="I am a column comment!"></ioVariable>
+                    <ioVariable io="output" name="C" data-type="INT"></ioVariable>
+                    <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+                                comment="I am another column comment!"></ioVariable>
+                    <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+                </variables>
+                <rows>
+                    <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+                        <duration comment="I am a duration comment!">[1,5]</duration>
+                        <cell comment="I am a cell comment!">5</cell>
+                        <cell>FALSE</cell>
+                        <cell>&gt; A+2</cell>
+                        <cell comment="I am another cell comment!">literalOne</cell>
+                    </row>
+                    <row comment="I am a row comment!">
+                        <duration>[1,1]</duration>
+                        <cell>C[-1]</cell>
+                        <cell>!B[-1]</cell>
+                        <cell>A</cell>
+                        <cell>literalTwo</cell>
+                    </row>
+                </rows>
+                <enumTypes>
+                    <enum name="enumD">
+                        <literal>literalOne</literal>
+                        <literal>literalTwo</literal>
+                    </enum>
+                </enumTypes>
+            </specification>
+        </tab>
+        <tab id="1" open="true" readOnly="true">
+            <specification isConcrete="false" comment="I am a table comment!">
+                <variables>
+                    <ioVariable io="input" name="R" data-type="INT" colwidth="10"></ioVariable>
+                    <ioVariable io="input" name="B" data-type="BOOL"
+                                comment="I am a column comment!"></ioVariable>
+                    <ioVariable io="output" name="C" data-type="INT"></ioVariable>
+                    <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+                                comment="I am another column comment!"></ioVariable>
+                    <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+                </variables>
+                <rows>
+                    <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+                        <duration comment="I am a duration comment!">[1,5]</duration>
+                        <cell comment="I am a cell comment!">5</cell>
+                        <cell>FALSE</cell>
+                        <cell>&gt; R+2</cell>
+                        <cell comment="I am another cell comment!">literalOne</cell>
+                    </row>
+                    <row comment="I am a row comment!">
+                        <duration>[1,1]</duration>
+                        <cell>C[-1]</cell>
+                        <cell>!B[-1]</cell>
+                        <cell>R</cell>
+                        <cell>literalTwo</cell>
+                    </row>
+                </rows>
+                <enumTypes>
+                    <enum name="enumD">
+                        <literal>literalOne</literal>
+                        <literal>literalTwo</literal>
+                    </enum>
+                </enumTypes>
+            </specification>
+            <specification isConcrete="true">
+                <variables>
+                    <ioVariable io="input" name="R" data-type="INT" colwidth="10"></ioVariable>
+                    <ioVariable io="input" name="B" data-type="BOOL"
+                                comment="I am a column comment!"></ioVariable>
+                    <ioVariable io="output" name="C" data-type="INT"></ioVariable>
+                    <ioVariable io="output" name="D" data-type="enumD" colwidth="50"
+                                comment="I am another column comment!"></ioVariable>
+                    <freeVariable name="p" data-type="INT" default="3"></freeVariable>
+                </variables>
+                <rows>
+                    <row>
+                        <duration comment="I am a duration comment!">2</duration>
+                        <cycle>
+                            <cell>1</cell>
+                            <cell>FALSE</cell>
+                            <cell>3</cell>
+                            <cell>literalOne</cell>
+                        </cycle>
+                        <cycle>
+                            <cell>4</cell>
+                            <cell>FALSE</cell>
+                            <cell>8</cell>
+                            <cell>literalTwo</cell>
+                        </cycle>
+                    </row>
+                    <row comment="I am a row comment!">
+                        <duration>1</duration>
+                        <cycle>
+                            <cell>3</cell>
+                            <cell>TRUE</cell>
+                            <cell>1</cell>
+                            <cell>literalTwo</cell>
+                        </cycle>
+                    </row>
+                </rows>
+                <enumTypes>
+                    <enum name="enumD">
+                        <literal>literalOne</literal>
+                        <literal>literalTwo</literal>
+                    </enum>
+                </enumTypes>
+            </specification>
+        </tab>
+    </tabs>
+    <config>
+        <general>
+            <uiLanguage>EN</uiLanguage>
+            <windowSize>
+                <width>800</width>
+                <height>500</height>
+            </windowSize>
+            <verificationTimeout>100</verificationTimeout>
+            <simulationTimeout>100</simulationTimeout>
+        </general>
+        <editor>
+            <showLineNumbers>true</showLineNumbers>
+            <fontFamily>Comic Sans</fontFamily>
+            <fontSize>12</fontSize>
+        </editor>
+    </config>
+    <history>
+        <filename>/path/to/someCode.st</filename>
+        <filename>/path/to/someSpec.xml</filename>
+        <filename>/path/to/anotherSpec.xml</filename>
+    </history>
+</session>
