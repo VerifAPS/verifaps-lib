@@ -12,8 +12,6 @@ import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
 import java.io.File
 import java.io.IOException
 import java.util.function.Consumer

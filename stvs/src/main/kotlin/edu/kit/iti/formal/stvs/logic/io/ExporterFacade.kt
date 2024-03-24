@@ -1,15 +1,19 @@
 package edu.kit.iti.formal.stvs.logic.io
 
+import com.google.gson.GsonBuilder
 import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.code.*
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToStream
 import java.io.*
 import java.nio.file.Path
+import kotlin.io.path.bufferedWriter
 import kotlin.io.path.outputStream
+
+val jsonFormat = GsonBuilder()
+    .setPrettyPrinting()
+    .create()
 
 /**
  * Facade class for facilitating the export of different objects to different export formats.
@@ -17,9 +21,6 @@ import kotlin.io.path.outputStream
  * @author Benjamin Alt
  */
 object ExporterFacade {
-    val jsonFormat = Json {
-        prettyPrint = true
-    }
 
     /**
      * Exports a [ConstraintSpecification] using the specified [ExportFormat].
@@ -63,8 +64,8 @@ object ExporterFacade {
      * @throws ExportException if an error occurred while exporting
      */
     @Throws(ExportException::class)
-    fun exportConfig(config: GlobalConfig, writer: OutputStream) {
-        jsonFormat.encodeToStream(config, writer)
+    fun exportConfig(config: GlobalConfig, writer: Writer) {
+        jsonFormat.toJson(config, writer)
     }
 
     /**
@@ -79,27 +80,25 @@ object ExporterFacade {
     @JvmStatic
     @Throws(IOException::class, ExportException::class)
     fun exportConfig(config: GlobalConfig, file: Path) {
-        file.outputStream().use { exportConfig(config, it) }
+        file.bufferedWriter().use { exportConfig(config, it) }
     }
 
     /**
      * Exports a [StvsRootModel] using the specified [ExportFormat].
      *
      * @param session The root model that should be exported
-     * @param format The format for exporting
      * @return The stream the exported object is written to
      * @throws ExportException if an error occurred while exporting
      */
     @Throws(ExportException::class)
-    fun exportSession(session: StvsRootModel, out: OutputStream) {
-        jsonFormat.encodeToStream(session, out)
+    fun exportSession(session: StvsRootModel, out: Writer) {
+        jsonFormat.toJson(session, out)
     }
 
     /**
      * Exports a [StvsRootModel] to a given file.
      *
      * @param session The session that should be exported
-     * @param format The format to use
      * @param file The file to write to
      * @throws IOException if an error occurred while saving
      * @throws ExportException if an error occurred while exporting
@@ -107,7 +106,7 @@ object ExporterFacade {
     @JvmStatic
     @Throws(IOException::class, ExportException::class)
     fun exportSession(session: StvsRootModel, file: Path) {
-        file.outputStream().use { exportSession(session, it) }
+        file.bufferedWriter().use { exportSession(session, it) }
     }
 
     /**
@@ -145,13 +144,12 @@ object ExporterFacade {
      * Exports a [History] to a file.
      *
      * @param history The history to export
-     * @param format The format to use
      * @param file The file to write ro
      * @throws IOException if an error occurred while saving
      * @throws ExportException if an error occurred while exporting
      */
     fun exportHistory(history: History, file: Path) {
-        file.outputStream().use { out -> jsonFormat.encodeToStream(history, out) }
+        file.bufferedWriter().use { out -> jsonFormat.toJson(history, out) }
     }
 
     /**
