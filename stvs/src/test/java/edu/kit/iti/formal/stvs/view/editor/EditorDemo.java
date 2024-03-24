@@ -60,11 +60,11 @@ public class EditorDemo {
     if (parsedCode != null) {
       StringBuilder output = new StringBuilder();
       output.append("Defined types:\n");
-      parsedCode.getDefinedTypes().forEach(type -> output.append(" - " + type + "\n"));
+      parsedCode.definedTypes.forEach(type -> output.append(" - " + type + "\n"));
       output.append("\n");
       output.append("\n");
       output.append("Defined IOVariables:\n");
-      parsedCode.getDefinedVariables().forEach(codeIoVariable -> output.append(" - " + codeIoVariable + "\n"));
+      parsedCode.definedVariables.forEach(codeIoVariable -> output.append(" - " + codeIoVariable + "\n"));
       output.append("SyntaxErrors: \n");
       code.getSyntaxErrors().forEach(syntaxError -> output.append(" - " + syntaxError + "\n"));
       textArea.setText(output.toString());

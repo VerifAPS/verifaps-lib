@@ -44,8 +44,7 @@ public class SmtConcretizerTest {
     ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(getClass().getResourceAsStream(name), ImporterFacade
         .ImportFormat.XML);
     FreeVariableListValidator freeVariableListValidator = new FreeVariableListValidator(new
-        SimpleObjectProperty<>(typeContext), constraintSpec
-        .getFreeVariableList());
+        SimpleObjectProperty<>(typeContext), constraintSpec.freeVariableList);
     List<ValidFreeVariable> freeVariables = freeVariableListValidator.validFreeVariablesProperty().get();
     this.freeVariables = freeVariables;
     ConstraintSpecificationValidator validator = new ConstraintSpecificationValidator(

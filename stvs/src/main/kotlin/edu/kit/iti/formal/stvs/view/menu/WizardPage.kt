@@ -1,31 +1,17 @@
-package edu.kit.iti.formal.stvs.view.menu;
+package edu.kit.iti.formal.stvs.view.menu
 
-import javafx.scene.Node;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.Node
+import javafx.scene.layout.VBox
 
 /**
  * Created by leonk on 22.03.2017.
  */
-public class WizardPage extends VBox {
-  private String title;
+open class WizardPage(var title: String) : VBox() {
+    init {
+        spacing = 20.0
+    }
 
-  public WizardPage(String title) {
-    super();
-    this.title = title;
-    setSpacing(20.0);
-  }
-
-  public WizardPage(String title, Node content) {
-    this(title);
-    getChildren().setAll(content);
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
+    constructor(title: String, content: Node?) : this(title) {
+        children.setAll(content)
+    }
 }

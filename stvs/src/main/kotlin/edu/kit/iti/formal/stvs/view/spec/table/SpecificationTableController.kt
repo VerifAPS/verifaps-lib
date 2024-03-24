@@ -1,253 +1,257 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.view.spec.table
 
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.*;
-import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
-import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-import javafx.beans.Observable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig
+import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.table.*
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification
+import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
+import edu.kit.iti.formal.stvs.view.*
+import javafx.beans.InvalidationListener
+import javafx.beans.Observable
+import javafx.beans.binding.Bindings
+import javafx.beans.property.ListProperty
+import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
+import javafx.event.ActionEvent
+import javafx.event.Event
+import javafx.event.EventHandler
+import javafx.scene.control.*
+import javafx.scene.input.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.util.function.Consumer
+import java.util.function.Function
+import java.util.stream.Collectors
 
 /**
- * The controller for the {@link SpecificationTableView}. Orchestrates complex user interactions on
+ * The controller for the [SpecificationTableView]. Orchestrates complex user interactions on
  * the view (such as dragging and dropping of rows, selecting columns and cells etc.) and trigger
- * updates on the model (the underlying {@link HybridSpecification}).
+ * updates on the model (the underlying [HybridSpecification]).
  *
  * @author Philipp
  */
-public class SpecificationTableController implements Controller {
-    public static final Logger LOGGER = LoggerFactory.getLogger(SpecificationTableController.class);
+class SpecificationTableController(
+    private val config: GlobalConfig, private val typeContext: ListProperty<Type>,
+    private val codeIoVariables: ListProperty<CodeIoVariable>,
+    validVariables: ObservableList<ValidFreeVariable>,
+    val hybridSpecification: HybridSpecification?
+) : Controller {
+    override val view: SpecificationTableView
+    private val tableView = TableView<HybridRow>()
 
-    private static final DataFormat SERIALIZED_MIME_TYPE =
-            new DataFormat("application/x-java-serialized-object");
-    private final SpecificationTableView view;
-    private final TableView<HybridRow> tableView;
-    private final HybridSpecification hybridSpec;
-    private final ObjectProperty<List<Type>> typeContext;
-    private final ObjectProperty<List<CodeIoVariable>> codeIoVariables;
-    private final ConstraintSpecificationValidator validator;
-    private final TableColumn<HybridRow, String> durations;
-    private final GlobalConfig config;
+    val validator: ConstraintSpecificationValidator = ConstraintSpecificationValidator(
+        typeContext, codeIoVariables,
+        validVariables, hybridSpecification!!
+    )
+    private val durations: TableColumn<HybridRow?, String>
 
     /**
      * Create a new SpecificationTableController.
      *
-     * @param config              A reference to the current {@link GlobalConfig}
+     * @param config              A reference to the current [GlobalConfig]
      * @param typeContext         A list of the currently defined types
-     * @param codeIoVariables     A list of the {@link CodeIoVariable}s defined in the code
-     * @param validVariables      A list of the currently defined {@link ValidFreeVariable}s
-     * @param hybridSpecification The {@link HybridSpecification} to display
+     * @param codeIoVariables     A list of the [CodeIoVariable]s defined in the code
+     * @param validVariables      A list of the currently defined [ValidFreeVariable]s
+     * @param hybridSpecification The [HybridSpecification] to display
      */
-    @SuppressWarnings("unchecked")
-    public SpecificationTableController(GlobalConfig config, ObjectProperty<List<Type>> typeContext,
-                                        ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-                                        ReadOnlyObjectProperty<List<ValidFreeVariable>> validVariables,
-                                        HybridSpecification hybridSpecification) {
-        this.config = config;
-        this.tableView = new TableView<>();
+    init {
+        this.durations = createViewColumn("Duration", { it?.duration })
 
-        this.typeContext = typeContext;
-        this.codeIoVariables = codeIoVariables;
-        this.hybridSpec = hybridSpecification;
-        this.validator = new ConstraintSpecificationValidator(typeContext, codeIoVariables,
-                validVariables, hybridSpecification);
-        this.durations = createViewColumn("Duration", HybridRow::getDuration);
+        tableView.columnResizePolicy = TableView.UNCONSTRAINED_RESIZE_POLICY
 
-        tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        tableView.columns.add(durations)
 
-        tableView.getColumns().add(durations);
+        tableView.isEditable = hybridSpecification!!.isEditable
+        tableView.selectionModel.selectionMode = SelectionMode.MULTIPLE
+        tableView.setRowFactory { tableView: TableView<HybridRow?> -> this.rowFactory(tableView) }
 
-        tableView.setEditable(hybridSpecification.isEditable());
-        tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableView.setRowFactory(this::rowFactory);
-
-        tableView.setContextMenu(createContextMenu());
+        tableView.contextMenu = createContextMenu()
 
 
-        this.view = new SpecificationTableView(tableView);
+        this.view = SpecificationTableView(tableView)
 
-        view.getBtnAddRows().setOnAction(event -> insertRow());
-        view.getBtnCommentRow().setOnAction(event -> addRowComment(event));
-        view.getBtnRemoveRows().setOnAction(event -> deleteRow());
-        view.getBtnResize().setOnAction(event -> resizeColumns());
+        view.btnAddRows.onAction = EventHandler { event: ActionEvent? -> insertRow() }
+        view.btnCommentRow.onAction = EventHandler { event: ActionEvent? -> addRowComment(event) }
+        view.btnRemoveRows.onAction = EventHandler { event: ActionEvent? -> deleteRow() }
+        view.btnResize.onAction = EventHandler { event: ActionEvent? -> resizeColumns() }
 
         //view.getHeader().setContextMenu(createTopLevelContextMenu());
+        hybridSpecification.columnHeaders!!
+            .forEach(Consumer { specIoVariable: SpecIoVariable -> this.addColumnToView(specIoVariable) })
 
-        hybridSpecification.getColumnHeaders().forEach(this::addColumnToView);
+        validator.problemsProperty().addListener { o: Observable? -> onProblemsChange() }
+        validator.recalculateSpecProblems()
 
-        validator.problemsProperty().addListener((Observable o) -> onProblemsChange());
-        validator.recalculateSpecProblems();
+        hybridSpecification.getSelection()!!
+            .setOnTimingDiagramSelectionClickListener({ columnId: String?, row: Int? ->
+                this.focusCell(columnId, row!!)
+            })
 
-        hybridSpec.getSelection().setOnTimingDiagramSelectionClickListener(this::focusCell);
-        hybridSpec.getSelection().columnProperty().addListener(this::onColumnSelectionChanged);
+        hybridSpecification.getSelection()!!
+            .columnProperty().addListener { obs, before: String?, columnNow: String? ->
+                this.onColumnSelectionChanged(obs, before, columnNow)
+            }
 
-        tableView.setItems(hybridSpec.getHybridRows());
+        tableView.setItems(hybridSpecification.hybridRows)
     }
 
-    private void onColumnSelectionChanged(ObservableValue<? extends String> obs, String before,
-                                          String columnNow) {
+    private fun onColumnSelectionChanged(
+        obs: ObservableValue<out String?>, before: String?,
+        columnNow: String?
+    ) {
         if (before != null) {
-            tableView.getColumns().stream().filter(column -> before.equals(column.getUserData()))
-                    .findFirst().ifPresent(column -> {
-                column.getStyleClass().remove("highlighted");
-            });
+            tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> before == column.userData }
+                .findFirst().ifPresent { column: TableColumn<HybridRow?, *> ->
+                    column.styleClass.remove("highlighted")
+                }
         }
         if (columnNow != null) {
             // If we don't clear, the gray selection could be confused with the highlighting
-            tableView.getSelectionModel().clearSelection();
-            tableView.getColumns().stream().filter(column -> columnNow.equals(column.getUserData()))
-                    .findFirst().ifPresent(column -> {
-                column.getStyleClass().add("highlighted");
-                tableView.scrollToColumn(column);
-            });
+            tableView.selectionModel.clearSelection()
+            tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> columnNow == column.userData }
+                .findFirst().ifPresent { column: TableColumn<HybridRow?, *> ->
+                    column.styleClass.add("highlighted")
+                    tableView.scrollToColumn(column)
+                }
         }
     }
 
-    private void focusCell(String columnId, int row) {
+    private fun focusCell(columnId: String?, row: Int) {
         tableView.edit(row,
-                tableView.getColumns().stream().filter(column -> columnId.equals(column.getUserData()))
-                        .findFirst().orElseThrow(
-                        () -> new IllegalArgumentException("Cannot focus unknown column: " + columnId)));
+            tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> columnId == column.userData }
+                .findFirst().orElseThrow { IllegalArgumentException("Cannot focus unknown column: $columnId") })
     }
 
-    private void onProblemsChange() {
-        List<ColumnProblem> columnProblems = validator.problemsProperty().get().stream()
-                .filter(problem -> problem instanceof ColumnProblem).map(problem -> (ColumnProblem) problem)
-                .collect(Collectors.toList());
-        for (TableColumn<HybridRow, ?> column : tableView.getColumns()) {
-            if (column.getUserData() == null) {
-                continue;
+    private fun onProblemsChange() {
+        val columnProblems = validator.problemsProperty().get()
+            .filterIsInstance<ColumnProblem>()
+        for (column in tableView.columns) {
+            if (column.userData == null) {
+                continue
             }
-            List<ColumnProblem> problemsForColumn = columnProblems.stream()
-                    .filter(problem -> problem.getColumn().equals(column.getUserData()))
-                    .collect(Collectors.toList());
+            val problemsForColumn = columnProblems.stream()
+                .filter { problem: ColumnProblem -> problem.column == column.userData }
+                .collect(Collectors.toList())
 
-            ColumnHeader columnHeader = (ColumnHeader) column.getGraphic();
+            val columnHeader = column.graphic as ColumnHeader
 
             if (problemsForColumn.isEmpty()) {
-                columnHeader.resetProblems();
+                columnHeader.resetProblems()
             } else {
-                columnHeader.configureProblems(problemsForColumn);
+                columnHeader.configureProblems(problemsForColumn)
             }
         }
     }
 
-    private SpecificationTableCell cellFactory(TableColumn<HybridRow, String> table) {
-        return new SpecificationTableCell(validator);
+    private fun cellFactory(table: TableColumn<HybridRow?, String>): SpecificationTableCell {
+        return SpecificationTableCell(validator)
     }
 
-    private <T> void removeByReference(List<T> toBeRemovedFrom, List<T> toRemove) {
-        for (T referenceToRemove : toRemove) {
-            Iterator<T> iterator = toBeRemovedFrom.iterator();
+    private fun <T> removeByReference(toBeRemovedFrom: MutableList<T>?, toRemove: List<T>) {
+        for (referenceToRemove in toRemove) {
+            val iterator = toBeRemovedFrom!!.iterator()
             while (iterator.hasNext()) {
-                T iteratedItem = iterator.next();
-                if (iteratedItem == referenceToRemove) {
-                    iterator.remove();
+                val iteratedItem = iterator.next()
+                if (iteratedItem === referenceToRemove) {
+                    iterator.remove()
                 }
             }
         }
     }
 
-    public void insertRow() {
-        int selectedIndex = tableView.getSelectionModel().getSelectedIndex();
-        addEmptyRow(selectedIndex + 1);
+    fun insertRow() {
+        val selectedIndex = tableView.selectionModel.selectedIndex
+        addEmptyRow(selectedIndex + 1)
     }
 
-    public void deleteRow() {
-        List<HybridRow> toRemove = new ArrayList<>();
-        toRemove.addAll(tableView.getSelectionModel().getSelectedItems());
-        removeByReference(hybridSpec.getHybridRows(), toRemove);
+    fun deleteRow() {
+        val toRemove: MutableList<HybridRow?> = ArrayList()
+        toRemove.addAll(tableView.selectionModel.selectedItems)
+        removeByReference(hybridSpecification!!.hybridRows, toRemove)
     }
 
-    public void addNewColumn() {
-        new IoVariableChooserDialog(codeIoVariables, hybridSpec.getColumnHeaders())
-                .showAndWait().ifPresent(this::addNewColumn);
+    fun addNewColumn() {
+        IoVariableChooserDialog(codeIoVariables, hybridSpecification!!.columnHeaders)
+            .showAndWait().ifPresent { specIoVariable: SpecIoVariable -> this.addNewColumn(specIoVariable) }
     }
 
-    public void addRowComment(Event event) {
-        int index = tableView.getSelectionModel().getSelectedIndex();
+    fun addRowComment(event: Event?) {
+        val index = tableView.selectionModel.selectedIndex
         if (index < 0) {
-            return;
+            return
         }
-        TableColumn<HybridRow, ?> tableColumn = tableView.getColumns().get(1);
-        CommentPopOverManager popOverManager =
-            new CommentPopOverManager(hybridSpec.getRows().get(index), hybridSpec.isEditable(), tableColumn.getGraphic(), 0, 200);
+        val tableColumn = tableView.columns[1]
+        val popOverManager =
+            CommentPopOverManager(
+                hybridSpecification!!.rows!![index],
+                hybridSpecification!!.isEditable,
+                tableColumn.graphic,
+                0.0,
+                200.0
+            )
     }
 
-    public void resizeColumns() {
-        LOGGER.debug("SpecificationTableController.resizeColumns");
-        ViewUtils.autoFitTable(tableView);
-    }
-
-
-    private ContextMenu createContextMenu() {
-        MenuItem insertRow = new MenuItem("Insert Row");
-        MenuItem columnResize = new MenuItem("Resize columns");
-        MenuItem deleteRow = new MenuItem("Delete Row");
-        MenuItem comment = new MenuItem("Comment ...");
-
-        insertRow.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        insertRow.setOnAction(event -> insertRow());
-
-        deleteRow.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-        deleteRow.setOnAction(event -> deleteRow());
-
-        MenuItem addNewColumn = new MenuItem("New Column...");
-        addNewColumn.setOnAction(event -> addNewColumn());
-
-        comment.setOnAction(event -> addRowComment(event));
-        comment.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+k"));
-        insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-        deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-        addNewColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-        columnResize.setAccelerator(KeyCodeCombination.keyCombination("Ctrl+R"));
-        columnResize.setOnAction(event -> resizeColumns());
-
-        return new ContextMenu(insertRow, deleteRow, addNewColumn, comment, columnResize);
+    fun resizeColumns() {
+        LOGGER.debug("SpecificationTableController.resizeColumns")
+        ViewUtils.autoFitTable(tableView)
     }
 
 
-    private ContextMenu createColumnContextMenu(TableColumn<HybridRow, ?> column) {
-        MenuItem changeColumn = new MenuItem("Change Column...");
-        MenuItem removeColumn = new MenuItem("Remove Column");
-        MenuItem commentColumn = new MenuItem("Comment ...");
-        commentColumn.setAccelerator(KeyCombination.keyCombination("Ctrl+k"));
-        changeColumn.setOnAction(event -> {
-            new IoVariableChangeDialog(hybridSpec.getColumnHeaderByName((String) column.getUserData()),
-                    hybridSpec.getColumnHeaders()
-                            .filtered(var -> !var.getName().equals(column.getUserData()))).showAndWait();
-        });
-        removeColumn.setOnAction(event -> {
-            tableView.getColumns().remove(column);
-            hybridSpec.removeColumnByName((String) column.getUserData());
-        });
-        commentColumn.setOnAction(event -> {
-            String specIoVariableName = (String) column.getUserData();
-            SpecIoVariable commentable = hybridSpec.getColumnHeaderByName(specIoVariableName);
-            new CommentPopOverManager(commentable, tableView.isEditable(), column.getGraphic());
-        });
-        changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-        removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()));
-        return new ContextMenu(changeColumn, removeColumn, commentColumn);
+    private fun createContextMenu(): ContextMenu {
+        val insertRow = MenuItem("Insert Row")
+        val columnResize = MenuItem("Resize columns")
+        val deleteRow = MenuItem("Delete Row")
+        val comment = MenuItem("Comment ...")
+
+        insertRow.accelerator = KeyCodeCombination(KeyCode.INSERT)
+        insertRow.onAction = EventHandler { event: ActionEvent? -> insertRow() }
+
+        deleteRow.accelerator = KeyCodeCombination(KeyCode.DELETE)
+        deleteRow.onAction = EventHandler { event: ActionEvent? -> deleteRow() }
+
+        val addNewColumn = MenuItem("New Column...")
+        addNewColumn.onAction = EventHandler { event: ActionEvent? -> addNewColumn() }
+
+        comment.onAction = EventHandler { event: ActionEvent? -> addRowComment(event) }
+        comment.accelerator = KeyCodeCombination.keyCombination("Ctrl+k")
+        insertRow.disableProperty().bind(Bindings.not(tableView.editableProperty()))
+        deleteRow.disableProperty().bind(Bindings.not(tableView.editableProperty()))
+        addNewColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()))
+        columnResize.accelerator = KeyCodeCombination.keyCombination("Ctrl+R")
+        columnResize.onAction = EventHandler { event: ActionEvent? -> resizeColumns() }
+
+        return ContextMenu(insertRow, deleteRow, addNewColumn, comment, columnResize)
+    }
+
+
+    private fun createColumnContextMenu(column: TableColumn<HybridRow?, *>): ContextMenu {
+        val changeColumn = MenuItem("Change Column...")
+        val removeColumn = MenuItem("Remove Column")
+        val commentColumn = MenuItem("Comment ...")
+        commentColumn.accelerator = KeyCombination.keyCombination("Ctrl+k")
+        changeColumn.onAction = EventHandler { event: ActionEvent? ->
+            IoVariableChangeDialog(
+                hybridSpecification!!.getColumnHeaderByName(column.userData as String),
+                hybridSpecification.columnHeaders
+                    .filtered({ `var`: SpecIoVariable -> !`var`.name.equals(column.userData) })
+            ).showAndWait()
+        }
+        removeColumn.onAction = EventHandler { event: ActionEvent? ->
+            tableView.columns.remove(column)
+            hybridSpecification!!.removeColumnByName(column.userData as String)
+        }
+        commentColumn.onAction = EventHandler { event: ActionEvent? ->
+            val specIoVariableName = column.userData as String
+            val commentable = hybridSpecification!!.getColumnHeaderByName(specIoVariableName)
+            CommentPopOverManager(commentable, tableView.isEditable, column.graphic)
+        }
+        changeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()))
+        removeColumn.disableProperty().bind(Bindings.not(tableView.editableProperty()))
+        return ContextMenu(changeColumn, removeColumn, commentColumn)
     }
 
     /**
@@ -255,12 +259,14 @@ public class SpecificationTableController implements Controller {
      *
      * @param index Index where the row should be added
      */
-    public void addEmptyRow(int index) {
-        Map<String, ConstraintCell> wildcardCells = new HashMap<>();
-        hybridSpec.getColumnHeaders().forEach(
-                specIoVariable -> wildcardCells.put(specIoVariable.getName(), new ConstraintCell("-")));
-        SpecificationRow<ConstraintCell> wildcardRow = ConstraintSpecification.createRow(wildcardCells);
-        hybridSpec.getHybridRows().add(index, new HybridRow(wildcardRow, new ConstraintDuration("1")));
+    fun addEmptyRow(index: Int) {
+        val wildcardCells: MutableMap<String?, ConstraintCell> = HashMap()
+        hybridSpecification!!.columnHeaders!!.forEach(
+            Consumer { specIoVariable: SpecIoVariable ->
+                wildcardCells[specIoVariable.name] = ConstraintCell("-")
+            })
+        val wildcardRow = ConstraintSpecification.createRow(wildcardCells)
+        hybridSpecification.hybridRows!!.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
     }
 
     /**
@@ -268,133 +274,135 @@ public class SpecificationTableController implements Controller {
      *
      * @param specIoVariable variable for which the column should be added
      */
-    public void addNewColumn(SpecIoVariable specIoVariable) {
+    fun addNewColumn(specIoVariable: SpecIoVariable) {
         // Add column to model:
-        if (hybridSpec.getHybridRows().isEmpty()) {
-            hybridSpec.getColumnHeaders().add(specIoVariable);
+        if (hybridSpecification!!.hybridRows!!.isEmpty()) {
+            hybridSpecification.columnHeaders!!.add(specIoVariable)
         } else {
-            SpecificationColumn<ConstraintCell> dataColumn =
-                    new SpecificationColumn<>(hybridSpec.getHybridRows().stream()
-                            .map(row -> new ConstraintCell("-")).collect(Collectors.toList()));
-            hybridSpec.addColumn(specIoVariable, dataColumn);
+            val dataColumn =
+                SpecificationColumn(
+                    hybridSpecification.hybridRows!!.stream()
+                        .map<ConstraintCell>({ row: HybridRow? -> ConstraintCell("-") })
+                        .collect(Collectors.toList())
+                )
+            hybridSpecification.addColumn(specIoVariable, dataColumn)
         }
 
         // Add column to view:
-        addColumnToView(specIoVariable);
+        addColumnToView(specIoVariable)
     }
 
-    private void addColumnToView(final SpecIoVariable specIoVariable) {
-        TableColumn<HybridRow, String> column = createViewColumn(specIoVariable.getName(),
-                hybridRow -> hybridRow.getCells().get(specIoVariable.getName()));
+    private fun addColumnToView(specIoVariable: SpecIoVariable) {
+        val column = createViewColumn(
+            specIoVariable.name
+        ) { hybridRow: HybridRow? -> hybridRow!!.cells!![specIoVariable.name] }
 
-        column.setUserData(specIoVariable.getName());
-        specIoVariable.nameProperty()
-                .addListener((Observable o) -> column.setUserData(specIoVariable.getName()));
-        column.setText("");
-        column.setGraphic(new ColumnHeader(specIoVariable));
-        column.setPrefWidth(specIoVariable.getColumnConfig().getWidth());
-        column.widthProperty().addListener(
-                (obs, old, newVal) -> specIoVariable.getColumnConfig().setWidth(newVal.doubleValue()));
-        column.setContextMenu(createColumnContextMenu(column));
+        column.userData = specIoVariable.name
+        specIoVariable.nameProperty
+            .addListener(InvalidationListener { o: Observable? -> column.setUserData(specIoVariable.name) })
+        column.text = ""
+        column.graphic = ColumnHeader(specIoVariable)
+        column.prefWidth = specIoVariable.columnConfig!!.getWidth()
+        column.widthProperty().addListener { obs: ObservableValue<out Number>?, old: Number?, newVal: Number ->
+            specIoVariable.columnConfig!!.setWidth(newVal.toDouble())
+        }
+        column.contextMenu = createColumnContextMenu(column)
 
-        tableView.getColumns().add(tableView.getColumns().size() - 1, column);
+        tableView.columns.add(tableView.columns.size - 1, column)
     }
 
-    private TableColumn<HybridRow, String> createViewColumn(String colName,
-                                                            final Function<HybridRow, HybridCell<?>> extractCellFromRow) {
-        TableColumn<HybridRow, String> column = new TableColumn<>(colName);
-        column.setSortable(false);
-        column.setEditable(true);
-        column.setPrefWidth(100);
-        column.setCellFactory(this::cellFactory);
+    private fun createViewColumn(
+        colName: String?,
+        extractCellFromRow: Function<HybridRow?, HybridCell<*>?>
+    ): TableColumn<HybridRow?, String> {
+        val column = TableColumn<HybridRow?, String>(colName)
+        column.isSortable = false
+        column.isEditable = true
+        column.prefWidth = 100.0
+        column.setCellFactory { table: TableColumn<HybridRow?, String> -> this.cellFactory(table) }
 
-        column.setCellValueFactory(rowModelData -> extractCellFromRow.apply(rowModelData.getValue())
-                .stringRepresentationProperty());
+        column.setCellValueFactory {
+            extractCellFromRow.apply(it.value)?.stringRepresentationProperty
+        }
 
-        return column;
+        return column
     }
 
-    private TableRow<HybridRow> rowFactory(TableView<HybridRow> tableView) {
-        TableRow<HybridRow> row = new TableRow<HybridRow>() {
-            {
-                hybridSpec.getSelection().rowProperty().addListener(this::rowSelectionChanged);
+    private fun rowFactory(tableView: TableView<HybridRow?>): TableRow<HybridRow?> {
+        val row: TableRow<HybridRow?> = object : TableRow<HybridRow?>() {
+            init {
+                hybridSpecification!!.getSelection()!!
+                    .rowProperty().addListener { obs, before: Int?, now: Int? ->
+                        this.rowSelectionChanged(before, now)
+                    }
             }
 
-            private void rowSelectionChanged(ObservableValue<? extends Integer> obs, Integer before,
-                                             Integer now) {
-                if (before != null && getIndex() == before) {
-                    getStyleClass().remove("highlighted");
+            private fun rowSelectionChanged(before: Int?, now: Int?) {
+                if (before != null && index == before) {
+                    styleClass.remove("highlighted")
                 }
-                if (now != null && getIndex() == now) {
-                    getStyleClass().add("highlighted");
-                    tableView.scrollTo(getIndex());
+                if (now != null && index == now) {
+                    styleClass.add("highlighted")
+                    tableView.scrollTo(index)
                 }
             }
-        };
+        }
 
-        row.setOnDragDetected(event -> {
-            if (!row.isEmpty()) {
-                Integer index = row.getIndex();
-                tableView.getSelectionModel().clearAndSelect(index);
-                Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
-                db.setDragView(row.snapshot(null, null));
-                ClipboardContent cc = new ClipboardContent();
-                cc.put(SERIALIZED_MIME_TYPE, index);
-                db.setContent(cc);
-                event.consume();
+        row.onDragDetected = EventHandler { event: MouseEvent ->
+            if (!row.isEmpty) {
+                val index = row.index
+                tableView.selectionModel.clearAndSelect(index)
+                val db = row.startDragAndDrop(TransferMode.MOVE)
+                db.dragView = row.snapshot(null, null)
+                val cc = ClipboardContent()
+                cc[SERIALIZED_MIME_TYPE] = index
+                db.setContent(cc)
+                event.consume()
             }
-        });
+        }
 
-        row.setOnDragOver(event -> {
-            Dragboard db = event.getDragboard();
+        row.onDragOver = EventHandler { event: DragEvent ->
+            val db = event.dragboard
             if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                if (tableView.isEditable()
-                        && row.getIndex() != (Integer) db.getContent(SERIALIZED_MIME_TYPE)) {
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                    event.consume();
+                if (tableView.isEditable
+                    && row.index != db.getContent(SERIALIZED_MIME_TYPE) as Int
+                ) {
+                    event.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+                    event.consume()
                 }
             }
-        });
+        }
 
-        row.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
+        row.onDragDropped = EventHandler { event: DragEvent ->
+            val db = event.dragboard
             if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-                HybridRow draggedRow = tableView.getItems().remove(draggedIndex);
+                val draggedIndex = db.getContent(SERIALIZED_MIME_TYPE) as Int
+                val draggedRow = tableView.items.removeAt(draggedIndex)
 
-                int dropIndex;
-
-                if (row.isEmpty()) {
-                    dropIndex = tableView.getItems().size();
+                val dropIndex = if (row.isEmpty) {
+                    tableView.items.size
                 } else {
-                    dropIndex = row.getIndex();
+                    row.index
                 }
 
-                tableView.getItems().add(dropIndex, draggedRow);
+                tableView.items.add(dropIndex, draggedRow)
 
-                event.setDropCompleted(true);
-                tableView.getSelectionModel().clearAndSelect(dropIndex);
+                event.isDropCompleted = true
+                tableView.selectionModel.clearAndSelect(dropIndex)
 
                 //update indexProperty on TableCells (needed for the IndexColumn's CommentIcon)
-                tableView.refresh();
+                tableView.refresh()
 
-                event.consume();
+                event.consume()
             }
-        });
+        }
 
-        return row;
+        return row
     }
 
-    @Override
-    public SpecificationTableView getView() {
-        return view;
-    }
+    companion object {
+        val LOGGER: Logger = LoggerFactory.getLogger(SpecificationTableController::class.java)
 
-    public HybridSpecification getHybridSpecification() {
-        return hybridSpec;
-    }
-
-    public ConstraintSpecificationValidator getValidator() {
-        return this.validator;
+        private val SERIALIZED_MIME_TYPE = DataFormat("application/x-java-serialized-object")
     }
 }

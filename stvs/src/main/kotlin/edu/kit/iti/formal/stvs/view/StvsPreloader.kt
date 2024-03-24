@@ -1,79 +1,69 @@
-package edu.kit.iti.formal.stvs.view;
+package edu.kit.iti.formal.stvs.view
 
-import edu.kit.iti.formal.stvs.StvsApplication;
-import javafx.application.Platform;
-import javafx.application.Preloader;
-import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Timer;
+import edu.kit.iti.formal.stvs.StvsApplication
+import javafx.application.Preloader
+import javafx.geometry.Insets
+import javafx.scene.Scene
+import javafx.scene.control.Label
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
+import javafx.scene.layout.Background
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.Region
+import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
+import javafx.stage.Screen
+import javafx.stage.Stage
+import javafx.stage.StageStyle
 
 /**
  * Created by csicar on 21.03.17.
  */
-public class StvsPreloader extends Preloader {
-  private Stage stage;
-  private Image splashImage;
+class StvsPreloader : Preloader() {
+    private var stage: Stage? = null
+    private var splashImage: Image? = null
 
 
-  @Override
-  public void init() {
-    splashImage = new Image(StvsApplication.class.getResourceAsStream("logo.png"));
-  }
-
-  @Override
-  public void start(Stage stage) {
-    this.stage = stage;
-
-    stage.initStyle(StageStyle.TRANSPARENT);
-
-    VBox box = new VBox(20);
-    box.setMaxWidth(Region.USE_PREF_SIZE);
-    box.setMaxHeight(Region.USE_PREF_SIZE);
-    box.setBackground(Background.EMPTY);
-    String style = "-fx-background-color: rgba(255, 255, 255, 0.5);";
-    box.setStyle(style);
-
-    box.setPadding(new Insets(50));
-    BorderPane root = new BorderPane(box);
-    root.setStyle(style);
-    root.setBackground(Background.EMPTY);
-    Scene scene = new Scene(root);
-    scene.setFill(Color.TRANSPARENT);
-    stage.setScene(scene);
-
-    ImageView splashView = new ImageView(splashImage);
-    box.getChildren().addAll(splashView, new Label("ST Verification Studio is loading.."));
-    stage.show();
-    Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-    stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
-    stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
-  }
-
-  @Override
-  public void handleStateChangeNotification(StateChangeNotification evt) {
-    if (evt.getType() == StateChangeNotification.Type.BEFORE_START) {
-      try {
-        Thread.sleep(1000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      stage.hide();
+    override fun init() {
+        splashImage = Image(StvsApplication::class.java.getResourceAsStream("logo.png"))
     }
-  }
+
+    override fun start(stage: Stage) {
+        this.stage = stage
+
+        stage.initStyle(StageStyle.TRANSPARENT)
+
+        val box = VBox(20.0)
+        box.maxWidth = Region.USE_PREF_SIZE
+        box.maxHeight = Region.USE_PREF_SIZE
+        box.background = Background.EMPTY
+        val style = "-fx-background-color: rgba(255, 255, 255, 0.5);"
+        box.style = style
+
+        box.padding = Insets(50.0)
+        val root = BorderPane(box)
+        root.style = style
+        root.background = Background.EMPTY
+        val scene = Scene(root)
+        scene.fill = Color.TRANSPARENT
+        stage.scene = scene
+
+        val splashView = ImageView(splashImage)
+        box.children.addAll(splashView, Label("ST Verification Studio is loading.."))
+        stage.show()
+        val primScreenBounds = Screen.getPrimary().visualBounds
+        stage.x = (primScreenBounds.width - stage.width) / 2
+        stage.y = (primScreenBounds.height - stage.height) / 2
+    }
+
+    override fun handleStateChangeNotification(evt: StateChangeNotification) {
+        if (evt.type == StateChangeNotification.Type.BEFORE_START) {
+            try {
+                Thread.sleep(1000)
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+            stage!!.hide()
+        }
+    }
 }

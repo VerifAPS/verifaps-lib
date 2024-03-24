@@ -1,38 +1,38 @@
-package edu.kit.iti.formal.stvs.view.spec.variables;
+package edu.kit.iti.formal.stvs.view.spec.variables
 
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json;
-import javafx.beans.Observable;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.*;
-import javafx.util.converter.DefaultStringConverter;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
+import edu.kit.iti.formal.stvs.model.common.FreeVariable
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList
+import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
+import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem
+import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json
+import javafx.beans.Observable
+import javafx.beans.property.ListProperty
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.scene.control.*
+import javafx.scene.control.cell.TextFieldTableCell
+import javafx.scene.input.*
+import javafx.util.Callback
+import javafx.util.converter.DefaultStringConverter
+import java.util.*
+import java.util.stream.Collectors
+import kotlin.math.min
 
 /**
- * This is a controller for {@link VariableCollection}.
+ * This is a controller for [VariableCollection].
  *
  * @author Philipp
  */
-public class VariableCollectionController implements Controller {
+class VariableCollectionController(
+    codeTypes: ListProperty<Type>,
+    val freeVariableList: FreeVariableList?
+) : Controller {
+    val validator: FreeVariableListValidator = FreeVariableListValidator(codeTypes, freeVariableList!!)
+    override val view: VariableCollection = VariableCollection()
 
-    private static final DataFormat JSON_MIME_TYPE = new DataFormat("application/json");
-    private FreeVariableList freeVariableList;
-    private FreeVariableListValidator validator;
-    private VariableCollection view;
-    private ContextMenu contextMenu;
+    private var contextMenu = ContextMenu()
 
     /**
      * Creates an instance with a predefined list of variables.
@@ -41,167 +41,160 @@ public class VariableCollectionController implements Controller {
      * @param codeTypes        Available code types
      * @param freeVariableList Predefined free variables
      */
-    public VariableCollectionController(ObjectProperty<List<Type>> codeTypes,
-                                        FreeVariableList freeVariableList) {
-        this.freeVariableList = freeVariableList;
-        this.validator = new FreeVariableListValidator(codeTypes, freeVariableList);
+    init {
+        /* Set up context menu */
+        this.contextMenu = ContextMenu()
 
-        this.contextMenu = new ContextMenu();
-        this.view = new VariableCollection();
+        val menuItemAdd = MenuItem("Add Variable")
+        menuItemAdd.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked(actionEvent) }
+        menuItemAdd.accelerator = KeyCodeCombination(KeyCode.ADD)
+        contextMenu.items.add(menuItemAdd)
 
-    /* Set up context menu */
-        this.contextMenu = new ContextMenu();
+        val menuItemDelete = MenuItem("Delete Variable")
+        menuItemDelete.onAction = EventHandler { actionEvent: ActionEvent -> this.onDeleteVariableClicked(actionEvent) }
+        menuItemDelete.accelerator = KeyCodeCombination(KeyCode.DELETE)
+        contextMenu.items.add(menuItemDelete)
 
-        MenuItem menuItemAdd = new MenuItem("Add Variable");
-        menuItemAdd.setOnAction(this::onAddVariableClicked);
-        menuItemAdd.setAccelerator(new KeyCodeCombination(KeyCode.ADD));
-        contextMenu.getItems().add(menuItemAdd);
+        view.freeVariableTableView.contextMenu = contextMenu
+        view.freeVariableTableView.rowFactory =
+            Callback { tableView: TableView<FreeVariable?> -> this.rowFactory(tableView) }
 
-        MenuItem menuItemDelete = new MenuItem("Delete Variable");
-        menuItemDelete.setOnAction(this::onDeleteVariableClicked);
-        menuItemDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
-        contextMenu.getItems().add(menuItemDelete);
+        view.nameTableColumn.cellValueFactory = Callback { it.value?.nameProperty }
+        view.typeTableColumn.cellValueFactory = Callback { it.value?.typeProperty }
+        view.constraintTableColumn.cellValueFactory = Callback { it.value?.constraintProperty }
 
-        view.getFreeVariableTableView().setContextMenu(contextMenu);
-        view.getFreeVariableTableView().setRowFactory(this::rowFactory);
+        view.nameTableColumn.cellFactory =
+            Callback { tableColumn: TableColumn<FreeVariable?, String?> -> this.cellFactory(tableColumn) }
+        view.typeTableColumn.cellFactory =
+            Callback { tableColumn: TableColumn<FreeVariable?, String?> -> this.cellFactory(tableColumn) }
+        view.constraintTableColumn.cellFactory =
+            Callback { tableColumn: TableColumn<FreeVariable?, String?> -> this.cellFactory(tableColumn) }
 
-        view.getNameTableColumn().setCellValueFactory(data -> data.getValue().nameProperty());
-        view.getTypeTableColumn().setCellValueFactory(data -> data.getValue().typeProperty());
-        view.getConstraintTableColumn()
-                .setCellValueFactory(data -> data.getValue().constraintProperty());
-
-        view.getNameTableColumn().setCellFactory(this::cellFactory);
-        view.getTypeTableColumn().setCellFactory(this::cellFactory);
-        view.getConstraintTableColumn().setCellFactory(this::cellFactory);
-
-        view.getFreeVariableTableView().setItems(freeVariableList.getVariables());
+        view.freeVariableTableView.items = freeVariableList!!.variables
 
 
-        view.getBtnAddRow().setOnAction(this::onAddVariableClicked);
-        view.getBtnRemoveRow().setOnAction(this::onDeleteVariableClicked);
-
+        view.btnAddRow.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked(actionEvent) }
+        view.btnRemoveRow.onAction =
+            EventHandler { actionEvent: ActionEvent -> this.onDeleteVariableClicked(actionEvent) }
     }
 
-    private void onDeleteVariableClicked(ActionEvent actionEvent) {
-        TableView<FreeVariable> tableView = view.getFreeVariableTableView();
-        List<FreeVariable> newList = new LinkedList<>();
-        ObservableList<Integer> sm = tableView.getSelectionModel().getSelectedIndices();
-        for (int i = 0; i < tableView.getItems().size(); i++) {
+    private fun onDeleteVariableClicked(actionEvent: ActionEvent) {
+        val tableView = view.freeVariableTableView
+        val newList: MutableList<FreeVariable?> = LinkedList()
+        val sm = tableView.selectionModel.selectedIndices
+        for (i in tableView.items.indices) {
             if (!sm.contains(i)) {
-                newList.add(tableView.getItems().get(i));
+                newList.add(tableView.items[i])
             }
         }
-        tableView.getItems().setAll(newList);
+        tableView.items.setAll(newList)
 
         // naive implementation does not work, if two rows are equals (in name, type and constraint)
         //tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems());
-        tableView.getSelectionModel().clearSelection();
+        tableView.selectionModel.clearSelection()
     }
 
-    private void onAddVariableClicked(ActionEvent actionEvent) {
-        freeVariableList.getVariables().add(new FreeVariable("variable", "BOOL"));
+    private fun onAddVariableClicked(actionEvent: ActionEvent) {
+        freeVariableList!!.variables.add(FreeVariable("variable", "BOOL"))
     }
 
-    @Override
-    public VariableCollection getView() {
-        return view;
-    }
-
-    public FreeVariableList getFreeVariableList() {
-        return freeVariableList;
-    }
-
-    public FreeVariableListValidator getValidator() {
-        return validator;
-    }
-
-    private TableCell<FreeVariable, String> cellFactory(
-            TableColumn<FreeVariable, String> tableColumn) {
-        return new TextFieldTableCell<FreeVariable, String>(new DefaultStringConverter()) {
-            {
-                validator.problemsProperty().addListener((Observable o) -> onProblemsChanged());
-                getStyleClass().add("freevar");
-                onProblemsChanged();
+    private fun cellFactory(
+        tableColumn: TableColumn<FreeVariable?, String?>
+    ): TableCell<FreeVariable?, String?> {
+        return object : TextFieldTableCell<FreeVariable?, String>(DefaultStringConverter()) {
+            init {
+                validator.problemsProperty.addListener { o: Observable? -> onProblemsChanged() }
+                styleClass.add("freevar")
+                onProblemsChanged()
             }
 
-            private void configureProblematic(String tooltip) {
-                getStyleClass().remove("freevar-problem");
-                getStyleClass().add("freevar-problem");
-                setTooltip(new Tooltip(tooltip));
+            private fun configureProblematic(tooltip: String) {
+                styleClass.remove("freevar-problem")
+                styleClass.add("freevar-problem")
+                setTooltip(Tooltip(tooltip))
             }
 
-            private void configureUnproblematic() {
-                getStyleClass().remove("freevar-problem");
-                setTooltip(null);
+            private fun configureUnproblematic() {
+                styleClass.remove("freevar-problem")
+                tooltip = null
             }
 
-            @Override
-            public void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                onProblemsChanged();
+            override fun updateItem(item: String, empty: Boolean) {
+                super.updateItem(item, empty)
+                onProblemsChanged()
             }
 
-            private void onProblemsChanged() {
-                if (!isEmpty()) {
-                    List<FreeVariableProblem> problems = validator.problemsProperty().get()
-                            .getOrDefault(getTableRow().getItem(), Collections.emptyList());
+            private fun onProblemsChanged() {
+                if (!isEmpty) {
+                    val problems = validator.problemsProperty.get()
+                        .getOrDefault(tableRow.item, emptyList())
                     if (problems.isEmpty()) {
-                        configureUnproblematic();
+                        configureUnproblematic()
                     } else {
-                        configureProblematic(String.join("\n\n", problems.stream()
-                                .map(FreeVariableProblem::getGuiMessage).collect(Collectors.toList())));
+                        configureProblematic(
+                            java.lang.String.join(
+                                "\n\n", problems.stream()
+                                    .map(FreeVariableProblem::guiMessage).collect(Collectors.toList())
+                            )
+                        )
                     }
                 }
             }
-        };
+        }
     }
 
-    private TableRow<FreeVariable> rowFactory(TableView<FreeVariable> tableView) {
-        TableRow<FreeVariable> row = new TableRow<>();
+    private fun rowFactory(tableView: TableView<FreeVariable?>): TableRow<FreeVariable?> {
+        val row = TableRow<FreeVariable?>()
 
-        row.setOnDragDetected(event -> {
-            ObservableList<FreeVariable> selected = tableView.getSelectionModel().getSelectedItems();
-            if (!selected.isEmpty()) {
-                String serializedSelection = Json.stringFromRealFreeVariables(selected);
-                Dragboard db = tableView.startDragAndDrop(TransferMode.MOVE);
-                ClipboardContent cc = new ClipboardContent();
-                cc.putString(serializedSelection);
-                cc.put(JSON_MIME_TYPE, serializedSelection);
-                db.setContent(cc);
+        row.onDragDetected = EventHandler { event: MouseEvent ->
+            val selected = tableView.selectionModel.selectedItems.filterNotNull()
+            if (selected.isNotEmpty()) {
+                val serializedSelection = Json.stringFromRealFreeVariables(selected)
+                val db = tableView.startDragAndDrop(TransferMode.MOVE)
+                val cc = ClipboardContent()
+                cc.putString(serializedSelection)
+                cc[JSON_MIME_TYPE] = serializedSelection
+                db.setContent(cc)
 
-                event.consume();
+                event.consume()
             }
-        });
+        }
 
-        row.setOnDragOver(event -> {
-            Dragboard db = event.getDragboard();
+        row.onDragOver = EventHandler { event: DragEvent ->
+            val db = event.dragboard
             if (db.hasContent(JSON_MIME_TYPE)) {
-                event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                event.consume();
+                event.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
+                event.consume()
             }
-        });
+        }
 
-        row.setOnDragDropped(event -> {
-            Dragboard db = event.getDragboard();
+        row.onDragDropped = EventHandler { event: DragEvent ->
+            val db = event.dragboard
             if (db.hasContent(JSON_MIME_TYPE)) {
-                String dragboardContent = db.getContent(JSON_MIME_TYPE).toString();
-                List<FreeVariable> droppedVariables = Json.stringToRealFreeVariables(dragboardContent);
+                val dragboardContent = db.getContent(JSON_MIME_TYPE).toString()
+                val droppedVariables = Json.stringToRealFreeVariables(dragboardContent)
 
-                tableView.getItems().removeIf(freeVariable -> droppedVariables.stream()
-                        .anyMatch(var -> var.getName().equals(freeVariable.getName())));
+                tableView.items.removeIf { freeVariable: FreeVariable? ->
+                    droppedVariables.any { v: FreeVariable? -> v!!.name == freeVariable!!.name }
+                }
 
-                int dropIndex = row.getIndex();
-                tableView.getItems().addAll(Math.min(dropIndex, tableView.getItems().size()),
-                        droppedVariables);
+                val dropIndex = row.index
+                tableView.items.addAll(
+                    min(dropIndex, tableView.items.size),
+                    droppedVariables
+                )
 
-                tableView.getSelectionModel().clearSelection();
-                tableView.getSelectionModel().selectRange(dropIndex, dropIndex + droppedVariables.size());
+                tableView.selectionModel.clearSelection()
+                tableView.selectionModel.selectRange(dropIndex, dropIndex + droppedVariables.size)
 
-                event.setDropCompleted(true);
-                event.consume();
+                event.isDropCompleted = true
+                event.consume()
             }
-        });
-        return row;
+        }
+        return row
     }
 
+    companion object {
+        private val JSON_MIME_TYPE = DataFormat("application/json")
+    }
 }

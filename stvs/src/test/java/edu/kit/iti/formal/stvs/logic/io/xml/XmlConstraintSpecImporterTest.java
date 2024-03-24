@@ -2,10 +2,6 @@ package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import com.google.gson.JsonElement;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
-import edu.kit.iti.formal.stvs.model.expressions.TypeInt;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest;
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser;
@@ -15,9 +11,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 

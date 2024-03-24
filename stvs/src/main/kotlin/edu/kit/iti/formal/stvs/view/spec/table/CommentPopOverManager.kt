@@ -1,29 +1,33 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.view.spec.table
 
-import edu.kit.iti.formal.stvs.model.table.Commentable;
-import javafx.scene.Node;
+import edu.kit.iti.formal.stvs.model.table.Commentable
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.scene.Node
 
-public class CommentPopOverManager {
-  private final Commentable commentable;
-  private final boolean editable;
-  private final CommentPopOver commentPopOver;
+class CommentPopOverManager @JvmOverloads constructor(
+    commentable: Commentable?,
+    editable: Boolean,
+    node: Node?,
+    x: Double = 0.0,
+    y: Double = 0.0
+) {
+    private val commentable: Commentable?
+    private val editable: Boolean
+    private val commentPopOver: CommentPopOver
 
-  public CommentPopOverManager(Commentable commentable, boolean editable, Node node) {
-    this(commentable, editable, node, 0.0, 0.0);
-  }
-
-  public CommentPopOverManager(Commentable commentable, boolean editable, Node node, double x, double y) {
-    if (node == null) {
-      throw new NullPointerException("Node node cannot be null");
+    init {
+        if (node == null) {
+            throw NullPointerException("Node node cannot be null")
+        }
+        this.commentable = commentable
+        this.editable = editable
+        this.commentPopOver = CommentPopOver()
+        commentPopOver.show(node)
+        commentPopOver.textArea.text = commentable!!.comment
+        commentPopOver.saveButton.onAction = EventHandler { actionEvent: ActionEvent? ->
+            commentable.comment = commentPopOver.textArea.text
+            commentPopOver.hide()
+        }
     }
-    this.commentable = commentable;
-    this.editable = editable;
-    this.commentPopOver = new CommentPopOver();
-    commentPopOver.show(node);
-    commentPopOver.getTextArea().setText(commentable.getComment());
-    commentPopOver.getSaveButton().setOnAction(actionEvent -> {
-      commentable.setComment(commentPopOver.getTextArea().getText());
-      commentPopOver.hide();
-    });
-  }
 }

@@ -1,93 +1,89 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.view.spec.table
 
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.util.ListTypeConverter;
-
-import java.util.List;
-
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
+import edu.kit.iti.formal.stvs.util.ListTypeConverter.makeObservableList
+import javafx.beans.property.ListProperty
+import javafx.beans.value.ObservableValue
+import javafx.collections.ObservableList
+import javafx.scene.control.*
+import javafx.scene.layout.VBox
+import javafx.util.Callback
 
 /**
  * The dialog for configuring new i/o variables (i.e. adding columns) in a specification table.
  * @author Philipp
  */
-public class IoVariableChooserDialog extends Dialog<SpecIoVariable> {
+class IoVariableChooserDialog(
+    codeIoVariables: ListProperty<CodeIoVariable>,
+    alreadyDefinedVariables: ObservableList<SpecIoVariable>
+) : Dialog<SpecIoVariable?>() {
+    private val nameTextField = TextField()
+    private val typeTextField = TextField()
+    private val definitionPane = IoVariableDefinitionPane()
+    private val ioVariables = ListView<CodeIoVariable>()
+    private val createButton = ButtonType("Create", ButtonBar.ButtonData.OK_DONE)
 
-  private final TextField nameTextField;
-  private final TextField typeTextField;
-  private final IoVariableDefinitionPane definitionPane;
-  private final ListView<CodeIoVariable> ioVariables;
-  private final ButtonType createButton = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
-
-  /**
-   * Creates an instance of a chooser dialog.
-   * @param codeIoVariables variables that can be found in code
-   * @param alreadyDefinedVariables variables already used in the table
-   */
-  public IoVariableChooserDialog(ObjectProperty<List<CodeIoVariable>> codeIoVariables,
-      ObservableList<SpecIoVariable> alreadyDefinedVariables) {
-    super();
-
-    this.nameTextField = new TextField();
-    this.typeTextField = new TextField();
-    this.ioVariables = new ListView<>();
-    this.definitionPane = new IoVariableDefinitionPane();
-
-    ioVariables.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    ioVariables.getSelectionModel().selectedItemProperty().addListener(this::onSelectionChanged);
-    ioVariables.setCellFactory(this::createCellForListView);
-    ioVariables.setItems(ListTypeConverter.makeObservableList(codeIoVariables));
-    ioVariables.setPrefHeight(200);
-
-    setResultConverter(this::convertResult);
-
-    VBox box = new VBox(definitionPane, ioVariables);
-    box.setSpacing(10);
-    getDialogPane().setContent(box);
-    getDialogPane().getButtonTypes().add(createButton);
-
-    getDialogPane().lookupButton(createButton).disableProperty()
-        .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables));
-    getDialogPane().setId("IoVariableChooserDialogPane");
-  }
-
-  private ListCell<CodeIoVariable> createCellForListView(
-      ListView<CodeIoVariable> codeIoVariableListView) {
-    return new ListCell<CodeIoVariable>() {
-      @Override
-      protected void updateItem(CodeIoVariable item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty) {
-          setText(null);
-        } else {
-          setText(item.getCategory() + " " + item.getName() + " : " + item.getType());
+    /**
+     * Creates an instance of a chooser dialog.
+     * @param codeIoVariables variables that can be found in code
+     * @param alreadyDefinedVariables variables already used in the table
+     */
+    init {
+        ioVariables.selectionModel.selectionMode = SelectionMode.SINGLE
+        ioVariables.selectionModel.selectedItemProperty()
+            .addListener { obs, old: CodeIoVariable?, value: CodeIoVariable? ->
+                this.onSelectionChanged(obs, old, value)
+            }
+        ioVariables.setCellFactory { codeIoVariableListView: ListView<CodeIoVariable?> ->
+            this.createCellForListView(
+                codeIoVariableListView
+            )
         }
-      }
-    };
-  }
+        val makeObservableList = codeIoVariables
+        ioVariables.setItems(makeObservableList)
+        ioVariables.prefHeight = 200.0
 
-  private void onSelectionChanged(ObservableValue<? extends CodeIoVariable> obs, CodeIoVariable old,
-      CodeIoVariable value) {
-    definitionPane.setFromIoVariable(value);
-  }
+        resultConverter = Callback { buttonType: ButtonType -> this.convertResult(buttonType) }
 
-  private SpecIoVariable convertResult(ButtonType buttonType) {
-    SpecIoVariable defined = definitionPane.getDefinedVariable();
-    if (defined != null && buttonType == createButton) {
-      return defined;
-    } else {
-      return null;
+        val box = VBox(definitionPane, ioVariables)
+        box.spacing = 10.0
+        dialogPane.content = box
+        dialogPane.buttonTypes.add(createButton)
+
+        dialogPane.lookupButton(createButton).disableProperty()
+            .bind(definitionPane.createDefinitionInvalidBinding(alreadyDefinedVariables))
+        dialogPane.id = "IoVariableChooserDialogPane"
     }
-  }
+
+    private fun createCellForListView(
+        codeIoVariableListView: ListView<CodeIoVariable?>
+    ): ListCell<CodeIoVariable?> {
+        return object : ListCell<CodeIoVariable?>() {
+            override fun updateItem(item: CodeIoVariable?, empty: Boolean) {
+                super.updateItem(item, empty)
+                text = if (empty) {
+                    null
+                } else {
+                    item?.category.toString() + " " + item?.name + " : " + item?.type
+                }
+            }
+        }
+    }
+
+    private fun onSelectionChanged(
+        obs: ObservableValue<out CodeIoVariable?>, old: CodeIoVariable?,
+        value: CodeIoVariable?
+    ) {
+        definitionPane.setFromIoVariable(value)
+    }
+
+    private fun convertResult(buttonType: ButtonType): SpecIoVariable? {
+        val defined = definitionPane.definedVariable
+        return if (defined != null && buttonType == createButton) {
+            defined
+        } else {
+            null
+        }
+    }
 }

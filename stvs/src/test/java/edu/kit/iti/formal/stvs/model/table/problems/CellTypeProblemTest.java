@@ -1,13 +1,10 @@
 package edu.kit.iti.formal.stvs.model.table.problems;
 
 import edu.kit.iti.formal.stvs.model.expressions.*;
-import edu.kit.iti.formal.stvs.model.table.ConstraintCell;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.and;

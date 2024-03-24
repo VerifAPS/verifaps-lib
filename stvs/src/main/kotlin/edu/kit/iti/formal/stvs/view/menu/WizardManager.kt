@@ -1,114 +1,105 @@
-package edu.kit.iti.formal.stvs.view.menu;
+package edu.kit.iti.formal.stvs.view.menu
 
-import edu.kit.iti.formal.stvs.view.Controller;
-
-import javafx.beans.Observable;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
+import edu.kit.iti.formal.stvs.view.Controller
+import javafx.beans.Observable
+import javafx.beans.property.IntegerProperty
+import javafx.beans.property.SimpleIntegerProperty
+import javafx.collections.FXCollections
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.scene.Node
+import javafx.scene.Scene
+import javafx.stage.Stage
+import javafx.stage.WindowEvent
 
 /**
  * Created by leonk on 22.03.2017.
  */
-public class WizardManager implements Controller {
+open class WizardManager(vararg wizardPages: WizardPage?) : Controller {
+    private val wizardView: WizardView
+    private val wizardStage: Stage?
+    private val pageNumber: IntegerProperty = SimpleIntegerProperty(0)
+    val wizardPages: ObservableList<WizardPage?> = FXCollections.observableArrayList()
 
-  private final WizardView wizardView;
-  private final Stage wizardStage;
-  private final IntegerProperty pageNumber = new SimpleIntegerProperty(0);
-  private ObservableList<WizardPage> wizardPages = FXCollections.observableArrayList();
+    init {
+        this.wizardPages.addAll(*wizardPages)
+        wizardView = WizardView()
+        pageNumber.addListener { observable: Observable? -> this.onPageChanged(observable) }
 
-  public WizardManager(WizardPage... wizardPages) {
-    this.wizardPages.addAll(wizardPages);
-    wizardView = new WizardView();
-    pageNumber.addListener(this::onPageChanged);
+        wizardView.next.onAction = EventHandler { event: ActionEvent -> this.next(event) }
+        wizardView.previous.onAction = EventHandler { event: ActionEvent -> this.previous(event) }
 
-    wizardView.getNext().setOnAction(this::next);
-    wizardView.getPrevious().setOnAction(this::previous);
-
-    wizardStage = makeStage(wizardView);
-    wizardStage.setWidth(wizardView.getWidth());
-    wizardStage.setHeight(wizardView.getHeight());
-    wizardStage.setX(0.0);
-    wizardStage.setY(0.0);
-  }
-
-  protected Stage makeStage(WizardView wizardView) {
-    Stage stage = new Stage();
-    stage.setScene(new Scene(wizardView));
-    return stage;
-  }
-
-  protected void onPageChanged(Observable observable) {
-    int page = pageNumber.get();
-    wizardView.getTitleLabel().setText(wizardPages.get(page).getTitle());
-    wizardView.getPageNumberLabel().setText((page + 1) + "/" + wizardPages.size());
-    wizardView.setContent(wizardPages.get(page));
-    if (page == 0) {
-      wizardView.getPrevious().setDisable(true);
-    } else {
-      wizardView.getPrevious().setDisable(false);
+        wizardStage = makeStage(wizardView)
+        wizardStage!!.width = wizardView.width
+        wizardStage.height = wizardView.height
+        wizardStage.x = 0.0
+        wizardStage.y = 0.0
     }
-    if (page == wizardPages.size() - 1) {
-      wizardView.getNext().setOnAction(this::finish);
-      wizardView.getNext().setText("Finish");
-    } else {
-      wizardView.getNext().setOnAction(this::next);
-      wizardView.getNext().setText("Next");
-    }
-  }
 
-  private void next(ActionEvent event) {
-    if (pageNumber.get() + 1 < wizardPages.size()) {
-      pageNumber.setValue(pageNumber.get() + 1);
+    protected open fun makeStage(wizardView: WizardView?): Stage? {
+        val stage = Stage()
+        stage.scene = Scene(wizardView)
+        return stage
     }
-  }
 
-  private void previous(ActionEvent event) {
-    if (pageNumber.get() > 0) {
-      pageNumber.setValue(pageNumber.get() - 1);
+    protected fun onPageChanged(observable: Observable?) {
+        val page = pageNumber.get()
+        wizardView.titleLabel.text = wizardPages[page]!!.title
+        wizardView.pageNumberLabel.text = (page + 1).toString() + "/" + wizardPages.size
+        wizardView.setContent(wizardPages[page])
+        if (page == 0) {
+            wizardView.previous.isDisable = true
+        } else {
+            wizardView.previous.isDisable = false
+        }
+        if (page == wizardPages.size - 1) {
+            wizardView.next.onAction = EventHandler { event: ActionEvent -> this.finish(event) }
+            wizardView.next.text = "Finish"
+        } else {
+            wizardView.next.onAction = EventHandler { event: ActionEvent -> this.next(event) }
+            wizardView.next.text = "Next"
+        }
     }
-  }
 
-  private void finish(ActionEvent event) {
-    wizardStage.fireEvent(
-        new WindowEvent(
-            wizardStage,
-            WindowEvent.WINDOW_CLOSE_REQUEST
+    private fun next(event: ActionEvent) {
+        if (pageNumber.get() + 1 < wizardPages.size) {
+            pageNumber.value = pageNumber.get() + 1
+        }
+    }
+
+    private fun previous(event: ActionEvent) {
+        if (pageNumber.get() > 0) {
+            pageNumber.value = pageNumber.get() - 1
+        }
+    }
+
+    private fun finish(event: ActionEvent) {
+        wizardStage!!.fireEvent(
+            WindowEvent(
+                wizardStage,
+                WindowEvent.WINDOW_CLOSE_REQUEST
+            )
         )
-    );
-  }
-
-  public void showAndWait() {
-    if (wizardPages.size() < 1) {
-      throw new IllegalArgumentException("Cannot create empty wizardView.");
     }
-    wizardPages.addListener(this::illegalChangeListener);
-    onPageChanged(pageNumber);
-    wizardStage.showAndWait();
-    wizardPages.removeListener(this::illegalChangeListener);
-    onClose();
-  }
 
-  private void illegalChangeListener(ListChangeListener.Change change){
-    throw new IllegalStateException("Pages must not be changed while wizard is visible.");
-  }
+    fun showAndWait() {
+        require(wizardPages.size >= 1) { "Cannot create empty wizardView." }
+        wizardPages.addListener(ListChangeListener { change -> this.illegalChangeListener(change) })
+        onPageChanged(pageNumber)
+        wizardStage!!.showAndWait()
+        wizardPages.removeListener(ListChangeListener { change -> this.illegalChangeListener(change) })
+        onClose()
+    }
 
-  protected void onClose() {
-  }
+    private fun illegalChangeListener(change: ListChangeListener.Change<*>) {
+        throw IllegalStateException("Pages must not be changed while wizard is visible.")
+    }
 
-  public ObservableList<WizardPage> getWizardPages() {
-    return wizardPages;
-  }
+    protected open fun onClose() {
+    }
 
-  @Override
-  public Node getView() {
-    return wizardView;
-  }
+    override val view: Node
+        get() = wizardView
 }

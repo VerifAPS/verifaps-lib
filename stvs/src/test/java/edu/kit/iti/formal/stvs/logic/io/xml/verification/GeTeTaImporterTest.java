@@ -31,11 +31,11 @@ public class GeTeTaImporterTest {
         .getResourceAsStream("testSets/counterexample_1/geteta_report_counterexample_1.xml"));
     assertThat(verificationResult, instanceOf(Counterexample.class));
     Counterexample counterexample = (Counterexample) verificationResult;
-    assertEquals(ValueBool.TRUE, counterexample.getCounterexample().getRows().get(0).getCells()
+    assertEquals(ValueBool.TRUE, counterexample.counterexample.getRows().get(0).getCells()
         .get("ONS_Trig").getValue());
-    assertEquals(new ValueInt(-10), counterexample.getCounterexample().getConcreteValuesForConstraintCell("neg_val", 0).get(0).getValue());
-    assertEquals(3, counterexample.getCounterexample().getColumnHeaders().size());
-    assertEquals(1, counterexample.getCounterexample().getDurations().size());
+    assertEquals(new ValueInt(-10), counterexample.counterexample.getConcreteValuesForConstraintCell("neg_val", 0).get(0).getValue());
+    assertEquals(3, counterexample.counterexample.getColumnHeaders().size());
+    assertEquals(1, counterexample.counterexample.getDurations().size());
   }
 
   @Test
@@ -61,7 +61,7 @@ public class GeTeTaImporterTest {
         .getResourceAsStream("testSets/problematic_1/geteta_report_unknown_error_1.xml"),
         ImporterFacade.ImportFormat.GETETA, typeContext, constraintSpec);
     assertThat(result, instanceOf(VerificationError.class));
-    assertNotEquals(Optional.empty(), result.getLogFile());
+    assertNotEquals(Optional.empty(), result.logFile);
   }
 
   @Test(expected = ImportException.class)

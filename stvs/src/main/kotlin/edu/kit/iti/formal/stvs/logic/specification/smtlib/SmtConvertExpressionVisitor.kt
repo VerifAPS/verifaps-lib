@@ -1,198 +1,178 @@
-package edu.kit.iti.formal.stvs.logic.specification.smtlib;
+package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.ExpressionVisitor;
-import edu.kit.iti.formal.stvs.model.expressions.LiteralExpr;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
-import edu.kit.iti.formal.stvs.model.expressions.UnaryFunctionExpr;
-import edu.kit.iti.formal.stvs.model.expressions.ValueEnum;
-import edu.kit.iti.formal.stvs.model.expressions.VariableExpr;
-
-import java.util.HashMap;
-import java.util.Map;
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
+import edu.kit.iti.formal.stvs.model.expressions.*
+import kotlin.math.max
 
 /**
  * This class provides a visitor for an expression to convert it into a smt model.
  *
  * @author Carsten Csiky
  */
-public class SmtConvertExpressionVisitor implements ExpressionVisitor<SExpression> {
-  // static maps
+class SmtConvertExpressionVisitor(
+    private val smtEncoder: SmtEncoder, private val row: Int, private val iteration: Int,
+    private val column: ValidIoVariable) : ExpressionVisitor<SExpression> {
+    val constraint: SmtModel
 
-  private static Map<UnaryFunctionExpr.Op, String> smtlibUnaryOperationNames =
-      new HashMap<UnaryFunctionExpr.Op, String>() {
-        {
-          put(UnaryFunctionExpr.Op.NOT, "not");
-          put(UnaryFunctionExpr.Op.UNARY_MINUS, "bvneg");
-        }
-      };
-  private static Map<BinaryFunctionExpr.Op, String> smtlibBinOperationNames =
-      new HashMap<BinaryFunctionExpr.Op, String>() {
-        {
-          put(BinaryFunctionExpr.Op.AND, "and");
-          put(BinaryFunctionExpr.Op.OR, "or");
-          put(BinaryFunctionExpr.Op.XOR, "xor");
-          put(BinaryFunctionExpr.Op.DIVISION, "bvsdiv");
-          put(BinaryFunctionExpr.Op.MULTIPLICATION, "bvmul");
-          put(BinaryFunctionExpr.Op.EQUALS, "=");
-          put(BinaryFunctionExpr.Op.GREATER_EQUALS, "bvsge");
-          put(BinaryFunctionExpr.Op.LESS_EQUALS, "bvsle");
-          put(BinaryFunctionExpr.Op.LESS_THAN, "bvslt");
-          put(BinaryFunctionExpr.Op.GREATER_THAN, "bvsgt");
-          put(BinaryFunctionExpr.Op.MINUS, "bvsub");
-          put(BinaryFunctionExpr.Op.PLUS, "bvadd");
-          put(BinaryFunctionExpr.Op.MODULO, "bvsmod");
-        }
-      };
+    /**
+     * Creates a visitor to convert an expression to a set of constraints.
+     *
+     * @param smtEncoder encoder that holds additional information about the expression that should be
+     * parsed
+     * @param row row, that holds the cell the visitor should convert
+     * @param iteration current iteration
+     * @param column column, that holds the cell the visitor should convert
+     */
+    init {
+        val name = "|" + column.name + "_" + row + "_" + iteration + "|"
 
-  private final SmtEncoder smtEncoder;
-  private final int row;
-  private final int iteration;
-  private final ValidIoVariable column;
+        this.constraint = SmtModel().addHeaderDefinitions(
+            SList(
+                "declare-const", name,
+                SmtEncoder.getSmtLibVariableTypeName(column.validType)!!
+            )
+        )
 
-  private final SmtModel constraint;
-
-  /**
-   * Creates a visitor to convert an expression to a set of constraints.
-   *
-   * @param smtEncoder encoder that holds additional information about the expression that should be
-   *        parsed
-   * @param row row, that holds the cell the visitor should convert
-   * @param iteration current iteration
-   * @param column column, that holds the cell the visitor should convert
-   */
-  public SmtConvertExpressionVisitor(SmtEncoder smtEncoder, int row, int iteration,
-      ValidIoVariable column) {
-    this.smtEncoder = smtEncoder;
-    this.row = row;
-    this.iteration = iteration;
-    this.column = column;
-
-    String name = "|" + column.getName() + "_" + row + "_" + iteration + "|";
-
-    this.constraint = new SmtModel().addHeaderDefinitions(new SList("declare-const", name,
-        SmtEncoder.getSmtLibVariableTypeName(column.getValidType())));
-
-    // Constrain enum bitvectors to their valid range
-    column.getValidType().match(() -> null, () -> null, enumeration -> {
-      addEnumBitvectorConstraints(name, enumeration);
-      return null;
-    });
-  }
-
-  /**
-   * Adds constraints to enum variables to limit the range of their representing bitvector.
-   *
-   * @param name Name of solver variable
-   * @param enumeration Type of enumeration
-   */
-  private void addEnumBitvectorConstraints(String name, TypeEnum enumeration) {
-    this.constraint.addGlobalConstrains(new SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)));
-    this.constraint.addGlobalConstrains(
-        new SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration.getValues().size(), 4)));
-  }
-
-
-  @Override
-  public SExpression visitBinaryFunction(BinaryFunctionExpr binaryFunctionExpr) {
-    SExpression left =
-        binaryFunctionExpr.getFirstArgument().takeVisitor(SmtConvertExpressionVisitor.this);
-    SExpression right =
-        binaryFunctionExpr.getSecondArgument().takeVisitor(SmtConvertExpressionVisitor.this);
-
-    switch (binaryFunctionExpr.getOperation()) {
-      case NOT_EQUALS:
-        return new SList("not", new SList("=", left, right));
-      default:
-        String name = smtlibBinOperationNames.get(binaryFunctionExpr.getOperation());
-        if (name == null) {
-          throw new IllegalArgumentException(
-              "Operation " + binaryFunctionExpr.getOperation() + " is " + "not supported");
-        }
-        return new SList(name, left, right);
+        // Constrain enum bitvectors to their valid range
+        column.validType.match<Any?>({ null }, { null }, { enumeration: TypeEnum? ->
+            addEnumBitvectorConstraints(name, enumeration)
+            null
+        })
     }
-  }
 
-  @Override
-  public SExpression visitUnaryFunction(UnaryFunctionExpr unaryFunctionExpr) {
-    SExpression argument = unaryFunctionExpr.getArgument().takeVisitor(this);
-    String name = smtlibUnaryOperationNames.get(unaryFunctionExpr.getOperation());
-
-    if (name == null) {
-      if (unaryFunctionExpr.getOperation() == UnaryFunctionExpr.Op.UNARY_MINUS) {
-        return new SList("-", new SAtom("0"), argument);
-      } else {
-        throw new IllegalArgumentException(
-            "Operation " + unaryFunctionExpr.getOperation() + "is " + "not supported");
-      }
+    /**
+     * Adds constraints to enum variables to limit the range of their representing bitvector.
+     *
+     * @param name Name of solver variable
+     * @param enumeration Type of enumeration
+     */
+    private fun addEnumBitvectorConstraints(name: String, enumeration: TypeEnum?) {
+        constraint.addGlobalConstrains(SList("bvsge", name, BitvectorUtils.hexFromInt(0, 4)))
+        constraint.addGlobalConstrains(
+            SList("bvslt", name, BitvectorUtils.hexFromInt(enumeration!!.values.size, 4))
+        )
     }
-    return new SList(name, argument);
-  }
 
-  @Override
-  public SExpression visitLiteral(LiteralExpr literalExpr) {
-    String literalAsString =
-        literalExpr.getValue().match(integer -> BitvectorUtils.hexFromInt(integer, 4),
-            bool -> bool ? "true" : "false", this::getEnumValueAsBitvector);
-    return new SAtom(literalAsString);
-  }
 
-  private String getEnumValueAsBitvector(ValueEnum enumeration) {
-    return BitvectorUtils.hexFromInt(enumeration.getType().getValues().indexOf(enumeration), 4);
-  }
+    override fun visitBinaryFunction(binaryFunctionExpr: BinaryFunctionExpr): SExpression {
+        val left =
+            binaryFunctionExpr.firstArgument!!.takeVisitor<SExpression>(this)
+        val right =
+            binaryFunctionExpr.secondArgument!!.takeVisitor<SExpression>(this)
 
-  /*
+        when (binaryFunctionExpr.operation) {
+            BinaryFunctionExpr.Op.NOT_EQUALS -> return SList("not", SList("=", left, right))
+            else -> {
+                val name = smtlibBinOperationNames[binaryFunctionExpr.operation]
+                    ?: throw IllegalArgumentException(
+                        "Operation " + binaryFunctionExpr.operation + " is " + "not supported"
+                    )
+                return SList(name, left, right)
+            }
+        }
+    }
+
+    override fun visitUnaryFunction(unaryFunctionExpr: UnaryFunctionExpr): SExpression {
+        val argument = unaryFunctionExpr.argument!!.takeVisitor<SExpression>(this)
+        val name = smtlibUnaryOperationNames[unaryFunctionExpr.operation]
+            ?: if (unaryFunctionExpr.operation == UnaryFunctionExpr.Op.UNARY_MINUS) {
+                return SList(
+                    "-",
+                    SAtom("0"),
+                    argument
+                )
+            } else {
+                throw IllegalArgumentException(
+                    "Operation " + unaryFunctionExpr.operation + "is " + "not supported"
+                )
+            }
+
+        return SList(name, argument)
+    }
+
+    override fun visitLiteral(literalExpr: LiteralExpr): SExpression {
+        val literalAsString =
+            literalExpr.value!!.match({ integer: Int -> BitvectorUtils.hexFromInt(integer, 4) },
+                { bool: Boolean -> if (bool) "true" else "false" },
+                { enumeration: ValueEnum? -> this.getEnumValueAsBitvector(enumeration) })
+        return SAtom(literalAsString)
+    }
+
+    private fun getEnumValueAsBitvector(enumeration: ValueEnum?): String {
+        return BitvectorUtils.hexFromInt(enumeration!!.type.values.indexOf(enumeration), 4)
+    }
+
+    /*
    * private String integerLiteralAsBitVector(int integer, int length){
    * 
    * }
    */
+    override fun visitVariable(variableExpr: VariableExpr): SExpression {
+        val variableName = variableExpr.variableName
+        val variableReferenceIndex = variableExpr.getIndex()!!.orElse(0)
 
-  @Override
-  public SExpression visitVariable(VariableExpr variableExpr) {
-    String variableName = variableExpr.getVariableName();
-    Integer variableReferenceIndex = variableExpr.getIndex().orElse(0);
+        // Check if variable is in getTypeForVariable
+        checkNotNull(smtEncoder.getTypeForVariable(variableName)) { "Wrong Context: No variable of name '$variableName' in getTypeForVariable" }
 
-    // Check if variable is in getTypeForVariable
-    if (smtEncoder.getTypeForVariable(variableName) == null) {
-      throw new IllegalStateException(
-          "Wrong Context: No variable of name '" + variableName + "' in getTypeForVariable");
+        // is an IOVariable?
+        if (smtEncoder.isIoVariable(variableName)) {
+            // Do Rule (3)
+
+            // does it reference a previous cycle? -> guarantee reference-ability
+
+            if (variableReferenceIndex < 0) {
+                constraint.addGlobalConstrains( // sum(z-1) >= max(0, alpha - i)
+                    SList(
+                        "bvuge", sumRowIterations(row - 1), SAtom(
+                            BitvectorUtils.hexFromInt(
+                                max(0.0, -(iteration + variableReferenceIndex).toDouble()).toInt(), 4
+                            )
+                        )
+                    )
+                )
+            }
+
+            // Do Rule part of Rule (I)
+            // A[-v] -> A_z_(i-v)
+            return SAtom(
+                "|" + variableName + "_" + row + "_" + (iteration + variableReferenceIndex) + "|"
+            )
+
+            // return new SAtom(variableName);
+        } else {
+            return SAtom("|$variableName|")
+        }
     }
 
-    // is an IOVariable?
-    if (smtEncoder.isIoVariable(variableName)) {
-      // Do Rule (3)
+    private fun sumRowIterations(j: Int): SExpression {
+        val list = SList().addAll("bvadd")
 
-      // does it reference a previous cycle? -> guarantee reference-ability
-      if (variableReferenceIndex < 0) {
-        constraint.addGlobalConstrains(
-            // sum(z-1) >= max(0, alpha - i)
-            new SList("bvuge", sumRowIterations(row - 1), new SAtom(
-                BitvectorUtils.hexFromInt(Math.max(0, -(iteration + variableReferenceIndex)), 4))));
-      }
-
-      // Do Rule part of Rule (I)
-      // A[-v] -> A_z_(i-v)
-      return new SAtom(
-          "|" + variableName + "_" + row + "_" + (iteration + variableReferenceIndex) + "|");
-
-      // return new SAtom(variableName);
-    } else {
-      return new SAtom("|" + variableName + "|");
+        for (l in 0..j) {
+            list.addAll("n_$l")
+        }
+        return list
     }
-  }
 
-  private SExpression sumRowIterations(int j) {
-    SList list = new SList().addAll("bvadd");
-
-    for (int l = 0; l <= j; l++) {
-      list.addAll("n_" + l);
+    companion object {
+        // static maps
+        private val smtlibUnaryOperationNames = mapOf(
+            UnaryFunctionExpr.Op.NOT to "not",
+            UnaryFunctionExpr.Op.UNARY_MINUS to "bvneg"
+        )
+        private val smtlibBinOperationNames = mapOf(
+            BinaryFunctionExpr.Op.AND to "and",
+            BinaryFunctionExpr.Op.OR to "or",
+            BinaryFunctionExpr.Op.XOR to "xor",
+            BinaryFunctionExpr.Op.DIVISION to "bvsdiv",
+            BinaryFunctionExpr.Op.MULTIPLICATION to "bvmul",
+            BinaryFunctionExpr.Op.EQUALS to "=",
+            BinaryFunctionExpr.Op.GREATER_EQUALS to "bvsge",
+            BinaryFunctionExpr.Op.LESS_EQUALS to "bvsle",
+            BinaryFunctionExpr.Op.LESS_THAN to "bvslt",
+            BinaryFunctionExpr.Op.GREATER_THAN to "bvsgt",
+            BinaryFunctionExpr.Op.MINUS to "bvsub",
+            BinaryFunctionExpr.Op.PLUS to "bvadd",
+            BinaryFunctionExpr.Op.MODULO to "bvsmod"
+        )
     }
-    return list;
-  }
-
-  public SmtModel getConstraint() {
-    return constraint;
-  }
 }

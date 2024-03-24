@@ -1,37 +1,24 @@
-package edu.kit.iti.formal.stvs.view.menu;
+package edu.kit.iti.formal.stvs.view.menu
 
-import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.ANY;
-import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.CODE;
-import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SESSION;
-import static edu.kit.iti.formal.stvs.view.common.FileChooserFactory.FileType.SPECIFICATION;
-
-import edu.kit.iti.formal.stvs.logic.examples.ExamplesFacade;
-import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.logic.io.ExporterFacade;
-import edu.kit.iti.formal.stvs.logic.io.ImportException;
-import edu.kit.iti.formal.stvs.logic.io.ImporterFacade;
-import edu.kit.iti.formal.stvs.model.StvsRootModel;
-import edu.kit.iti.formal.stvs.model.code.Code;
-import edu.kit.iti.formal.stvs.model.examples.Example;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-import edu.kit.iti.formal.stvs.view.common.AlertFactory;
-import edu.kit.iti.formal.stvs.view.common.FileChooserFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Optional;
-
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.scene.control.*;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.MenuItem;
-import javafx.stage.FileChooser;
+import edu.kit.iti.formal.stvs.logic.examples.ExamplesFacade
+import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.model.StvsRootModel
+import edu.kit.iti.formal.stvs.model.code.Code
+import edu.kit.iti.formal.stvs.model.examples.Example
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification
+import edu.kit.iti.formal.stvs.view.Controller
+import edu.kit.iti.formal.stvs.view.ViewUtils
+import edu.kit.iti.formal.stvs.view.common.AlertFactory.createAlert
+import edu.kit.iti.formal.stvs.view.common.FileChooserFactory
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.ListChangeListener
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.scene.control.*
+import javafx.stage.FileChooser
+import java.io.*
+import java.util.*
 
 /**
  * Created by csicar on 10.01.17. Controller for the MenuBar at the top of the window does just fire
@@ -39,346 +26,361 @@ import javafx.stage.FileChooser;
  *
  * @author Carsten Csiky
  */
-public class StvsMenuBarController implements Controller {
-    private StvsMenuBar view;
-    private ObjectProperty<StvsRootModel> rootModel;
-    private ObjectProperty<File> lastDirectory = new SimpleObjectProperty<>(
-            new File("."));
+class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controller {
+    // create view
+    override val view: StvsMenuBar = StvsMenuBar()
+
+    // set own properties
+    private val rootModel: ObjectProperty<StvsRootModel> = rootModel
+    private val lastDirectory = SimpleObjectProperty(File("."))
 
     /**
      * create a StvsMenuBarController; the parameters will be modified.
      *
      * @param rootModel the applications root model
      */
-    public StvsMenuBarController(ObjectProperty<StvsRootModel> rootModel) {
-        // set own properties
-        this.rootModel = rootModel;
-
-        // create view
-        this.view = new StvsMenuBar();
-
-        rootModel.get().getHistory().getFilenames()
-                .addListener(new HistoryFilenamesChangeListener());
+    init {
+        rootModel.get().history.filenames.addListener(HistoryFilenamesChangeListener())
         // Fill history menu
-        updateHistoryMenu();
+        updateHistoryMenu()
 
         // add listener
-        view.newCode.setOnAction(this::createNewCode);
-        view.newSpec.setOnAction(this::createNewSpec);
-        view.open.setOnAction(this::openFile);
-        view.openSession.setOnAction(this::openSession);
-        view.openCode.setOnAction(this::openCode);
-        view.openSpec.setOnAction(this::openSpec);
-        view.saveAll.setOnAction(this::saveAll);
-        view.saveSessionAs.setOnAction(this::saveSessionAs);
-        view.saveCode.setOnAction(this::saveCode);
-        view.saveSpec.setOnAction(this::saveSpec);
-        view.config.setOnAction(this::openConfigDialog);
-        view.wizard.setOnAction(this::openWizard);
-        view.about.setOnAction(this::openAboutDialog);
+        view.newCode.onAction = EventHandler { actionEvent: ActionEvent -> this.createNewCode(actionEvent) }
+        view.newSpec.onAction = EventHandler { actionEvent: ActionEvent -> this.createNewSpec(actionEvent) }
+        view.open.onAction = EventHandler { t: ActionEvent -> this.openFile(t) }
+        view.openSession.onAction = EventHandler { t: ActionEvent -> this.openSession(t) }
+        view.openCode.onAction = EventHandler { t: ActionEvent -> this.openCode(t) }
+        view.openSpec.onAction = EventHandler { t: ActionEvent -> this.openSpec(t) }
+        view.saveAll.onAction = EventHandler { t: ActionEvent -> this.saveAll(t) }
+        view.saveSessionAs.onAction = EventHandler { actionEvent: ActionEvent -> this.saveSessionAs(actionEvent) }
+        view.saveCode.onAction = EventHandler { t: ActionEvent -> this.saveCode(t) }
+        view.saveSpec.onAction = EventHandler { t: ActionEvent -> this.saveSpec(t) }
+        view.config.onAction = EventHandler { t: ActionEvent -> this.openConfigDialog(t) }
+        view.wizard.onAction = EventHandler { actionEvent: ActionEvent -> this.openWizard(actionEvent) }
+        view.about.onAction = EventHandler { actionEvent: ActionEvent -> this.openAboutDialog(actionEvent) }
 
         //popluate examples
-        for (Example ex : ExamplesFacade.getExamples()) {
-            final Example a = ex;
-            final MenuItem mex = new MenuItem(ex.getName());
-            mex.setOnAction((value) -> this.openExample(a));
-            mex.setMnemonicParsing(true);
-            Tooltip.install(mex.getGraphic(), new Tooltip(ex.getDescription()));
-            view.examples.getItems().add(mex);
+        for (ex in ExamplesFacade.examples) {
+            val a = ex
+            val mex = MenuItem(ex.name)
+            mex.onAction = EventHandler { value: ActionEvent? -> this.openExample(a) }
+            mex.isMnemonicParsing = true
+            Tooltip.install(mex.graphic, Tooltip(ex.description))
+            view.examples.items.add(mex)
         }
     }
 
-    void openExample(Example ex) {
-        URL url = ex.getSessionFile();
+    fun openExample(ex: Example) {
+        val url = ex.sessionFile
         try {
-            StvsRootModel session = ImporterFacade
-                    .importSession(url.openStream(),
-                            ImporterFacade.ImportFormat.XML,
-                            rootModel.get().getGlobalConfig(),
-                            rootModel.get().getHistory());
+            val session: StvsRootModel = ImporterFacade.importSession(
+                url!!.openStream(),
+                rootModel.get().globalConfig,
+                rootModel.get().history
+            )
 
-            session.setFilename(null);
-            this.rootModel.set(session);
+            //session.filename = null
+            rootModel.set(session)
 
-            if (null != ex.getHtmlHelp()) {
-                ViewUtils.openHelpText("Help for " + ex.getName() + " Example",
-                        ex.getHtmlHelp());
+            if (null != ex.htmlHelp) {
+                ViewUtils.openHelpText(
+                    "Help for " + ex.name + " Example",
+                    ex.htmlHelp
+                )
             }
-
-        } catch (ImportException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (e: ImportException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
-
     }
 
-    private void updateHistoryMenu() {
-        view.openRecentItems.clear();
-        for (String filename : rootModel.get().getHistory().getFilenames()) {
-            MenuItem newItem = new MenuItem(filename);
-            newItem.setOnAction(
-                    (actionEvent -> doOpenFile(new File(filename))));
-            view.openRecentItems.add(newItem);
+    private fun updateHistoryMenu() {
+        view.openRecentItems.clear()
+        for (filename in rootModel.get().history.filenames) {
+            val newItem = MenuItem(filename)
+            newItem.onAction = EventHandler { _: ActionEvent? -> doOpenFile(File(filename)) }
+            view.openRecentItems.add(newItem)
         }
-        view.openRecent.getItems().clear();
-        view.openRecent.getItems().addAll(view.openRecentItems);
+        view.openRecent.items.clear()
+        view.openRecent.items.addAll(view.openRecentItems)
     }
 
 
-    private void openWizard(ActionEvent actionEvent) {
-        new WelcomeWizard(rootModel.get().getGlobalConfig()).showAndWait();
+    private fun openWizard(actionEvent: ActionEvent) {
+        WelcomeWizard(rootModel.get().globalConfig).showAndWait()
     }
 
 
-    private void doOpenFile(File file) {
+    private fun doOpenFile(file: File) {
         try {
-            ImporterFacade.importFile(file, rootModel.get().getGlobalConfig(),
-                    rootModel.get().getHistory(), (hybridSpecification) -> {
-                        // handle hybridspecification
-                        rootModel.get().getHybridSpecifications()
-                                .add(hybridSpecification);
-                    }, (rootModel) -> {
-                        // handle rootModel
-                        rootModel.setWorkingdir(file.getParentFile());
-                        rootModel.setFilename(file.getName());
-                        this.rootModel.setValue(rootModel);
-                    }, (code -> {
-                        // handle code
-                        rootModel.get().getScenario().setCode(code);
-                    }));
-            rootModel.get().getHistory().addFilename(file.getAbsolutePath());
-        } catch (IOException | ImportException ex) {
-            AlertFactory.createAlert(Alert.AlertType.ERROR, "File Open Error",
-                    "An error occurred while opening a file.",
-                    "The file " + file.getAbsolutePath()
-                            + " could not be opened.", ex.getMessage())
-                    .showAndWait();
+            ImporterFacade.importFile(file.toPath(), rootModel.get().globalConfig,
+                rootModel.get().history, ImportHybridSpecificationHandler { hybridSpecification: HybridSpecification? ->
+                    // handle hybridspecification
+                    rootModel.get().hybridSpecifications
+                        .add(hybridSpecification)
+                }, ImportStvsRootModelHandler { rootModel ->
+                    // handle rootModel
+                    rootModel.workingdir = file.getParentFile()
+                    rootModel.filename = file.getName()
+                    this.rootModel.setValue(rootModel)
+                }, (ImportCodeHandler { code: Code? ->
+                    // handle code
+                    rootModel.get().scenario.code = code
+                })
+            )
+            rootModel.get().history.addFilename(file.absolutePath)
+        } catch (ex: IOException) {
+            createAlert(
+                Alert.AlertType.ERROR, "File Open Error",
+                "An error occurred while opening a file.",
+                "The file " + file.absolutePath
+                        + " could not be opened.", ex.message
+            )
+                .showAndWait()
+        } catch (ex: ImportException) {
+            createAlert(
+                Alert.AlertType.ERROR, "File Open Error",
+                "An error occurred while opening a file.",
+                "The file " + file.absolutePath
+                        + " could not be opened.", ex.message
+            )
+                .showAndWait()
         }
     }
 
 
-    private void saveSessionAs(ActionEvent actionEvent) {
-        FileChooser fileChooser = FileChooserFactory
-                .createSaveFileChooser(SESSION,
-                        rootModel.get().getWorkingdir());
-        File chosenFile = fileChooser
-                .showSaveDialog(view.getScene().getWindow());
+    private fun saveSessionAs(actionEvent: ActionEvent) {
+        val fileChooser = FileChooserFactory.createSaveFileChooser(
+            FileChooserFactory.FileType.SESSION,
+            rootModel.get().workingdir
+        )
+        val chosenFile: File = fileChooser
+            .showSaveDialog(view.scene.window)
         if (chosenFile != null) {
-            handleSaveAll(chosenFile);
-            setWorkingDir(chosenFile);
+            handleSaveAll(chosenFile)
+            setWorkingDir(chosenFile)
         }
     }
 
-    private void createNewSpec(ActionEvent actionEvent) {
-        rootModel.get().addNewHybridSpec();
+    private fun createNewSpec(actionEvent: ActionEvent) {
+        rootModel.get().addNewHybridSpec()
     }
 
-    private void createNewCode(ActionEvent actionEvent) {
-        boolean clear = false;
-        if (!rootModel.get().getScenario().getCode().getSourcecode().isEmpty()) {
-            ButtonType save = new ButtonType("Save", ButtonBar.ButtonData.APPLY);
-            Alert request = new Alert(Alert.AlertType.CONFIRMATION, "Do you really want to throw away your code?",
-                    ButtonType.YES, save, ButtonType.NO);
+    private fun createNewCode(actionEvent: ActionEvent) {
+        var clear = false
+        if (rootModel.get().scenario.code.sourcecode.isNotEmpty()) {
+            val save: ButtonType = ButtonType("Save", ButtonBar.ButtonData.APPLY)
+            val request = Alert(
+                Alert.AlertType.CONFIRMATION, "Do you really want to throw away your code?",
+                ButtonType.YES, save, ButtonType.NO
+            )
             //request.initOwner();
-            Optional<ButtonType> answer = request.showAndWait();
+            val answer: Optional<ButtonType> = request.showAndWait()
             if (answer.isPresent()) {
                 if (answer.get() == save) {
-                    clear = saveCode(actionEvent);
+                    clear = saveCode(actionEvent)
                 }
                 if (answer.get() == ButtonType.YES) {
-                    clear = true;
+                    clear = true
                 }
             }
-            if (clear) this.rootModel.get().getScenario().setCode(new Code());
+            if (clear) rootModel.get().scenario.code = Code()
         }
     }
 
-    private void openConfigDialog(ActionEvent t) {
-        ConfigDialogManager dialogManager = new ConfigDialogManager(
-                rootModel.get().getGlobalConfig());
-        dialogManager.showAndWait();
+    private fun openConfigDialog(t: ActionEvent) {
+        val dialogManager = ConfigDialogManager(
+            rootModel.get().globalConfig
+        )
+        dialogManager.showAndWait()
     }
 
 
-    private void openAboutDialog(ActionEvent actionEvent) {
-        Dialog dialog = new Dialog();
-        AboutDialogPane pane = new AboutDialogPane();
-        dialog.setTitle("About");
-        dialog.setDialogPane(pane);
+    private fun openAboutDialog(actionEvent: ActionEvent) {
+        val dialog: Dialog<*> = Dialog<Any?>()
+        val pane = AboutDialogPane()
+        dialog.title = "About"
+        dialog.dialogPane = pane
 
-        dialog.showAndWait();
+        dialog.showAndWait()
     }
 
-    private void openCode(ActionEvent t) {
-        FileChooser fileChooser = FileChooserFactory
-                .createOpenFileChooser(CODE, rootModel.get().getWorkingdir());
-        File chosenFile = fileChooser
-                .showOpenDialog(view.getScene().getWindow());
+    private fun openCode(t: ActionEvent) {
+        val fileChooser: FileChooser =
+            FileChooserFactory.createOpenFileChooser(FileChooserFactory.FileType.CODE, rootModel.get().workingdir)
+        val chosenFile = fileChooser.showOpenDialog(view.scene.window)
         if (chosenFile == null) {
-            return;
+            return
         }
         try {
-            Code code = ImporterFacade.importStCode(chosenFile);
-            this.rootModel.get().getScenario().setCode(code);
-            this.rootModel.get().getHistory()
-                    .addFilename(chosenFile.getAbsolutePath());
-            setWorkingDir(chosenFile);
-        } catch (IOException e) {
-            AlertFactory.createAlert(e).showAndWait();
+            val code: Code = ImporterFacade.importStCode(chosenFile.toPath())
+            rootModel.get().scenario.code = code
+            rootModel.get().history
+                .addFilename(chosenFile.absolutePath)
+            setWorkingDir(chosenFile)
+        } catch (e: IOException) {
+            createAlert(e).showAndWait()
         }
     }
 
-    private void openSession(ActionEvent t) {
-        FileChooser fileChooser = FileChooserFactory
-                .createOpenFileChooser(SESSION,
-                        rootModel.get().getWorkingdir());
-        File chosenFile = fileChooser
-                .showOpenDialog(view.getScene().getWindow());
+    private fun openSession(t: ActionEvent) {
+        val fileChooser: FileChooser = FileChooserFactory.createOpenFileChooser(
+            FileChooserFactory.FileType.SESSION,
+            rootModel.get().workingdir
+        )
+        val chosenFile: File = fileChooser
+            .showOpenDialog(view.scene.window)
 
         if (chosenFile == null) {
-            return;
+            return
         }
         try {
-            StvsRootModel model = ImporterFacade
-                    .importSession(chosenFile, ImporterFacade.ImportFormat.XML,
-                            rootModel.get().getGlobalConfig(),
-                            rootModel.get().getHistory());
-            setWorkingDir(chosenFile);
-            model.setFilename(chosenFile.getName());
-            this.rootModel.set(model);
-            this.rootModel.get().getHistory()
-                    .addFilename(chosenFile.getAbsolutePath());
-        } catch (IOException | ImportException exception) {
-            AlertFactory.createAlert(exception).showAndWait();
+            val model: StvsRootModel = ImporterFacade.importSession(
+                chosenFile.toPath(),
+                rootModel.get().globalConfig,
+                rootModel.get().history
+            )
+            setWorkingDir(chosenFile)
+            model.filename = chosenFile.getName()
+            rootModel.set(model)
+            rootModel.get().history
+                .addFilename(chosenFile.absolutePath)
+        } catch (exception: IOException) {
+            createAlert(exception).showAndWait()
+        } catch (exception: ImportException) {
+            createAlert(exception).showAndWait()
         }
     }
 
-    private void openSpec(ActionEvent t) {
-        FileChooser fileChooser = FileChooserFactory
-                .createOpenFileChooser(SPECIFICATION,
-                        rootModel.get().getWorkingdir());
-        File chosenFile = fileChooser
-                .showOpenDialog(view.getScene().getWindow());
+    private fun openSpec(t: ActionEvent) {
+        val fileChooser: FileChooser = FileChooserFactory.createOpenFileChooser(
+            FileChooserFactory.FileType.SPECIFICATION,
+            rootModel.get().workingdir
+        )
+        val chosenFile = fileChooser.showOpenDialog(view.scene.window)
         if (chosenFile == null) {
-            return;
+            return
         }
         try {
-            HybridSpecification spec = ImporterFacade
-                    .importHybridSpec(chosenFile,
-                            ImporterFacade.ImportFormat.XML);
-            this.rootModel.get().getHybridSpecifications().add(spec);
-            this.rootModel.get().getHistory()
-                    .addFilename(chosenFile.getAbsolutePath());
-            setWorkingDir(chosenFile);
-        } catch (IOException | ImportException e) {
-            AlertFactory.createAlert(e).showAndWait();
+            val spec: HybridSpecification = ImporterFacade.importHybridSpec(chosenFile.toPath())
+            rootModel.get().hybridSpecifications.add(spec)
+            rootModel.get().history
+                .addFilename(chosenFile.absolutePath)
+            setWorkingDir(chosenFile)
+        } catch (e: IOException) {
+            createAlert(e).showAndWait()
+        } catch (e: ImportException) {
+            createAlert(e).showAndWait()
         }
     }
 
-    private void openFile(ActionEvent t) {
-        FileChooser fileChooser = FileChooserFactory
-                .createOpenFileChooser(ANY, rootModel.get().getWorkingdir());
-        File chosenFile = fileChooser
-                .showOpenDialog(view.getScene().getWindow());
+    private fun openFile(t: ActionEvent) {
+        val fileChooser: FileChooser =
+            FileChooserFactory.createOpenFileChooser(FileChooserFactory.FileType.ANY, rootModel.get().workingdir)
+        val chosenFile = fileChooser.showOpenDialog(view.scene.window)
 
         if (chosenFile == null) {
-            return;
+            return
         }
-        doOpenFile(chosenFile);
-        setWorkingDir(chosenFile);
+        doOpenFile(chosenFile)
+        setWorkingDir(chosenFile)
     }
 
-    private void saveAll(ActionEvent t) {
-        if (this.rootModel.get().getFilename().isEmpty()) {
-            FileChooser fileChooser = FileChooserFactory
-                    .createSaveFileChooser(SESSION,
-                            rootModel.get().getWorkingdir());
-            File chosenFile = fileChooser
-                    .showSaveDialog(view.getScene().getWindow());
+    private fun saveAll(t: ActionEvent) {
+        if (rootModel.get().filename.isEmpty()) {
+            val fileChooser: FileChooser = FileChooserFactory.createSaveFileChooser(
+                FileChooserFactory.FileType.SESSION,
+                rootModel.get().workingdir
+            )
+            val chosenFile = fileChooser.showSaveDialog(view.scene.window)
             if (chosenFile != null) {
-                handleSaveAll(chosenFile);
+                handleSaveAll(chosenFile)
             }
         } else {
-            handleSaveAll(new File(rootModel.get().getWorkingdir(),
-                    rootModel.get().getFilename()));
+            handleSaveAll(
+                File(
+                    rootModel.get().workingdir,
+                    rootModel.get().filename
+                )
+            )
         }
     }
 
-    private void handleSaveAll(File path) {
+    private fun handleSaveAll(path: File) {
         try {
-            rootModel.get().setWorkingdir(path.getParentFile());
-            rootModel.get().setFilename(path.getName());
-            ExporterFacade.exportSession(rootModel.get(),
-                    ExporterFacade.ExportFormat.XML, path);
-        } catch (IOException | ExportException exception) {
-            AlertFactory.createAlert(exception).showAndWait();
+            rootModel.get().workingdir = path.getParentFile()
+            rootModel.get().filename = path.getName()
+            ExporterFacade.exportSession(
+                rootModel.get(),
+                path.toPath()
+            )
+        } catch (exception: IOException) {
+            createAlert(exception).showAndWait()
+        } catch (exception: ExportException) {
+            createAlert(exception).showAndWait()
         }
     }
 
-    private boolean saveCode(ActionEvent t) {
+    private fun saveCode(t: ActionEvent): Boolean {
         // Set the code filename, if no filename set yet
-        Code code = rootModel.get().getScenario().getCode();
-        if (code.getFilename().isEmpty()) {
-            FileChooser fileChooser = FileChooserFactory
-                    .createSaveFileChooser(CODE,
-                            rootModel.get().getWorkingdir());
-            File chosenFile = fileChooser
-                    .showSaveDialog(view.getScene().getWindow());
+        val code: Code = rootModel.get().scenario.code
+        if (code.filename!!.isEmpty()) {
+            val fileChooser: FileChooser = FileChooserFactory.createSaveFileChooser(
+                FileChooserFactory.FileType.CODE,
+                rootModel.get().workingdir
+            )
+            val chosenFile = fileChooser.showSaveDialog(view.scene.window)
             if (chosenFile == null) {
-                return false;
+                return false
             }
-            code.setFilename(chosenFile.getAbsolutePath());
+            code.filename = chosenFile.absolutePath
         }
         // Export the code to the file
         try {
-            ExporterFacade.exportCode(code, false);
-            return true;
-        } catch (IOException e) {
-            AlertFactory.createAlert(e).showAndWait();
-            return false;
+            ExporterFacade.exportCode(code, false)
+            return true
+        } catch (e: IOException) {
+            createAlert(e).showAndWait()
+            return false
         }
     }
 
-    private void saveSpec(ActionEvent t) {
+    private fun saveSpec(t: ActionEvent) {
         try {
-            ConstraintSpecification spec = rootModel.get().getScenario()
-                    .getActiveSpec();
+            val spec = rootModel.get().scenario.activeSpec
             if (spec == null) { // There is no active specification tab open yet
-                AlertFactory.createAlert(Alert.AlertType.ERROR,
-                        "Save Specification", "No specification available.", "")
-                        .showAndWait();
+                createAlert(
+                    Alert.AlertType.ERROR,
+                    "Save Specification", "No specification available.", ""
+                )
+                    .showAndWait()
             } else {
-                FileChooser fileChooser = FileChooserFactory
-                        .createSaveFileChooser(SPECIFICATION,
-                                rootModel.get().getWorkingdir());
-                File specFile = fileChooser
-                        .showSaveDialog(view.getScene().getWindow());
-                ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML,
-                        specFile);
+                val fileChooser = FileChooserFactory.createSaveFileChooser(
+                    FileChooserFactory.FileType.SPECIFICATION,
+                    rootModel.get().workingdir
+                )
+                val specFile: File = fileChooser
+                    .showSaveDialog(view.scene.window)
+                ExporterFacade.exportSpec(
+                    spec, ExporterFacade.ExportFormat.XML,
+                    specFile
+                )
             }
-        } catch (ExportException | IOException e) {
-            AlertFactory.createAlert(e).showAndWait();
+        } catch (e: ExportException) {
+            createAlert(e).showAndWait()
+        } catch (e: IOException) {
+            createAlert(e).showAndWait()
         }
     }
 
-    @Override
-    public StvsMenuBar getView() {
-        return view;
+    fun setWorkingDir(workingDir: File) {
+        rootModel.get().workingdir = if (workingDir.isDirectory()) workingDir else workingDir.getParentFile()
     }
 
-    public void setWorkingDir(File workingDir) {
-        rootModel.get().setWorkingdir(workingDir.isDirectory() ?
-                workingDir :
-                workingDir.getParentFile());
-    }
-
-    private class HistoryFilenamesChangeListener
-            implements javafx.collections.ListChangeListener<String> {
-
-        @Override
-        public void onChanged(Change<? extends String> change) {
-            updateHistoryMenu();
+    private inner class HistoryFilenamesChangeListener : ListChangeListener<String?> {
+        override fun onChanged(change: ListChangeListener.Change<out String>) {
+            updateHistoryMenu()
         }
     }
 }

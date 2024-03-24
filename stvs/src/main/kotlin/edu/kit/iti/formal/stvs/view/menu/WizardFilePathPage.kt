@@ -1,65 +1,64 @@
-package edu.kit.iti.formal.stvs.view.menu;
+package edu.kit.iti.formal.stvs.view.menu
 
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import edu.kit.iti.formal.stvs.view.common.ActualHyperLink;
-import edu.kit.iti.formal.stvs.view.common.FileSelectionField;
-
-import java.io.File;
-
-import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.StringProperty;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-
+import de.jensd.fx.glyphs.GlyphsDude
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import edu.kit.iti.formal.stvs.view.common.ActualHyperLink
+import edu.kit.iti.formal.stvs.view.common.FileSelectionField
+import javafx.beans.Observable
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.StringProperty
+import javafx.scene.Node
+import javafx.scene.control.Label
+import javafx.scene.layout.HBox
+import java.io.File
 
 /**
  * Created by leonk on 22.03.2017.
  */
-public class WizardFilePathPage extends WizardPage {
-  private final FileSelectionField filePathField = new FileSelectionField();
-  private final BooleanProperty valid = new SimpleBooleanProperty();
-  private final HBox notValidContainer = new HBox(20.0);
+class WizardFilePathPage(title: String, description: String?, filePath: StringProperty?) : WizardPage(title) {
+    private val filePathField = FileSelectionField()
+    private val valid: BooleanProperty = SimpleBooleanProperty()
+    private val notValidContainer = HBox(20.0)
 
-  public WizardFilePathPage(String title, String description, StringProperty filePath) {
-    super(title);
+    init {
+        val notValidIcon: Node = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE)
+        notValidContainer.children.addAll(
+            notValidIcon,
+            Label("Something is wrong with this path. Not all features of STVS will work as expected!")
+        )
+        notValidContainer.visibleProperty().bind(valid.not())
+        filePathField.textField.textProperty().addListener { observable: Observable -> this.validator(observable) }
+        validator(filePathField.textField.textProperty())
 
-    Node notValidIcon = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE);
-    notValidContainer.getChildren().addAll(notValidIcon,
-        new Label("Something is wrong with this path. Not all features of STVS will work as expected!"));
-    notValidContainer.visibleProperty().bind(valid.not());
-    filePathField.getTextField().textProperty().addListener(this::validator);
-    validator(filePathField.getTextField().textProperty());
-
-    this.getChildren().addAll(new Label(description), filePathField, notValidContainer);
-    filePathField.getTextField().textProperty().bindBidirectional(filePath);
-
-  }
-
-  public WizardFilePathPage(String title, String description, StringProperty filePath,
-      String downloadLink) {
-    this(title, description, filePath);
-    this.getChildren().addAll(new Label("Download the dependency from:"),
-        new ActualHyperLink(downloadLink, downloadLink));
-  }
-
-  private void validator(Observable observable) {
-    String path = filePathField.getTextField().textProperty().get();
-    if (path != null && new File(path).canRead()) {
-      valid.setValue(true);
-    } else {
-      valid.setValue(false);
+        children.addAll(Label(description), filePathField, notValidContainer)
+        filePathField.textField.textProperty().bindBidirectional(filePath)
     }
-  }
 
-  public boolean isValid() {
-    return valid.get();
-  }
+    constructor(
+        title: String, description: String?, filePath: StringProperty?,
+        downloadLink: String
+    ) : this(title, description, filePath) {
+        children.addAll(
+            Label("Download the dependency from:"),
+            ActualHyperLink(downloadLink, downloadLink)
+        )
+    }
 
-  public BooleanProperty validProperty() {
-    return valid;
-  }
+    private fun validator(observable: Observable) {
+        val path = filePathField.textField.textProperty().get()
+        if (path != null && File(path).canRead()) {
+            valid.value = true
+        } else {
+            valid.value = false
+        }
+    }
+
+    fun isValid(): Boolean {
+        return valid.get()
+    }
+
+    fun validProperty(): BooleanProperty {
+        return valid
+    }
 }

@@ -1,38 +1,36 @@
-package edu.kit.iti.formal.stvs.logic.io;
+package edu.kit.iti.formal.stvs.logic.io
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.File
+import java.util.*
 
 /**
  * Created by csicar on 20.07.17.
  */
-public class ExecutableLocator {
-  public static Optional<File> findExecutableFile(String executableName) {
-    String envPath = System.getenv("PATH");
-    if (envPath.isEmpty()) {
-      return Optional.empty();
-    }
-    Optional<File> path = Arrays.stream(envPath.split(":")).map(File::new)
-        .filter(File::exists)
-        .filter(file -> {
-      if (!file.isDirectory()) {
-        return false;
-      } else {
-        File[] files = file.listFiles((file1, s) -> s.equals(executableName));
-        if (files == null) {
-          return false;
+object ExecutableLocator {
+    @JvmStatic
+    fun findExecutableFile(executableName: String): Optional<File> {
+        val envPath = System.getenv("PATH")
+        if (envPath.isEmpty()) {
+            return Optional.empty()
         }
-        return files.length != 0;
-      }
-    }).findAny();
-    return path.map(file -> new File(file, executableName));
-  }
+        val path = Arrays.stream(envPath.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
+            .map { pathname: String? -> File(pathname) }
+            .filter { obj: File -> obj.exists() }
+            .filter { file: File ->
+                if (!file.isDirectory) {
+                    return@filter false
+                } else {
+                    val files = file.listFiles { file1: File?, s: String -> s == executableName }
+                    if (files == null) {
+                        return@filter false
+                    }
+                    return@filter files.size != 0
+                }
+            }.findAny()
+        return path.map { file: File? -> File(file, executableName) }
+    }
 
-  public static Optional<String> findExecutableFileAsString(String executableName) {
-    return findExecutableFile(executableName).map(File::toString);
-  }
+    fun findExecutableFileAsString(executableName: String): Optional<String> {
+        return findExecutableFile(executableName).map { obj: File -> obj.toString() }
+    }
 }

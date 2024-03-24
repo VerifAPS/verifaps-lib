@@ -1,62 +1,32 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.view.spec.table
 
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import edu.kit.iti.formal.stvs.view.spec.Lockable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import org.controlsfx.control.PopOver;
+import de.jensd.fx.glyphs.GlyphsDude
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import edu.kit.iti.formal.stvs.view.spec.Lockable
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.geometry.Insets
+import javafx.scene.control.Button
+import javafx.scene.control.ButtonBar
+import javafx.scene.control.TextArea
+import javafx.scene.layout.VBox
+import org.controlsfx.control.PopOver
 
-public class CommentPopOver extends PopOver implements Lockable {
-  private final BooleanProperty editable = new SimpleBooleanProperty(true);
-  private final TextArea textArea;
+class CommentPopOver : PopOver(), Lockable {
+    override val editableProperty: BooleanProperty = SimpleBooleanProperty(true)
 
-  private final ButtonBar buttonBar;
+    val textArea: TextArea = TextArea()
 
-  private final Button saveButton;
+    private val buttonBar = ButtonBar()
 
-  public CommentPopOver() {
-    super();
-    textArea = new TextArea();
-    saveButton = GlyphsDude.createIconButton(FontAwesomeIcon.SAVE);
-    buttonBar = new ButtonBar();
-    buttonBar.getButtons().addAll(saveButton);
-    VBox content = new VBox(textArea, buttonBar);
-    content.setPadding(new Insets(5));
-    this.setTitle("Edit Comment");
-    this.setContentNode(content);
-    textArea.editableProperty().bind(editable);
+    val saveButton: Button = GlyphsDude.createIconButton(FontAwesomeIcon.SAVE)
 
-  }
-
-
-  @Override
-  public boolean getEditable() {
-    return editable.get();
-  }
-
-  @Override
-  public BooleanProperty getEditableProperty() {
-    return editable;
-  }
-
-  @Override
-  public void setEditable(boolean editable) {
-    this.editable.set(editable);
-  }
-
-  public TextArea getTextArea() {
-    return textArea;
-  }
-
-  public Button getSaveButton() {
-    return saveButton;
-  }
-
+    init {
+        buttonBar.buttons.addAll(saveButton)
+        val content = VBox(textArea, buttonBar)
+        content.padding = Insets(5.0)
+        this.title = "Edit Comment"
+        this.contentNode = content
+        textArea.editableProperty().bind(editableProperty)
+    }
 }

@@ -125,7 +125,7 @@ public class JsonTableParser {
               concreteSpec.getColumnHeaderByName(columnId).getValidType().parseLiteral(cellString.trim())
                   .orElseThrow(() -> new RuntimeException("Couldnt parse: "
                       + cellString + " of type "
-                      + concreteSpec.getColumnHeaderByName(columnId).getValidType().getTypeName()
+                      + concreteSpec.getColumnHeaderByName(columnId).getValidType().typeName
                       + " in column " + columnId))));
       concreteSpec.getRows().add(SpecificationRow.createUnobservableRow(cells));
     }

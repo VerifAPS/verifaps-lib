@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
@@ -162,7 +161,7 @@ public class ImporterFacadeTest {
         ImporterFacade.ImportFormat.XML, new GlobalConfig(), new History());
     String code = FileUtils.readFileToString(new File(StvsApplication.class.getResource
         ("testSets/valid_1/code_valid_1.st").toURI()), "utf-8");
-    Assert.assertEquals(TestUtils.removeWhitespace(code), TestUtils.removeWhitespace(importedSession.getScenario()
+    Assert.assertEquals(TestUtils.removeWhitespace(code), TestUtils.removeWhitespace(importedSession.scenario
         .getCode().getSourcecode()));
   }
 

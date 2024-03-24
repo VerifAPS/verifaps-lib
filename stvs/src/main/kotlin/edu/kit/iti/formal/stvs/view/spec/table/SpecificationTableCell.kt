@@ -1,120 +1,104 @@
-package edu.kit.iti.formal.stvs.view.spec.table;
+package edu.kit.iti.formal.stvs.view.spec.table
 
-import edu.kit.iti.formal.stvs.model.table.HybridCell;
-import edu.kit.iti.formal.stvs.model.table.HybridRow;
-import edu.kit.iti.formal.stvs.model.table.problems.CellProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator;
-import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem;
-import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem;
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.VBox;
-import javafx.util.converter.DefaultStringConverter;
+import edu.kit.iti.formal.stvs.model.table.HybridCell
+import edu.kit.iti.formal.stvs.model.table.HybridRow
+import edu.kit.iti.formal.stvs.model.table.problems.CellProblem
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
+import edu.kit.iti.formal.stvs.model.table.problems.DurationProblem
+import edu.kit.iti.formal.stvs.model.table.problems.SpecProblem
+import edu.kit.iti.formal.stvs.view.ViewUtils
+import javafx.beans.Observable
+import javafx.scene.control.*
+import javafx.scene.layout.VBox
+import javafx.util.converter.DefaultStringConverter
+import java.util.stream.Collectors
 
 /**
  * The view for a cell in a specification table.
  *
  * @author Philipp
  */
-public class SpecificationTableCell extends AdvancedTextFieldTableCell<HybridRow, String> {
-
-  private final ConstraintSpecificationValidator validator;
-
-  /**
-   * Create a new SpecificationTableCell with a given validator.
-   * @param validator The validator for this cell
-   */
-  public SpecificationTableCell(ConstraintSpecificationValidator validator) {
-    super(new DefaultStringConverter());
-    this.validator = validator;
-
-    validator.problemsProperty().addListener(observable -> this.onProblemsChanged());
-    emptyProperty().addListener(observable -> this.onProblemsChanged());
-    getStyleClass().add("spec-cell");
-    ViewUtils.setupClass(this);
-    onProblemsChanged();
-  }
-
-  @Override
-  public void updateItem(String item, boolean empty) {
-    super.updateItem(item, empty);
-    if (!empty && getCellModel() != null) {
-      List<String> counterExampleCells = getCellModel().counterExamplesProperty();
-      VBox counterExampleLabels = new VBox();
-      counterExampleLabels.getChildren().addAll(counterExampleCells.stream().map(text -> {
-        Label label = new Label(text);
-        label.getStyleClass().add("spec-counterexample");
-        return label;
-      }).collect(Collectors.toList()));
-      setGraphic(counterExampleLabels);
+class SpecificationTableCell(private val validator: ConstraintSpecificationValidator) :
+    AdvancedTextFieldTableCell<HybridRow?, String?>(DefaultStringConverter()) {
+    /**
+     * Create a new SpecificationTableCell with a given validator.
+     * @param validator The validator for this cell
+     */
+    init {
+        validator.problemsProperty().addListener { observable: Observable? -> this.onProblemsChanged() }
+        emptyProperty().addListener { observable: Observable? -> this.onProblemsChanged() }
+        styleClass.add("spec-cell")
+        ViewUtils.setupClass(this)
+        onProblemsChanged()
     }
-  }
 
-  private void configureProblem(SpecProblem problem) {
-    getStyleClass().remove("spec-cell-problem");
-    getStyleClass().add("spec-cell-problem");
-    setTooltip(new Tooltip(problem.getErrorMessage()));
-  }
-
-  private void resetCellVisuals() {
-    getStyleClass().remove("spec-cell-problem");
-    setTooltip(null);
-  }
-
-  private void onProblemsChanged() {
-    if (!isEmpty()) {
-      List<SpecProblem> problems = validator.problemsProperty().get();
-      for (SpecProblem problem : problems) {
-        if (problem instanceof CellProblem && !isDurationCell()) {
-          CellProblem cellProblem = (CellProblem) problem;
-          String col = cellProblem.getColumn();
-          if (col.equals(getColumnId()) && cellProblem.getRow() == getRowIndex()) {
-            configureProblem(problem);
-            return;
-          }
-        } else if (problem instanceof DurationProblem) {
-          DurationProblem durationProblem = (DurationProblem) problem;
-          if (durationProblem.getRow() == getRowIndex()) {
-            configureProblem(problem);
-            return;
-          }
+    override fun updateItem(item: String?, empty: Boolean) {
+        super.updateItem(item, empty)
+        if (!empty && cellModel != null) {
+            val counterExampleCells: List<String?>? = cellModel!!.counterExamplesProperty
+            val counterExampleLabels = VBox()
+            counterExampleLabels.children.addAll(counterExampleCells!!.stream().map { text: String? ->
+                val label = Label(text)
+                label.styleClass.add("spec-counterexample")
+                label
+            }.collect(Collectors.toList()))
+            graphic = counterExampleLabels
         }
-      }
     }
-    resetCellVisuals();
-  }
 
-  private HybridCell<?> getCellModel() {
-    if (getTableRow() == null) {
-      return null;
+    private fun configureProblem(problem: SpecProblem) {
+        styleClass.remove("spec-cell-problem")
+        styleClass.add("spec-cell-problem")
+        tooltip = Tooltip(problem.errorMessage)
     }
-    HybridRow row = (HybridRow) getTableRow().getItem();
-    if (row == null) {
-      return null;
+
+    private fun resetCellVisuals() {
+        styleClass.remove("spec-cell-problem")
+        tooltip = null
     }
-    String columnId = (String) getTableColumn().getUserData();
-    if (columnId != null) {
-      return row.getCells().get(columnId);
-    } else { // we are a duration cell
-      return row.getDuration();
+
+    private fun onProblemsChanged() {
+        if (!isEmpty) {
+            val problems = validator.problemsProperty().get()
+            for (problem in problems) {
+                if (problem is CellProblem && !isDurationCell) {
+                    val cellProblem = problem
+                    val col = cellProblem.column
+                    if (col == columnId && cellProblem.row == rowIndex) {
+                        configureProblem(problem)
+                        return
+                    }
+                } else if (problem is DurationProblem) {
+                    if (problem.row == rowIndex) {
+                        configureProblem(problem)
+                        return
+                    }
+                }
+            }
+        }
+        resetCellVisuals()
     }
-  }
 
-  private boolean isDurationCell() {
-    return getTableColumn().getUserData() == null;
-  }
+    private val cellModel: HybridCell<*>?
+        get() {
+            if (tableRow == null) {
+                return null
+            }
+            val row = tableRow.item ?: return null
+            val columnId = tableColumn.userData as String
+            return if (columnId != null) {
+                row.cells!![columnId]
+            } else { // we are a duration cell
+                row.duration
+            }
+        }
 
-  private String getColumnId() {
-    return (String) getTableColumn().getUserData();
-  }
+    private val isDurationCell: Boolean
+        get() = tableColumn.userData == null
 
-  private int getRowIndex() {
-    return getTableRow().getIndex();
-  }
+    private val columnId: String
+        get() = tableColumn.userData as String
+
+    private val rowIndex: Int
+        get() = tableRow.index
 }

@@ -96,7 +96,7 @@ public class FreeVariableListValidatorTest {
     System.out.println("Expected problem: " + expectedProblem);
     System.out.println("Actual problems: " + problems.stream().map(
         problem -> problem.getClass().getSimpleName()
-            + "(" + problem.getErrorMessage() + ")").collect(Collectors.toList()));
+            + "(" + problem.errorMessage + ")").collect(Collectors.toList()));
     assertTrue("Problems contain only expected problems", problems.stream()
         .allMatch(problem -> problem.getClass().getSimpleName().equals(expectedProblem)));
   }

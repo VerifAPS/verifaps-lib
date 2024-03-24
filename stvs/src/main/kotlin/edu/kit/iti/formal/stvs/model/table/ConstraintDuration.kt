@@ -1,0 +1,23 @@
+package edu.kit.iti.formal.stvs.model.table
+
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
+
+/**
+ * An abstract duration given by a constraint rather than a concrete value. For the grammar of
+ * constraint durations, see https://git.scc.kit.edu/peese/stverificationstudio/issues/25.
+ *
+ * @author Benjamin Alt
+ */
+class ConstraintDuration(stringRepresentation: String?) : CellOperationProvider {
+    override val stringRepresentationProperty: StringProperty = SimpleStringProperty(stringRepresentation)
+    override val commentProperty: StringProperty = SimpleStringProperty()
+
+    constructor(sourceDuration: ConstraintDuration) : this(sourceDuration.asString) {
+        comment = sourceDuration.comment
+    }
+
+    override fun toString(): String {
+        return debuggingString()!!
+    }
+}

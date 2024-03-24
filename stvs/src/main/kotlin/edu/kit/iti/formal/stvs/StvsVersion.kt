@@ -1,23 +1,22 @@
-package edu.kit.iti.formal.stvs;
+package edu.kit.iti.formal.stvs
 
 /**
  * @author Alexander Weigl
  * @version 1 (15.04.17)
  */
-public class StvsVersion {
-    public static String getVersion() {
-        return StvsVersion.class.getPackage().getImplementationVersion();
-    }
+object StvsVersion {
+    @JvmStatic
+    val version: String
+        get() = StvsVersion::class.java.getPackage().implementationVersion
 
-    public static String getBuildId() {
-        return StvsVersion.class.getPackage().getSpecificationVersion();
-    }
+    @JvmStatic
+    val buildId: String
+        get() = StvsVersion::class.java.getPackage().specificationVersion
+    @JvmStatic
+    val name: String
+        get() = StvsVersion::class.java.getPackage().name
 
-    public static String getName() {
-        return StvsVersion.class.getPackage().getName();
-    }
-
-    public static String getWindowTitle() {
-        return "Structured Text Verification Studio - STVS";
-    }
+    @JvmStatic
+    val windowTitle: String
+        get() = "Structured Text Verification Studio - STVS"
 }

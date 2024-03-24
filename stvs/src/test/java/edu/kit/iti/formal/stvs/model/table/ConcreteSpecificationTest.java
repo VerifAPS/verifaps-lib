@@ -80,7 +80,7 @@ public class ConcreteSpecificationTest {
 
   @Test
   public void testIsCounterexample() {
-    assertFalse(concreteSpec.isCounterExample());
+    assertFalse(concreteSpec.isCounterExample);
   }
 
   @Test

@@ -1,76 +1,72 @@
-package edu.kit.iti.formal.stvs.view.spec.variables.clipboard;
+package edu.kit.iti.formal.stvs.view.spec.variables.clipboard
 
-import com.google.gson.Gson;
-import edu.kit.iti.formal.stvs.model.common.FreeVariable;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.gson.Gson
+import edu.kit.iti.formal.stvs.model.common.FreeVariable
+import java.util.stream.Collectors
 
 /**
- * This class handles the conversion from a lis of {@link FreeVariable} to JSON and vice versa.
+ * This class handles the conversion from a list of [FreeVariable] to JSON and vice versa.
  *
  * @author Philipp
  */
-public class Json {
-  private static final Gson GSON = new Gson();
+object Json {
+    private val GSON = Gson()
 
-  private Json() {}
+    /**
+     * Generates JSON from variables.
+     * @param freeVariables variables to convert
+     * @return Stringified JSON version of variables
+     */
+    fun stringFromRealFreeVariables(freeVariables: List<FreeVariable>): String {
+        return GSON.toJson(fromRealFreeVariables(freeVariables), FreeVarSelection::class.java)
+    }
 
-  public static class FreeVarSelection {
-    public List<FreeVar> selected;
-  }
+    /**
+     * Generates variables from JSON.
+     * @param input Stringified JSON version of variables
+     * @return restored variables
+     */
+    fun stringToRealFreeVariables(input: String?): List<FreeVariable> {
+        return toRealFreeVariables(GSON.fromJson(input, FreeVarSelection::class.java))
+    }
 
-  public static class FreeVar {
-    public String name;
-    public String type;
-    public String defaultval;
-  }
+    /**
+     * Generates a stringifyable [FreeVarSelection] from a list of [FreeVariable].
+     * @param freeVariables variables to convert
+     * @return converted selection
+     */
+    fun fromRealFreeVariables(freeVariables: List<FreeVariable>): FreeVarSelection {
+        val vars = freeVariables.stream().map { freeVariable: FreeVariable ->
+            val `var` = FreeVar()
+            `var`.name = freeVariable.name
+            `var`.type = freeVariable.type
+            `var`.defaultval = freeVariable.constraint
+            `var`
+        }.collect(Collectors.toList())
+        val selection = FreeVarSelection()
+        selection.selected = vars
+        return selection
+    }
 
-  /**
-   * Generates JSON from variables.
-   * @param freeVariables variables to convert
-   * @return Stringified JSON version of variables
-   */
-  public static String stringFromRealFreeVariables(List<FreeVariable> freeVariables) {
-    return GSON.toJson(fromRealFreeVariables(freeVariables), FreeVarSelection.class);
-  }
+    /**
+     * Generates a list of [FreeVariable] from the stringifyable class [FreeVarSelection].
+     *
+     * @param selection stringifyable selection
+     * @return list of variables
+     */
+    fun toRealFreeVariables(selection: FreeVarSelection): List<FreeVariable> {
+        return selection.selected!!.stream()
+            .map { freeVar: FreeVar -> FreeVariable(freeVar.name, freeVar.type, freeVar.defaultval) }
+            .collect(Collectors.toList())
+    }
 
-  /**
-   * Generates variables from JSON.
-   * @param input Stringified JSON version of variables
-   * @return restored variables
-   */
-  public static List<FreeVariable> stringToRealFreeVariables(String input) {
-    return toRealFreeVariables(GSON.fromJson(input, FreeVarSelection.class));
-  }
+    class FreeVarSelection {
+        var selected: List<FreeVar>? = null
+    }
 
-  /**
-   * Generates a stringifyable {@link FreeVarSelection} from a list of {@link FreeVariable}.
-   * @param freeVariables variables to convert
-   * @return converted selection
-   */
-  public static FreeVarSelection fromRealFreeVariables(List<FreeVariable> freeVariables) {
-    List<FreeVar> vars = freeVariables.stream().map(freeVariable -> {
-      FreeVar var = new FreeVar();
-      var.name = freeVariable.getName();
-      var.type = freeVariable.getType();
-      var.defaultval = freeVariable.getConstraint();
-      return var;
-    }).collect(Collectors.toList());
-    FreeVarSelection selection = new FreeVarSelection();
-    selection.selected = vars;
-    return selection;
-  }
-
-  /**
-   * Generates a list of {@link FreeVariable} from the stringifyable class {@link FreeVarSelection}.
-   *
-   * @param selection stringifyable selection
-   * @return list of variables
-   */
-  public static List<FreeVariable> toRealFreeVariables(FreeVarSelection selection) {
-    return selection.selected.stream()
-        .map(freeVar -> new FreeVariable(freeVar.name, freeVar.type, freeVar.defaultval))
-        .collect(Collectors.toList());
-  }
+    class FreeVar {
+        var name: String? = null
+        var type: String? = null
+        var defaultval: String? = null
+    }
 }

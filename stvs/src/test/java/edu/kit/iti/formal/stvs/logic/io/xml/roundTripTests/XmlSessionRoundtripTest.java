@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals;
     StvsRootModel importedSession = ImporterFacade.importSession(file,
         ImporterFacade.ImportFormat.XML, new GlobalConfig(), new History());
     File tempFile = File.createTempFile("test", "");
-    ExporterFacade.exportSession(importedSession, ExporterFacade.ExportFormat.XML, tempFile);
+    ExporterFacade.exportSession(importedSession, tempFile);
     String fileContentsAfter = TestUtils.readFromFile(tempFile.getAbsolutePath());
     assertEquals("ComparisonFailure at file: "+file.getPath(), TestUtils.removeWhitespace
             (fileContentsBefore),

@@ -1,37 +1,30 @@
-package edu.kit.iti.formal.stvs.logic.specification.smtlib;
+package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable;
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.expressions.Expression;
-import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.SpecificationColumn;
-import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
-
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static edu.kit.iti.formal.stvs.logic.specification.smtlib.SList.sexpr;
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
+import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.table.ValidSpecification
+import java.util.stream.Collectors
+import java.util.stream.IntStream
+import kotlin.math.min
 
 /**
  * Created by csicar on 09.02.17.
  *
  * @author Carsten Csiky
  */
-public class SmtEncoder {
+class SmtEncoder(
+    private val maxDurations: List<Int>,
+    private val specification: ValidSpecification,
+    private val validFreeVariables: List<ValidFreeVariable>
+) {
     // Map<Row, Max. number of cycles for that row>
-    private final List<ValidIoVariable> ioVariables;
-    private final ValidSpecification specification;
-    private final Map<String, Type> freeVariablesContext;
-    private final List<ValidFreeVariable> validFreeVariables;
-    private final List<Integer> maxDurations;
-    private final List<String> ioVariableTypes;
+    private val ioVariables: List<ValidIoVariable>
+    private val freeVariablesContext: Map<String, Type>
+    private val ioVariableTypes: List<String?>
 
-    private SmtModel constraint;
+    var constraint: SmtModel?
+        private set
 
     /**
      * Creates an encoder for a specification. Each row is unrolled at most maxDuration times. This is
@@ -39,93 +32,101 @@ public class SmtEncoder {
      *
      * @param maxDuration        Max duration for all rows
      * @param specification      The specification that should be encoded
-     * @param validFreeVariables The free variables that are referred to in {@code specification}
+     * @param validFreeVariables The free variables that are referred to in `specification`
      */
-    public SmtEncoder(int maxDuration, ValidSpecification specification,
-            List<ValidFreeVariable> validFreeVariables) {
-        this(generateAllSameList(maxDuration, specification.getRows().size()),
-                specification, validFreeVariables);
-    }
+    constructor(
+        maxDuration: Int, specification: ValidSpecification?,
+        validFreeVariables: List<ValidFreeVariable>
+    ) : this(
+        generateAllSameList(maxDuration, specification!!.rows.size),
+        specification, validFreeVariables
+    )
 
     /**
      * Creates an encoder for a specification. Each row is unrolled at most the number specified in
-     * {@code maxDurations}.
+     * `maxDurations`.
      *
      * @param maxDurations       list of maximum durations for each row
      * @param specification      specification to encode
      * @param validFreeVariables free variables that appear in the specification
      */
-    public SmtEncoder(List<Integer> maxDurations,
-            ValidSpecification specification,
-            List<ValidFreeVariable> validFreeVariables) {
-        if (maxDurations.size() != specification.getRows().size()) {
-            throw new IllegalArgumentException(
-                    "Size of maxDurations and size of specification rows do not match");
-        }
-        this.maxDurations = maxDurations;
-        this.specification = specification;
-        this.ioVariables = specification.getColumnHeaders();
-        this.validFreeVariables = validFreeVariables;
-        this.freeVariablesContext = validFreeVariables.stream().collect(
-                Collectors.toMap(ValidFreeVariable::getName,
-                        ValidFreeVariable::getType));
-        this.ioVariableTypes = ioVariables.stream()
-                .map(ValidIoVariable::getName).collect(Collectors.toList());
+    init {
+        require(maxDurations.size == specification.rows.size) { "Size of maxDurations and size of specification rows do not match" }
+        this.ioVariables = specification.columnHeaders
+        this.freeVariablesContext = validFreeVariables.associate { it.name to it.type }
+        this.ioVariableTypes = ioVariables.map { it.name }
 
-        this.constraint = new SmtModel()
-                .addHeaderDefinitions(createFreeVariables())
-                .addHeaderDefinitions(setFreeVariablesDefaultValues());
+        this.constraint = SmtModel()
+            .addHeaderDefinitions(createFreeVariables())
+            .addHeaderDefinitions(setFreeVariablesDefaultValues())
 
         // Step (2): upper und lower Bound von Durations festlegen
-        defineDurationBounds();
+        defineDurationBounds()
 
         // Step (5)
-        unrollRowsToConstraints();
+        unrollRowsToConstraints()
 
         // Step 4 neg. Indizes verbinden
-        connectBackwardReferences();
+        connectBackwardReferences()
     }
 
     /**
      * This connects backward references by aggregating all possible backward references relative to
      * the row before they appeared.
      */
-    private void connectBackwardReferences() {
-        for (ValidIoVariable ioVariable : this.ioVariables) {
-            SpecificationColumn<Expression> column = this.specification
-                    .getColumnByName(ioVariable.getName());
-            String variableName = ioVariable.getName();
+    private fun connectBackwardReferences() {
+        for (ioVariable in ioVariables) {
+            val column = specification.getColumnByName(ioVariable.name)
+            val variableName = ioVariable.name
             // Iterate over Rows
-            for (int z = 0; z < column.getCells().size(); z++) {
-                Expression expression = column.getCells().get(z);
+            for (z in column.cells.indices) {
+                val expression = column.cells[z]
                 // Add n_x to const declaration
-                this.constraint.addHeaderDefinitions(
-                        sexpr("declare-const", "n_" + z, "(_ BitVec 16)"));
+                constraint!!.addHeaderDefinitions(
+                    SList.sexpr("declare-const", "n_$z", "(_ BitVec 16)")
+                )
                 // Iterate over potential backward steps
-                for (int i = 1; i <= getMaxDurationSum(z - 1); i++) {
+                for (i in 1..getMaxDurationSum(z - 1)) {
                     // Iterate over possible cycles in last row
-                    for (int k = 0; k <= getMaxDuration(z - 1); k++) {
+                    for (k in 0..getMaxDuration(z - 1)) {
                         // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
-                        this.constraint.addGlobalConstrains(sexpr("implies",
-                                sexpr("=", "n_" + (z - 1),
-                                        BitvectorUtils.hexFromInt(k, 4)),
-                                sexpr("=", "|" + variableName + "_" + z + "_"
-                                                + (-i) + "|",
-                                        "|" + variableName + "_" + (z - 1) + "_"
-                                                + (k - i) + "|")));
+                        constraint!!.addGlobalConstrains(
+                            SList.sexpr(
+                                "implies",
+                                SList.sexpr(
+                                    "=", "n_" + (z - 1),
+                                    BitvectorUtils.hexFromInt(k, 4)
+                                ),
+                                SList.sexpr(
+                                    "=", "|" + variableName + "_" + z + "_"
+                                            + (-i) + "|",
+                                    "|" + variableName + "_" + (z - 1) + "_"
+                                            + (k - i) + "|"
+                                )
+                            )
+                        )
                         // Add backward reference to const declaration
-                        this.constraint.addHeaderDefinitions(
-                                sexpr("declare-const",
-                                        "|" + variableName + "_" + (z - 1) + "_"
-                                                + (k - i) + "|",
-                                        getSmtLibVariableTypeName(
-                                                ioVariable.getValidType())));
+                        constraint!!.addHeaderDefinitions(
+                            SList.sexpr(
+                                "declare-const",
+                                "|" + variableName + "_" + (z - 1) + "_"
+                                        + (k - i) + "|",
+                                getSmtLibVariableTypeName(
+                                    ioVariable.validType
+                                )
+                            )
+                        )
                     }
                     // Add backward reference to const declaration
-                    this.constraint.addHeaderDefinitions(sexpr("declare-const",
+                    constraint!!.addHeaderDefinitions(
+                        SList.sexpr(
+                            "declare-const",
                             "|" + variableName + "_" + z + "_" + (-i) + "|",
                             getSmtLibVariableTypeName(
-                                    ioVariable.getValidType())));
+                                ioVariable.validType
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -133,29 +134,35 @@ public class SmtEncoder {
 
     /**
      * Unrolls constraints (expressions are converted to constraints for each cell) to their duration
-     * specified in {@code maxDurations}.
+     * specified in `maxDurations`.
      */
-    private void unrollRowsToConstraints() {
-        for (ValidIoVariable ioVariable : this.ioVariables) {
-            SpecificationColumn<Expression> column = this.specification
-                    .getColumnByName(ioVariable.getName());
-            for (int z = 0; z < column.getCells().size(); z++) {
-                Expression expression = column.getCells().get(z);
+    private fun unrollRowsToConstraints() {
+        for (ioVariable in ioVariables) {
+            val column = specification.getColumnByName(ioVariable.name)
+            for (z in column.cells.indices) {
+                val expression = column.cells[z]!!
 
-                for (int i = 0; i < getMaxDuration(z); i++) {
-                    SmtConvertExpressionVisitor visitor = new SmtConvertExpressionVisitor(
-                            this, z, i, ioVariable);
-                    SExpression expressionConstraint = expression
-                            .takeVisitor(visitor);
+                for (i in 0 until getMaxDuration(z)) {
+                    val visitor = SmtConvertExpressionVisitor(
+                        this, z, i, ioVariable
+                    )
+                    val expressionConstraint = expression.takeVisitor(visitor)
                     // n_z >= i => ExpressionVisitor(z,i,...)
-                    this.constraint = new SmtModel(
-                            visitor.getConstraint().getGlobalConstraints(),
-                            visitor.getConstraint().getVariableDefinitions())
-                            .combine(this.constraint);
-                    this.constraint.addGlobalConstrains(sexpr("implies",
-                            sexpr("bvuge", "n_" + z,
-                                    BitvectorUtils.hexFromInt(i, 4)),
-                            expressionConstraint));
+                    this.constraint = SmtModel(
+                        visitor.constraint.globalConstraints,
+                        visitor.constraint.variableDefinitions
+                    )
+                        .combine(this.constraint)
+                    constraint!!.addGlobalConstrains(
+                        SList.sexpr(
+                            "implies",
+                            SList.sexpr(
+                                "bvuge", "n_$z",
+                                BitvectorUtils.hexFromInt(i, 4)
+                            ),
+                            expressionConstraint
+                        )
+                    )
                 }
             }
         }
@@ -163,42 +170,43 @@ public class SmtEncoder {
 
     /**
      * Adds global constraint to limit durations to their bounds. n_z is limited to [x,y] where x is
-     * determined by {@link LowerBoundedInterval#getLowerBound()} for each row and y is determined by
-     * {@link LowerBoundedInterval#getUpperBound()} or the entry {@code maxDurations} whichever one is
+     * determined by [LowerBoundedInterval.lowerBound] for each row and y is determined by
+     * [LowerBoundedInterval.upperBound] or the entry `maxDurations` whichever one is
      * less.
      */
-    private void defineDurationBounds() {
-        for (int z = 0; z < this.specification.getDurations().size(); z++) {
-            LowerBoundedInterval interval = this.specification.getDurations()
-                    .get(z);
+    private fun defineDurationBounds() {
+        for (z in specification.durations.indices) {
+            val interval = specification.durations.get(z)!!
             // n_z >= lowerBound_z
-            this.constraint.addGlobalConstrains(sexpr("bvuge", "n_" + z,
-                    BitvectorUtils.hexFromInt(interval.getLowerBound(), 4)
-                            + ""));
+            constraint!!.addGlobalConstrains(
+                SList.sexpr(
+                    "bvuge", "n_$z",
+                    BitvectorUtils.hexFromInt(interval.lowerBound, 4)
+                            + ""
+                )
+            )
             // n_z <= upperBound_z
-            if (interval.getUpperBound().isPresent()) {
-                this.constraint.addGlobalConstrains(sexpr("bvule", "n_" + z,
+            if (interval.upperBound.isPresent) {
+                constraint!!.addGlobalConstrains(
+                    SList.sexpr(
+                        "bvule", "n_$z",
                         BitvectorUtils.hexFromInt(
-                                Math.min(interval.getUpperBound().get(),
-                                        getMaxDuration(z)), 4)));
-            }
-            else {
-                this.constraint.addGlobalConstrains(sexpr("bvule", "n_" + z,
-                        BitvectorUtils.hexFromInt(getMaxDuration(z), 4)));
+                            min(
+                                interval.upperBound.get().toDouble(),
+                                getMaxDuration(z).toDouble()
+                            ).toInt(), 4
+                        )
+                    )
+                )
+            } else {
+                constraint!!.addGlobalConstrains(
+                    SList.sexpr(
+                        "bvule", "n_$z",
+                        BitvectorUtils.hexFromInt(getMaxDuration(z), 4)
+                    )
+                )
             }
         }
-    }
-
-    /**
-     * Generates a List with one number repeated multiple times
-     *
-     * @param number number to be repeated
-     * @param times  how many times {@code number} should be repeated
-     * @return List of number repeated {@code times} times.
-     */
-    private static List<Integer> generateAllSameList(int number, int times) {
-        return IntStream.generate(() -> number).limit(times).boxed()
-                .collect(Collectors.toList());
     }
 
     /**
@@ -208,12 +216,14 @@ public class SmtEncoder {
      * @param variable variable for which the assertion should be generated
      * @return asserts that the variable is equal to its default value
      */
-    private SExpression getDefaultValueEquality(ValidFreeVariable variable) {
-        Expression constraint = variable.getConstraint();
+    private fun getDefaultValueEquality(variable: ValidFreeVariable): SExpression? {
+        val constraint = variable.constraint
 
-        SmtConvertExpressionVisitor scev = new SmtConvertExpressionVisitor(this,
-                0, 0, variable.asIOVariable());
-        return constraint.takeVisitor(scev);
+        val scev = SmtConvertExpressionVisitor(
+            this,
+            0, 0, variable.asIOVariable()
+        )
+        return constraint!!.takeVisitor(scev)
 
         /*return defaultValue.match((integerVal) -> sexpr("=",
                         "|" + variable.getName() + "|",
@@ -226,75 +236,83 @@ public class SmtEncoder {
                                 4)));*/
     }
 
-    private static SList getDeclarationForVariable(Type type,
-            String variableName) {
-        return sexpr("declare-const", "|" + variableName + "|",
-                getSmtLibVariableTypeName(type));
+    fun isIoVariable(name: String?): Boolean {
+        return ioVariableTypes.contains(name)
     }
 
-    protected static String getSmtLibVariableTypeName(Type type) {
-        return type.match(() -> "(_ BitVec 16)", () -> "Bool",
-                e -> "(_ BitVec 16)");
-    }
-
-    protected boolean isIoVariable(String name) {
-        return ioVariableTypes.contains(name);
-    }
-
-    private List<SExpression> setFreeVariablesDefaultValues() {
+    private fun setFreeVariablesDefaultValues(): List<SExpression?> {
         return validFreeVariables.stream()
-                .filter(variable -> variable.getConstraint() != null)
-                .map(this::getDefaultValueEquality)
-                .map(sexpr -> sexpr("assert", sexpr))
-                .collect(Collectors.toList());
+            .filter { variable: ValidFreeVariable -> variable.constraint != null }
+            .map<SExpression?> { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
+            .map { sexpr: SExpression -> SList.sexpr("assert", sexpr) }
+            .collect(Collectors.toList<SExpression?>())
     }
 
-    protected Type getTypeForVariable(String variableName) {
-        Type type = freeVariablesContext.get(variableName);
+    fun getTypeForVariable(variableName: String?): Type? {
+        var type = freeVariablesContext[variableName]
         if (type == null) {
-            try {
-                type = specification.getColumnHeaderByName(variableName)
-                        .getValidType();
-            }
-            catch (NoSuchElementException exception) {
-                type = null;
+            type = try {
+                specification.getColumnHeaderByName(variableName).validType
+            } catch (exception: NoSuchElementException) {
+                null
             }
         }
-        return type;
+        return type
     }
 
-    private List<SExpression> createFreeVariables() {
-        return freeVariablesContext.entrySet().stream()
-                .filter(item -> !isIoVariable(item.getKey()))
-                .map(item -> getDeclarationForVariable(item.getValue(),
-                        item.getKey())).collect(Collectors.toList());
+    private fun createFreeVariables(): List<SExpression?> {
+        return freeVariablesContext.entries.stream()
+            .filter { item: Map.Entry<String?, Type> -> !isIoVariable(item.key) }
+            .map { item: Map.Entry<String?, Type> ->
+                getDeclarationForVariable(
+                    item.value,
+                    item.key!!
+                )
+            }.collect(Collectors.toList())
     }
 
-    private int getMaxDurationSum(int z) {
-        int sum = 0;
-        for (int i = 0; i <= z; i++) {
-            sum += getMaxDuration(i);
+    private fun getMaxDurationSum(z: Int): Int {
+        var sum = 0
+        for (i in 0..z) {
+            sum += getMaxDuration(i)
         }
 
-        return sum;
+        return sum
     }
 
-    private Integer getMaxDuration(int j) {
+    private fun getMaxDuration(j: Int): Int {
         if (j < 0) {
-            return 0;
+            return 0
         }
-        Optional<Integer> interval = specification.getDurations().get(j)
-                .getUpperBound();
+        val interval = specification.durations[j]!!.upperBound
 
-        if (interval.isPresent()) {
-            return Math.min(maxDurations.get(j), interval.get());
-        }
-        else {
-            return maxDurations.get(j);
+        return if (interval.isPresent) {
+            min(maxDurations[j].toDouble(), interval.get().toDouble()).toInt()
+        } else {
+            maxDurations[j]
         }
     }
 
-    public SmtModel getConstraint() {
-        return constraint;
+    companion object {
+        /**
+         * Generates a List with one number repeated multiple times
+         *
+         * @param number number to be repeated
+         * @param times  how many times `number` should be repeated
+         * @return List of number repeated `times` times.
+         */
+        private fun generateAllSameList(number: Int, times: Int): List<Int> {
+            return IntStream.generate { number }.limit(times.toLong()).boxed()
+                .collect(Collectors.toList())
+        }
+
+        private fun getDeclarationForVariable(type: Type, variableName: String) =
+            SList.sexpr("declare-const", "|$variableName|", getSmtLibVariableTypeName(type))
+
+        fun getSmtLibVariableTypeName(type: Type) = when (type) {
+            is TypeInt -> "(_ BitVec 16)"
+            is TypeBool -> "Bool"
+            is TypeEnum -> "(_ BitVec 16)"
+        }
     }
 }

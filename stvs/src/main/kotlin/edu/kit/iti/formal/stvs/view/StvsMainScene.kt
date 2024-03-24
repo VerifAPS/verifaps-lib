@@ -1,107 +1,96 @@
-package edu.kit.iti.formal.stvs.view;
+package edu.kit.iti.formal.stvs.view
 
-import edu.kit.iti.formal.stvs.logic.io.ExportException;
-import edu.kit.iti.formal.stvs.model.StvsRootModel;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.config.History;
-import edu.kit.iti.formal.stvs.view.common.AlertFactory;
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController;
-
-import java.io.IOException;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-
-import javax.xml.bind.JAXBException;
+import edu.kit.iti.formal.stvs.logic.io.ExportException
+import edu.kit.iti.formal.stvs.model.StvsRootModel
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig
+import edu.kit.iti.formal.stvs.model.config.History
+import edu.kit.iti.formal.stvs.view.common.AlertFactory
+import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.Scene
+import javafx.scene.control.Alert
+import javafx.scene.layout.Priority
+import javafx.scene.layout.VBox
+import tornadofx.getValue
+import tornadofx.setValue
+import java.io.IOException
 
 /**
  * Main Scene that holds all visible nodes of the program.
  *
  * @author Lukas Fritsch
  */
-public class StvsMainScene {
+class StvsMainScene @JvmOverloads constructor(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) {
 
-  private StvsMenuBarController menuBarController;
-  private StvsRootController rootController;
-  private ObjectProperty<StvsRootModel> rootModelProperty;
-  private final Scene scene;
+    private val rootModelProperty = SimpleObjectProperty<StvsRootModel>(rootModel)
+    var rootModel by rootModelProperty
 
-  public StvsMainScene() {
-    this(StvsRootModel.autoloadSession());
-  }
+    var rootController: StvsRootController = StvsRootController(rootModelProperty.get())
 
-  /**
-   * Creates an instance from a root model.
-   * @param rootModel Model that should be represented by this instance.
-   */
-  public StvsMainScene(StvsRootModel rootModel) {
-    this.rootModelProperty = new SimpleObjectProperty<>(rootModel);
-    this.rootController = new StvsRootController(rootModelProperty.get());
-    this.menuBarController = new StvsMenuBarController(rootModelProperty);
-    this.rootModelProperty.get().getGlobalConfig().setAll(GlobalConfig.autoloadConfig());
-    this.rootModelProperty.get().getHistory().setAll(History.autoloadHistory());
+    val menuBarController: StvsMenuBarController = StvsMenuBarController(rootModelProperty)
 
-    rootModelProperty.addListener(this::rootModelChanged);
+    val scene: Scene
 
-    this.scene = new Scene(createVBox(), rootModel.getGlobalConfig().getWindowWidth(),
-        rootModel.getGlobalConfig().getWindowHeight());
+    /**
+     * Creates an instance from a root model.
+     * @param rootModel Model that should be represented by this instance.
+     */
+    init {
+        rootModelProperty.get().globalConfig.setAll(GlobalConfig.autoloadConfig())
+        rootModelProperty.get().history.setAll(History.autoloadHistory())
 
-    rootModel.getGlobalConfig().windowWidthProperty().bind(scene.widthProperty());
-    rootModel.getGlobalConfig().windowHeightProperty().bind(scene.heightProperty());
-  }
+        rootModelProperty.addListener { obs, oldModel, rootModel -> this.rootModelChanged(rootModel) }
 
-  private VBox createVBox() {
-    VBox vbox = new VBox();
-    vbox.getChildren().addAll(menuBarController.getView(), rootController.getView());
-    VBox.setVgrow(rootController.getView(), Priority.ALWAYS);
+        this.scene = Scene(
+            createVBox(), rootModel.globalConfig.windowWidth.toDouble(),
+            rootModel.globalConfig.windowHeight.toDouble()
+        )
 
-    return vbox;
-  }
-
-  private void rootModelChanged(ObservableValue<? extends StvsRootModel> obs,
-      StvsRootModel oldModel, StvsRootModel rootModel) {
-    this.rootController = new StvsRootController(rootModel);
-    scene.setRoot(createVBox());
-  }
-
-  public StvsRootController getRootController() {
-    return rootController;
-  }
-
-  public void setRootController(StvsRootController rootController) {
-    this.rootController = rootController;
-  }
-
-  public Scene getScene() {
-    return scene;
-  }
-
-  /**
-   * Code that should be executed before the scene is destroyed on exit.
-   */
-  public void onClose() {
-    StvsRootModel stvsRootModel = rootModelProperty.get();
-    if (stvsRootModel != null) {
-      try {
-        stvsRootModel.getGlobalConfig().autosaveConfig();
-        stvsRootModel.getHistory().autosaveHistory();
-        stvsRootModel.autosaveSession();
-      } catch (IOException | ExportException | JAXBException e) {
-        AlertFactory.createAlert(Alert.AlertType.ERROR, "Autosave error",
-            "Error saving the current" + " configuration",
-            "The current configuration could not be saved.", e.getMessage()).showAndWait();
-      }
+        rootModel.globalConfig.windowWidthProperty.bind(scene.widthProperty())
+        rootModel.globalConfig.windowHeightProperty.bind(scene.heightProperty())
     }
-  }
 
-  public BooleanProperty shouldBeMaximizedProperty() {
-    return rootModelProperty.get().getGlobalConfig().windowMaximizedProperty();
-  }
+    private fun createVBox(): VBox {
+        val vbox = VBox()
+        vbox.children.addAll(menuBarController.view, rootController.view)
+        VBox.setVgrow(rootController.view, Priority.ALWAYS)
+
+        return vbox
+    }
+
+    private fun rootModelChanged(rootModel: StvsRootModel) {
+        this.rootController = StvsRootController(rootModel)
+        scene.root = createVBox()
+    }
+
+    /**
+     * Code that should be executed before the scene is destroyed on exit.
+     */
+    fun onClose() {
+        val stvsRootModel: StvsRootModel = rootModelProperty.get()
+        if (stvsRootModel != null) {
+            try {
+                stvsRootModel.globalConfig.autosaveConfig()
+                stvsRootModel.history.autosaveHistory()
+                stvsRootModel.autosaveSession()
+            } catch (e: IOException) {
+                AlertFactory.createAlert(
+                    Alert.AlertType.ERROR, "Autosave error",
+                    "Error saving the current" + " configuration",
+                    "The current configuration could not be saved.", e.message
+                ).showAndWait()
+            } catch (e: ExportException) {
+                AlertFactory.createAlert(
+                    Alert.AlertType.ERROR, "Autosave error",
+                    "Error saving the current" + " configuration",
+                    "The current configuration could not be saved.", e.message
+                ).showAndWait()
+            }
+        }
+    }
+
+    fun shouldBeMaximizedProperty(): BooleanProperty {
+        return rootModelProperty.get().globalConfig.windowMaximizedProperty
+    }
 }

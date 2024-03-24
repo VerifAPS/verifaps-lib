@@ -1,18 +1,17 @@
-package edu.kit.iti.formal.stvs.logic.io;
+package edu.kit.iti.formal.stvs.logic.io
 
-import edu.kit.iti.formal.stvs.model.code.Code;
+import edu.kit.iti.formal.stvs.model.code.*
 
 /**
- * An {@code ImportCodeHandler} is notified when {@link Code} is loaded by
- * {@link ImporterFacade.ImportFormat#importFile}.
+ * An `ImportCodeHandler` is notified when [Code] is loaded by
+ * [ImporterFacade.ImportFormat.importFile].
  */
-@FunctionalInterface
-public interface ImportCodeHandler {
-  /**
-   * This method needs to be provided by an implementation of {@code ImportCodeHandler}. It is
-   * called if {@link Code} is loaded.
-   *
-   * @param code Code that was loaded
-   */
-  void accept(Code code);
+fun interface ImportCodeHandler {
+    /**
+     * This method needs to be provided by an implementation of `ImportCodeHandler`. It is
+     * called if [Code] is loaded.
+     *
+     * @param code Code that was loaded
+     */
+    fun accept(code: Code?)
 }

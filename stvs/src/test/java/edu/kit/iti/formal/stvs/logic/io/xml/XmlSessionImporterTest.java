@@ -49,10 +49,10 @@ public class XmlSessionImporterTest {
         (StvsApplication.class.getResource("testSets/valid_1/concrete_spec_valid_1.xml").toURI()
         ), ImporterFacade.ImportFormat.XML, typeContext);
     hybridSpec.setConcreteInstance(concreteSpec);
-    assertEquals(hybridSpec, importedSession.getHybridSpecifications().get(0));
+    assertEquals(hybridSpec, importedSession.hybridSpecifications.get(0));
     String code = FileUtils.readFileToString(new File(StvsApplication.class.getResource
         ("testSets/valid_1/code_valid_1.st").toURI()), "utf-8");
-    assertEquals(TestUtils.removeWhitespace(code), TestUtils.removeWhitespace(importedSession.getScenario()
+    assertEquals(TestUtils.removeWhitespace(code), TestUtils.removeWhitespace(importedSession.scenario
         .getCode().getSourcecode()));
   }
 }

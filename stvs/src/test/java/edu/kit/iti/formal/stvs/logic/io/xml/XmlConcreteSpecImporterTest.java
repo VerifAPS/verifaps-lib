@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml;
 
 import com.google.gson.JsonElement;
-import edu.kit.iti.formal.stvs.logic.io.ExportException;
 import edu.kit.iti.formal.stvs.logic.io.ImportException;
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool;
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt;

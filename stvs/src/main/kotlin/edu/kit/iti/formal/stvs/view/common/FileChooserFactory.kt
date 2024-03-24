@@ -1,10 +1,7 @@
-package edu.kit.iti.formal.stvs.view.common;
+package edu.kit.iti.formal.stvs.view.common
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import javafx.stage.FileChooser;
+import javafx.stage.FileChooser
+import java.io.File
 
 /**
  * Factory for creating the appropriate FileChoosers (with the right titles, file extension filters,
@@ -12,82 +9,84 @@ import javafx.stage.FileChooser;
  *
  * @author Benjamin Alt
  */
-public class FileChooserFactory {
+object FileChooserFactory {
+    /**
+     * The file extension filters corresponding to the different FileTypes.
+     */
+    private val filters: MutableMap<FileType, FileChooser.ExtensionFilter>
 
-  /**
-   * The type of file for which a dialog should be created.
-   */
-  public enum FileType {
-    SPECIFICATION, SESSION, CODE, ANY
-  }
+    /**
+     * The String representations of the different FileTypes.
+     */
+    private val typeIdentifiers: MutableMap<FileType, String>
 
-  /**
-   * The file extension filters corresponding to the different FileTypes.
-   */
-  private static final Map<FileType, FileChooser.ExtensionFilter> filters;
-
-  /**
-   * The String representations of the different FileTypes.
-   */
-  private static final Map<FileType, String> typeIdentifiers;
-
-  /*
+    /*
    * Initialize the filters and typeIdentifiers maps.
    */
-  static {
-    filters = new HashMap<>();
-    filters.put(FileType.SPECIFICATION,
-        new FileChooser.ExtensionFilter("Specification files " + "(*.xml)", "*.xml"));
-    filters.put(FileType.CODE,
-        new FileChooser.ExtensionFilter("Structured Text files (*.st)", "*.st"));
-    filters.put(FileType.SESSION,
-        new FileChooser.ExtensionFilter("Session files (*.xml)", "*.xml"));
-    filters.put(FileType.ANY, new FileChooser.ExtensionFilter(
-        "ST Verification Studio files (*" + ".st, *.xml)", "*.st", "*.xml"));
+    init {
+        filters = HashMap()
+        filters[FileType.SPECIFICATION] =
+            FileChooser.ExtensionFilter("Specification files " + "(*.xml)", "*.xml")
+        filters[FileType.CODE] =
+            FileChooser.ExtensionFilter("Structured Text files (*.st)", "*.st")
+        filters[FileType.SESSION] =
+            FileChooser.ExtensionFilter("Session files (*.xml)", "*.xml")
+        filters[FileType.ANY] = FileChooser.ExtensionFilter(
+            "ST Verification Studio files (*" + ".st, *.xml)", "*.st", "*.xml"
+        )
 
-    typeIdentifiers = new HashMap<>();
-    typeIdentifiers.put(FileType.SPECIFICATION, "Specification");
-    typeIdentifiers.put(FileType.CODE, "Code");
-    typeIdentifiers.put(FileType.SESSION, "Session");
-    typeIdentifiers.put(FileType.ANY, "File");
-  }
+        typeIdentifiers = HashMap()
+        typeIdentifiers[FileType.SPECIFICATION] = "Specification"
+        typeIdentifiers[FileType.CODE] = "Code"
+        typeIdentifiers[FileType.SESSION] = "Session"
+        typeIdentifiers[FileType.ANY] = "File"
+    }
 
-  /**
-   * Create a new FileChooser for opening files.
-   *
-   * @param type The type of file to open
-   * @param workingdir The directory the FileChooser opens initially
-   * @return An appropriate FileChooser for opening the given type of file
-   */
-  public static FileChooser createOpenFileChooser(FileType type, File workingdir) {
-    return createFileChooser(workingdir, "Open " + typeIdentifiers.get(type), filters.get(type));
-  }
+    /**
+     * Create a new FileChooser for opening files.
+     *
+     * @param type The type of file to open
+     * @param workingdir The directory the FileChooser opens initially
+     * @return An appropriate FileChooser for opening the given type of file
+     */
+    fun createOpenFileChooser(type: FileType, workingdir: File?): FileChooser {
+        return createFileChooser(workingdir, "Open " + typeIdentifiers[type], filters[type])
+    }
 
-  /**
-   * Create a new FileChooser for saving files.
-   *
-   * @param type The type of file to save
-   * @param workingdir The directory the FileChooser opens initially
-   * @return An appropriate FileChooser for saving the given type of file
-   */
-  public static FileChooser createSaveFileChooser(FileType type, File workingdir) {
-    return createFileChooser(workingdir, "Save " + typeIdentifiers.get(type), filters.get(type));
-  }
+    /**
+     * Create a new FileChooser for saving files.
+     *
+     * @param type The type of file to save
+     * @param workingdir The directory the FileChooser opens initially
+     * @return An appropriate FileChooser for saving the given type of file
+     */
+    fun createSaveFileChooser(type: FileType, workingdir: File?): FileChooser {
+        return createFileChooser(workingdir, "Save " + typeIdentifiers[type], filters[type])
+    }
 
-  /**
-   * Create a new FileChooser with a given working directory, title and extension filter.
-   *
-   * @param workingdir The directory the FileChooser opens initially
-   * @param title The FileChooser window title
-   * @param filter The extension filter for the FileChooser
-   * @return A FileChooser with the desired characteristics
-   */
-  public static FileChooser createFileChooser(File workingdir, String title,
-      FileChooser.ExtensionFilter filter) {
-    FileChooser fileChooser = new FileChooser();
-    fileChooser.setTitle(title);
-    fileChooser.getExtensionFilters().addAll(filter);
-    fileChooser.setInitialDirectory(workingdir);
-    return fileChooser;
-  }
+    /**
+     * Create a new FileChooser with a given working directory, title and extension filter.
+     *
+     * @param workingdir The directory the FileChooser opens initially
+     * @param title The FileChooser window title
+     * @param filter The extension filter for the FileChooser
+     * @return A FileChooser with the desired characteristics
+     */
+    fun createFileChooser(
+        workingdir: File?, title: String?,
+        filter: FileChooser.ExtensionFilter?
+    ): FileChooser {
+        val fileChooser = FileChooser()
+        fileChooser.title = title
+        fileChooser.extensionFilters.addAll(filter)
+        fileChooser.initialDirectory = workingdir
+        return fileChooser
+    }
+
+    /**
+     * The type of file for which a dialog should be created.
+     */
+    enum class FileType {
+        SPECIFICATION, SESSION, CODE, ANY
+    }
 }

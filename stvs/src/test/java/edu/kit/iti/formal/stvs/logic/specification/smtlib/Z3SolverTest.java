@@ -57,8 +57,7 @@ public class Z3SolverTest {
     ConstraintSpecification constraintSpec = ImporterFacade.importConstraintSpec(getClass().getResourceAsStream(name), ImporterFacade
         .ImportFormat.XML);
     FreeVariableListValidator freeVariableListValidator = new FreeVariableListValidator(new
-        SimpleObjectProperty<>(typeContext), constraintSpec
-        .getFreeVariableList());
+        SimpleObjectProperty<>(typeContext), constraintSpec.freeVariableList);
     List<ValidFreeVariable> freeVariables = freeVariableListValidator.validFreeVariablesProperty().get();
     this.freeVariables = freeVariables;
     ConstraintSpecificationValidator recognizer = new ConstraintSpecificationValidator(
@@ -99,9 +98,9 @@ public class Z3SolverTest {
     ConcreteSpecification concretized = solver.concretizeSmtModel(preprocessor.getConstraint(), spec.getColumnHeaders());
     assertNotNull(concretized);
     ObservableList<ConcreteDuration> durations = concretized.getDurations();
-    assertTrue(durations.get(0).getDuration() >= 5 && durations.get(0).getDuration() <= 7);
-    assertEquals(1, durations.get(1).getDuration());
-    assertEquals(2, durations.get(2).getDuration());
+    assertTrue(durations.get(0).duration >= 5 && durations.get(0).duration <= 7);
+    assertEquals(1, durations.get(1).duration);
+    assertEquals(2, durations.get(2).duration);
   }
 
   @Test
@@ -117,10 +116,10 @@ public class Z3SolverTest {
 
   @Test
   public void setZ3Path() throws Exception {
-    solver.setZ3Path("testValue");
-    assertEquals("testValue", solver.getZ3Path());
-    solver.setZ3Path("otherValue");
-    assertEquals("otherValue", solver.getZ3Path());
+    solver.z3Path = "testValue";
+    assertEquals("testValue", solver.z3Path);
+    solver.z3Path = "otherValue";
+    assertEquals("otherValue", solver.z3Path);
   }
 
   @Test

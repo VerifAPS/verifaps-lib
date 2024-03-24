@@ -1,25 +1,20 @@
-package edu.kit.iti.formal.stvs.logic.io;
+package edu.kit.iti.formal.stvs.logic.io
 
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer;
-import edu.kit.iti.formal.stvs.model.code.Code;
-import org.antlr.v4.runtime.Token;
-
-import java.util.regex.Pattern;
+import edu.kit.iti.formal.automation.parser.IEC61131Lexer
+import edu.kit.iti.formal.stvs.model.code.Code
+import java.util.regex.Pattern
 
 /**
  * This class is used to escape identifiers for the GeTeTa verification engine.
  *
  * @author Benjamin Alt
  * @author Alexander Weigl
- * @deprecated Disabled due to bugs with enum constant.
  */
-
-@Deprecated()
-public class VariableEscaper {
-
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?[0-9]+");
-    private static final Pattern BOOL_PATTERN = Pattern.compile("(TRUE)|(FALSE)");
-    private static final String PREFIX = "var_";
+@Deprecated("Disabled due to bugs with enum constant.")
+object VariableEscaper {
+    private val NUMBER_PATTERN: Pattern = Pattern.compile("-?[0-9]+")
+    private val BOOL_PATTERN: Pattern = Pattern.compile("(TRUE)|(FALSE)")
+    private const val PREFIX = "var_"
 
     /**
      * Prepends an escaping prefix to a given identifier.
@@ -27,10 +22,10 @@ public class VariableEscaper {
      * @param identifier identifier that should be escaped.
      * @return escaped identifier
      */
-    public static String escapeIdentifier(String identifier) {
-        return identifier;
+    fun escapeIdentifier(identifier: String): String {
+        return identifier
 
-    /*if (!NUMBER_PATTERN.matcher(identifier).matches()
+        /*if (!NUMBER_PATTERN.matcher(identifier).matches()
         && !BOOL_PATTERN.matcher(identifier).matches()) {
       return PREFIX + identifier;
     }
@@ -43,9 +38,10 @@ public class VariableEscaper {
      * @param expr expression to be escaped.
      * @return escaped expression
      */
-    public static String escapeCellExpression(String expr) {
-        return expr;
-    /*CharStream charStream = new ANTLRInputStream(expr);
+    @JvmStatic
+    fun escapeCellExpression(expr: String): String {
+        return expr
+        /*CharStream charStream = new ANTLRInputStream(expr);
     CellExpressionLexer lexer = new CellExpressionLexer(charStream);
     String result = expr;
     int currentOffset = 0;
@@ -68,26 +64,27 @@ public class VariableEscaper {
      * @param code code that should be escaped
      * @return escaped code
      */
-    public static String escapeCode(Code code) {
-        StringBuilder res = new StringBuilder("");
-        for (Token token : code.getTokens()) {
-            if (token.getType() == IEC61131Lexer.IDENTIFIER) {
-                res.append(escapeIdentifier(token.getText()));
-            } else if (token.getType() == IEC61131Lexer.CAST_LITERAL) {
-                res.append(escapeEnumReference(token.getText()));
+    @JvmStatic
+    fun escapeCode(code: Code): String {
+        val res = StringBuilder("")
+        for (token in code.tokens) {
+            if (token!!.type == IEC61131Lexer.IDENTIFIER) {
+                res.append(escapeIdentifier(token.text))
+            } else if (token.type == IEC61131Lexer.CAST_LITERAL) {
+                res.append(escapeEnumReference(token.text))
             } else {
-                res.append(token.getText());
+                res.append(token.text)
             }
         }
-        return res.toString();
+        return res.toString()
     }
 
-    private static String escapeEnumReference(String tokenText) {
-        String[] tokens = tokenText.split("#");
-        if (tokens.length != 2) {
-            return escapeIdentifier(tokenText);
+    private fun escapeEnumReference(tokenText: String): String {
+        val tokens = tokenText.split("#".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        if (tokens.size != 2) {
+            return escapeIdentifier(tokenText)
         }
-        return escapeIdentifier(tokens[0]) + "#" + escapeIdentifier(tokens[1]);
+        return escapeIdentifier(tokens[0]) + "#" + escapeIdentifier(tokens[1])
     }
 
     /**
@@ -96,10 +93,10 @@ public class VariableEscaper {
      * @param varName identifier from which the escaping should be removed.
      * @return unescaped identifier
      */
-    public static String unescapeIdentifier(String varName) {
+    fun unescapeIdentifier(varName: String): String {
         if (varName.startsWith(PREFIX)) {
-            return varName.substring(PREFIX.length());
+            return varName.substring(PREFIX.length)
         }
-        return varName;
+        return varName
     }
 }

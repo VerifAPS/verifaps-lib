@@ -20,12 +20,12 @@ public class ConcreteDurationTest {
 
   @Test
   public void testGetDuration() {
-    assertEquals(2, durationA.getDuration());
+    assertEquals(2, durationA.duration);
   }
 
   @Test
   public void testGetBeginCycle() {
-    assertEquals(1, durationA.getBeginCycle());
+    assertEquals(1, durationA.beginCycle);
   }
 
   @Test

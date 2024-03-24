@@ -1,60 +1,48 @@
-package edu.kit.iti.formal.stvs.view.spec;
+package edu.kit.iti.formal.stvs.view.spec
 
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-import javafx.collections.ObservableList;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.layout.AnchorPane;
+import edu.kit.iti.formal.stvs.view.ViewUtils
+import javafx.collections.ObservableList
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.scene.control.*
+import javafx.scene.layout.AnchorPane
 
 /**
  * This Pane displays a collection of specifications as tabs.
  *
  * @author Carsten Csiky
  */
-public class SpecificationsPane extends AnchorPane {
-  private TabPane tabPane;
-  private Button addButton;
+class SpecificationsPane : AnchorPane() {
+    val tabPane: TabPane = TabPane()
+    val addButton: Button = Button("+")
 
-  /**
-   * Creates an empty instance.
-   */
-  public SpecificationsPane() {
-    this.tabPane = new TabPane();
-    this.addButton = new Button("+");
-    ViewUtils.setupClass(this);
+    /**
+     * Creates an empty instance.
+     */
+    init {
+        ViewUtils.setupClass(this)
 
 
-    AnchorPane.setTopAnchor(tabPane, 0.0);
-    AnchorPane.setLeftAnchor(tabPane, 0.0);
-    AnchorPane.setRightAnchor(tabPane, 0.0);
-    AnchorPane.setBottomAnchor(tabPane, 0.0);
-    AnchorPane.setTopAnchor(addButton, 5.0);
-    AnchorPane.setRightAnchor(addButton, 5.0);
+        setTopAnchor(tabPane, 0.0)
+        setLeftAnchor(tabPane, 0.0)
+        setRightAnchor(tabPane, 0.0)
+        setBottomAnchor(tabPane, 0.0)
+        setTopAnchor(addButton, 5.0)
+        setRightAnchor(addButton, 5.0)
 
-    this.getChildren().addAll(tabPane, addButton);
-  }
+        children.addAll(tabPane, addButton)
+    }
 
-  public ObservableList<Tab> getTabs() {
-    return tabPane.getTabs();
-  }
+    val tabs: ObservableList<Tab?>
+        get() = tabPane.tabs
 
-  public TabPane getTabPane() {
-    return tabPane;
-  }
-
-  public Button getAddButton() {
-    return addButton;
-  }
-
-  /**
-   * Defines what should be invoked if a tab is added.
-   * @param listener method to invoke
-   */
-  public void onTabAdded(Runnable listener) {
-    addButton.setOnAction(actionEvent -> {
-      listener.run();
-    });
-  }
-
+    /**
+     * Defines what should be invoked if a tab is added.
+     * @param listener method to invoke
+     */
+    fun onTabAdded(listener: Runnable) {
+        addButton.onAction = EventHandler { actionEvent: ActionEvent? ->
+            listener.run()
+        }
+    }
 }

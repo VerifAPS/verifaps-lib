@@ -255,7 +255,7 @@ public class RandomTableGenerator {
       specIoVariableNames.add(var.getName());
     }
     String name = nonConflictingName(specIoVariableNames);
-    return new SpecIoVariable(randomCategory(), randomType().getTypeName(), name);
+    return new SpecIoVariable(randomCategory(), randomType().typeName, name);
   }
 
   private VariableCategory randomCategory() {
@@ -274,7 +274,7 @@ public class RandomTableGenerator {
     String name = nonConflictingName(freeVariableNames);
     Type type = randomType();
     Value defaultValue = type.generateDefaultValue();
-    return new FreeVariable(name, type.getTypeName(), defaultValue.getValueString());
+    return new FreeVariable(name, type.typeName, defaultValue.valueString);
   }
 
   private Type randomType() {

@@ -1,216 +1,216 @@
-package edu.kit.iti.formal.stvs.view.spec.timingdiagram;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram
 
-import edu.kit.iti.formal.stvs.model.common.Selection;
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable;
-import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification;
-import edu.kit.iti.formal.stvs.view.Controller;
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController;
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView;
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.Point2D;
-import javafx.scene.chart.Axis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.transform.Transform;
-import org.apache.commons.lang3.tuple.Pair;
+import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
+import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramController
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.TimingDiagramView
+import edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerController
+import javafx.beans.Observable
+import javafx.beans.property.*
+import javafx.event.EventHandler
+import javafx.scene.chart.Axis
+import javafx.scene.control.*
+import javafx.scene.input.*
+import javafx.scene.layout.AnchorPane
+import tornadofx.getValue
+import tornadofx.setValue
+import java.util.*
+import java.util.function.Consumer
+import kotlin.math.max
 
 /**
  * Represents the controller for the collection of multiple timing diagrams.
  *
  * @author Leon Kaucher
  */
-public class TimingDiagramCollectionController implements Controller {
-  private final int totalCycleCount;
-  private final XAxisDragState dragState = new XAxisDragState();
-  private TimingDiagramCollectionView view;
-  private Selection selection;
-  private DoubleProperty visibleRange = new SimpleDoubleProperty();
+class TimingDiagramCollectionController(
+    concreteSpec: ConcreteSpecification?,
+    private val selection: Selection?
+) : Controller {
+    private val totalCycleCount = concreteSpec!!.rows.size
+    private val dragState = XAxisDragState()
+    override val view: TimingDiagramCollectionView = TimingDiagramCollectionView()
+    private val visibleRange: DoubleProperty = SimpleDoubleProperty()
 
-  private BooleanProperty activated = new SimpleBooleanProperty(true);
+    val activatedProperty: BooleanProperty = SimpleBooleanProperty(true)
+    var activated by activatedProperty
 
-  /**
-   * Creates the controller for a {@link TimingDiagramCollectionView}. This controller uses a given
-   * {@link ConcreteSpecification} to generate a {@link TimingDiagramController} for each
-   * {@link ValidIoVariable} in the specification.
-   *
-   * @param concreteSpec the concrete specification that should be displayed
-   * @param selection the selection that should be used for selecting cycles
-   */
-  public TimingDiagramCollectionController(ConcreteSpecification concreteSpec,
-      Selection selection) {
-    this.selection = selection;
-    this.totalCycleCount = concreteSpec.getRows().size();
-    view = new TimingDiagramCollectionView();
-    view.onMouseDraggedProperty().setValue(this::mouseDraggedHandler);
-    view.onMousePressedProperty().setValue(this::mousePressedHandler);
+    /**
+     * Creates the controller for a [TimingDiagramCollectionView]. This controller uses a given
+     * [ConcreteSpecification] to generate a [TimingDiagramController] for each
+     * [ValidIoVariable] in the specification.
+     *
+     * @param concreteSpec the concrete specification that should be displayed
+     * @param selection the selection that should be used for selecting cycles
+     */
+    init {
+        view.onMouseDraggedProperty().value = EventHandler { event: MouseEvent -> this.mouseDraggedHandler(event) }
+        view.onMousePressedProperty().value = EventHandler { event: MouseEvent -> this.mousePressedHandler(event) }
 
-    view.getOutdatedMessage().visibleProperty().bind(activated.not());
-    view.getOutdatedMessage().managedProperty().bind(activated.not());
+        view.outdatedMessage.visibleProperty().bind(activatedProperty.not())
+        view.outdatedMessage.managedProperty().bind(activatedProperty.not())
 
-    concreteSpec.getColumnHeaders().forEach(validIoVariable -> {
-      createTimingDiagram(concreteSpec, validIoVariable);
-    });
-    view.getXaxis().setUpperBound(concreteSpec.getRows().size());
-    initxScrollbar();
-  }
-
-  /**
-   * Generates a {@link TimingDiagramController} for a given {@link ValidIoVariable}. The method
-   * adds multiple views to the {@link TimingDiagramCollectionView view} of this controller:
-   * <ul>
-   * <li>A {@link TimingDiagramView} wrapped in a
-   * {@link edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerView}
-   * will be added to {@link TimingDiagramCollectionView#diagramContainer}</li>
-   * <li>A {@link Label} (title of the {@link ValidIoVariable}) will be added to
-   * {@link TimingDiagramCollectionView#labelContainer}</li>
-   * <li>A {@link Axis} will be added to the {@link TimingDiagramCollectionView#yaxisContainer}</li>
-   * </ul>
-   *
-   * @param concreteSpec the concrete specification which should be used to extract the needed
-   *        information
-   * @param validIoVariable the variable for which a diagram should be generated
-   */
-  private void createTimingDiagram(ConcreteSpecification concreteSpec,
-      ValidIoVariable validIoVariable) {
-    Pair<TimingDiagramController, Axis> diagramAxisPair = validIoVariable.getValidType().match(
-        () -> TimingDiagramController.createIntegerTimingDiagram(concreteSpec, validIoVariable,
-            view.getXaxis(), selection, activated),
-        () -> TimingDiagramController.createBoolTimingDiagram(concreteSpec, validIoVariable,
-            view.getXaxis(), selection, activated),
-        (e) -> TimingDiagramController.createEnumTimingDiagram(concreteSpec, validIoVariable, e,
-            view.getXaxis(), selection, activated));
-    TimingDiagramView timingDiagramView = diagramAxisPair.getLeft().getView();
-
-    if (concreteSpec.isCounterExample()) {
-      timingDiagramView.getStyleClass().add("counterexample");
+        concreteSpec!!.columnHeaders.forEach(Consumer { validIoVariable: ValidIoVariable ->
+            createTimingDiagram(concreteSpec, validIoVariable)
+        })
+        view.xaxis.upperBound = concreteSpec.rows.size.toDouble()
+        initxScrollbar()
     }
-    Axis externalYAxis = diagramAxisPair.getRight();
-    VerticalResizeContainerController verticalResizeContainerController =
-        new VerticalResizeContainerController(timingDiagramView);
 
-    this.view.getDiagramContainer().getChildren().add(verticalResizeContainerController.getView());
-    this.view.getyAxisContainer().getChildren().add(externalYAxis);
-    timingDiagramView.getyAxis().layoutBoundsProperty()
-        .addListener(change -> updateAxisExternalPosition(timingDiagramView, externalYAxis));
-    verticalResizeContainerController.getView().layoutYProperty()
-        .addListener(change -> updateAxisExternalPosition(timingDiagramView, externalYAxis));
-    AnchorPane.setRightAnchor(externalYAxis, 0.0);
+    /**
+     * Generates a [TimingDiagramController] for a given [ValidIoVariable]. The method
+     * adds multiple views to the [view][TimingDiagramCollectionView] of this controller:
+     *
+     *  * A [TimingDiagramView] wrapped in a
+     * [edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer.VerticalResizeContainerView]
+     * will be added to [TimingDiagramCollectionView.diagramContainer]
+     *  * A [Label] (title of the [ValidIoVariable]) will be added to
+     * [TimingDiagramCollectionView.labelContainer]
+     *  * A [Axis] will be added to the [TimingDiagramCollectionView.yaxisContainer]
+     *
+     *
+     * @param concreteSpec the concrete specification which should be used to extract the needed
+     * information
+     * @param validIoVariable the variable for which a diagram should be generated
+     */
+    private fun createTimingDiagram(
+        concreteSpec: ConcreteSpecification?,
+        validIoVariable: ValidIoVariable
+    ) {
+        val diagramAxisPair = validIoVariable.validType.match(
+            {
+                TimingDiagramController.createIntegerTimingDiagram(
+                    concreteSpec, validIoVariable,
+                    view.xaxis, selection, activatedProperty
+                )
+            },
+            {
+                TimingDiagramController.createBoolTimingDiagram(
+                    concreteSpec, validIoVariable,
+                    view.xaxis, selection, activatedProperty
+                )
+            },
+            { e: TypeEnum? ->
+                TimingDiagramController.createEnumTimingDiagram(
+                    concreteSpec, validIoVariable, e,
+                    view.xaxis, selection, activatedProperty
+                )
+            })!!
+        val timingDiagramView = diagramAxisPair.left.view
 
-    Label label = new Label(validIoVariable.getName());
-    label.getStyleClass().add(validIoVariable.getCategory().name().toLowerCase());
-    this.view.getLabelContainer().getChildren().add(label);
-    // Ensures that labels are always centered vertically relative to their diagram
-    label.layoutYProperty().bind(externalYAxis.layoutYProperty()
-        .add(externalYAxis.heightProperty().divide(2)).subtract(label.heightProperty().divide(2)));
-  }
+        if (concreteSpec!!.isCounterExample) {
+            timingDiagramView.styleClass.add("counterexample")
+        }
+        val externalYAxis = diagramAxisPair.right
+        val verticalResizeContainerController =
+            VerticalResizeContainerController(timingDiagramView)
 
-  /**
-   * Ensures that the scrollbar below the xAxis can only be used within the range of the shown data
-   * and that the scrollbar position and shown range are always synchronized.
-   */
-  private void initxScrollbar() {
-    ScrollBar scrollBar = view.getXscrollBar();
-    NumberAxis globalxAxis = view.getXaxis();
-    scrollBar.setMin(0);
-    visibleRange.bind(globalxAxis.upperBoundProperty().subtract(globalxAxis.lowerBoundProperty()));
-    scrollBar.maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount));
+        view.diagramContainer.children.add(verticalResizeContainerController.view)
+        view.getyAxisContainer().children.add(externalYAxis)
+        timingDiagramView.getyAxis().layoutBoundsProperty()
+            .addListener { change: Observable? -> updateAxisExternalPosition(timingDiagramView, externalYAxis) }
+        verticalResizeContainerController.view.layoutYProperty()
+            .addListener { change: Observable? -> updateAxisExternalPosition(timingDiagramView, externalYAxis) }
+        AnchorPane.setRightAnchor(externalYAxis, 0.0)
 
-    globalxAxis.lowerBoundProperty().addListener(change -> {
-      scrollBar.setValue(globalxAxis.getLowerBound());
-    });
-
-    // I don't know, why it need to be divided by 2 but it seems to work very good this way
-    scrollBar.visibleAmountProperty().bind(visibleRange.divide(2));
-
-    scrollBar.valueProperty().addListener(change -> {
-      globalxAxis.setUpperBound(scrollBar.getValue() + visibleRange.get());
-      globalxAxis.setLowerBound(scrollBar.getValue());
-    });
-  }
-
-  /**
-   * This method calculates the position of an y {@link Axis} embedded in a diagram relative to the
-   * {@link TimingDiagramCollectionView#diagramContainer} and updates the position of the external
-   * axis.
-   *
-   * @param timingDiagramView Timing Diagram which holds the y Axis
-   * @param externalYAxis externalYAxis that should be repositioned
-   */
-  private void updateAxisExternalPosition(TimingDiagramView timingDiagramView, Axis externalYAxis) {
-    Transform transformation = ViewUtils.calculateTransformRelativeTo(view.getDiagramContainer(),
-        timingDiagramView.getyAxis());
-    double yaxisPosition =
-        transformation.transform(timingDiagramView.getyAxis().getLayoutBounds()).getMinY();
-    externalYAxis.layoutYProperty().set(yaxisPosition);
-  }
-
-  /**
-   * Handles drag events on xAxis.
-   *
-   * @param event mouse event
-   */
-  private void mouseDraggedHandler(MouseEvent event) {
-    Point2D point2D = getView().sceneToLocal(event.getSceneX(), event.getScreenY());
-    double newXPosition = point2D.getX();
-    double delta = newXPosition - dragState.startXPosition;
-    double deltaAsAxis = delta * dragState.screenDistanceToAxisRatio;
-    if (dragState.startLowerBound - deltaAsAxis < 0) {
-      deltaAsAxis = dragState.startLowerBound;
+        val label = Label(validIoVariable.name)
+        label.styleClass.add(validIoVariable.category.name.lowercase(Locale.getDefault()))
+        view.labelContainer.children.add(label)
+        // Ensures that labels are always centered vertically relative to their diagram
+        label.layoutYProperty().bind(
+            externalYAxis.layoutYProperty()
+                .add(externalYAxis.heightProperty().divide(2)).subtract(label.heightProperty().divide(2))
+        )
     }
-    NumberAxis xaxis = getView().getXaxis();
-    xaxis.setLowerBound(Math.max(dragState.startLowerBound - deltaAsAxis, 0));
-    xaxis.setUpperBound(Math.max(dragState.startUpperBound - deltaAsAxis, visibleRange.get()));
-  }
 
-  /**
-   * Handles press events on xAxis.
-   *
-   * @param event mouse event
-   */
-  private void mousePressedHandler(MouseEvent event) {
-    Point2D point2D = getView().sceneToLocal(event.getSceneX(), event.getScreenY());
-    NumberAxis xaxis = getView().getXaxis();
-    double displayForAxis = xaxis.getValueForDisplay(point2D.getX()).doubleValue();
-    double displayForAxisPlus100 = xaxis.getValueForDisplay(point2D.getX() + 100).doubleValue();
-    /*
+    /**
+     * Ensures that the scrollbar below the xAxis can only be used within the range of the shown data
+     * and that the scrollbar position and shown range are always synchronized.
+     */
+    private fun initxScrollbar() {
+        val scrollBar = view.xscrollBar
+        val globalxAxis = view.xaxis
+        scrollBar.min = 0.0
+        visibleRange.bind(globalxAxis.upperBoundProperty().subtract(globalxAxis.lowerBoundProperty()))
+        scrollBar.maxProperty().bind(visibleRange.multiply(-1).add(totalCycleCount))
+
+        globalxAxis.lowerBoundProperty().addListener { change: Observable? ->
+            scrollBar.value = globalxAxis.lowerBound
+        }
+
+        // I don't know, why it need to be divided by 2 but it seems to work very good this way
+        scrollBar.visibleAmountProperty().bind(visibleRange.divide(2))
+
+        scrollBar.valueProperty().addListener { change: Observable? ->
+            globalxAxis.upperBound = scrollBar.value + visibleRange.get()
+            globalxAxis.lowerBound = scrollBar.value
+        }
+    }
+
+    /**
+     * This method calculates the position of an y [Axis] embedded in a diagram relative to the
+     * [TimingDiagramCollectionView.diagramContainer] and updates the position of the external
+     * axis.
+     *
+     * @param timingDiagramView Timing Diagram which holds the y Axis
+     * @param externalYAxis externalYAxis that should be repositioned
+     */
+    private fun updateAxisExternalPosition(timingDiagramView: TimingDiagramView<*>?, externalYAxis: Axis<*>) {
+        val transformation = ViewUtils.calculateTransformRelativeTo(
+            view.diagramContainer,
+            timingDiagramView!!.getyAxis()
+        )
+        val yaxisPosition =
+            transformation.transform(timingDiagramView.getyAxis().layoutBounds).minY
+        externalYAxis.layoutYProperty().set(yaxisPosition)
+    }
+
+    /**
+     * Handles drag events on xAxis.
+     *
+     * @param event mouse event
+     */
+    private fun mouseDraggedHandler(event: MouseEvent) {
+        val point2D = view.sceneToLocal(event.sceneX, event.screenY)
+        val newXPosition = point2D.x
+        val delta = newXPosition - dragState.startXPosition
+        var deltaAsAxis = delta * dragState.screenDistanceToAxisRatio
+        if (dragState.startLowerBound - deltaAsAxis < 0) {
+            deltaAsAxis = dragState.startLowerBound
+        }
+        val xaxis = view.xaxis
+        xaxis.lowerBound = max(dragState.startLowerBound - deltaAsAxis, 0.0)
+        xaxis.upperBound = max(dragState.startUpperBound - deltaAsAxis, visibleRange.get())
+    }
+
+    /**
+     * Handles press events on xAxis.
+     *
+     * @param event mouse event
+     */
+    private fun mousePressedHandler(event: MouseEvent) {
+        val point2D = view.sceneToLocal(event.sceneX, event.screenY)
+        val xaxis = view.xaxis
+        val displayForAxis = xaxis.getValueForDisplay(point2D.x).toDouble()
+        val displayForAxisPlus100 = xaxis.getValueForDisplay(point2D.x + 100).toDouble()
+        /*
      * Calculates Ratio between pixel and axis units by taking to different points on the axis and
      * dividing them by the screen distance
      */
-    dragState.screenDistanceToAxisRatio = (displayForAxisPlus100 - displayForAxis) / 100;
-    dragState.startXPosition = point2D.getX();
-    dragState.startLowerBound = xaxis.getLowerBound();
-    dragState.startUpperBound = xaxis.getUpperBound();
-    System.out.println(point2D);
-  }
+        dragState.screenDistanceToAxisRatio = (displayForAxisPlus100 - displayForAxis) / 100
+        dragState.startXPosition = point2D.x
+        dragState.startLowerBound = xaxis.lowerBound
+        dragState.startUpperBound = xaxis.upperBound
+        println(point2D)
+    }
 
-  public TimingDiagramCollectionView getView() {
-    return view;
-  }
-
-  public boolean isActivated() {
-    return activated.get();
-  }
-
-  public BooleanProperty activatedProperty() {
-    return activated;
-  }
-
-  public void setActivated(boolean activated) {
-    this.activated.set(activated);
-  }
-
-  private static class XAxisDragState {
-    double startXPosition;
-    double startLowerBound;
-    double startUpperBound;
-    double screenDistanceToAxisRatio;
-  }
+    private class XAxisDragState {
+        var startXPosition: Double = 0.0
+        var startLowerBound: Double = 0.0
+        var startUpperBound: Double = 0.0
+        var screenDistanceToAxisRatio: Double = 0.0
+    }
 }

@@ -53,7 +53,7 @@ public class VariableCollectionDemo {
 
     VariableCollectionController controller = new VariableCollectionController(op(types), varlist);
 
-    Node rightPane = createExtractedVarsTextArea(controller, controller.getValidator());
+    Node rightPane = createExtractedVarsTextArea(controller, controller.validator);
 
     return Arrays.asList(controller.getView(), rightPane);
   }
@@ -63,7 +63,7 @@ public class VariableCollectionDemo {
     textArea.getStyleClass().addAll("model-text-area");
     textArea.setEditable(false);
 
-    FreeVariableList set = controller.getFreeVariableList();
+    FreeVariableList set = controller.freeVariableList;
 
     updateText(textArea, set.getVariables());
     set.getVariables().addListener((ListChangeListener<? super FreeVariable>) c ->

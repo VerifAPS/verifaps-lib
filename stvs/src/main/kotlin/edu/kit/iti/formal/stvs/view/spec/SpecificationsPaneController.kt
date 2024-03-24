@@ -1,183 +1,159 @@
-package edu.kit.iti.formal.stvs.view.spec;
+package edu.kit.iti.formal.stvs.view.spec
 
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable;
-import edu.kit.iti.formal.stvs.model.common.FreeVariableList;
-import edu.kit.iti.formal.stvs.model.common.SpecIoVariable;
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig;
-import edu.kit.iti.formal.stvs.model.expressions.Type;
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification;
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification;
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario;
-import edu.kit.iti.formal.stvs.model.verification.VerificationState;
-import edu.kit.iti.formal.stvs.view.Controller;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TextInputDialog;
+import de.jensd.fx.glyphs.GlyphsDude
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
+import edu.kit.iti.formal.stvs.model.config.GlobalConfig
+import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
+import edu.kit.iti.formal.stvs.model.verification.VerificationState
+import edu.kit.iti.formal.stvs.view.*
+import javafx.beans.binding.Bindings
+import javafx.beans.property.ListProperty
+import javafx.beans.property.ObjectProperty
+import javafx.beans.value.ObservableValue
+import javafx.collections.ListChangeListener
+import javafx.collections.ObservableList
+import javafx.event.ActionEvent
+import javafx.event.Event
+import javafx.event.EventHandler
+import javafx.scene.control.*
 
 /**
- * Controller for {@link SpecificationsPane}. The tab logic is handled here.
+ * Controller for [SpecificationsPane]. The tab logic is handled here.
  *
  * @author Carsten Csiky
  */
-public class SpecificationsPaneController implements Controller {
+class SpecificationsPaneController(
+    private val hybridSpecifications: ObservableList<HybridSpecification>,
+    private val state: ObjectProperty<VerificationState?>,
+    private val typeContext: ListProperty<Type>,
+    private val ioVariables: ListProperty<CodeIoVariable>,
+    private val globalConfig: GlobalConfig,
+    private val scenario: VerificationScenario
+) : Controller {
+    override val view: SpecificationsPane = SpecificationsPane()
+    private val controllers: MutableMap<Tab?, SpecificationController> = HashMap()
 
-  private final GlobalConfig globalConfig;
-  private ObservableList<HybridSpecification> hybridSpecifications;
-  private SpecificationsPane view;
-  private ObjectProperty<VerificationState> state;
-  private ObjectProperty<List<Type>> typeContext;
-  private ObjectProperty<List<CodeIoVariable>> ioVariables;
-  private final Map<Tab, SpecificationController> controllers;
-  private final VerificationScenario scenario;
-
-  /**
-   * Creates an instance of this controller.
-   *
-   * @param hybridSpecifications list of the specifications t display
-   * @param state the state of the verification
-   * @param typeContext  available types in code
-   * @param ioVariables  available variables in code
-   * @param globalConfig Global config object
-   * @param scenario scenario that represents what the verification needs
-   */
-  public SpecificationsPaneController(ObservableList<HybridSpecification> hybridSpecifications,
-      ObjectProperty<VerificationState> state, ObjectProperty<List<Type>> typeContext,
-      ObjectProperty<List<CodeIoVariable>> ioVariables, GlobalConfig globalConfig,
-      VerificationScenario scenario) {
-    this.view = new SpecificationsPane();
-    this.globalConfig = globalConfig;
-    this.scenario = scenario;
-    this.state = state;
-    this.controllers = new HashMap<>();
-    this.typeContext = typeContext;
-    this.ioVariables = ioVariables;
-    this.hybridSpecifications = hybridSpecifications;
-
-    hybridSpecifications.forEach(this::addTab);
-    this.view.onTabAdded(() -> {
-      HybridSpecification hybridSpecification =
-          new HybridSpecification(new FreeVariableList(new ArrayList<>()), true);
-      System.out.println(ioVariables.get());
-      for (CodeIoVariable ioVariable : ioVariables.get()) {
-        SpecIoVariable specIoVariable = new SpecIoVariable(ioVariable.getCategory(),
-            ioVariable.getType(), ioVariable.getName());
-        hybridSpecification.getColumnHeaders().add(specIoVariable);
-      }
-      hybridSpecifications.add(hybridSpecification);
-    });
-
-    view.getTabPane().getSelectionModel().selectedItemProperty()
-        .addListener((obs, old, tab) -> onSwitchActiveTab(tab));
-    onSwitchActiveTab(view.getTabPane().getSelectionModel().getSelectedItem());
-
-    hybridSpecifications.addListener((ListChangeListener<HybridSpecification>) change -> {
-      while (change.next()) {
-
-        /* addedPositionIndex stores the index that changed (starting at .getFrom()
-        * and should be ending at .getTo() ). Since in our case only one change should occur
-        * at a time, there is no need to worry about edge-cases (for now)*/
-        int addedPositionIndex = change.getFrom();
-        for (HybridSpecification addItem : change.getAddedSubList()) {
-          addTab(addItem, addedPositionIndex);
-          addedPositionIndex++;
+    /**
+     * Creates an instance of this controller.
+     *
+     * @param hybridSpecifications list of the specifications t display
+     * @param state the state of the verification
+     * @param typeContext  available types in code
+     * @param ioVariables  available variables in code
+     * @param globalConfig Global config object
+     * @param scenario scenario that represents what the verification needs
+     */
+    init {
+        hybridSpecifications.forEach { this.addTab(it) }
+        view.onTabAdded {
+            val hybridSpecification =
+                HybridSpecification(FreeVariableList(ArrayList()), true)
+            println(ioVariables.get())
+            for (ioVariable in ioVariables.get()!!) {
+                val specIoVariable = SpecIoVariable(
+                    ioVariable!!.category,
+                    ioVariable.type, ioVariable.name
+                )
+                hybridSpecification.columnHeaders.add(specIoVariable)
+            }
+            hybridSpecifications.add(hybridSpecification)
         }
-        for (HybridSpecification spec : change.getRemoved()) {
-          removeTab(change.getFrom());
+
+        view.tabPane.selectionModel.selectedItemProperty().addListener { _, _, tab: Tab -> onSwitchActiveTab(tab) }
+        onSwitchActiveTab(view.tabPane.selectionModel.selectedItem)
+
+        hybridSpecifications.addListener { change: ListChangeListener.Change<out HybridSpecification> ->
+            while (change.next()) {
+                /* addedPositionIndex stores the index that changed (starting at .getFrom()
+                 * and should be ending at .getTo() ). Since in our case only one change should occur
+                 * at a time, there is no need to worry about edge-cases (for now)*/
+                var addedPositionIndex = change.from
+                for (addItem in change.addedSubList) {
+                    addTab(addItem, addedPositionIndex)
+                    addedPositionIndex++
+                }
+                for (spec in change.removed) {
+                    removeTab(change.from)
+                }
+            }
         }
-      }
-    });
-  }
-
-  private void onTabCloseRequest(Event event, Tab tab) {
-    int indexToDelete = view.getTabPane().getTabs().indexOf(tab);
-    if (indexToDelete < 0) {
-      return;
     }
-    hybridSpecifications.remove(indexToDelete);
 
-  }
-
-  private void onSwitchActiveTab(Tab tab) {
-    SpecificationController controller = controllers.get(tab);
-    if (controller == null) {
-      scenario.setActiveSpec(null);
-    } else {
-      scenario.setActiveSpec(controller.getSpec());
+    private fun onTabCloseRequest(event: Event, tab: Tab) {
+        val indexToDelete = view.tabPane.tabs.indexOf(tab)
+        if (indexToDelete < 0) {
+            return
+        }
+        hybridSpecifications.removeAt(indexToDelete)
     }
-  }
 
-  private SpecificationController addTab(HybridSpecification hybridSpecification, int index) {
-    final SpecificationController controller =
-        new SpecificationController(typeContext, ioVariables, hybridSpecification, this.state,
-            Bindings.isEmpty(scenario.getCode().syntaxErrorsProperty()).not(), globalConfig);
-    Tab tab = new Tab();
-    tab.setOnCloseRequest(e -> onTabCloseRequest(e, tab));
-    if (hybridSpecification.isEditable()) {
-      tab.setContextMenu(createTabContextMenu());
+    private fun onSwitchActiveTab(tab: Tab?) {
+        val controller = controllers[tab]
+        if (controller == null) {
+            scenario.activeSpec = null
+        } else {
+            scenario.activeSpec = controller.spec
+        }
     }
-    tab.textProperty().bind(hybridSpecification.nameProperty());
-    tab.setContent(controller.getView());
-    if (hybridSpecification.isEditable()) {
-      tab.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.EDIT));
-    } else {
-      tab.setGraphic(GlyphsDude.createIcon(FontAwesomeIcon.LOCK));
+
+    private fun addTab(hybridSpecification: HybridSpecification, index: Int): SpecificationController {
+        val controller =
+            SpecificationController(
+                typeContext, ioVariables, hybridSpecification, this.state,
+                Bindings.isEmpty(scenario.code.syntaxErrorsProperty).not(), globalConfig
+            )
+        val tab = Tab()
+        tab.onCloseRequest = EventHandler { e: Event -> onTabCloseRequest(e, tab) }
+        if (hybridSpecification.isEditable) {
+            tab.contextMenu = createTabContextMenu()
+        }
+        tab.textProperty().bind(hybridSpecification.nameProperty)
+        tab.content = controller.view
+        if (hybridSpecification.isEditable) {
+            tab.graphic = GlyphsDude.createIcon(FontAwesomeIcon.EDIT)
+        } else {
+            tab.graphic = GlyphsDude.createIcon(FontAwesomeIcon.LOCK)
+        }
+        view.tabs.add(index, tab)
+        controllers[tab] = controller
+        view.tabPane.selectionModel.select(tab)
+        scenario.activeSpec = hybridSpecification
+        return controller
     }
-    view.getTabs().add(index, tab);
-    controllers.put(tab, controller);
-    view.getTabPane().getSelectionModel().select(tab);
-    scenario.setActiveSpec(hybridSpecification);
-    return controller;
-  }
 
-  public SpecificationController addTab(HybridSpecification hybridSpecification) {
-    return addTab(hybridSpecification, 0);
-  }
-
-  private void onTabSetName(ActionEvent actionEvent) {
-    Tab activeTab = view.getTabPane().getSelectionModel().getSelectedItem();
-    ConstraintSpecification activeSpec = controllers.get(activeTab).getSpec();
-    TextInputDialog textInputDialog = new TextInputDialog(activeSpec.getName());
-    textInputDialog.setHeaderText("Set Specification Name");
-    textInputDialog.setTitle("Specification Name");
-    textInputDialog.showAndWait();
-    if (textInputDialog.getResult() != null) {
-      activeSpec.setName(textInputDialog.getResult());
+    fun addTab(hybridSpecification: HybridSpecification): SpecificationController {
+        return addTab(hybridSpecification, 0)
     }
-  }
 
-  private ContextMenu createTabContextMenu() {
-    ContextMenu contextMenu = new ContextMenu();
-    MenuItem setNameItem = new MenuItem("Rename");
-    setNameItem.setOnAction(this::onTabSetName);
-    contextMenu.getItems().add(setNameItem);
-    return contextMenu;
-  }
+    private fun onTabSetName(actionEvent: ActionEvent) {
+        val activeTab = view.tabPane.selectionModel.selectedItem
+        val activeSpec = controllers[activeTab]?.spec
+        val textInputDialog = TextInputDialog(activeSpec!!.name)
+        textInputDialog.headerText = "Set Specification Name"
+        textInputDialog.title = "Specification Name"
+        textInputDialog.showAndWait()
+        if (textInputDialog.result != null) {
+            activeSpec.name = textInputDialog.result
+        }
+    }
+
+    private fun createTabContextMenu(): ContextMenu {
+        val contextMenu = ContextMenu()
+        val setNameItem = MenuItem("Rename")
+        setNameItem.onAction = EventHandler { actionEvent: ActionEvent -> this.onTabSetName(actionEvent) }
+        contextMenu.items.add(setNameItem)
+        return contextMenu
+    }
 
 
-  private void removeTab(int index) {
-    Tab removeTab = view.getTabs().get(index);
-    controllers.remove(removeTab);
-    view.getTabs().remove(index);
-  }
-
-
-  @Override
-  public SpecificationsPane getView() {
-    return view;
-  }
+    private fun removeTab(index: Int) {
+        val removeTab = view.tabs[index]
+        controllers.remove(removeTab)
+        view.tabs.removeAt(index)
+    }
 }

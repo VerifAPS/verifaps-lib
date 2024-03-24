@@ -1,65 +1,64 @@
-package edu.kit.iti.formal.stvs.view.common;
+package edu.kit.iti.formal.stvs.view.common
 
-import edu.kit.iti.formal.stvs.view.ViewUtils;
-
-import java.util.Optional;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Pos;
-import javafx.scene.control.TextField;
+import edu.kit.iti.formal.stvs.view.ViewUtils
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.geometry.Pos
+import javafx.scene.control.TextField
 
 /**
  * A Input field that only allows positive integers.
  *
  * @author Carsten Csiky
  */
-public class PositiveIntegerInputField extends TextField {
-  private BooleanProperty valid;
+class PositiveIntegerInputField : TextField() {
+    private val valid: BooleanProperty
 
-  /**
-   * Creates an instances of this positive integer only field.
-   */
-  public PositiveIntegerInputField() {
-    this.textProperty().addListener(this::onInputChange);
-    valid = new SimpleBooleanProperty();
-    valid.addListener(this::onValidStateChange);
-    this.alignmentProperty().setValue(Pos.CENTER_RIGHT);
-    ViewUtils.setupClass(this);
-  }
-
-  private void onValidStateChange(ObservableValue<?> observableValue, Boolean old, Boolean value) {
-    if (value) {
-      this.getStyleClass().add("valid");
-    } else {
-      this.getStyleClass().remove("valid");
+    /**
+     * Creates an instances of this positive integer only field.
+     */
+    init {
+        textProperty().addListener { observableValue, old, newValue ->
+            this.onInputChange(newValue)
+        }
+        valid = SimpleBooleanProperty()
+        valid.addListener { _, _, value: Boolean ->
+            this.onValidStateChange(value)
+        }
+        alignmentProperty().setValue(Pos.CENTER_RIGHT)
+        ViewUtils.setupClass(this)
     }
-  }
 
-  private void onInputChange(ObservableValue<?> observableValue, String old, String newValue) {
-    valid.set(getText().trim().matches("(?!0)[0-9]+"));
-  }
-
-  /**
-   * get inputfield value as an integer if no integer representation is available Optional.empty()
-   * will be returned
-   *
-   * @return value as an integer
-   */
-  public Optional<Integer> getInteger() {
-    if (valid.get()) {
-      return Optional.of(Integer.valueOf(this.getText().trim()));
-    } else {
-      return Optional.empty();
+    private fun onValidStateChange(value: Boolean) {
+        if (value) {
+            styleClass.add("valid")
+        } else {
+            styleClass.remove("valid")
+        }
     }
-  }
 
-  public boolean isValid() {
-    return valid.get();
-  }
+    private fun onInputChange(newValue: String) {
+        valid.set(text.trim { it <= ' ' }.matches("(?!0)[0-9]+".toRegex()))
+    }
 
-  public BooleanProperty validProperty() {
-    return valid;
-  }
+    val integer: Int?
+        /**
+         * get inputfield value as an integer if no integer representation is available Optional.empty()
+         * will be returned
+         *
+         * @return value as an integer
+         */
+        get() = if (valid.get()) {
+            text.trim { it <= ' ' }.toInt()
+        } else {
+            null
+        }
+
+    fun isValid(): Boolean {
+        return valid.get()
+    }
+
+    fun validProperty(): BooleanProperty {
+        return valid
+    }
 }

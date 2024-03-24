@@ -78,40 +78,40 @@ public class CodeTest {
   @Test
   public void testParsedCodeTypeExtraction() {
     ParsedCode parsed = enumDefinition.getParsedCode();
-    assertEquals("Find all defined Types", 3, parsed.getDefinedTypes().size());
+    assertEquals("Find all defined Types", 3, parsed.definedTypes.size());
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<Type> expectedDefinedTypes = new HashSet<>();
     expectedDefinedTypes.add(TypeBool.BOOL);
     expectedDefinedTypes.add(TypeInt.INT);
     expectedDefinedTypes.add(myEnum);
-    assertCollectionsEqual(expectedDefinedTypes, parsed.getDefinedTypes());
+    assertCollectionsEqual(expectedDefinedTypes, parsed.definedTypes);
   }
 
   @Test
   public void testParsedCodeIOVariableExtraction() {
     ParsedCode parsed = enumDefinition.getParsedCode();
-    assertEquals("Find all defined IOVariables", 7, parsed.getDefinedVariables().size());
+    assertEquals("Find all defined IOVariables", 7, parsed.definedVariables.size());
 
     Type myEnum = new TypeEnum("MY_ENUM", Arrays.asList("possible", "values", "enum"));
     Set<CodeIoVariable> expectedVariables = new HashSet<>();
     expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "BOOL", "active"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, "INT", "number"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.getTypeName(), "my_enum"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.getTypeName(), "my_output"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.INPUT, myEnum.typeName, "my_enum"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, myEnum.typeName, "my_output"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"));
-    expectedVariables.add(new CodeIoVariable(VariableCategory.LOCAL, myEnum.getTypeName(),"my_enum_local"));
+    expectedVariables.add(new CodeIoVariable(VariableCategory.LOCAL, myEnum.typeName,"my_enum_local"));
     expectedVariables.add(new CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout"));
-    assertCollectionsEqual(expectedVariables, parsed.getDefinedVariables());
+    assertCollectionsEqual(expectedVariables, parsed.definedVariables);
   }
 
   @Test
   public void testParsedCodeBlocks() {
     FoldableCodeBlock expectedBlock = new FoldableCodeBlock(5, 27);
-    assertEquals(expectedBlock, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0));
-    assertEquals(1, enumDefinition.getParsedCode().getFoldableCodeBlocks().size());
-    assertEquals(5, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getStartLine());
-    assertEquals(27, enumDefinition.getParsedCode().getFoldableCodeBlocks().get(0).getEndLine());
+    assertEquals(expectedBlock, enumDefinition.getParsedCode().foldableCodeBlocks.get(0));
+    assertEquals(1, enumDefinition.getParsedCode().foldableCodeBlocks.size());
+    assertEquals(5, enumDefinition.getParsedCode().foldableCodeBlocks.get(0).startLine);
+    assertEquals(27, enumDefinition.getParsedCode().foldableCodeBlocks.get(0).endLine);
   }
 
   @Test

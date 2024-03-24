@@ -154,7 +154,7 @@ public class SmtModelTest {
         new SAtom("d"),
         new SAtom("ee"),
         new SAtom("fff")
-    ), simple.getGlobalConstraints());
+    ), simple.globalConstraints);
   }
 
   @Test
@@ -163,7 +163,7 @@ public class SmtModelTest {
         new SAtom("a"),
         new SAtom("bb"),
         new SAtom("ccc")
-    ), simple.getVariableDefinitions());
+    ), simple.variableDefinitions);
   }
 
   @Test
@@ -209,7 +209,7 @@ public class SmtModelTest {
   @Test
   public void testEmptyConstructor() {
     SmtModel model = new SmtModel();
-    assertTrue(model.getVariableDefinitions().isEmpty());
-    assertTrue(model.getGlobalConstraints().isEmpty());
+    assertTrue(model.variableDefinitions.isEmpty());
+    assertTrue(model.globalConstraints.isEmpty());
   }
 }

@@ -9,8 +9,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeEnum;
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.experimental.theories.suppliers.TestedOn;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +39,7 @@ public class SmtEncoderTest {
     SmtEncoder smtEncoder = new SmtEncoder(3000, validSpec, freeVariables);
     SmtModel model = smtEncoder.getConstraint();
 
-    List<SExpression> constrains = model.getGlobalConstraints();
+    List<SExpression> constrains = model.globalConstraints;
     System.out.println(model.toString());
   }
 
@@ -59,8 +57,8 @@ public class SmtEncoderTest {
     SmtEncoder smtEncoder = new SmtEncoder(3000, validSpec, freeVariables);
     SmtModel model = smtEncoder.getConstraint();
 
-    Collection<SExpression> constrains = model.getGlobalConstraints();
-    Collection<SExpression> header = model.getVariableDefinitions();
+    Collection<SExpression> constrains = model.globalConstraints;
+    Collection<SExpression> header = model.variableDefinitions;
     System.out.println(model.toString());
     System.out.println(model.toText().length());
     System.out.println(header);
@@ -97,7 +95,7 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
+    List<SExpression> constraints = output.globalConstraints;
 
     System.out.println(output.toString());
 
@@ -131,7 +129,7 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
+    List<SExpression> constraints = output.globalConstraints;
 
     System.out.println(output.toString());
 
@@ -165,7 +163,7 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
+    List<SExpression> constraints = output.globalConstraints;
 
     System.out.println(output.toString());
 
@@ -218,8 +216,8 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, Collections.emptyList());
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
-    Collection<SExpression> definitions = output.getVariableDefinitions();
+    List<SExpression> constraints = output.globalConstraints;
+    Collection<SExpression> definitions = output.variableDefinitions;
 
 
 
@@ -249,7 +247,7 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
+    List<SExpression> constraints = output.globalConstraints;
 
 
     testWithStatements(constraints,
@@ -278,8 +276,8 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
-    Collection<SExpression> definitions = output.getVariableDefinitions();
+    List<SExpression> constraints = output.globalConstraints;
+    Collection<SExpression> definitions = output.variableDefinitions;
 
     System.out.println(output.toString());
 
@@ -302,8 +300,8 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDuration, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    List<SExpression> constraints = output.getGlobalConstraints();
-    Collection<SExpression> definitions = output.getVariableDefinitions();
+    List<SExpression> constraints = output.globalConstraints;
+    Collection<SExpression> definitions = output.variableDefinitions;
 
     System.out.println(output.toString());
     System.out.println(output.toText());
@@ -347,7 +345,7 @@ public class SmtEncoderTest {
 
     SmtEncoder smtEncoder = new SmtEncoder(maxDurations, spec, freeVariables);
     SmtModel output = smtEncoder.getConstraint();
-    Collection<SExpression> constraints = output.getGlobalConstraints();
+    Collection<SExpression> constraints = output.globalConstraints;
 
     System.out.println(output);
 

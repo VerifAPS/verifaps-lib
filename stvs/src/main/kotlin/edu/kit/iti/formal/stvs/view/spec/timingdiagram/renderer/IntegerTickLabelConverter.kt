@@ -1,12 +1,6 @@
-package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer;
+package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.ValueAxis;
-import javafx.util.StringConverter;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javafx.util.StringConverter
 
 /**
  * Created by csicar on 12.06.17.
@@ -20,19 +14,16 @@ import java.util.List;
   that has to be implemented for implementing ValueAxis is quite involved (deciding how many
   tick-marks should be displayed, given a certain height of the widget, etc.)
  */
-public class IntegerTickLabelConverter extends StringConverter<Number> {
-
-  @Override
-  public String toString(Number number) {
-    if (number.intValue() == number.doubleValue()) {
-      return ""+number.intValue();
+class IntegerTickLabelConverter : StringConverter<Number>() {
+    override fun toString(number: Number): String {
+        if (number.toInt().toDouble() == number.toDouble()) {
+            return "" + number.toInt()
+        }
+        return ""
     }
-    return "";
-  }
 
-  @Override
-  public Number fromString(String s) {
-    Number value = Double.parseDouble(s);
-    return value;
-  }
+    override fun fromString(s: String): Number {
+        val value: Number = s.toDouble()
+        return value
+    }
 }

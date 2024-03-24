@@ -54,7 +54,7 @@ public class SExpressionTest {
 
   @Test
   public void isAtom() throws Exception {
-    assertEquals(expression.toSexpr().isAtomic(), expression.isAtom());
+    assertEquals(expression.toSexpr().isAtomic(), expression.isAtom);
   }
 
   @Test

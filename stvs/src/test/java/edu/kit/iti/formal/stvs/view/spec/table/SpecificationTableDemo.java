@@ -69,7 +69,7 @@ public class SpecificationTableDemo {
         new HybridSpecification(freeVariableList, true));
     Pane extractedTablePane = createExtractedTableTextArea(
         table.getHybridSpecification(),
-        table.getValidator());
+            table.validator);
 
     return Arrays.asList(table.getView(), extractedTablePane);
   }
@@ -100,7 +100,7 @@ public class SpecificationTableDemo {
 
   private void updateProblemsText(TextArea problemsArea, ConstraintSpecificationValidator recognizer) {
     String error = String.join("\n", recognizer.problemsProperty().get().stream().map(
-        specProblem -> specProblem.getClass().getSimpleName() + ": " + specProblem.getErrorMessage()
+        specProblem -> specProblem.getClass().getSimpleName() + ": " + specProblem.errorMessage
     ).collect(Collectors.toList()));
     problemsArea.setText(error);
   }
