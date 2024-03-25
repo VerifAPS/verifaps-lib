@@ -21,9 +21,9 @@ import java.io.IOException
  *
  * @author Lukas Fritsch
  */
-class StvsMainScene @JvmOverloads constructor(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) {
+class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) {
 
-    private val rootModelProperty = SimpleObjectProperty<StvsRootModel>(rootModel)
+    private val rootModelProperty = SimpleObjectProperty(rootModel)
     var rootModel by rootModelProperty
 
     var rootController: StvsRootController = StvsRootController(rootModelProperty.get())

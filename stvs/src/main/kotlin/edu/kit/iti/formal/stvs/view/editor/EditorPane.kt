@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.editor
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.model.code.*
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.collections.ListChangeListener
@@ -13,6 +11,8 @@ import javafx.scene.layout.HBox
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory
 import org.fxmisc.richtext.model.StyleSpans
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 import java.util.function.IntFunction
 
 /**
@@ -90,7 +90,7 @@ class EditorPane @JvmOverloads constructor(
      * @return Node intended as the prefix
      */
     private fun createLinePrefixForLine(i: Int): Node {
-        val icon = GlyphsDude.createIconLabel(FontAwesomeIcon.EXCLAMATION_CIRCLE, "", null, null, null)
+        val icon = Label(null, FontIcon(FontAwesomeSolid.EXCLAMATION_CIRCLE))
         val lineSyntaxErrors = syntaxErrors.filtered { syntaxError -> syntaxError!!.line == i + 1 }
             .filterNotNull()
         setLineIcon(i, lineSyntaxErrors, icon)

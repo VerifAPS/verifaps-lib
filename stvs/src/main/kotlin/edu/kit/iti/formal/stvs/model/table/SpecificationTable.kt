@@ -31,13 +31,8 @@ open class SpecificationTable<H : Named?, C, D>(
 
     /**
      * Get the SpecIoVariables for this table, i.e. the column headers.
-     *
-     *
-     *
      * You should **not mutate** this list. For adding new columns, use
      * [SpecificationTable.addColumn].
-     *
-     *
      * @return the list of SpecIoVariables
      */
     var columnHeaders: ObservableList<H> = FXCollections.observableArrayList(columnHeaderExtractor)

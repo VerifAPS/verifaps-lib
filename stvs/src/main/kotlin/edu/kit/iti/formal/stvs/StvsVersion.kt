@@ -7,14 +7,15 @@ package edu.kit.iti.formal.stvs
 object StvsVersion {
     @JvmStatic
     val version: String
-        get() = StvsVersion::class.java.getPackage().implementationVersion
+        get() = "<version>"
 
     @JvmStatic
     val buildId: String
-        get() = StvsVersion::class.java.getPackage().specificationVersion
+        get() = ""
+
     @JvmStatic
     val name: String
-        get() = StvsVersion::class.java.getPackage().name
+        get() = "stvs"
 
     @JvmStatic
     val windowTitle: String

@@ -5,9 +5,7 @@ import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableValue
 import javafx.util.Callback
-import kotlinx.serialization.Serializable
 
 /**
  * A specification the cell contents and durations of which are specified by constraints rather than
@@ -33,7 +31,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
      *
      * @param freeVariableList The initial list of free variables
      */
-    constructor(freeVariableList: FreeVariableList) : this(SpecificationTable.DEFAULT_NAME, freeVariableList)
+    constructor(freeVariableList: FreeVariableList) : this(DEFAULT_NAME, freeVariableList)
 
     /**
      * Construct a new, empty ConstraintSpecification with a given name and an initial list of free
@@ -44,8 +42,8 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
      */
     init {
         this.onSpecIoVariableNameChanged =
-            ChangeListener<String?> { obs, nameBefore, nameAfter ->
-                this.onSpecIoVariableNameChanged(obs, nameBefore, nameAfter)
+            ChangeListener<String?> { _, nameBefore, nameAfter ->
+                this.onSpecIoVariableNameChanged(nameBefore, nameAfter)
             }
     }
 
@@ -64,7 +62,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
             columnHeaders.add(SpecIoVariable(specIoVariable))
         }
         for (row in sourceSpec.rows) {
-            val clonedCells = hashMapOf<String?, ConstraintCell>()
+            val clonedCells = hashMapOf<String, ConstraintCell>()
             for (colHeader in row!!.cells.keys) {
                 clonedCells[colHeader] = ConstraintCell(row.cells[colHeader])
             }
@@ -106,8 +104,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
     }
 
     private fun onSpecIoVariableNameChanged(
-        obs: ObservableValue<out String?>, nameBefore: String?,
-        nameAfter: String?
+        nameBefore: String?, nameAfter: String?
     ) {
         for (row in rows) {
             val entry = row!!.cells[nameBefore]
@@ -126,7 +123,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
          * which to fill the new row
          * @return A SpecificationRow containing the given ConstraintCells
          */
-        fun createRow(initialCells: Map<String?, ConstraintCell>): SpecificationRow<ConstraintCell> =
+        fun createRow(initialCells: Map<String, ConstraintCell>): SpecificationRow<ConstraintCell> =
             SpecificationRow(initialCells) { cell: ConstraintCell ->
                 arrayOf(cell.stringRepresentationProperty, cell.commentProperty)
             }

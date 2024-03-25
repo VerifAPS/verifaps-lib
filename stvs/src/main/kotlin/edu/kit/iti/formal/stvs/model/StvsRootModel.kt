@@ -80,8 +80,8 @@ class StvsRootModel @JvmOverloads constructor(
             parsedCode.definedVariables.forEach(Consumer { codeIoVariable: CodeIoVariable ->
                 hybridSpec.columnHeaders.add(
                     SpecIoVariable(
-                        codeIoVariable.category,
-                        codeIoVariable.type, codeIoVariable.name
+                        category = codeIoVariable.category,
+                        typeIdentifier = codeIoVariable.type, name = codeIoVariable.name
                     )
                 )
             })
@@ -102,9 +102,7 @@ class StvsRootModel @JvmOverloads constructor(
         fun autoloadSession(): StvsRootModel {
             val sessionFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_SESSION_FILENAME
             return try {
-                ImporterFacade.importSession(
-                    sessionFile, GlobalConfig(), History()
-                )
+                ImporterFacade.importSession(sessionFile, GlobalConfig(), History())
             } catch (e: Exception) {
                 StvsRootModel()
             }

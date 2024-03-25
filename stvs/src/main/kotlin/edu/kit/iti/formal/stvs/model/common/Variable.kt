@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.stvs.model.common
 
+import kotlinx.serialization.Serializable
+
 /**
  * A variable, having a name and a type.
  * @author Benjamin Alt
  */
-interface Variable : Named {
+@Serializable
+sealed interface Variable : Named {
     val type: String
 }

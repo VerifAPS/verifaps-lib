@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.menu
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.view.common.ActualHyperLink
 import edu.kit.iti.formal.stvs.view.common.FileSelectionField
 import javafx.beans.Observable
@@ -11,6 +9,8 @@ import javafx.beans.property.StringProperty
 import javafx.scene.Node
 import javafx.scene.control.Label
 import javafx.scene.layout.HBox
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 import java.io.File
 
 /**
@@ -22,7 +22,7 @@ class WizardFilePathPage(title: String, description: String?, filePath: StringPr
     private val notValidContainer = HBox(20.0)
 
     init {
-        val notValidIcon: Node = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE)
+        val notValidIcon: Node = FontIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE)
         notValidContainer.children.addAll(
             notValidIcon,
             Label("Something is wrong with this path. Not all features of STVS will work as expected!")

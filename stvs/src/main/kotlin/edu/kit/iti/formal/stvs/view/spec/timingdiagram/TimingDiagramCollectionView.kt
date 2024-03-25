@@ -1,8 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView
 import javafx.beans.Observable
@@ -16,6 +13,9 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.text.TextAlignment
 import javafx.stage.*
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * Represents the view for the collection of multiple timing diagrams.
@@ -50,7 +50,7 @@ class TimingDiagramCollectionView : VBox() {
         // Create the message at the top of all diagrams, that is visible when the diagram is outdated
         val outdatedLabel = Label("This Timing-Diagram is outdated.")
         outdatedLabel.styleClass.add("outdatedLabel")
-        val outdatedIcon: Node = GlyphsDude.createIcon(FontAwesomeIcon.EXCLAMATION_TRIANGLE)
+        val outdatedIcon: Node = FontIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE)
         outdatedIcon.styleClass.add("outdatedIcon")
         outdatedMessage = HBox(outdatedIcon, outdatedLabel)
         outdatedMessage.styleClass.add("outdatedMessage")
@@ -104,7 +104,7 @@ class TimingDiagramCollectionView : VBox() {
         tp.textAlignment = TextAlignment.LEFT
         tp.isWrapText = false
         val btnOpenExternal = Button()
-        btnOpenExternal.graphic = FontAwesomeIconView(FontAwesomeIcon.EXTERNAL_LINK_SQUARE)
+        btnOpenExternal.graphic = FontIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT)
         btnOpenExternal.onAction = EventHandler { event: ActionEvent -> this.showInDialog(event) }
         tp.graphic = btnOpenExternal
         tp.contentDisplay = ContentDisplay.RIGHT

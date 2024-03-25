@@ -1,12 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.variables
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import edu.kit.iti.formal.stvs.model.common.FreeVariable
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.scene.Node
 import javafx.scene.control.*
 import javafx.scene.layout.*
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * This is the view that displays free variables and offers editing them.
@@ -24,11 +24,11 @@ class VariableCollection : TitledPane() {
     private val toolBar = ToolBar()
     val btnRemoveRow: Button = Button(
         "Remove Rows",
-        FontAwesomeIconView(FontAwesomeIcon.MINUS_SQUARE)
+        FontIcon(FontAwesomeSolid.MINUS_SQUARE)
     )
     val btnAddRow: Button = Button(
         "Add Rows",
-        FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE)
+        FontIcon(FontAwesomeSolid.PLUS_SQUARE)
     )
 
 

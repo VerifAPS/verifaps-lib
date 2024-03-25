@@ -119,8 +119,8 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
     companion object {
         private fun createCellsFromRow(
             subscribingRow: SpecificationRow<ConstraintCell>
-        ): Map<String?, HybridCell<ConstraintCell>> {
-            val cells: MutableMap<String?, HybridCell<ConstraintCell>> = HashMap()
+        ): Map<String, HybridCell<ConstraintCell>> {
+            val cells = hashMapOf<String, HybridCell<ConstraintCell>>()
             for ((key, value) in subscribingRow.cells) {
                 val hybridCell = HybridCell(value)
                 cells[key] = hybridCell

@@ -3,24 +3,42 @@ package edu.kit.iti.formal.stvs.model.common
 import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.util.Callback
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * A free variable. Free variables have a name, a type and a default value and can occur in
  * constraint expressions.
  * @author Philipp
  */
-class FreeVariable @JvmOverloads
-/**
- * Creates a free variable with a name and type. A default value will be generated through
- * [Type.generateDefaultValue].
- *
- * @param name Name of the free variable
- * @param type Identifier of the type of the free variable
- */
-constructor(name: String?, type: String?, constraint: String? = null) : Variable {
-    val nameProperty: StringProperty = SimpleStringProperty(name)
-    val typeProperty: StringProperty = SimpleStringProperty(type)
-    val constraintProperty: StringProperty = SimpleStringProperty(constraint ?: DONTCARE)
+@Serializable
+class FreeVariable : Variable {
+    @Transient
+    val nameProperty: StringProperty = SimpleStringProperty()
+    override var name by nameProperty
+
+    @Transient
+    val typeProperty: StringProperty = SimpleStringProperty()
+    override var type by typeProperty
+
+    @Transient
+    val constraintProperty: StringProperty = SimpleStringProperty(DONTCARE)
+    var constraint by constraintProperty
+
+    /**
+     * Creates a free variable with a name and type. A default value will be generated through
+     * [Type.generateDefaultValue].
+     *
+     * @param name Name of the free variable
+     * @param type Identifier of the type of the free variable
+     */
+    constructor(name: String?, type: String?, constraint: String? = null) {
+        this.name = name
+        this.type = type
+        this.constraint = constraint ?: DONTCARE
+    }
 
     /**
      * Creates a free variable with a name, type and default value.
@@ -36,18 +54,7 @@ constructor(name: String?, type: String?, constraint: String? = null) : Variable
      */
     constructor(freeVar: FreeVariable) : this(freeVar.name, freeVar.type, freeVar.constraint)
 
-    var constraint: String?
-        get() = constraintProperty.get()
-        set(value) = constraintProperty.set(value)
-
     override fun toString(): String = "FreeVariable{name=$name, type=$type, constraint=$constraint}"
-    override var type: String
-        get() = typeProperty.get()
-        set(value) = typeProperty.set(value)
-
-    override var name: String?
-        get() = nameProperty.get()
-        set(value) = nameProperty.set(value)
 
     companion object {
         /**

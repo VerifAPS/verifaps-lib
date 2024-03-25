@@ -18,14 +18,14 @@ class FreeVariableList {
      * on the list.
      * @return The [ObservableList] of [FreeVariable]s
      */
-    var variables by variablesProperty
+    var variables: ObservableList<FreeVariable> by variablesProperty
 
     /**
      * Construct a FreeVariableList from a list of [FreeVariable]s.
      * @param variables The list of free variables
      */
     @JvmOverloads
-    constructor(variables: List<FreeVariable?>? = ArrayList()) {
+    constructor(variables: List<FreeVariable> = ArrayList()) {
         this.variables = FXCollections.observableList<FreeVariable?>(variables, FreeVariable.EXTRACTOR)
     }
 

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.stvs.model.expressions.Expression
 import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser
@@ -65,7 +66,7 @@ class CellParseProblem(exception: ParseException, column: String?, row: Int) :
         ): Expression {
             val parser = ExpressionParser(columnId, typeContext)
             try {
-                return parser.parseExpression(cell?.asString)
+                return parser.parseExpression(cell?.asString?:"")
             } catch (parseException: ParseException) {
                 throw CellParseProblem(parseException, columnId, row)
             } catch (unsupportedException: UnsupportedExpressionException) {

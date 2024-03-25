@@ -5,13 +5,14 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import javafx.beans.property.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import kotlinx.serialization.*
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
 import java.nio.file.Paths
 import kotlin.io.path.*
+
+
 
 /**
  * Contains global configuration specified by the user.

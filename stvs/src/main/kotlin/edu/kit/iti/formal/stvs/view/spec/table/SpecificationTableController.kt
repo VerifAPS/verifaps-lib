@@ -80,18 +80,18 @@ class SpecificationTableController(
         view.btnResize.onAction = EventHandler { event: ActionEvent? -> resizeColumns() }
 
         //view.getHeader().setContextMenu(createTopLevelContextMenu());
-        hybridSpecification.columnHeaders!!
+        hybridSpecification.columnHeaders
             .forEach(Consumer { specIoVariable: SpecIoVariable -> this.addColumnToView(specIoVariable) })
 
         validator.problemsProperty().addListener { o: Observable? -> onProblemsChange() }
         validator.recalculateSpecProblems()
 
-        hybridSpecification.getSelection()!!
+        hybridSpecification.getSelection()
             .setOnTimingDiagramSelectionClickListener({ columnId: String?, row: Int? ->
                 this.focusCell(columnId, row!!)
             })
 
-        hybridSpecification.getSelection()!!
+        hybridSpecification.getSelection()
             .columnProperty().addListener { obs, before: String?, columnNow: String? ->
                 this.onColumnSelectionChanged(obs, before, columnNow)
             }
@@ -187,8 +187,8 @@ class SpecificationTableController(
         val tableColumn = tableView.columns[1]
         val popOverManager =
             CommentPopOverManager(
-                hybridSpecification!!.rows!![index],
-                hybridSpecification!!.isEditable,
+                hybridSpecification!!.rows[index],
+                hybridSpecification.isEditable,
                 tableColumn.graphic,
                 0.0,
                 200.0
@@ -260,13 +260,13 @@ class SpecificationTableController(
      * @param index Index where the row should be added
      */
     fun addEmptyRow(index: Int) {
-        val wildcardCells: MutableMap<String?, ConstraintCell> = HashMap()
-        hybridSpecification!!.columnHeaders!!.forEach(
+        val wildcardCells: MutableMap<String, ConstraintCell> = HashMap()
+        hybridSpecification!!.columnHeaders.forEach(
             Consumer { specIoVariable: SpecIoVariable ->
                 wildcardCells[specIoVariable.name] = ConstraintCell("-")
             })
         val wildcardRow = ConstraintSpecification.createRow(wildcardCells)
-        hybridSpecification.hybridRows!!.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
+        hybridSpecification.hybridRows.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
     }
 
     /**
@@ -276,12 +276,12 @@ class SpecificationTableController(
      */
     fun addNewColumn(specIoVariable: SpecIoVariable) {
         // Add column to model:
-        if (hybridSpecification!!.hybridRows!!.isEmpty()) {
-            hybridSpecification.columnHeaders!!.add(specIoVariable)
+        if (hybridSpecification!!.hybridRows.isEmpty()) {
+            hybridSpecification.columnHeaders.add(specIoVariable)
         } else {
             val dataColumn =
                 SpecificationColumn(
-                    hybridSpecification.hybridRows!!.stream()
+                    hybridSpecification.hybridRows.stream()
                         .map<ConstraintCell>({ row: HybridRow? -> ConstraintCell("-") })
                         .collect(Collectors.toList())
                 )
@@ -295,16 +295,16 @@ class SpecificationTableController(
     private fun addColumnToView(specIoVariable: SpecIoVariable) {
         val column = createViewColumn(
             specIoVariable.name
-        ) { hybridRow: HybridRow? -> hybridRow!!.cells!![specIoVariable.name] }
+        ) { hybridRow: HybridRow? -> hybridRow!!.cells[specIoVariable.name] }
 
         column.userData = specIoVariable.name
         specIoVariable.nameProperty
             .addListener(InvalidationListener { o: Observable? -> column.setUserData(specIoVariable.name) })
         column.text = ""
         column.graphic = ColumnHeader(specIoVariable)
-        column.prefWidth = specIoVariable.columnConfig!!.getWidth()
+        column.prefWidth = specIoVariable.columnConfig.width
         column.widthProperty().addListener { obs: ObservableValue<out Number>?, old: Number?, newVal: Number ->
-            specIoVariable.columnConfig!!.setWidth(newVal.toDouble())
+            specIoVariable.columnConfig.width = newVal.toDouble()
         }
         column.contextMenu = createColumnContextMenu(column)
 
@@ -331,7 +331,7 @@ class SpecificationTableController(
     private fun rowFactory(tableView: TableView<HybridRow?>): TableRow<HybridRow?> {
         val row: TableRow<HybridRow?> = object : TableRow<HybridRow?>() {
             init {
-                hybridSpecification!!.getSelection()!!
+                hybridSpecification!!.getSelection()
                     .rowProperty().addListener { obs, before: Int?, now: Int? ->
                         this.rowSelectionChanged(before, now)
                     }

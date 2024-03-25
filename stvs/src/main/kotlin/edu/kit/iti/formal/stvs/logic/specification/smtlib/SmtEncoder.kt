@@ -216,7 +216,7 @@ class SmtEncoder(
      * @param variable variable for which the assertion should be generated
      * @return asserts that the variable is equal to its default value
      */
-    private fun getDefaultValueEquality(variable: ValidFreeVariable): SExpression? {
+    private fun getDefaultValueEquality(variable: ValidFreeVariable): SExpression {
         val constraint = variable.constraint
 
         val scev = SmtConvertExpressionVisitor(
@@ -240,12 +240,11 @@ class SmtEncoder(
         return ioVariableTypes.contains(name)
     }
 
-    private fun setFreeVariablesDefaultValues(): List<SExpression?> {
-        return validFreeVariables.stream()
+    private fun setFreeVariablesDefaultValues(): List<SExpression> {
+        return validFreeVariables
             .filter { variable: ValidFreeVariable -> variable.constraint != null }
-            .map<SExpression?> { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
-            .map { sexpr: SExpression -> SList.sexpr("assert", sexpr) }
-            .collect(Collectors.toList<SExpression?>())
+            .map { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
+            .map { SList.sexpr("assert", it) }
     }
 
     fun getTypeForVariable(variableName: String?): Type? {
@@ -260,7 +259,7 @@ class SmtEncoder(
         return type
     }
 
-    private fun createFreeVariables(): List<SExpression?> {
+    private fun createFreeVariables(): List<SExpression> {
         return freeVariablesContext.entries.stream()
             .filter { item: Map.Entry<String?, Type> -> !isIoVariable(item.key) }
             .map { item: Map.Entry<String?, Type> ->

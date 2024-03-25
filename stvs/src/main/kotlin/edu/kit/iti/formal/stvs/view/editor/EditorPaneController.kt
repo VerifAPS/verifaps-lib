@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.editor
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.stvs.model.code.*
 import edu.kit.iti.formal.stvs.model.code.ParsedCode.Companion.parseCode
@@ -20,6 +18,8 @@ import javafx.scene.input.*
 import org.antlr.v4.runtime.Token
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.ExecutorService
@@ -94,10 +94,10 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
 
     private fun createMenuItem(
         name: String, action: Runnable,
-        icon: FontAwesomeIcon
+        icon: FontAwesomeSolid
     ): MenuItem {
         val item = createMenuItem(name, action)
-        item.graphic = GlyphsDude.createIcon(icon)
+        item.graphic = FontIcon(icon)
         return item
     }
 
@@ -114,12 +114,12 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         val menu = ContextMenu()
         menu.items.addAll(createMenuItem(
             "Undo", { codeArea.undo() },
-            FontAwesomeIcon.UNDO
+            FontAwesomeSolid.UNDO
         ), createMenuItem("Redo") { codeArea.redo() },
             SeparatorMenuItem(),
-            createMenuItem("Paste", { codeArea.paste() }, FontAwesomeIcon.PASTE),
-            createMenuItem("Copy", { codeArea.copy() }, FontAwesomeIcon.COPY),
-            createMenuItem("Cut", { codeArea.cut() }, FontAwesomeIcon.CUT),
+            createMenuItem("Paste", { codeArea.paste() }, FontAwesomeSolid.PASTE),
+            createMenuItem("Copy", { codeArea.copy() }, FontAwesomeSolid.COPY),
+            createMenuItem("Cut", { codeArea.cut() }, FontAwesomeSolid.CUT),
             createMenuItem("Select All") { codeArea.selectAll() })
         view.contextMenu = menu
     }
@@ -158,7 +158,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
     }
 
     private fun computeHighlighting(
-        sourcecode: String?
+        sourcecode: String
     ): StyleSpans<Collection<String>> {
         val tokens: MutableList<Token?> = ArrayList()
         val syntaxErrors: MutableList<SyntaxError?> = ArrayList()

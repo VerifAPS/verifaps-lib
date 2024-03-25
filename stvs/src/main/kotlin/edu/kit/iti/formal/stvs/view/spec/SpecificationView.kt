@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.HybridRow
 import edu.kit.iti.formal.stvs.view.ViewUtils
@@ -17,6 +15,9 @@ import javafx.scene.control.*
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 import java.util.function.Supplier
 
 /**
@@ -46,11 +47,15 @@ class SpecificationView : VBox(), Lockable {
     var diagram: TimingDiagramCollectionView? = null
         set(value) {
             field = value
-            timingDiagramPane.children.setAll(diagram)
-            AnchorPane.setLeftAnchor(diagram, 0.0)
-            AnchorPane.setRightAnchor(diagram, 0.0)
-            AnchorPane.setTopAnchor(diagram, 0.0)
-            AnchorPane.setBottomAnchor(diagram, 0.0)
+            if (value == null) {
+                timingDiagramPane.children.setAll()
+            } else {
+                timingDiagramPane.children.setAll(diagram)
+                AnchorPane.setLeftAnchor(diagram, 0.0)
+                AnchorPane.setRightAnchor(diagram, 0.0)
+                AnchorPane.setTopAnchor(diagram, 0.0)
+                AnchorPane.setBottomAnchor(diagram, 0.0)
+            }
         }
 
     /**
@@ -92,7 +97,7 @@ class SpecificationView : VBox(), Lockable {
      * Set verification button to a state that signals that the verification can be started.
      */
     fun setVerificationButtonPlay() {
-        val icon = GlyphsDude.createIcon(FontAwesomeIcon.PLAY)
+        val icon = FontIcon(FontAwesomeSolid.PLAY)
         icon.fill = Color.MEDIUMSEAGREEN
         startButton.text = "Verify"
         startButton.graphic = icon
@@ -103,7 +108,7 @@ class SpecificationView : VBox(), Lockable {
      * Set verification button to a state that signals that the verification can be stopped.
      */
     fun setVerificationButtonStop() {
-        val icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP)
+        val icon = FontIcon(FontAwesomeSolid.STOP)
         icon.fill = Color.INDIANRED
         startButton.text = "Stop Verification"
         startButton.graphic = icon
@@ -113,7 +118,7 @@ class SpecificationView : VBox(), Lockable {
      * Set concretizer button to a state that signals that the concretizer can be started.
      */
     fun setConcretizerButtonStart() {
-        val icon = GlyphsDude.createIcon(FontAwesomeIcon.LINE_CHART)
+        val icon = FontIcon(FontAwesomeRegular.CHART_BAR)
         icon.fill = Color.MEDIUMSEAGREEN
         startConcretizerButton.text = "Concretize"
         startConcretizerButton.styleClass.addAll("action", "action-concretize")
@@ -124,7 +129,7 @@ class SpecificationView : VBox(), Lockable {
      * Set concretizer button to a state that signals that the concretizer can be stopped.
      */
     fun setConcretizerButtonStop() {
-        val icon = GlyphsDude.createIcon(FontAwesomeIcon.STOP)
+        val icon = FontIcon(FontAwesomeSolid.STOP)
         icon.fill = Color.INDIANRED
         startConcretizerButton.text = "Stop Concretization"
         startConcretizerButton.graphic = icon

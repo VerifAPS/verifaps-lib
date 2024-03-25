@@ -1,13 +1,15 @@
 package edu.kit.iti.formal.stvs.view.common
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.*
-import javafx.scene.layout.*
+import javafx.scene.control.Button
+import javafx.scene.control.TextField
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.stage.FileChooser
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * A text field with a button for choosing a file and displaying their path.
@@ -24,7 +26,7 @@ class FileSelectionField : HBox() {
         spacing = 10.0
         ViewUtils.setupClass(this)
         textField = TextField()
-        val fileSelectButton = GlyphsDude.createIconButton(FontAwesomeIcon.FOLDER_OPEN)
+        val fileSelectButton = Button(null, FontIcon(FontAwesomeSolid.FOLDER_OPEN))
         children.add(textField)
         children.add(fileSelectButton)
         fileSelectButton.onAction =

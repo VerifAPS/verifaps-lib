@@ -5,6 +5,9 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.antlr.v4.runtime.Token
 import tornadofx.getValue
 import tornadofx.setValue
@@ -15,24 +18,30 @@ import tornadofx.setValue
  * @author Lukas
  * @author Philipp
  */
-class Code @JvmOverloads constructor(filename: String? =  "", sourcecode: String? = "") {
-    val filenameProperty: StringProperty = SimpleStringProperty(filename)
-    var filename by filenameProperty
+@Serializable
+class Code {
+    @Transient
+    val filenameProperty: StringProperty = SimpleStringProperty(null)
+    var filename: String? by filenameProperty
 
-    val sourceCodeProperty: StringProperty = SimpleStringProperty(sourcecode)
+    @Transient
+    val sourceCodeProperty: StringProperty = SimpleStringProperty("")
     var sourcecode: String by sourceCodeProperty
 
     /**
      * last valid parsed Code.
      */
+    @Transient
     val parsedCodeProperty = NullableProperty<ParsedCode?>()
-    var parsedCode by parsedCodeProperty
+    var parsedCode: ParsedCode? by parsedCodeProperty
 
+    @Transient
     val tokensProperty: SimpleListProperty<Token> = SimpleListProperty(FXCollections.observableArrayList())
-    var tokens by tokensProperty
+    var tokens: ObservableList<Token> by tokensProperty
 
+    @Transient
     val syntaxErrorsProperty: SimpleListProperty<SyntaxError> = SimpleListProperty(FXCollections.observableArrayList())
-    var syntaxErrors by syntaxErrorsProperty
+    var syntaxErrors: ObservableList<SyntaxError> by syntaxErrorsProperty
 
     /**
      * Creates a codefile which is invalidated.
@@ -40,6 +49,11 @@ class Code @JvmOverloads constructor(filename: String? =  "", sourcecode: String
      * @param filename name of the codefile
      * @param sourcecode content of the codefile
      */
+    constructor(filename: String? = null, sourcecode: String = "") {
+        this.filename = filename
+        this.sourcecode = sourcecode
+    }
+
     /**
      * Creates a default codefile.
      */

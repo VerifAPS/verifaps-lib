@@ -11,7 +11,8 @@ import kotlin.math.max
  */
 class SmtConvertExpressionVisitor(
     private val smtEncoder: SmtEncoder, private val row: Int, private val iteration: Int,
-    private val column: ValidIoVariable) : ExpressionVisitor<SExpression> {
+    private val column: ValidIoVariable
+) : ExpressionVisitor<SExpression> {
     val constraint: SmtModel
 
     /**
@@ -29,7 +30,7 @@ class SmtConvertExpressionVisitor(
         this.constraint = SmtModel().addHeaderDefinitions(
             SList(
                 "declare-const", name,
-                SmtEncoder.getSmtLibVariableTypeName(column.validType)!!
+                SmtEncoder.getSmtLibVariableTypeName(column.validType)
             )
         )
 
@@ -55,10 +56,8 @@ class SmtConvertExpressionVisitor(
 
 
     override fun visitBinaryFunction(binaryFunctionExpr: BinaryFunctionExpr): SExpression {
-        val left =
-            binaryFunctionExpr.firstArgument!!.takeVisitor<SExpression>(this)
-        val right =
-            binaryFunctionExpr.secondArgument!!.takeVisitor<SExpression>(this)
+        val left = binaryFunctionExpr.firstArgument.takeVisitor(this)
+        val right = binaryFunctionExpr.secondArgument.takeVisitor(this)
 
         when (binaryFunctionExpr.operation) {
             BinaryFunctionExpr.Op.NOT_EQUALS -> return SList("not", SList("=", left, right))
@@ -73,7 +72,7 @@ class SmtConvertExpressionVisitor(
     }
 
     override fun visitUnaryFunction(unaryFunctionExpr: UnaryFunctionExpr): SExpression {
-        val argument = unaryFunctionExpr.argument!!.takeVisitor<SExpression>(this)
+        val argument = unaryFunctionExpr.argument!!.takeVisitor(this)
         val name = smtlibUnaryOperationNames[unaryFunctionExpr.operation]
             ?: if (unaryFunctionExpr.operation == UnaryFunctionExpr.Op.UNARY_MINUS) {
                 return SList(
@@ -92,7 +91,7 @@ class SmtConvertExpressionVisitor(
 
     override fun visitLiteral(literalExpr: LiteralExpr): SExpression {
         val literalAsString =
-            literalExpr.value!!.match({ integer: Int -> BitvectorUtils.hexFromInt(integer, 4) },
+            literalExpr.value.match({ integer: Int -> BitvectorUtils.hexFromInt(integer, 4) },
                 { bool: Boolean -> if (bool) "true" else "false" },
                 { enumeration: ValueEnum? -> this.getEnumValueAsBitvector(enumeration) })
         return SAtom(literalAsString)

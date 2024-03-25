@@ -180,7 +180,7 @@ class Z3Solver(config: GlobalConfig) {
         ) {
             for (cycle in 0 until duration.duration) {
                 val rawRow: Map<String?, String>? = rawRows[duration.beginCycle + cycle]
-                val newRow: MutableMap<String?, ConcreteCell> = HashMap()
+                val newRow= hashMapOf<String, ConcreteCell>()
                 validIoVariables.forEach(Consumer { validIoVariable: ValidIoVariable? ->
                     if (rawRow == null) {
                         newRow[validIoVariable!!.name] = ConcreteCell(validIoVariable.validType.generateDefaultValue())

@@ -2,68 +2,44 @@ package edu.kit.iti.formal.stvs.model.config
 
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * Configuration for table column. Contains GUI-related information about a column.
  *
  * @author Philipp
  */
+@Serializable
 class ColumnConfig {
-    private var width: DoubleProperty
-
-    /**
-     * Default ColumnConfig.
-     */
-    constructor() {
-        width = SimpleDoubleProperty(100.0)
-    }
+    @Transient
+    private val widthProperty = SimpleDoubleProperty(100.0)
+    var width by widthProperty
 
     /**
      * Create a new ColumnConfig.
      *
      * @param colwidth The initial column width
      */
-    constructor(colwidth: Double) {
+    constructor(colwidth: Double=100.0) {
         require(!(colwidth <= 0)) { "Column width must be positive" }
-        width = SimpleDoubleProperty(colwidth)
+        width = colwidth
     }
 
-    /**
-     * Get the current column width.
-     *
-     * @return The current column width
-     */
-    fun getWidth(): Double {
-        return width.get()
-    }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ColumnConfig) return false
 
-    /**
-     * Set the current column width.
-     *
-     * @param width The current column width
-     */
-    fun setWidth(width: Double) {
-        require(!(width <= 0)) { "Column width must be positive" }
-        this.width.set(width)
-    }
+        if (width != other.width) return false
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj !is ColumnConfig) {
-            return false
-        }
-
-        return width.get() == obj.width.get()
+        return true
     }
 
     override fun hashCode(): Int {
-        val bits = java.lang.Double.doubleToRawLongBits(width.get())
-        return (bits xor (bits shr 32)).toInt()
+        return width.hashCode()
     }
 
-    fun widthProperty(): DoubleProperty {
-        return width
-    }
+
 }

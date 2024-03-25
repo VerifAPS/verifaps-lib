@@ -98,12 +98,10 @@ class VariableCollectionController(
         freeVariableList!!.variables.add(FreeVariable("variable", "BOOL"))
     }
 
-    private fun cellFactory(
-        tableColumn: TableColumn<FreeVariable?, String?>
-    ): TableCell<FreeVariable?, String?> {
+    private fun cellFactory(tableColumn: TableColumn<FreeVariable?, String?>): TableCell<FreeVariable?, String?> {
         return object : TextFieldTableCell<FreeVariable?, String>(DefaultStringConverter()) {
             init {
-                validator.problemsProperty.addListener { o: Observable? -> onProblemsChanged() }
+                validator.problemsProperty.addListener { _: Observable? -> onProblemsChanged() }
                 styleClass.add("freevar")
                 onProblemsChanged()
             }
@@ -119,7 +117,7 @@ class VariableCollectionController(
                 tooltip = null
             }
 
-            override fun updateItem(item: String, empty: Boolean) {
+            override fun updateItem(item: String?, empty: Boolean) {
                 super.updateItem(item, empty)
                 onProblemsChanged()
             }

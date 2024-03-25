@@ -1,12 +1,17 @@
 package edu.kit.iti.formal.stvs.model.config
 
+
 import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import tornadofx.getValue
+import tornadofx.setValue
 import java.io.IOException
 import java.nio.file.Files
 import java.util.function.Consumer
@@ -20,14 +25,16 @@ import kotlin.io.path.isDirectory
  * @author Benjamin Alt
  */
 @Serializable
-data class History(
+class History {
     /**
      * Get the current file history.
      *
      * @return An ObservableList with the most recently opened filenames.
      */
-    val filenames: ObservableList<String> = FXCollections.observableArrayList()
-) {
+    @Transient
+    val filenamesProperty = SimpleListProperty(FXCollections.observableArrayList<String>())
+    var filenames: ObservableList<String> by filenamesProperty
+
 
     /**
      * Creates a history of recently opened files from the given collection.
@@ -36,7 +43,7 @@ data class History(
      * @param filenames the most recently opened files.
      * @throws IllegalArgumentException if the given collection is bigger than [.HISTORY_DEPTH]
      */
-    constructor(filenames: Collection<String>) : this() {
+    constructor(filenames: Collection<String> = listOf()) {
         require(filenames.size <= HISTORY_DEPTH) {
             // Don't silently cut off the part of the input collection that doesn't fit
             "List of filenames exceeds history size"
@@ -60,7 +67,7 @@ data class History(
         // Prevent filenames from getting larger than HISTORY_DEPTH
         val excess = filenames.size - HISTORY_DEPTH + 1
         if (excess > 0) {
-            filenames.remove(0, excess)
+            filenamesProperty.get().remove(0, excess)
         }
         filenames.add(filename)
     }
@@ -92,6 +99,20 @@ data class History(
     fun setAll(history: History) {
         history.filenames.forEach(Consumer { filename: String -> this.addFilename(filename) })
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is History) return false
+
+        if (filenames != other.filenames) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return filenames.hashCode()
+    }
+
 
     companion object {
         private const val AUTOLOAD_HISTORY_FILENAME = "stvs-history.json"

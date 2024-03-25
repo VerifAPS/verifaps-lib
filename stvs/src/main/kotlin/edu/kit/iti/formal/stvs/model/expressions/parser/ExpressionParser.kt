@@ -1,9 +1,11 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser
 
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.stvs.model.expressions.*
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.tree.ParseTree
-import org.antlr.v4.runtime.tree.TerminalNode
 
 /**
  * This class parses Expressions using the ANTLR parser generator library. The resulting Expression
@@ -11,7 +13,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
  *
  * @author Philipp
  */
-class ExpressionParser : CellExpressionBaseVisitor<Expression> {
+class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     private var columnName: String?
     private var columnAsVariable: Expression
     private var enumValues: Map<String, ValueEnum>
@@ -65,11 +67,11 @@ class ExpressionParser : CellExpressionBaseVisitor<Expression> {
      * @throws UnsupportedExpressionException When unsupported grammar features are reached
      */
     @Throws(ParseException::class, UnsupportedExpressionException::class)
-    fun parseExpression(expressionAsString: String?): Expression {
-        val charStream: CharStream = ANTLRInputStream(expressionAsString)
-        val lexer = CellExpressionLexer(charStream)
-        val tokens: TokenStream = CommonTokenStream(lexer)
-        val parser = CellExpressionParser(tokens)
+    fun parseExpression(expressionAsString: String): Expression {
+        val charStream = CharStreams.fromString(expressionAsString)
+        val lexer = TestTableLanguageLexer(charStream)
+        val tokens = CommonTokenStream(lexer)
+        val parser = TestTableLanguageParser(tokens)
         parser.removeErrorListeners()
         parser.addErrorListener(ThrowingErrorListener())
         try {
@@ -98,49 +100,53 @@ class ExpressionParser : CellExpressionBaseVisitor<Expression> {
         return tree.accept(this)
     }
 
-    override fun visitCell(ctx: CellExpressionParser.CellContext): Expression {
+    override fun visitCell(ctx: TestTableLanguageParser.CellContext): Expression {
         val optionalExpression =
-            ctx.chunk().stream().map { chunkContext: CellExpressionParser.ChunkContext -> chunkContext.accept(this) }
+            ctx.chunk().stream().map { chunkContext: TestTableLanguageParser.ChunkContext -> chunkContext.accept(this) }
                 .reduce { e1, e2 -> BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2) }
         // We can always .get() this value, since the grammar enforces
         // that at least one chunk exists in a cell.
         return optionalExpression.get()
     }
 
-    override fun visitDontcare(ctx: CellExpressionParser.DontcareContext): Expression {
+    override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): Expression {
         return LiteralExpr(ValueBool.TRUE)
     }
 
-    override fun visitConstant(ctx: CellExpressionParser.ConstantContext): Expression {
-        val literalExpr: Expression = LiteralExpr(valueFromConstantToken(ctx))
-        return BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, literalExpr)
+    override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext?): Expression {
+        return LiteralExpr(ValueBool.TRUE)
     }
 
-    override fun visitBconstant(ctx: CellExpressionParser.BconstantContext): Expression {
-        return LiteralExpr(valueFromConstantToken(ctx.constant()))
+    override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext?): Expression {
+        return LiteralExpr(ValueBool.TRUE)
+
     }
 
-    override fun visitVariable(ctx: CellExpressionParser.VariableContext): Expression {
+    override fun visitConstantString(ctx: TestTableLanguageParser.ConstantStringContext): Expression {
+        return LiteralExpr(TODO())
+    }
+
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): Expression {
         // If we come here, its a top-level variable.
         // In this case there's an implicit equality with the column variable.
         val variableExpr = parseOccuringString(ctx)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, variableExpr)
     }
 
-    override fun visitBvariable(ctx: CellExpressionParser.BvariableContext): Expression {
+    override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext): Expression {
         return parseOccuringString(ctx.variable())
     }
 
     // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
-    private fun parseOccuringString(ctx: CellExpressionParser.VariableContext): Expression {
-        return parseArrayIndex(ctx)?.let { index: Int ->
+    private fun parseOccuringString(ctx: TestTableLanguageParser.VariableContext): Expression {
+        return parseArrayIndex(ctx).let { index: Int ->
             // If it has an index to it, like A[-2], its a variable for sure
             // (indices don't make sense for enums!)
             VariableExpr(parseIdentifier(ctx), index)
         } ?: maybeParseEnum(ctx)
     }
 
-    private fun maybeParseEnum(ctx: CellExpressionParser.VariableContext): Expression {
+    private fun maybeParseEnum(ctx: TestTableLanguageParser.VariableContext): Expression {
         val identifier = parseIdentifier(ctx)
         val enumValue = enumValues[identifier]
 
@@ -152,58 +158,35 @@ class ExpressionParser : CellExpressionBaseVisitor<Expression> {
         }
     }
 
-    private fun parseArrayIndex(ctx: CellExpressionParser.VariableContext) =
-        ctx.INTEGER()?.let { getArrayIndex(it) }
+    private fun parseArrayIndex(ctx: TestTableLanguageParser.VariableContext) =
+        ctx.i().text.toInt().let { getArrayIndex(it) }
 
-    private fun parseIdentifier(ctx: CellExpressionParser.VariableContext): String {
+    private fun parseIdentifier(ctx: TestTableLanguageParser.VariableContext): String {
         return ctx.IDENTIFIER().text
     }
 
-    private fun valueFromConstantToken(ctx: CellExpressionParser.ConstantContext): Value {
-        // I have to trust ANTLR to not have any other values here... :/
-        when (ctx.a.type) {
-            CellExpressionLexer.INTEGER -> {
-                val tooLongExpression = ParseException(
-                    ctx.a.line,
-                    ctx.a.charPositionInLine, "Integer value is too big: " + ctx.a.text
-                )
-                try {
-                    val parsedInt = ctx.text.toShort().toInt()
-                    return ValueInt(parsedInt)
-                } catch (nfe: NumberFormatException) {
-                    throw ParseRuntimeException(tooLongExpression)
-                }
-                return ValueBool.TRUE
-            }
-
-            CellExpressionLexer.T -> return ValueBool.TRUE
-            CellExpressionLexer.F -> return ValueBool.FALSE
-            else -> throw IllegalStateException("Can not parse given value.")
-        }
-    }
-
-    override fun visitSinglesided(ctx: CellExpressionParser.SinglesidedContext): Expression {
-        val op = binaryOperationFromToken(ctx.op.relOp)
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): Expression {
+        val op = binaryOperationFromToken(ctx.op.start)
         val rightSide = ctx.expr().accept(this)
         return BinaryFunctionExpr(op, columnAsVariable, rightSide)
     }
 
     private fun binaryOperationFromToken(token: Token): BinaryFunctionExpr.Op {
         return when (token.type) {
-            CellExpressionLexer.EQUALS -> BinaryFunctionExpr.Op.EQUALS
-            CellExpressionLexer.NOT_EQUALS -> BinaryFunctionExpr.Op.NOT_EQUALS
-            CellExpressionLexer.GREATER_THAN -> BinaryFunctionExpr.Op.GREATER_THAN
-            CellExpressionLexer.GREATER_EQUALS -> BinaryFunctionExpr.Op.GREATER_EQUALS
-            CellExpressionLexer.LESS_THAN -> BinaryFunctionExpr.Op.LESS_THAN
-            CellExpressionLexer.LESS_EQUALS -> BinaryFunctionExpr.Op.LESS_EQUALS
-            CellExpressionLexer.AND -> BinaryFunctionExpr.Op.AND
-            CellExpressionLexer.OR -> BinaryFunctionExpr.Op.OR
-            CellExpressionLexer.XOR -> BinaryFunctionExpr.Op.XOR
-            CellExpressionLexer.PLUS -> BinaryFunctionExpr.Op.PLUS
-            CellExpressionLexer.MINUS -> BinaryFunctionExpr.Op.MINUS
-            CellExpressionLexer.MULT -> BinaryFunctionExpr.Op.MULTIPLICATION
-            CellExpressionLexer.DIV -> BinaryFunctionExpr.Op.DIVISION
-            CellExpressionLexer.MOD -> BinaryFunctionExpr.Op.MODULO
+            TestTableLanguageLexer.EQUALS -> BinaryFunctionExpr.Op.EQUALS
+            TestTableLanguageLexer.NOT_EQUALS -> BinaryFunctionExpr.Op.NOT_EQUALS
+            TestTableLanguageLexer.GREATER_THAN -> BinaryFunctionExpr.Op.GREATER_THAN
+            TestTableLanguageLexer.GREATER_EQUALS -> BinaryFunctionExpr.Op.GREATER_EQUALS
+            TestTableLanguageLexer.LESS_THAN -> BinaryFunctionExpr.Op.LESS_THAN
+            TestTableLanguageLexer.LESS_EQUALS -> BinaryFunctionExpr.Op.LESS_EQUALS
+            TestTableLanguageLexer.AND -> BinaryFunctionExpr.Op.AND
+            TestTableLanguageLexer.OR -> BinaryFunctionExpr.Op.OR
+            TestTableLanguageLexer.XOR -> BinaryFunctionExpr.Op.XOR
+            TestTableLanguageLexer.PLUS -> BinaryFunctionExpr.Op.PLUS
+            TestTableLanguageLexer.MINUS -> BinaryFunctionExpr.Op.MINUS
+            TestTableLanguageLexer.MULT -> BinaryFunctionExpr.Op.MULTIPLICATION
+            TestTableLanguageLexer.DIV -> BinaryFunctionExpr.Op.DIVISION
+            TestTableLanguageLexer.MOD -> BinaryFunctionExpr.Op.MODULO
             else -> throw ParseRuntimeException(
                 ParseException(
                     token.line, token.charPositionInLine,
@@ -213,74 +196,74 @@ class ExpressionParser : CellExpressionBaseVisitor<Expression> {
         }
     }
 
-    override fun visitPlus(ctx: CellExpressionParser.PlusContext): Expression {
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.PLUS, left, right)
     }
 
-    override fun visitSubstract(ctx: CellExpressionParser.SubstractContext): Expression {
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.MINUS, left, right)
     }
 
-    override fun visitMult(ctx: CellExpressionParser.MultContext): Expression {
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.MULTIPLICATION, left, right)
     }
 
-    override fun visitDiv(ctx: CellExpressionParser.DivContext): Expression {
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.DIVISION, left, right)
     }
 
-    override fun visitMod(ctx: CellExpressionParser.ModContext): Expression {
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.MODULO, left, right)
     }
 
-    override fun visitLogicalAnd(ctx: CellExpressionParser.LogicalAndContext): Expression {
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, left, right)
     }
 
-    override fun visitLogicalXor(ctx: CellExpressionParser.LogicalXorContext): Expression {
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.XOR, left, right)
     }
 
-    override fun visitLogicalOr(ctx: CellExpressionParser.LogicalOrContext): Expression {
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.OR, left, right)
     }
 
-    override fun visitInequality(ctx: CellExpressionParser.InequalityContext): Expression {
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.NOT_EQUALS, left, right)
     }
 
-    override fun visitEquality(ctx: CellExpressionParser.EqualityContext): Expression {
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, left, right)
     }
 
 
-    override fun visitCompare(ctx: CellExpressionParser.CompareContext): Expression {
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext): Expression {
         val left = ctx.left.accept(this)
         val right = ctx.right.accept(this)
         return BinaryFunctionExpr(binaryOperationFromToken(ctx.op), left, right)
     }
 
-    override fun visitInterval(ctx: CellExpressionParser.IntervalContext): Expression {
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): Expression {
         val lower = ctx.lower.accept(this)
         val upper = ctx.upper.accept(this)
         return makeInterval(columnAsVariable, lower, upper)
@@ -296,30 +279,29 @@ class ExpressionParser : CellExpressionBaseVisitor<Expression> {
         return BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, greaterThanLower, smallerThanUpper)
     }
 
-    override fun visitMinus(ctx: CellExpressionParser.MinusContext): Expression {
+    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): Expression {
         val toBeNegated = ctx.sub.accept(this)
         return UnaryFunctionExpr(UnaryFunctionExpr.Op.UNARY_MINUS, toBeNegated)
     }
 
-    override fun visitNegation(ctx: CellExpressionParser.NegationContext): Expression {
+    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): Expression {
         return UnaryFunctionExpr(UnaryFunctionExpr.Op.NOT, ctx.sub.accept(this))
     }
 
-    override fun visitParens(ctx: CellExpressionParser.ParensContext): Expression {
+    override fun visitParens(ctx: TestTableLanguageParser.ParensContext): Expression {
         return ctx.sub.accept(this)
     }
 
-    override fun visitGuardedcommand(ctx: CellExpressionParser.GuardedcommandContext): Expression {
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): Expression {
         throw UnsupportedExpressionRuntimeException("Guarded command (if)")
     }
 
-    override fun visitFunctioncall(ctx: CellExpressionParser.FunctioncallContext): Expression {
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): Expression {
         throw UnsupportedExpressionRuntimeException("Functioncall")
     }
 
     companion object {
-        private fun getArrayIndex(node: TerminalNode): Int {
-            val index = node.text.toInt()
+        private fun getArrayIndex(index: Int): Int {
             if (index > 0) {
                 throw UnsupportedExpressionRuntimeException("Positive Variable Index")
             }

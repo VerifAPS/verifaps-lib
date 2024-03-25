@@ -83,8 +83,8 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
          * @return Generated variable
          */
         get() = SpecIoVariable(
-            categoryComboBox.value!!, typeTextField.text,
-            nameTextField.text
+            category = categoryComboBox.value!!, typeIdentifier = typeTextField.text,
+            name = nameTextField.text
         )
 
     /**

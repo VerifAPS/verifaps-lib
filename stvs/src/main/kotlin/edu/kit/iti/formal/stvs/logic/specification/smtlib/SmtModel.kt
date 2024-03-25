@@ -12,9 +12,10 @@ import java.util.stream.Collectors
  */
 class SmtModel : SExpression {
     @JvmField
-    val globalConstraints: MutableList<SExpression?>?
+    val globalConstraints: MutableList<SExpression> = arrayListOf()
+
     @JvmField
-    val variableDefinitions: MutableList<SExpression?>?
+    val variableDefinitions: MutableList<SExpression> = arrayListOf()
 
     /**
      * Creates an instance with preset definitions/constraints. both lists should be modifiable
@@ -22,17 +23,9 @@ class SmtModel : SExpression {
      * @param globalConstraints list of global constraints
      * @param variableDefinitions list of variable definitions
      */
-    constructor(globalConstraints: MutableList<SExpression?>?, variableDefinitions: MutableList<SExpression?>?) {
-        this.globalConstraints = globalConstraints
-        this.variableDefinitions = variableDefinitions
-    }
-
-    /**
-     * Creates an instance with empty sets.
-     */
-    constructor() {
-        this.globalConstraints = ArrayList()
-        this.variableDefinitions = ArrayList()
+    constructor(globalConstraints: List<SExpression> =listOf(), variableDefinitions: List<SExpression> =listOf()) {
+        this.globalConstraints.addAll(globalConstraints)
+        this.variableDefinitions.addAll(variableDefinitions)
     }
 
     /**
@@ -54,8 +47,10 @@ class SmtModel : SExpression {
         val equivalentSList = SList().addAll(
             variableDefinitions
         )
-        globalConstraints?.forEach(Consumer { constraint: SExpression? -> equivalentSList.addAll(SList("assert", constraint)) })
-        return equivalentSList!!.toSexpr()
+        globalConstraints.forEach(Consumer { constraint: SExpression ->
+            equivalentSList.addAll(SList("assert", constraint))
+        })
+        return equivalentSList.toSexpr()
     }
 
     /**
@@ -74,30 +69,30 @@ class SmtModel : SExpression {
      * @return constraints as string
      */
     fun globalConstraintsToText(): String {
-        return globalConstraints!!.stream().map { constr: SExpression? -> SList("assert", constr) }
+        return globalConstraints.stream().map { constr: SExpression -> SList("assert", constr) }
             .map { obj: SList -> obj.toText() }.collect(Collectors.joining(" \n "))
     }
 
-    override fun toText(): String? {
+    override fun toText(): String {
         return """${headerToText()} 
  ${globalConstraintsToText()}"""
     }
 
-    fun addGlobalConstrains(vararg globalConstraint: SExpression?): SmtModel {
-        return addGlobalConstrains(Arrays.asList(*globalConstraint))
+    fun addGlobalConstrains(vararg globalConstraint: SExpression): SmtModel {
+        return addGlobalConstrains(listOf(*globalConstraint))
     }
 
-    fun addGlobalConstrains(globalConstraints: Collection<SExpression?>?): SmtModel {
-        this.globalConstraints!!.addAll(globalConstraints!!)
+    fun addGlobalConstrains(globalConstraints: Collection<SExpression>): SmtModel {
+        this.globalConstraints.addAll(globalConstraints)
         return this
     }
 
-    fun addHeaderDefinitions(vararg variableDefinition: SExpression?): SmtModel {
+    fun addHeaderDefinitions(vararg variableDefinition: SExpression): SmtModel {
         return addHeaderDefinitions(Arrays.asList(*variableDefinition))
     }
 
-    fun addHeaderDefinitions(variableDefinitions: Collection<SExpression?>?): SmtModel {
-        this.variableDefinitions!!.addAll(variableDefinitions!!)
+    fun addHeaderDefinitions(variableDefinitions: Collection<SExpression>): SmtModel {
+        this.variableDefinitions.addAll(variableDefinitions)
         return this
     }
 
@@ -106,9 +101,9 @@ class SmtModel : SExpression {
 
     override fun toString(): String {
         return ("SmtModel{\n" + "\tglobalConstraints=\n\t\t"
-                + globalConstraints!!.stream().map { obj: SExpression? -> obj.toString() }
+                + globalConstraints.stream().map { obj: SExpression? -> obj.toString() }
             .collect(Collectors.joining("\n\t\t"))
-                + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions!!.stream()
+                + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream()
             .map { obj: SExpression? -> obj.toString() }.collect(Collectors.joining("\n\t\t"))
                 + "\n}")
     }
@@ -132,8 +127,8 @@ class SmtModel : SExpression {
     }
 
     override fun hashCode(): Int {
-        var result = globalConstraints?.hashCode() ?: 0
-        result = 31 * result + (variableDefinitions?.hashCode() ?: 0)
+        var result = globalConstraints.hashCode()
+        result = 31 * result + variableDefinitions.hashCode()
         return result
     }
 }

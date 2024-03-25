@@ -1,8 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.variables.clipboard
 
-import com.google.gson.Gson
 import edu.kit.iti.formal.stvs.model.common.FreeVariable
-import java.util.stream.Collectors
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /**
  * This class handles the conversion from a list of [FreeVariable] to JSON and vice versa.
@@ -10,7 +11,7 @@ import java.util.stream.Collectors
  * @author Philipp
  */
 object Json {
-    private val GSON = Gson()
+    var json = Json
 
     /**
      * Generates JSON from variables.
@@ -18,7 +19,7 @@ object Json {
      * @return Stringified JSON version of variables
      */
     fun stringFromRealFreeVariables(freeVariables: List<FreeVariable>): String {
-        return GSON.toJson(fromRealFreeVariables(freeVariables), FreeVarSelection::class.java)
+        return json.encodeToString(fromRealFreeVariables(freeVariables))
     }
 
     /**
@@ -27,7 +28,8 @@ object Json {
      * @return restored variables
      */
     fun stringToRealFreeVariables(input: String?): List<FreeVariable> {
-        return toRealFreeVariables(GSON.fromJson(input, FreeVarSelection::class.java))
+        if (input == null) return listOf()
+        return toRealFreeVariables(json.decodeFromString<FreeVarSelection>(input))
     }
 
     /**
@@ -36,16 +38,8 @@ object Json {
      * @return converted selection
      */
     fun fromRealFreeVariables(freeVariables: List<FreeVariable>): FreeVarSelection {
-        val vars = freeVariables.stream().map { freeVariable: FreeVariable ->
-            val `var` = FreeVar()
-            `var`.name = freeVariable.name
-            `var`.type = freeVariable.type
-            `var`.defaultval = freeVariable.constraint
-            `var`
-        }.collect(Collectors.toList())
-        val selection = FreeVarSelection()
-        selection.selected = vars
-        return selection
+        val vars = freeVariables.map { FreeVar(it.name, it.type, it.constraint) }
+        return FreeVarSelection(vars)
     }
 
     /**
@@ -55,18 +49,12 @@ object Json {
      * @return list of variables
      */
     fun toRealFreeVariables(selection: FreeVarSelection): List<FreeVariable> {
-        return selection.selected!!.stream()
-            .map { freeVar: FreeVar -> FreeVariable(freeVar.name, freeVar.type, freeVar.defaultval) }
-            .collect(Collectors.toList())
+        return selection.selected.map { FreeVariable(it.name, it.type, it.defaultval) }
     }
 
-    class FreeVarSelection {
-        var selected: List<FreeVar>? = null
-    }
+    @Serializable
+    data class FreeVarSelection(var selected: List<FreeVar> = listOf())
 
-    class FreeVar {
-        var name: String? = null
-        var type: String? = null
-        var defaultval: String? = null
-    }
+    @Serializable
+    data class FreeVar(var name: String? = null, var type: String? = null, var defaultval: String? = null)
 }

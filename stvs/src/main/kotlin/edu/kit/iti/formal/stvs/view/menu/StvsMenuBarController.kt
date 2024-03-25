@@ -360,12 +360,10 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
                     FileChooserFactory.FileType.SPECIFICATION,
                     rootModel.get().workingdir
                 )
-                val specFile: File = fileChooser
-                    .showSaveDialog(view.scene.window)
-                ExporterFacade.exportSpec(
-                    spec, ExporterFacade.ExportFormat.XML,
-                    specFile
-                )
+                val specFile = fileChooser.showSaveDialog(view.scene.window)
+                specFile?.let {
+                    ExporterFacade.exportSpec(spec, it)
+                }
             }
         } catch (e: ExportException) {
             createAlert(e).showAndWait()

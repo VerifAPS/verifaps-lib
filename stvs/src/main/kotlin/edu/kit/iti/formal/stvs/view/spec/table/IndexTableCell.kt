@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.model.table.HybridRow
 import javafx.beans.property.*
 import javafx.beans.value.ChangeListener
@@ -9,13 +7,16 @@ import javafx.beans.value.ObservableValue
 import javafx.scene.control.*
 import javafx.scene.text.Text
 import javafx.scene.text.TextAlignment
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * Created by csicar on 22.06.17.
  * IndexTableCell displays the index of the current row in a cell.
  */
 class IndexTableCell(private val tableView: TableView<*>?) : TableCell<HybridRow?, String?>() {
-    private val icon: Text = GlyphsDude.createIcon(FontAwesomeIcon.FILE_TEXT)
+    private val icon: Text = FontIcon(FontAwesomeRegular.FILE_CODE)
     private val tooltip = Tooltip()
 
     /**
@@ -41,7 +42,7 @@ class IndexTableCell(private val tableView: TableView<*>?) : TableCell<HybridRow
         this.setTooltip(tooltip)
     }
 
-    private fun getCommentPropertyByIndex(index: Int): StringProperty? {
+    private fun getCommentPropertyByIndex(index: Int): StringProperty {
         if (tableView == null || index < 0 || index >= tableView.items.size) {
             return SimpleStringProperty("")
         }

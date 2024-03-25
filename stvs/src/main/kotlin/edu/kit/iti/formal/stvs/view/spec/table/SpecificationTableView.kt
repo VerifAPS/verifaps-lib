@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView
 import edu.kit.iti.formal.stvs.model.table.HybridRow
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.event.ActionEvent
@@ -13,6 +11,9 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.util.Callback
+import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * The view responsible for displaying
@@ -29,19 +30,19 @@ class SpecificationTableView(/*public Label getHeader() {
     private val content = VBox()
     val btnRemoveRows: Button = Button(
         "Remove Rows",
-        FontAwesomeIconView(FontAwesomeIcon.MINUS_SQUARE)
+        FontIcon(FontAwesomeSolid.MINUS_SQUARE)
     )
     val btnAddRows: Button = Button(
         "Add Row",
-        FontAwesomeIconView(FontAwesomeIcon.PLUS_SQUARE)
+        FontIcon(FontAwesomeSolid.PLUS_SQUARE)
     )
     val btnResize: Button = Button(
         "Resize",
-        FontAwesomeIconView(FontAwesomeIcon.ADJUST)
+        FontIcon(FontAwesomeSolid.ADJUST)
     )
     val btnCommentRow: Button = Button(
         "Comment",
-        FontAwesomeIconView(FontAwesomeIcon.COMMENT)
+        FontIcon(FontAwesomeSolid.COMMENT)
     )
 
 
@@ -61,7 +62,7 @@ class SpecificationTableView(/*public Label getHeader() {
 
         //        setOnMouseClicked(this::showInDialog);
         val btnOpenExternal = Button()
-        btnOpenExternal.graphic = FontAwesomeIconView(FontAwesomeIcon.EXTERNAL_LINK_SQUARE)
+        btnOpenExternal.graphic = FontIcon(FontAwesomeSolid.EXTERNAL_LINK_ALT)
         btnOpenExternal.onAction = EventHandler { event: ActionEvent -> this.showInDialog(event) }
         graphic = btnOpenExternal
         contentDisplay = ContentDisplay.RIGHT

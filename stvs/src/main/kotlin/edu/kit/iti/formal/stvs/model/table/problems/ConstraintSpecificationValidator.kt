@@ -164,7 +164,7 @@ class ConstraintSpecificationValidator(
         for (rowIndex in specification.rows.indices) {
             val row = specification.rows[rowIndex]
 
-            val expressionsForRow: MutableMap<String?, Expression?> = HashMap()
+            val expressionsForRow = hashMapOf<String, Expression?>()
 
             // Check cells for problems
             for ((columnId, cell) in row!!.cells) {

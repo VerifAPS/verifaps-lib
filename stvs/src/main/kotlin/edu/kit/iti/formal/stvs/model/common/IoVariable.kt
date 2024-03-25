@@ -8,12 +8,17 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * Base class for input/output variables.
  *
  * @author Benjamin Alt
  */
+@Serializable
 sealed class IoVariable : Variable {
     abstract override val name: String
     abstract override val type: String
@@ -58,6 +63,7 @@ data class CodeIoVariable(
  *
  * @author Philipp
  */
+@Serializable
 data class ValidIoVariable(
     override val category: VariableCategory,
     override val name: String,
@@ -73,20 +79,32 @@ data class ValidIoVariable(
  * An input/output variable in a specification table.
  * @author Philipp
  */
-class SpecIoVariable(category: VariableCategory, val role: VariableRole, typeIdentifier: String, name: String) :
+@Serializable
+class SpecIoVariable() :
     IoVariable(), Commentable {
 
-    val nameProperty: StringProperty = SimpleStringProperty(name)
-    val typeProperty: StringProperty = SimpleStringProperty(typeIdentifier)
-    val categoryProperty: ObjectProperty<VariableCategory> = SimpleObjectProperty(category)
-    val roleProperty: ObjectProperty<VariableRole> = SimpleObjectProperty(role)
+    @Transient
+    val nameProperty: StringProperty = SimpleStringProperty()
+    override var name by nameProperty
+
+    @Transient
+    val typeProperty: StringProperty = SimpleStringProperty()
+    override var type by typeProperty
+
+
+    @Transient
+    val categoryProperty: ObjectProperty<VariableCategory> = SimpleObjectProperty()
+    override var category by categoryProperty
+
+
+    @Transient
+    val roleProperty: ObjectProperty<VariableRole> = SimpleObjectProperty()
+    var role by roleProperty
 
     var columnConfig = ColumnConfig()
 
+    @Transient
     override val commentProperty: StringProperty = SimpleStringProperty("")
-    override var comment: String?
-        get() = commentProperty.get()
-        set(value) = commentProperty.set(value)
 
     /**
      * Creates a variable that appears in the specification.
@@ -95,34 +113,24 @@ class SpecIoVariable(category: VariableCategory, val role: VariableRole, typeIde
      * @param typeIdentifier The identifier of the type of the variable
      * @param name The name of the Variable
      */
-    constructor(category: VariableCategory, typeIdentifier: String, name: String) : this(
-        category,
-        category.defaultRole,
-        typeIdentifier,
-        name
-    )
-
+    constructor(
+        category: VariableCategory,
+        role: VariableRole = category.defaultRole,
+        typeIdentifier: String,
+        name: String
+    ) : this() {
+        this.category = category
+        this.role = role
+        this.type = typeIdentifier
+        this.name = name
+    }
 
     /**
      * Copy constructor: Create a deep copy of a given SpecIoVariable.
      * @param specIoVariable The SpecIoVariable to copy
      */
-    constructor(specIoVariable: SpecIoVariable) : this(
-        specIoVariable.category,
-        specIoVariable.role,
-        specIoVariable.type,
-        specIoVariable.name
-    )
-
-    override var name: String
-        get() = nameProperty.get()
-        set(value) = nameProperty.set(value)
-    override var type: String
-        get() = typeProperty.get()
-        set(value) = typeProperty.set(value)
-    override var category: VariableCategory
-        get() = categoryProperty.get()
-        set(value) = categoryProperty.set(value)
+    constructor(specIoVariable: SpecIoVariable)
+            : this(specIoVariable.category, specIoVariable.role, specIoVariable.type, specIoVariable.name)
 
     override fun toString(): String {
         return "SpecIoVariable($category $name : $type)"

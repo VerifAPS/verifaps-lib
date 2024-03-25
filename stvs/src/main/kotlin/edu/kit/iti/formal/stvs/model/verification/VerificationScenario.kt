@@ -12,8 +12,6 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
@@ -25,7 +23,6 @@ import java.io.IOException
  *
  * @author Benjamin Alt
  */
-@Serializable
 class VerificationScenario() {
     @Transient
     val verificationResultProperty = NullableProperty<VerificationResult>()

@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec
 
-import de.jensd.fx.glyphs.GlyphsDude
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
@@ -14,13 +12,14 @@ import edu.kit.iti.formal.stvs.view.*
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ObjectProperty
-import javafx.beans.value.ObservableValue
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.scene.control.*
+import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
+import org.kordamp.ikonli.javafx.FontIcon
 
 /**
  * Controller for [SpecificationsPane]. The tab logic is handled here.
@@ -56,8 +55,8 @@ class SpecificationsPaneController(
             println(ioVariables.get())
             for (ioVariable in ioVariables.get()!!) {
                 val specIoVariable = SpecIoVariable(
-                    ioVariable!!.category,
-                    ioVariable.type, ioVariable.name
+                    category = ioVariable!!.category,
+                    typeIdentifier = ioVariable.type, name = ioVariable.name
                 )
                 hybridSpecification.columnHeaders.add(specIoVariable)
             }
@@ -115,9 +114,9 @@ class SpecificationsPaneController(
         tab.textProperty().bind(hybridSpecification.nameProperty)
         tab.content = controller.view
         if (hybridSpecification.isEditable) {
-            tab.graphic = GlyphsDude.createIcon(FontAwesomeIcon.EDIT)
+            tab.graphic = FontIcon(FontAwesomeSolid.EDIT)
         } else {
-            tab.graphic = GlyphsDude.createIcon(FontAwesomeIcon.LOCK)
+            tab.graphic = FontIcon(FontAwesomeSolid.LOCK)
         }
         view.tabs.add(index, tab)
         controllers[tab] = controller

@@ -39,7 +39,7 @@ interface SExpression {
          * @return instance which is represented by `string`
          */
         @JvmStatic
-        fun fromText(string: String?): SExpression {
+        fun fromText(string: String): SExpression {
             try {
                 val s = SexpFactory.parse(string)
                 return fromSexp(s)

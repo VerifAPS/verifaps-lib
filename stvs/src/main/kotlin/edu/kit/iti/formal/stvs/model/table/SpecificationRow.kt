@@ -16,10 +16,10 @@ import java.util.stream.Collectors
  *
  * @author Benjamin Alt
  */
-open class SpecificationRow<C>(cells: Map<String?, C>, val extractor: Callback<C, Array<Observable>>) : Commentable,
+open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C, Array<Observable>>) : Commentable,
     Observable {
 
-    val cells: ObservableMap<String?, C> = FXCollections.observableMap(cells)
+    val cells: ObservableMap<String, C> = FXCollections.observableMap(cells)
     override var commentProperty = SimpleStringProperty()
     private val listeners: MutableList<InvalidationListener> = arrayListOf()
 
@@ -66,8 +66,8 @@ open class SpecificationRow<C>(cells: Map<String?, C>, val extractor: Callback<C
      * @param c The cell to add a listener to
      */
     private fun subscribeToCell(c: C?) {
-        for (observable in extractor!!.call(c)!!) {
-            observable!!.addListener { observable: Observable -> this.listenRowInvalidation(observable) }
+        for (observable in extractor.call(c)!!) {
+            observable.addListener { observable: Observable -> this.listenRowInvalidation(observable) }
         }
     }
 
@@ -77,8 +77,8 @@ open class SpecificationRow<C>(cells: Map<String?, C>, val extractor: Callback<C
      * @param cell The cell to remove the listener from
      */
     private fun unsubscribeFromCell(cell: C?) {
-        for (observable in extractor!!.call(cell)!!) {
-            observable!!.removeListener { observable: Observable -> this.listenRowInvalidation(observable) }
+        for (observable in extractor.call(cell)!!) {
+            observable.removeListener { observable: Observable -> this.listenRowInvalidation(observable) }
         }
     }
 
@@ -91,11 +91,11 @@ open class SpecificationRow<C>(cells: Map<String?, C>, val extractor: Callback<C
     }
 
     override fun addListener(listener: InvalidationListener) {
-        listeners!!.add(listener)
+        listeners.add(listener)
     }
 
     override fun removeListener(listener: InvalidationListener) {
-        listeners!!.remove(listener)
+        listeners.remove(listener)
     }
 
     companion object {
@@ -107,8 +107,8 @@ open class SpecificationRow<C>(cells: Map<String?, C>, val extractor: Callback<C
          * @param <E> The type of the cells in the unobservable row
          * @return The created unobservable row
         </E> */
-        fun <E> createUnobservableRow(cells: Map<String?, E>): SpecificationRow<E> {
-            return SpecificationRow(cells) { p: E -> arrayOf() }
+        fun <E> createUnobservableRow(cells: Map<String, E>): SpecificationRow<E> {
+            return SpecificationRow(cells) { arrayOf() }
         }
     }
 }

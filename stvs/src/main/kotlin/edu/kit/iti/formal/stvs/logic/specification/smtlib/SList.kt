@@ -12,7 +12,7 @@ import java.util.stream.Collectors
  * @author Carsten Csiky
  */
 class SList : SExpression {
-    private var sexp: MutableList<SExpression?>? = null
+    private var sexp: MutableList<SExpression> = arrayListOf()
 
     /**
      * Creates an instance from a list of [SExpression].
@@ -23,8 +23,8 @@ class SList : SExpression {
      * Creates an empty SList.
      */
     @JvmOverloads
-    constructor(sexp: MutableList<SExpression?>? = ArrayList()) {
-        this.sexp = sexp
+    constructor(sexp: List<SExpression> = ArrayList()) {
+        this.sexp.addAll(sexp)
     }
 
     /**
@@ -33,11 +33,10 @@ class SList : SExpression {
      *
      * @param vals atomic expressions as string
      */
-    constructor(vararg vals: String) : this(Arrays.stream<String>(vals).map<SAtom?> { string: String? -> SAtom(string) }
-        .collect(Collectors.toList<SExpression?>()))
+    constructor(vararg vals: String) : this(vals.map { SAtom(it) })
 
-    constructor(command: String?) : this(ArrayList<SExpression?>()) {
-        addAll(command!!)
+    constructor(command: String) : this() {
+        addAll(command)
     }
 
     /**
@@ -47,9 +46,9 @@ class SList : SExpression {
      * @param command atomic command expression
      * @param sexp following expressions
      */
-    constructor(command: String?, vararg sexp: SExpression?) : this() {
+    constructor(command: String, vararg sexp: SExpression) : this() {
         addAll(SAtom(command))
-        addAll(Arrays.asList(*sexp))
+        addAll(listOf(*sexp))
     }
 
     /**
@@ -81,8 +80,8 @@ class SList : SExpression {
                 + " ) ")
     }
 
-    fun addAll(vararg sexp: SExpression?): SList {
-        return addAll(Arrays.asList(*sexp))
+    fun addAll(vararg sexp: SExpression): SList {
+        return addAll(listOf(*sexp))
     }
 
     fun addAll(vararg values: String): SList {
@@ -90,7 +89,7 @@ class SList : SExpression {
             .collect(Collectors.toList()))
     }
 
-    fun addAll(exprs: Collection<SExpression?>?): SList {
+    fun addAll(exprs: Collection<SExpression>): SList {
         sexp!!.addAll(exprs!!)
         return this
     }
@@ -100,7 +99,7 @@ class SList : SExpression {
             .collect(Collectors.toList()))
     }
 
-    val list: List<SExpression?>?
+    val list: List<SExpression>
         get() = this.sexp
 
     /**
@@ -140,7 +139,7 @@ class SList : SExpression {
         }
 
 
-        fun sexpr(command: String?, vararg vals: SExpression?): SList {
+        fun sexpr(command: String, vararg vals: SExpression): SList {
             return SList(command, *vals)
         }
 

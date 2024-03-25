@@ -2,6 +2,7 @@ package edu.kit.iti.formal.stvs.model.code
 
 import edu.kit.iti.formal.automation.IEC61131Facade.file
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
@@ -148,39 +149,44 @@ class ParsedCode
          */
         @JvmStatic
         fun parseCode(
-            input: String?, parsedTokenHandler: ParsedTokenHandler?,
+            input: String, parsedTokenHandler: ParsedTokenHandler,
             syntaxErrorsListener: ParsedSyntaxErrorHandler, parsedCodeListener: ParsedCodeHandler
         ) {
             val syntaxErrorListener = SyntaxErrorListener()
 
+            lex(input, parsedTokenHandler, syntaxErrorListener)
+
             val stream = CharStreams.fromString(input) //, parsedTokenHandler, syntaxErrorListener);
-            //TODO parsedTokenHandler?
-            val ast = parse(stream, syntaxErrorListener)
 
-            syntaxErrorsListener.accept(syntaxErrorListener.syntaxErrors)
+            try {
+                val ast = parse(stream, syntaxErrorListener)
+                syntaxErrorsListener.accept(syntaxErrorListener.syntaxErrors)
 
-            // Find types in parsed code
-            val typeVisitor = TypeDeclarationVisitor()
-            ast.accept(typeVisitor)
-            val definedTypesByName: MutableMap<String, Type> = HashMap()
-            typeVisitor.getDefinedTypes()
-                .forEach(Consumer { type: Type -> definedTypesByName[type.typeName] = type })
+                // Find types in parsed code
+                val typeVisitor = TypeDeclarationVisitor()
+                ast.accept(typeVisitor)
+                val definedTypesByName: MutableMap<String, Type> = HashMap()
+                typeVisitor.getDefinedTypes()
+                    .forEach(Consumer { type: Type -> definedTypesByName[type.typeName] = type })
 
-            // Find IoVariables in parsed code
-            val variableVisitor = VariableVisitor()
-            ast.accept(variableVisitor)
+                // Find IoVariables in parsed code
+                val variableVisitor = VariableVisitor()
+                ast.accept(variableVisitor)
 
-            // Find code blocks in parsed code
-            val blockVisitor = BlockVisitor()
-            ast.accept(blockVisitor)
-            val foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks()
+                // Find code blocks in parsed code
+                val blockVisitor = BlockVisitor()
+                ast.accept(blockVisitor)
+                val foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks()
 
-            parsedCodeListener.accept(
-                ParsedCode(
-                    foldableCodeBlocks,
-                    variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes()
+                parsedCodeListener.accept(
+                    ParsedCode(
+                        foldableCodeBlocks,
+                        variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes()
+                    )
                 )
-            )
+            } catch (_: SyntaxErrorReporter.ParserException) {
+                //ignore
+            }
         }
 
         /**
