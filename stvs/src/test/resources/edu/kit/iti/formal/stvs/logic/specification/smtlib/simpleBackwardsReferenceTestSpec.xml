@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false">
+    <variables>
+        <ioVariable colwidth="20" data-type="INT" io="input" name="A"/>
+    </variables>
+    <rows>
+        <row comment="">
+            <duration>3</duration>
+            <cell>-</cell>
+        </row>
+        <row comment="">
+            <duration>[1,5]</duration>
+            <cell>5</cell>
+        </row>
+        <row comment="">
+            <duration>[1,5]</duration>
+            <cell>A[-4]</cell>
+        </row>
+    </rows>
+</specification>

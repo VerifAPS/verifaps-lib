@@ -1845,7 +1845,7 @@ data class VariableDeclaration(
         get() = isType(INPUT)
 
     val isInOut: Boolean
-        get() = isInput && isOutput
+        get() = isType(INOUT) || isInput && isOutput
 
     val isGlobal: Boolean
         get() = isType(GLOBAL)

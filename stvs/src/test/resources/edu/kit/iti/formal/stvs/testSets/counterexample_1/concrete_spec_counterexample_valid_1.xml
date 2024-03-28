@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="true"
+               name="Unnamed Specification">
+    <variables>
+        <ioVariable data-type="BOOL" io="input" name="Start_Stop"/>
+        <ioVariable data-type="BOOL" io="output" name="ONS_Trig"/>
+    </variables>
+    <rows>
+        <row>
+            <duration>1</duration>
+            <cycle>
+                <cell>TRUE</cell>
+                <cell>TRUE</cell>
+            </cycle>
+        </row>
+    </rows>
+</specification>

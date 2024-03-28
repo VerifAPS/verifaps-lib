@@ -1,0 +1,20 @@
+<?xml version="1.0" standalone="no"?>
+
+<config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../config.xsd">
+    <general>
+        <uiLanguage>EN</uiLanguage>
+        <windowSize>
+            <width>800</width>
+            <height>500</height>
+        </windowSize>
+        <verificationTimeout>100</verificationTimeout>
+        <simulationTimeout>100</simulationTimeout>
+    </general>
+    <editor>
+        <showLineNumbers>true</showLineNumbers>
+        <fontFamily>Comic Sans</fontFamily>
+        <fontSize>12</fontSize>
+    </editor>
+</config>

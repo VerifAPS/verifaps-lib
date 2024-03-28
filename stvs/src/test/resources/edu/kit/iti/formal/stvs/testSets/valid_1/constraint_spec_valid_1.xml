@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false"
+               name="Unnamed Specification">
+    <variables>
+        <ioVariable colwidth="100" data-type="INT" io="input" name="A"/>
+        <ioVariable colwidth="100" data-type="BOOL" io="input" name="B"/>
+        <ioVariable colwidth="100" data-type="INT" io="output" name="C"/>
+        <ioVariable colwidth="100" data-type="enumD" io="output" name="D"/>
+        <freeVariable data-type="BOOL" default="-" name="p"/>
+        <freeVariable data-type="INT" default="42" name="q"/>
+    </variables>
+    <rows>
+        <row comment="">
+            <duration>[2,3]</duration>
+            <cell>q</cell>
+            <cell>= NOT p</cell>
+            <cell>-</cell>
+            <cell>literalOne</cell>
+        </row>
+        <row comment="">
+            <duration>-</duration>
+            <cell>= C[-1] - 1</cell>
+            <cell>B[-1]</cell>
+            <cell>52</cell>
+            <cell>-</cell>
+        </row>
+        <row comment="">
+            <duration>1</duration>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+        </row>
+    </rows>
+</specification>

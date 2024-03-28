@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+<code>
+<plaintext>PROGRAM  a
+VAR_INPUT 
+	i : INT;
+END_VAR
+
+VAR_OUTPUT
+  o :  INT;
+END_VAR
+
+o := i;
+
+END_PROGRAM</plaintext>
+</code>
+<tabs>
+<tab id="0" open="false" readOnly="false">
+<specification comment="" isConcrete="false" name="Unnamed Specification">
+<variables>
+<ioVariable colwidth="100" data-type="INT" io="input" name="i"/>
+<ioVariable colwidth="100" data-type="INT" io="output" name="o"/>
+<freeVariable data-type="INT" default="&gt;5" name="blubb"/>
+</variables>
+<rows>
+<row comment="">
+<duration>5</duration>
+<cell>blubb</cell>
+<cell>i</cell>
+</row>
+<row comment="">
+<duration>10</duration>
+<cell>=i[-1]+1</cell>
+<cell>i</cell>
+</row>
+</rows>
+</specification>
+</tab>
+</tabs>
+</session>

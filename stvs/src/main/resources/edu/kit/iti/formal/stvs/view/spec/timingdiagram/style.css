@@ -1,0 +1,58 @@
+.scroll-pane {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+    -fx-focus-color: transparent;
+}
+
+.scroll-pane:focused {
+    -fx-background-insets: 0;
+}
+
+.scroll-pane .corner {
+    -fx-background-insets: 0;
+}
+
+.labelContainer {
+    /*-fx-background-color: lightgrey;*/
+}
+
+.globalXAxis{
+    -fx-animated: false;
+    -fx-minor-tick-visible: false;
+}
+
+.globalXAxisContainer{
+    -fx-min-height: 30px;
+}
+
+.labelContainer * {
+    -fx-font-family: monospace;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 10;
+}
+
+.labelContainer .output{
+    -fx-text-fill: purple;
+}
+
+.labelContainer .input{
+    -fx-text-fill: darkgreen;
+}
+
+.outdatedLabel{
+    -fx-text-alignment: center;
+    -fx-text-fill: orangered;
+}
+
+.outdatedIcon{
+    -fx-fill: orangered;
+}
+
+.outdatedMessage{
+    -fx-alignment: center;
+
+}
+
+.collectionView{
+    -fx-alignment: top-center;
+}

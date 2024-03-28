@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false">
+    <variables>
+        <ioVariable io="output" name="C" data-type="INT"></ioVariable>
+        <freeVariable name="p" data-type="INT" default="15"></freeVariable>
+        <freeVariable name="q" data-type="Color" default="green"></freeVariable>
+        <freeVariable name="r" data-type="BOOL" default="true"></freeVariable>
+    </variables>
+    <rows>
+        <row><!-- Hier ist die Reihenfolge der Cells wichtig! -->
+            <duration comment="I am a duration comment!">5</duration>
+            <cell>p</cell>
+        </row>
+    </rows>
+    <enumTypes/>
+</specification>

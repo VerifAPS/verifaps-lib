@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><ns2:message xmlns:ns2="http://formal.iti.kit.edu/exteta-1.0/report/" returncode="nuxmv-error">
+    <log>
+        <entry level="debug" time="55">read xml file /tmp/verification-spec187635257487736418.xml</entry>
+        <entry level="debug" time="167">xml file successfully read</entry>
+        <entry level="info" time="167">No options in table file.</entry>
+        <entry level="info" time="167">No functions given in table file.</entry>
+        <entry level="debug" time="167">1 variables found</entry>
+        <entry level="debug" time="167">	 var_num : INT</entry>
+        <entry level="debug" time="223">parsed: 1 to (0sd16_1=var_num)</entry>
+        <entry level="debug" time="228">parsed: = var_num[-1] + var_num[-2] to (var_num=(var_num__history._$1+var_num__history._$2))</entry>
+        <entry level="debug" time="316">Row 1 can reach: {2}</entry>
+        <entry level="debug" time="316">Row 2 can reach: {}</entry>
+        <entry level="info" time="359">Start '[/home/philipp/program/PSE/nuXmv, -int, /tmp/verification-spec187635257487736418/modules.smv]'</entry>
+        <entry level="info" time="359">wd: /tmp/verification-spec187635257487736418</entry>
+        <entry level="info" time="359">Result in /tmp/verification-spec187635257487736418/log_51.txt</entry>
+        <entry level="fatal" time="381">NUXMV error: file /tmp/verification-spec187635257487736418/modules.smv: line 29: "table.var_num__history._$2" undefined</entry>
+        <entry level="debug" time="382">Row 1 can reach: {2}</entry>
+        <entry level="debug" time="382">Row 2 can reach: {}</entry>
+    </log>
+</ns2:message>

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# file file
+SCRIPT_FILE="$0"
+WORKING_DIR="$(pwd)"
+cd "$(dirname "$SCRIPT_FILE")"
+SCRIPT_FILE="$(basename "$SCRIPT_FILE")"
+
+while [ -L "$SCRIPT_FILE" ]; do
+  SCRIPT_FILE="$(readlink "$SCRIPT_FILE")"
+  cd "$(dirname "$SCRIPT_FILE")"
+  SCRIPT_FILE="$(basename "$SCRIPT_FILE")"
+done
+
+STVS_HOME="$(pwd)"
+
+cd "$WORKING_DIR"
+
+# Find usable java executable
+if [ -z "$JAVA_HOME" ]; then
+  JAVA_COMMAND=$(which java)
+  if [ "1" = "$?" ]; then
+    echo "No executable java found. Please set JAVA_HOME variable" >&2
+    exit 1
+  fi
+else
+  JAVA_COMMAND=$JAVA_HOME/bin/java
+fi
+if [ ! -e "$JAVA_COMMAND" ]; then
+  echo "$JAVA_COMMAND does not exist" >&2
+  exit 1
+fi
+if [ ! -x "$JAVA_COMMAND" ]; then
+  echo "$JAVA_COMMAND is not executable" >&2
+  exit 1
+fi
+
+$JAVA_COMMAND -jar $STVS_HOME/stverificationstudio.jar
+

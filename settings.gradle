@@ -12,6 +12,7 @@ include ':exec'
 include ':geteta'
 include ':smt'
 include 'absintsfc'
+include 'stvs'
 
 //include ':web-backend'
 //include 'asdl'

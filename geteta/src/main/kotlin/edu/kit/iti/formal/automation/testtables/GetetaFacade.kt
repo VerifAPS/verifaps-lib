@@ -40,7 +40,7 @@ import java.io.StringWriter
 
 const val TABLE_SEP = "_"
 
-object GetetaFacade {
+public object GetetaFacade {
     fun createParser(input: CharStream): TestTableLanguageParser {
         val lexer = TestTableLanguageLexer(input)
         val parser = TestTableLanguageParser(CommonTokenStream(lexer))
@@ -99,6 +99,7 @@ object GetetaFacade {
             return Duration.OpenInterval(0)
         val parser = createParser(duration)
         val p = parser.time()
+        parser.errorReporter.throwException()
         return p.accept(TimeParser(timeConstants))
     }
 
@@ -151,6 +152,7 @@ object GetetaFacade {
         return ttlb.testTables
     }
 
+    @JvmStatic
     fun exprsToSMV(vc: ParseContext,
                    constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>)
             : Map<String, SMVExpr> = constraints.map { (t, u) ->
@@ -163,14 +165,17 @@ object GetetaFacade {
     }.toMap()
 
 
+    @JvmStatic
     fun getHistoryName(variable: SVariable, cycles: Int): String {
         return getHistoryName(variable) + "._$" + cycles
     }
 
+    @JvmStatic
     fun getHistoryName(variable: SVariable): String {
         return variable.name + "__history"
     }
 
+    @JvmStatic
     fun runNuXMV(nuXmvPath: String, folder: String,
                  modules: List<SMVModule>,
                  vt: VerificationTechnique): NuXMVOutput {
@@ -178,6 +183,7 @@ object GetetaFacade {
         return adapter.call()
     }
 
+    @JvmStatic
     fun createNuXMVProcess(folder: String, modules: List<SMVModule>,
                            nuXmvPath: String, vt: VerificationTechnique): NuXMVProcess {
         val outputFolder = File(folder)
@@ -196,6 +202,7 @@ object GetetaFacade {
         return adapter
     }
 
+    @JvmStatic
     fun createSuperEnum(scopes: List<Scope>): EnumType {
         val allowedValues =
                 scopes.flatMap { scope ->
@@ -207,6 +214,7 @@ object GetetaFacade {
         return EnumType(allowedValues)
     }
 
+    @JvmStatic
     fun generateInterface(name: String = "anonym",
                           scope: Scope = Scope.defaultScope(),
                           includeState: Boolean = true): String {
@@ -234,19 +242,24 @@ object GetetaFacade {
         return s.toString()
     }
 
+    @JvmStatic
     fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
         return parseTableDSL(file, timeConstants)
     }
 
+    @JvmStatic
     fun constructTable(table: GeneralizedTestTable) =
             AutomatonBuilderPipeline(table).transform()
 
+    @JvmStatic
     fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) =
             constructSMV(constructTable(table), superEnum)
 
+    @JvmStatic
     fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
             SmvConstructionPipeline(automaton, superEnum).transform()
 
+    @JvmStatic
     fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
         val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample,
                 "_${testTable.name}")
@@ -254,6 +267,7 @@ object GetetaFacade {
         return analyzer.rowMapping
     }
 
+    @JvmStatic
     fun print(gtt: GeneralizedTestTable): String {
         val stream = StringWriter()
         val p = DSLTablePrinter(CodeWriter(stream))
@@ -261,6 +275,7 @@ object GetetaFacade {
         return stream.toString()
     }
 
+    @JvmStatic
     fun functionToSmv(fd: FunctionDeclaration): SmvFunctionDefinition {
         val parameters = fd.scope.variables.filter { it.isInput }
                 .map { DefaultTypeTranslator.INSTANCE.translate(it) }
@@ -268,6 +283,7 @@ object GetetaFacade {
         return SmvFunctionDefinition(body, parameters)
     }
 
+    @JvmStatic
     fun exprToSmv(expr: TestTableLanguageParser.ExprContext, parseContext: ParseContext): SMVExpr {
         val dummy = SVariable("dummy", SMVTypes.BOOLEAN)
         val visitor = TblLanguageToSmv(dummy, 0, parseContext)
@@ -275,6 +291,7 @@ object GetetaFacade {
     }
 
 
+    @JvmStatic
     fun meshTables(tables: List<SMVConstructionModel>): TestTableAutomaton {
         val automaton = TestTableAutomaton()
         automaton.stateError = tables.first().automaton.stateError
@@ -357,6 +374,7 @@ object GetetaFacade {
      *
      * Useful for meshed gtts where a common signature is needed during the SMV construction.
      */
+    @JvmStatic
     fun createMeshedDummy(gtts: List<GeneralizedTestTable>): GeneralizedTestTable {
         val gtt = GeneralizedTestTable("__meshed__")
         gtt.programRuns = gtts.first().programRuns

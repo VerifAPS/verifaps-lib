@@ -1,0 +1,6 @@
+.dragLine{
+    -fx-cursor: s_resize;
+}
+.resizeContainer{
+    -fx-min-width: 200;
+}
