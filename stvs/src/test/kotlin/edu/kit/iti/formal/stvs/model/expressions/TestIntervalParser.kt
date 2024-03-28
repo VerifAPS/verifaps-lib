@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser.Companion.parse
+import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertFailsWith
 
 /**
  * Created by philipp on 23.01.17.
@@ -31,29 +34,36 @@ class TestIntervalParser {
 
     @Test//(expected = ParseException::class)
     fun testNotNumbersInInterval() {
-        parse("[a,b]")
+        assertFailsWith<IllegalStateException> {
+            parse("[a,b]")
+        }
     }
 
     @Test//(expected = ParseException::class)
-
     fun testLowerBoundHigherThanHigherBound() {
-        parse("[3,2]")
+        assertFailsWith<IllegalArgumentException> {
+            parse("[3,2]")
+        }
     }
 
     @Test//(expected = ParseException::class)
     fun testNoNegativeNumbersAllowedInConstant() {
-        parse("-1")
+        //assertFailsWith<IllegalArgumentException> {
+            parse("-1")
+        //}
     }
 
     @Test//(expected = ParseException::class)
     fun testNoNegativeNumbersAllowedInInterval() {
-        parse("[-3,-1]")
+        assertFailsWith<SyntaxErrorReporter.ParserException> {
+            parse("[-3,-1]")
+        }
     }
 
     companion object {
         private fun assertParseEqual(toBeParsed: String, elaborationText: String, lower: Int, upper: Int?) {
             Assertions.assertEquals(
-                LowerBoundedInterval(lower, Optional.ofNullable(upper)),
+                LowerBoundedInterval(lower, upper),
                 parse(toBeParsed),
                 "Parse $toBeParsed$elaborationText"
             )

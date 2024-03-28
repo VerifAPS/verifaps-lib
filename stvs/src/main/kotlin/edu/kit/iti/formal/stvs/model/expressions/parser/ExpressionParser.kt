@@ -4,7 +4,9 @@ import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageLexer
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.stvs.model.expressions.*
-import org.antlr.v4.runtime.*
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.ParseTree
 
 /**
@@ -75,7 +77,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         parser.removeErrorListeners()
         parser.addErrorListener(ThrowingErrorListener())
         try {
-            return this.visit(parser.cell())
+            return parser.cell().accept(this)
         } catch (runtimeException: ParseRuntimeException) {
             throw runtimeException.parseException
         } catch (runtimeException: UnsupportedExpressionRuntimeException) {
@@ -102,11 +104,12 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
 
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): Expression {
         val optionalExpression =
-            ctx.chunk().stream().map { chunkContext: TestTableLanguageParser.ChunkContext -> chunkContext.accept(this) }
+            ctx.chunk()
+                .map { it.accept(this) }
                 .reduce { e1, e2 -> BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, e1, e2) }
         // We can always .get() this value, since the grammar enforces
         // that at least one chunk exists in a cell.
-        return optionalExpression.get()
+        return optionalExpression
     }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): Expression {
@@ -169,6 +172,17 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         val op = binaryOperationFromToken(ctx.op.start)
         val rightSide = ctx.expr().accept(this)
         return BinaryFunctionExpr(op, columnAsVariable, rightSide)
+    }
+
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): Expression {
+        val op = BinaryFunctionExpr.Op.EQUALS
+        val rightSide = ctx.variable().accept(this)
+        return BinaryFunctionExpr(op, columnAsVariable, rightSide)
+    }
+
+
+    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): Expression {
+        return LiteralExpr(ValueInt(ctx.text.toInt()))
     }
 
     private fun binaryOperationFromToken(token: Token): BinaryFunctionExpr.Op {

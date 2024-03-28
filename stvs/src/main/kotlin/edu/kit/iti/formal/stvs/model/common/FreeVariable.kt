@@ -16,16 +16,16 @@ import tornadofx.setValue
 @Serializable
 class FreeVariable : Variable {
     @Transient
-    val nameProperty: StringProperty = SimpleStringProperty()
-    override var name by nameProperty
+    val nameProperty: StringProperty = SimpleStringProperty("<unknown>")
+    override var name: String by nameProperty
 
     @Transient
-    val typeProperty: StringProperty = SimpleStringProperty()
-    override var type by typeProperty
+    val typeProperty: StringProperty = SimpleStringProperty("BOOL")
+    override var type: String by typeProperty
 
     @Transient
     val constraintProperty: StringProperty = SimpleStringProperty(DONTCARE)
-    var constraint by constraintProperty
+    var constraint: String by constraintProperty
 
     /**
      * Creates a free variable with a name and type. A default value will be generated through
@@ -35,8 +35,8 @@ class FreeVariable : Variable {
      * @param type Identifier of the type of the free variable
      */
     constructor(name: String?, type: String?, constraint: String? = null) {
-        this.name = name
-        this.type = type
+        this.name = name ?: this.name
+        this.type = type ?: this.type
         this.constraint = constraint ?: DONTCARE
     }
 
@@ -61,8 +61,8 @@ class FreeVariable : Variable {
          * The default extractor to allow observable collections containing FreeVariables to fire
          * change events when the properties of a FreeVariable change.
          */
-        val EXTRACTOR: Callback<FreeVariable?, Array<Observable>> = Callback { freeVar: FreeVariable? ->
-            arrayOf(freeVar!!.nameProperty, freeVar.typeProperty, freeVar.constraintProperty)
+        val EXTRACTOR: Callback<FreeVariable, Array<Observable>> = Callback { freeVar: FreeVariable ->
+            arrayOf(freeVar.nameProperty, freeVar.typeProperty, freeVar.constraintProperty)
         }
         private const val DONTCARE = "-"
     }

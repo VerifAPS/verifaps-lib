@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.StvsApplication
+import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import org.junit.jupiter.api.Assertions
@@ -17,7 +18,7 @@ class ConstraintSpecificationTest {
     @Throws(ImportException::class)
     fun setUp() {
         constraintSpec = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!
         )
     }
 
@@ -32,16 +33,14 @@ class ConstraintSpecificationTest {
     @Throws(ImportException::class)
     fun testEquals() {
         var equalSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!
         )
         Assertions.assertEquals(equalSpec, constraintSpec)
         Assertions.assertNotEquals(null, constraintSpec)
         equalSpec.comment = "I am a comment"
         Assertions.assertNotEquals(constraintSpec, equalSpec)
         equalSpec = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!
         )
         equalSpec.durations[0] = ConstraintDuration("4")
         Assertions.assertNotEquals(constraintSpec, equalSpec)

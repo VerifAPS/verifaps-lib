@@ -1,10 +1,14 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
+import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.equal
+import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.lessThan
+import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.literal
+import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.variable
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser
 import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException
 import edu.kit.iti.formal.stvs.model.expressions.parser.UnsupportedExpressionException
-import org.junit.Assert
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
@@ -17,62 +21,39 @@ class TestExpressionParser {
     private val parser = ExpressionParser(columnName)
 
     @Throws(ParseException::class, UnsupportedExpressionException::class)
-    private fun assertParseExpressionEqual(expr: String, expected: Expression?): Expression {
+    private fun assertParseExpressionEqual(expr: String, expected: Expression): Expression {
         val parsedExpr = parser.parseExpression(expr)
         println("$expr <means> $parsedExpr")
-        Assert.assertEquals(
-            expected,
-            parsedExpr
-        )
+        assertEquals(expected, parsedExpr)
         return parsedExpr
     }
 
     @Test
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testConstants() {
         // TRUE means X = TRUE
-        assertParseExpressionEqual(
-            "TRUE",
-            SimpleExpressions.equal(SimpleExpressions.`var`(columnName), SimpleExpressions.literal(true))
-        )
+        assertParseExpressionEqual("TRUE", equal(variable(columnName), literal(true)))
         // both upper and lower case
-        assertParseExpressionEqual(
-            "false",
-            SimpleExpressions.equal(SimpleExpressions.`var`(columnName), SimpleExpressions.literal(false))
-        )
+        assertParseExpressionEqual("false", equal(variable(columnName), literal(false)))
         // 1 means X = 1
-        assertParseExpressionEqual(
-            "1",
-            SimpleExpressions.equal(SimpleExpressions.`var`(columnName), SimpleExpressions.literal(1))
-        )
+        assertParseExpressionEqual("1", equal(variable(columnName), literal(1)))
         // - means TRUE
-        assertParseExpressionEqual("-", SimpleExpressions.literal(true))
+        assertParseExpressionEqual("-", literal(true))
     }
 
     @Test
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testVariables() {
-        assertParseExpressionEqual(
-            "b",
-            SimpleExpressions.equal(SimpleExpressions.`var`(columnName), SimpleExpressions.`var`("b"))
-        )
+        assertParseExpressionEqual("b", equal(variable(columnName), variable("b")))
         assertParseExpressionEqual(
             "b = ! FALSE",
-            SimpleExpressions.equal(
-                SimpleExpressions.`var`("b"),
-                SimpleExpressions.not(SimpleExpressions.literal(false))
-            )
+            equal(variable("b"), SimpleExpressions.not(literal(false)))
         )
     }
 
     @Test
     @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testVariablesWithIndex() {
-        assertParseExpressionEqual(
-            "A[-2]",
-            SimpleExpressions.equal(SimpleExpressions.`var`(columnName), SimpleExpressions.`var`("A", -2))
-        )
-        assertParseExpressionEqual("(A[0])", SimpleExpressions.`var`("A", 0))
+        assertParseExpressionEqual("A[-2]", equal(variable(columnName), variable("A", -2)))
+        assertParseExpressionEqual("(A[0])", variable("A", 0))
     }
 
     @Test
@@ -86,48 +67,42 @@ class TestExpressionParser {
     }
 
     @Test
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testOnesided() {
         // < 2 means X < 2
-        assertParseExpressionEqual(
-            "< 2",
-            SimpleExpressions.lessThan(SimpleExpressions.`var`(columnName), SimpleExpressions.literal(2))
-        )
+        assertParseExpressionEqual("< 2", lessThan(variable(columnName), literal(2)))
     }
 
     @Test
     @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testBinaryOperators() {
-        val binaryOps: MutableMap<String, BinaryFunctionExpr.Op> = HashMap()
-        binaryOps["+"] = BinaryFunctionExpr.Op.PLUS
-        binaryOps[" - "] = BinaryFunctionExpr.Op.MINUS
-        binaryOps["*"] = BinaryFunctionExpr.Op.MULTIPLICATION
-        binaryOps["/"] = BinaryFunctionExpr.Op.DIVISION
-        // power is commented out in grammar for some reason ?
-        //binaryOps.put("**", BinaryFunctionExpr.Op.POWER);
-        binaryOps["%"] = BinaryFunctionExpr.Op.MODULO
-        binaryOps[" MOD "] = BinaryFunctionExpr.Op.MODULO
-
-        binaryOps[">"] = BinaryFunctionExpr.Op.GREATER_THAN
-        binaryOps["<"] = BinaryFunctionExpr.Op.LESS_THAN
-        binaryOps[">="] = BinaryFunctionExpr.Op.GREATER_EQUALS
-        binaryOps["<="] = BinaryFunctionExpr.Op.LESS_EQUALS
-
-        binaryOps["="] = BinaryFunctionExpr.Op.EQUALS
-        binaryOps["!="] = BinaryFunctionExpr.Op.NOT_EQUALS
-        binaryOps["<>"] = BinaryFunctionExpr.Op.NOT_EQUALS
-
-        binaryOps["&"] = BinaryFunctionExpr.Op.AND
-        binaryOps[" AND "] = BinaryFunctionExpr.Op.AND
-        binaryOps["|"] = BinaryFunctionExpr.Op.OR
-        binaryOps[" OR "] = BinaryFunctionExpr.Op.OR
-        binaryOps[" XOR "] = BinaryFunctionExpr.Op.XOR
-        binaryOps[" xor "] = BinaryFunctionExpr.Op.XOR
+        val binaryOps = hashMapOf(
+            "+" to BinaryFunctionExpr.Op.PLUS,
+            " - " to BinaryFunctionExpr.Op.MINUS,
+            "*" to BinaryFunctionExpr.Op.MULTIPLICATION,
+            "/" to BinaryFunctionExpr.Op.DIVISION,
+            // power is commented out in grammar for some reason ?
+            //binaryOps.put("**", BinaryFunctionExpr.Op.POWER);
+            "%" to BinaryFunctionExpr.Op.MODULO,
+            " MOD " to BinaryFunctionExpr.Op.MODULO,
+            ">" to BinaryFunctionExpr.Op.GREATER_THAN,
+            "<" to BinaryFunctionExpr.Op.LESS_THAN,
+            ">=" to BinaryFunctionExpr.Op.GREATER_EQUALS,
+            "<=" to BinaryFunctionExpr.Op.LESS_EQUALS,
+            "=" to BinaryFunctionExpr.Op.EQUALS,
+            "!=" to BinaryFunctionExpr.Op.NOT_EQUALS,
+            "<>" to BinaryFunctionExpr.Op.NOT_EQUALS,
+            "&" to BinaryFunctionExpr.Op.AND,
+            " AND " to BinaryFunctionExpr.Op.AND,
+            "|" to BinaryFunctionExpr.Op.OR,
+            " OR " to BinaryFunctionExpr.Op.OR,
+            " XOR " to BinaryFunctionExpr.Op.XOR,
+            " xor " to BinaryFunctionExpr.Op.XOR
+        )
 
         for ((operator, operation) in binaryOps) {
             assertParseExpressionEqual(
                 "2" + operator + "2",
-                BinaryFunctionExpr(operation, SimpleExpressions.literal(2), SimpleExpressions.literal(2))
+                BinaryFunctionExpr(operation, literal(2), literal(2))
             )
         }
     }
@@ -136,28 +111,26 @@ class TestExpressionParser {
     @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testUnaryOperators() {
         // parens enforce an "expression" rule (not single-sided or constant or blah)
-        assertParseExpressionEqual("(- (2))", SimpleExpressions.negate(SimpleExpressions.literal(2)))
-        assertParseExpressionEqual("(!TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)))
-        assertParseExpressionEqual("(NOT TRUE)", SimpleExpressions.not(SimpleExpressions.literal(true)))
+        assertParseExpressionEqual("(- (2))", SimpleExpressions.negate(literal(2)))
+        assertParseExpressionEqual("(!TRUE)", SimpleExpressions.not(literal(true)))
+        assertParseExpressionEqual("(NOT TRUE)", SimpleExpressions.not(literal(true)))
     }
 
     @Test
-
     fun testInvalidPlus() {
         assertFailsWith<SyntaxErrorReporter.ParserException> { parser.parseExpression("= +3") }
     }
 
     @Test
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testInterval() {
         // [1, 4] means X >= 1 AND X <= 4
         assertParseExpressionEqual(
             "[4, 1]",
             SimpleExpressions.and(
                 SimpleExpressions.greaterEqual(
-                    SimpleExpressions.`var`(columnName),
-                    SimpleExpressions.literal(4)
-                ), SimpleExpressions.lessEqual(SimpleExpressions.`var`(columnName), SimpleExpressions.literal(1))
+                    variable(columnName),
+                    literal(4)
+                ), SimpleExpressions.lessEqual(variable(columnName), literal(1))
             )
         )
     }
@@ -170,7 +143,9 @@ class TestExpressionParser {
     @Test//(expected = UnsupportedExpressionException::class)
     @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testUnsupportedFunctioncall() {
-        assertFailsWith<ParseException> { assertFailsWith<ParseException> { parser.parseExpression("function(1, 2)") } }
+        assertFailsWith<UnsupportedExpressionException> {
+            parser.parseExpression("function(1, 2)")
+        }
     }
 
     @Test//(expected = UnsupportedExpressionException::class)

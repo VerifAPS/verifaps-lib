@@ -155,12 +155,11 @@ class ImporterFacadeTest {
         val typeContext =
             Arrays.asList<Type>(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
             ImporterFacade.ImportFormat.XML
         )
         val result: VerificationResult = ImporterFacade.importVerificationResult(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
+            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"), ImporterFacade
                 .ImportFormat.GETETA, typeContext, constraintSpec
         )
         Assert.assertThat<VerificationResult>(
@@ -176,12 +175,11 @@ class ImporterFacadeTest {
         val typeContext =
             Arrays.asList<Type>(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
             ImporterFacade.ImportFormat.XML
         )
         val result: VerificationResult = ImporterFacade.importVerificationResult(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml"), ImporterFacade
+            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"), ImporterFacade
                 .ImportFormat.XML, typeContext, constraintSpec
         )
     }

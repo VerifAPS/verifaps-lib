@@ -67,8 +67,7 @@ class SpecificationController(
         this.view = SpecificationView()
         this.selection = spec.getSelection()
         this.globalConfig = globalConfig
-        this.variableCollectionController =
-            VariableCollectionController(typeContext, spec.freeVariableList)
+        this.variableCollectionController = VariableCollectionController(typeContext, spec.freeVariableList)
         this.tableController = SpecificationTableController(
             globalConfig, typeContext,
             codeIoVariables, variableCollectionController.validator.validFreeVariablesProperty,

@@ -68,7 +68,6 @@ class SmtConcretizerTest {
     @Test
     fun testTermination() {
         val spec = importSpec("testSpec.xml")
-
         val maxDurations = mapOf(0 to 3000, 1 to 1, 2 to 2)
 
         val concretizer = SmtConcretizer(autoloadConfig())

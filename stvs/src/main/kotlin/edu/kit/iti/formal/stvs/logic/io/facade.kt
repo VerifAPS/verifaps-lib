@@ -232,7 +232,7 @@ object ImporterFacade {
 
         require(data.isConcrete)
 
-        val free = FreeVariableList(data.freeVariables)
+        val free = FreeVariableList(data.freeVariables.toMutableList())
         val s = ConcreteSpecification(data.isCounterExample)
         s.name = data.name
 
@@ -487,7 +487,7 @@ object ImporterFacade {
 }
 
 private fun SpecificationTableData.asConstraintSpecification(): ConstraintSpecification {
-    val free = FreeVariableList(freeVariables)
+    val free = FreeVariableList(freeVariables.toMutableList())
     val s = ConstraintSpecification(name, free)
     s.comment = comment
 

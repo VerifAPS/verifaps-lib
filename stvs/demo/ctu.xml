@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
-<code>
-<plaintext>PROGRAM CTU
+	<code>
+		<plaintext><![CDATA[
+PROGRAM CTU
 
   VAR_INPUT
     CU : BOOL;
     RESET : BOOL;
     PV : INT;
   END_VAR
-  
+
   VAR_OUTPUT
     Q : BOOL;
     CV : INT;
@@ -34,267 +35,267 @@
 
   CV := count;
 *)
-END_PROGRAM</plaintext>
-</code>
-<tabs>
-<tab id="0" open="false" readOnly="false">
-<specification comment="" isConcrete="false" name="Unnamed Specification">
-<variables>
-<ioVariable colwidth="100" data-type="BOOL" io="input" name="CU"/>
-<ioVariable colwidth="100" data-type="BOOL" io="input" name="RESET"/>
-<ioVariable colwidth="100" data-type="INT" io="input" name="PV"/>
-<ioVariable colwidth="100" data-type="BOOL" io="output" name="Q"/>
-<ioVariable colwidth="100" data-type="INT" io="output" name="CV"/>
-</variables>
-<rows>
-<row comment="">
-<duration>0</duration>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>2</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</row>
-<row comment="">
-<duration>0</duration>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>2</cell>
-<cell>FALSE</cell>
-<cell>= CV[-1]+1</cell>
-</row>
-</rows>
-<enumTypes/>
-</specification>
-<specification isConcrete="true" name="Unnamed Specification">
-<variables>
-<ioVariable data-type="BOOL" io="input" name="CU"/>
-<ioVariable data-type="BOOL" io="input" name="RESET"/>
-<ioVariable data-type="INT" io="input" name="PV"/>
-<ioVariable data-type="BOOL" io="output" name="Q"/>
-<ioVariable data-type="INT" io="output" name="CV"/>
-</variables>
-<rows>
-<row>
-<duration>10</duration>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-<cycle>
-<cell>FALSE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>0</cell>
-</cycle>
-</row>
-<row>
-<duration>20</duration>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>1</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>2</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>3</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>4</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>5</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>6</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>7</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>8</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>9</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>10</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>11</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>12</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>13</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>14</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>15</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>16</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>17</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>18</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>19</cell>
-</cycle>
-<cycle>
-<cell>TRUE</cell>
-<cell>FALSE</cell>
-<cell>100</cell>
-<cell>FALSE</cell>
-<cell>20</cell>
-</cycle>
-</row>
-</rows>
-<enumTypes/>
-</specification>
-</tab>
-</tabs>
-<history/>
+END_PROGRAM]]></plaintext>
+	</code>
+	<tabs>
+		<tab id="0" open="false" readOnly="false">
+			<specification comment="" isConcrete="false" name="Unnamed Specification">
+				<variables>
+					<ioVariable colwidth="100" data-type="BOOL" io="input" name="CU"/>
+					<ioVariable colwidth="100" data-type="BOOL" io="input" name="RESET"/>
+					<ioVariable colwidth="100" data-type="INT" io="input" name="PV"/>
+					<ioVariable colwidth="100" data-type="BOOL" io="output" name="Q"/>
+					<ioVariable colwidth="100" data-type="INT" io="output" name="CV"/>
+				</variables>
+				<rows>
+					<row comment="">
+						<duration>0</duration>
+						<cell>FALSE</cell>
+						<cell>FALSE</cell>
+						<cell>2</cell>
+						<cell>FALSE</cell>
+						<cell>0</cell>
+					</row>
+					<row comment="">
+						<duration>0</duration>
+						<cell>TRUE</cell>
+						<cell>FALSE</cell>
+						<cell>2</cell>
+						<cell>FALSE</cell>
+						<cell>= CV[-1]+1</cell>
+					</row>
+				</rows>
+				<enumTypes/>
+			</specification>
+			<specification isConcrete="true" name="Unnamed Specification">
+				<variables>
+					<ioVariable data-type="BOOL" io="input" name="CU"/>
+					<ioVariable data-type="BOOL" io="input" name="RESET"/>
+					<ioVariable data-type="INT" io="input" name="PV"/>
+					<ioVariable data-type="BOOL" io="output" name="Q"/>
+					<ioVariable data-type="INT" io="output" name="CV"/>
+				</variables>
+				<rows>
+					<row>
+						<duration>10</duration>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+						<cycle>
+							<cell>FALSE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>0</cell>
+						</cycle>
+					</row>
+					<row>
+						<duration>20</duration>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>1</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>2</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>3</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>4</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>5</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>6</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>7</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>8</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>9</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>10</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>11</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>12</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>13</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>14</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>15</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>16</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>17</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>18</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>19</cell>
+						</cycle>
+						<cycle>
+							<cell>TRUE</cell>
+							<cell>FALSE</cell>
+							<cell>100</cell>
+							<cell>FALSE</cell>
+							<cell>20</cell>
+						</cycle>
+					</row>
+				</rows>
+				<enumTypes/>
+			</specification>
+		</tab>
+	</tabs>
+	<history/>
 </session>

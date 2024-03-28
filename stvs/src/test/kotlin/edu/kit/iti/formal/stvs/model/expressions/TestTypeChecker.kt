@@ -1,9 +1,7 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory.enumOfName
 
-import org.junit.Assert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -34,13 +32,13 @@ class TestTypeChecker {
 
         val xEqualsThree =
             SimpleExpressions.equal(
-                SimpleExpressions.`var`("X"),
+                SimpleExpressions.variable("X"),
                 SimpleExpressions.literal(3)
             )
 
         val sumIsEleven =
             SimpleExpressions.equal(
-                SimpleExpressions.plus(SimpleExpressions.literal(5), SimpleExpressions.`var`("X")),
+                SimpleExpressions.plus(SimpleExpressions.literal(5), SimpleExpressions.variable("X")),
                 SimpleExpressions.literal(8)
             )
 

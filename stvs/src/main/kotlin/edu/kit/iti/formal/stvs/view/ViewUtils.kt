@@ -102,6 +102,7 @@ object ViewUtils {
     }
 
     fun autoFitTable(tableView: TableView<*>) {
+        return // TODO find a modern way for autofit columns
         for (column in tableView.columns) {
             try {
                 columnToFitMethod!!.invoke(tableView.skin, column, -1)

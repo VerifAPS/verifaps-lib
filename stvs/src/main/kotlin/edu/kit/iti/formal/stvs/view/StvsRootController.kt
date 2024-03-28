@@ -60,11 +60,11 @@ class StvsRootController(
         )
 
         rootModel.scenario.codeProperty
-            .addListener { _, old, code -> this.onCodeChange(code) }
+            .addListener { _, _, code -> this.onCodeChange(code) }
         rootModel.scenario.code.parsedCodeProperty
             .addListener { _, _, parsedCode -> onParsedCodeChange(parsedCode) }
         rootModel.scenario.verificationResultProperty
-            .addListener { o, old, res -> this.onVerificationResultChange(res) }
+            .addListener { _, _, res -> this.onVerificationResultChange(res) }
 
         this.view = StvsRootView(editorPaneController.view, specificationsPaneController.view)
         this.verificationResultHandler = VerificationResultHandler(this)

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.util.stream.Collectors
 
 /**
  * Created by philipp on 09.02.17.
@@ -23,20 +22,19 @@ class FreeVariableListValidatorTest {
         val typeContext = SimpleListProperty(
             FXCollections.observableArrayList(TypeInt.INT, TypeBool.BOOL)
         )
-
-        val validator = FreeVariableListValidator(
-            typeContext,
-            FreeVariableList(variables)
-        )
-
+        val validator = FreeVariableListValidator(typeContext, FreeVariableList(variables))
         checkProblems(expectedProblem, variables, validator)
     }
 
-    fun checkProblems(expectedProblem: String, variables: List<FreeVariable>, validator: FreeVariableListValidator) {
-        if (expectedProblem!!.isEmpty()) {
+    private fun checkProblems(
+        expectedProblem: String,
+        variables: List<FreeVariable>,
+        validator: FreeVariableListValidator
+    ) {
+        if (expectedProblem.isEmpty()) {
             validator.problemsProperty.get().values.forEach(System.out::println)
             Assertions.assertEquals(
-                variables!!.size,
+                variables.size,
                 validator.validFreeVariablesProperty.get().size,
                 "Number of valid free variables should be equal to number of unvalidated"
             )
@@ -47,17 +45,12 @@ class FreeVariableListValidatorTest {
         }
     }
 
-    fun checkExpectedProblems(
-        expectedProblem: String,
-        problems: Collection<FreeVariableProblem>
-    ) {
+    private fun checkExpectedProblems(expectedProblem: String, problems: Collection<FreeVariableProblem>) {
         println("Expected problem: $expectedProblem")
-        println("Actual problems: " + problems.stream().map { problem: FreeVariableProblem ->
-            (problem.javaClass.simpleName
-                    + "(" + problem.errorMessage + ")")
-        }.collect(Collectors.toList()))
-        Assertions.assertTrue(problems.stream()
-            .allMatch { problem: FreeVariableProblem -> problem.javaClass.simpleName == expectedProblem }, "Problems contain only expected problems"
+        println("Actual problems: " + problems.map { (it.javaClass.simpleName + "(" + it.errorMessage + ")") })
+        Assertions.assertTrue(
+            problems.all { it.javaClass.simpleName == expectedProblem },
+            "Problems contain only expected problems"
         )
     }
 

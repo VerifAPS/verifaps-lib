@@ -98,6 +98,23 @@ open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C,
         listeners.remove(listener)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SpecificationRow<*>) return false
+
+        if (cells != other.cells) return false
+        if (commentProperty != other.commentProperty) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = cells.hashCode()
+        result = 31 * result + commentProperty.hashCode()
+        return result
+    }
+
+
     companion object {
         /**
          * Create a row which is not observable. This is the case for rows in

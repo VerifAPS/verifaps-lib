@@ -18,7 +18,7 @@ class GeTeTaExporterTest {
     @Test
     @Throws(ImportException::class, IOException::class, ExportException::class, URISyntaxException::class)
     fun testExport() {
-        val stream = StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")
+        val stream = loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
             stream, ImporterFacade.ImportFormat.XML
         )

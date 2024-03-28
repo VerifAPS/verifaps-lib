@@ -99,6 +99,7 @@ public object GetetaFacade {
             return Duration.OpenInterval(0)
         val parser = createParser(duration)
         val p = parser.time()
+        parser.errorReporter.throwException()
         return p.accept(TimeParser(timeConstants))
     }
 

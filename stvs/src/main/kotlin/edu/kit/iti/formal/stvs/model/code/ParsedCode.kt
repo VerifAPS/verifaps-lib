@@ -1,10 +1,14 @@
 package edu.kit.iti.formal.stvs.model.code
 
+import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.IEC61131Facade.file
+import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
+import edu.kit.iti.formal.automation.datatypes.DataTypeVisitor
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor
+import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.expressions.Type
@@ -14,16 +18,12 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.Token
-import java.util.*
-import java.util.function.Consumer
-import java.util.stream.Collectors
 
 /**
  * Represents the formal model of source code (extracted from [Code]).
  * @author Lukas Fritsch
  */
-class ParsedCode
+data class ParsedCode
 /**
  * Creates a parsed code.
  *
@@ -31,77 +31,68 @@ class ParsedCode
  * @param definedVariables list of all defined variables (in the source code)
  * @param definedTypes list of all defined types (in the source code)
  */(
-    val foldableCodeBlocks: List<FoldableCodeBlock>,
-    val definedVariables: List<CodeIoVariable>, @JvmField val definedTypes: List<Type>
+    val foldableCodeBlocks: List<FoldableCodeBlock> = listOf(),
+    val definedVariables: List<CodeIoVariable> = listOf(),
+    val definedTypes: List<Type> = listOf()
 ) {
     /**
      * A visitor for type declarations. Builds a list of types which have been declared in the code.
      */
-    private class TypeDeclarationVisitor : DefaultVisitor<Void?>() {
-        private val definedTypes: MutableList<Type> = ArrayList()
+    private class TypeDeclarationVisitor : AstVisitor<Unit>() {
+        val definedTypes = arrayListOf<Type>()
 
         init {
             definedTypes.add(TypeBool.BOOL)
             definedTypes.add(TypeInt.INT)
         }
 
-        override fun visit(decls: TypeDeclarations): Void? {
-            decls.forEach { it.accept(this) }
-            return null
+        override fun visit(typeDeclarations: TypeDeclarations) {
+            typeDeclarations.forEach { it.accept(this) }
         }
 
-        override fun visit(enumType: EnumerationTypeDeclaration): Void? {
-            if (enumType.allowedValues.isNotEmpty()) {
+        override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
+            if (enumerationTypeDeclaration.allowedValues.isNotEmpty()) {
                 val type = TypeEnum(
-                    enumType.name,
-                    enumType.allowedValues.stream().map { obj: Token -> obj.text }.collect(Collectors.toList())
+                    enumerationTypeDeclaration.name,
+                    enumerationTypeDeclaration.allowedValues.map { it.text }
                 )
                 definedTypes.add(type)
             }
-            return null
         }
 
-        fun getDefinedTypes(): List<Type> {
-            return definedTypes
-        }
+        override fun defaultVisit(obj: Any) {}
     }
 
     /**
      * A visitor which visits a [ProgramDeclaration] and builds a list of i/o variables
      * defined therein.
      */
-    private class VariableVisitor : DefaultVisitor<Void?>() {
-        private val definedVariables: MutableList<CodeIoVariable> = ArrayList()
+    private class VariableVisitor : AstVisitor<Unit>() {
+        val definedVariables = arrayListOf<CodeIoVariable>()
 
-        override fun visit(program: ProgramDeclaration): Void? {
-            program.scope.variables.forEach(Consumer { variableEntry: VariableDeclaration ->
+        override fun visit(programDeclaration: ProgramDeclaration) {
+            programDeclaration.scope.variables.forEach{
                 // String varName = variableEntry.getKey();
-                val category = getCategoryFromDeclaration(variableEntry)
-                val dataTypeName = Optional.ofNullable(
-                    variableEntry.dataType!!.name
-                )
-                if (category.isPresent && dataTypeName.isPresent) {
-                    definedVariables
-                        .add(CodeIoVariable(category.get(), dataTypeName.get(), variableEntry.name))
+                val category = getCategoryFromDeclaration(it)
+                val dataTypeName = it.dataType?.name
+                if (category != null && dataTypeName != null) {
+                    definedVariables.add(CodeIoVariable(category, dataTypeName, it.name))
                 }
-            })
-            return null
-        }
-
-        private fun getCategoryFromDeclaration(varDecl: VariableDeclaration): Optional<VariableCategory> {
-            if (varDecl.isConstant) {
-                return Optional.empty()
             }
-            if (varDecl.isInput) return Optional.of(VariableCategory.INPUT)
-            if (varDecl.isOutput) return Optional.of(VariableCategory.OUTPUT)
-            if (varDecl.isLocal) return Optional.of(VariableCategory.LOCAL)
-            if (varDecl.isInternal) return Optional.of(VariableCategory.LOCAL)
-            if (varDecl.isInOut) return Optional.of(VariableCategory.INOUT)
-            return Optional.empty()
         }
 
-        fun getDefinedVariables(): List<CodeIoVariable> {
-            return definedVariables
+        override fun defaultVisit(obj: Any) {}
+
+        private fun getCategoryFromDeclaration(varDecl: VariableDeclaration): VariableCategory? {
+            return when {
+                varDecl.isConstant -> null
+                varDecl.isInput -> VariableCategory.INPUT
+                varDecl.isOutput -> VariableCategory.OUTPUT
+                varDecl.isLocal -> VariableCategory.LOCAL
+                varDecl.isInternal -> VariableCategory.LOCAL
+                varDecl.isInOut -> VariableCategory.INOUT
+                else -> null
+            }
         }
     }
 
@@ -109,8 +100,8 @@ class ParsedCode
      * A visitor which visits [FunctionDeclaration]s and builds a list of
      * [FoldableCodeBlock]s, where each function declaration corresponds to one block.
      */
-    private class BlockVisitor : DefaultVisitor<Void?>() {
-        private val foldableCodeBlocks: MutableList<FoldableCodeBlock> = ArrayList()
+    private class BlockVisitor : AstVisitor<Unit>() {
+        val foldableCodeBlocks = arrayListOf<FoldableCodeBlock>()
 
         private fun addBlock(topElement: Top) {
             foldableCodeBlocks.add(
@@ -121,19 +112,10 @@ class ParsedCode
             )
         }
 
-        override fun visit(function: FunctionDeclaration): Void? {
-            addBlock(function)
-            return null
-        }
+        override fun visit(functionDeclaration: FunctionDeclaration) = addBlock(functionDeclaration)
+        override fun defaultVisit(obj: Any) {}
 
-        override fun visit(program: ProgramDeclaration): Void? {
-            addBlock(program)
-            return null
-        }
-
-        fun getFoldableCodeBlocks(): List<FoldableCodeBlock> {
-            return this.foldableCodeBlocks
-        }
+        override fun visit(programDeclaration: ProgramDeclaration) = addBlock(programDeclaration)
     }
 
     companion object {
@@ -165,9 +147,7 @@ class ParsedCode
                 // Find types in parsed code
                 val typeVisitor = TypeDeclarationVisitor()
                 ast.accept(typeVisitor)
-                val definedTypesByName: MutableMap<String, Type> = HashMap()
-                typeVisitor.getDefinedTypes()
-                    .forEach(Consumer { type: Type -> definedTypesByName[type.typeName] = type })
+                //val definedTypesByName = typeVisitor.definedTypes.associateBy { it.typeName }
 
                 // Find IoVariables in parsed code
                 val variableVisitor = VariableVisitor()
@@ -176,12 +156,13 @@ class ParsedCode
                 // Find code blocks in parsed code
                 val blockVisitor = BlockVisitor()
                 ast.accept(blockVisitor)
-                val foldableCodeBlocks = blockVisitor.getFoldableCodeBlocks()
+                val foldableCodeBlocks = blockVisitor.foldableCodeBlocks
 
                 parsedCodeListener.accept(
                     ParsedCode(
                         foldableCodeBlocks,
-                        variableVisitor.getDefinedVariables(), typeVisitor.getDefinedTypes()
+                        variableVisitor.definedVariables,
+                        typeVisitor.definedTypes
                     )
                 )
             } catch (_: SyntaxErrorReporter.ParserException) {
@@ -197,7 +178,8 @@ class ParsedCode
          * @return The AST constructed from the token stream
          */
         private fun parse(tokenStream: CharStream, syntaxErrorListener: SyntaxErrorListener): PouElements {
-            return file(tokenStream)
+            val (pous, errors) =  fileResolve(tokenStream, true)
+            return pous
         }
 
         /**

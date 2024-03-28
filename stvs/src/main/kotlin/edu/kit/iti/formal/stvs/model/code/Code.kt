@@ -52,6 +52,7 @@ class Code {
     constructor(filename: String? = null, sourcecode: String = "") {
         this.filename = filename
         this.sourcecode = sourcecode
+        invalidate()
     }
 
     /**
@@ -62,11 +63,17 @@ class Code {
     }
 
     private fun invalidate() {
-        ParsedCode.parseCode(
-            sourceCodeProperty.get(),
-            { col: List<Token?>? -> tokens.setAll(col) },
-            { col: List<SyntaxError?>? -> syntaxErrors.setAll(col) },
-            { newValue: ParsedCode? -> parsedCode = newValue })
+        if (sourcecode.isEmpty()) {
+            tokens.setAll()
+            syntaxErrors.setAll()
+            parsedCode = null
+            return
+        }
+
+        ParsedCode.parseCode(sourcecode,
+            { col -> tokens.setAll(col) },
+            { col -> syntaxErrors.setAll(col) },
+            { newValue -> parsedCode = newValue })
     }
 
     fun updateSourcecode(sourcecode: String) {
@@ -78,19 +85,12 @@ class Code {
         if (this === other) return true
         if (other !is Code) return false
 
-        if (filename != other.filename) return false
         if (sourcecode != other.sourcecode) return false
-        if (parsedCode != other.parsedCode) return false
-        if (syntaxErrors != other.syntaxErrors) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = filename?.hashCode() ?: 0
-        result = 31 * result + sourcecode.hashCode()
-        result = 31 * result + (parsedCode?.hashCode() ?: 0)
-        result = 31 * result + (syntaxErrors?.hashCode() ?: 0)
-        return result
+        return sourcecode.hashCode()
     }
 }

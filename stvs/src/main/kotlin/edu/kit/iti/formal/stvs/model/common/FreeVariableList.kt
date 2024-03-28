@@ -25,8 +25,8 @@ class FreeVariableList {
      * @param variables The list of free variables
      */
     @JvmOverloads
-    constructor(variables: List<FreeVariable> = ArrayList()) {
-        this.variables = FXCollections.observableList<FreeVariable?>(variables, FreeVariable.EXTRACTOR)
+    constructor(variables: MutableList<FreeVariable> = arrayListOf()) {
+        this.variables = FXCollections.observableList(variables, FreeVariable.EXTRACTOR)
     }
 
     /**
@@ -35,10 +35,10 @@ class FreeVariableList {
      * @param freeVariableList the list to copy
      */
     constructor(freeVariableList: FreeVariableList) {
-        val clonedVariables: MutableList<FreeVariable> = ArrayList()
+        val clonedVariables = arrayListOf<FreeVariable>()
         for (freeVar in freeVariableList.variables) {
             clonedVariables.add(FreeVariable(freeVar))
         }
-        this.variables = FXCollections.observableList<FreeVariable?>(clonedVariables, FreeVariable.EXTRACTOR)
+        this.variables = FXCollections.observableList(clonedVariables, FreeVariable.EXTRACTOR)
     }
 }

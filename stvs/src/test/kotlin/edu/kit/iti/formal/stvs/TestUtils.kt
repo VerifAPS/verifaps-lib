@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
+import edu.kit.iti.formal.stvs.model.code.Code
+import edu.kit.iti.formal.stvs.model.code.CodeTest
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem
@@ -34,6 +36,16 @@ object TestUtils {
      * Tolerance for floating-point rounding errors when doing assertEquals() with doubles
      */
     const val EPSILON: Double = 0.001
+
+    fun loadCodeFromFile(filename: String): Code {
+        return InputStreamReader(CodeTest::class.java.getResourceAsStream(filename)!!).use {
+            Code(filename, it.readText())
+        }
+    }
+
+    fun loadFromTestSets(resource: String): InputStream {
+        return TestUtils::class.java.getResourceAsStream("testSets/$resource")!!
+    }
 
     fun importValidSpec(source: InputStream, vararg enumTypes: TypeEnum): ValidSpecification {
         val typeContext: MutableList<Type> = ArrayList()

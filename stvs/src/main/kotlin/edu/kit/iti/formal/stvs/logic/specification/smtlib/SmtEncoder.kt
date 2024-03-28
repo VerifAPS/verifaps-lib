@@ -186,13 +186,13 @@ class SmtEncoder(
                 )
             )
             // n_z <= upperBound_z
-            if (interval.upperBound.isPresent) {
+            if (interval.upperBound != null) {
                 constraint!!.addGlobalConstrains(
                     SList.sexpr(
                         "bvule", "n_$z",
                         BitvectorUtils.hexFromInt(
                             min(
-                                interval.upperBound.get().toDouble(),
+                                interval.upperBound.toDouble(),
                                 getMaxDuration(z).toDouble()
                             ).toInt(), 4
                         )
@@ -285,8 +285,8 @@ class SmtEncoder(
         }
         val interval = specification.durations[j]!!.upperBound
 
-        return if (interval.isPresent) {
-            min(maxDurations[j].toDouble(), interval.get().toDouble()).toInt()
+        return if (interval != null) {
+            min(maxDurations[j].toDouble(), interval.toDouble()).toInt()
         } else {
             maxDurations[j]
         }

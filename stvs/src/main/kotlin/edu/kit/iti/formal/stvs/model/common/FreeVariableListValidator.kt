@@ -6,9 +6,6 @@ import javafx.beans.property.*
 import javafx.collections.FXCollections
 import tornadofx.getValue
 import java.util.*
-import java.util.function.Consumer
-import java.util.function.Function
-import java.util.stream.Collectors
 
 /**
  * The validator for the effective model [FreeVariableList]. This class provides
@@ -31,7 +28,6 @@ class FreeVariableListValidator(
     private val valid: BooleanProperty = SimpleBooleanProperty(false)
 
     /**
-     *
      * Creates a validator with the given formal type context model for the effective
      * free variable model.
      *
@@ -40,8 +36,8 @@ class FreeVariableListValidator(
      * @param freeVariables the free variables model to validate
      */
     init {
-        freeVariables.variables!!.addListener { o: Observable? -> revalidate() }
-        typeContext.addListener { o: Observable? -> revalidate() }
+        freeVariables.variables.addListener { _: Observable? -> revalidate() }
+        typeContext.addListener { _: Observable? -> revalidate() }
         revalidate()
     }
 
@@ -50,45 +46,27 @@ class FreeVariableListValidator(
      * the [.problemsProperty].
      */
     fun revalidate() {
-        val typesByName = typeContext.get()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    { obj: Type -> obj.typeName }, Function.identity()
-                )
-            )
+        val typesByName = typeContext.get().associateBy { obj -> obj.typeName }
+        val variableMap = freeVariables.variables
+            .associate { it.name to (typesByName[it.type] ?: error("Type ${it.type} is unknown")) }
 
-        val variableMap: MutableMap<String, Type> = HashMap()
-        freeVariables.variables!!.forEach(
-            Consumer { variableMap[it.name!!] = typesByName[it.type]!! })
+        val problems = hashMapOf<FreeVariable?, MutableList<FreeVariableProblem>>()
+        val validated = arrayListOf<ValidFreeVariable>()
 
-        val problems: MutableMap<FreeVariable?, MutableList<FreeVariableProblem>> = HashMap()
-
-        val validated: MutableList<ValidFreeVariable> = ArrayList()
-
-        freeVariables.variables!!.forEach(Consumer { freeVariable: FreeVariable ->
-            val optionalDuplicateProblem: Optional<DuplicateFreeVariableProblem> =
+        freeVariables.variables.forEach { freeVariable: FreeVariable ->
+            val optionalDuplicateProblem =
                 DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.variables)
-            optionalDuplicateProblem.ifPresent { problem: DuplicateFreeVariableProblem ->
-                insertProblem(
-                    problems,
-                    freeVariable,
-                    problem
-                )
-            }
-            if (!optionalDuplicateProblem.isPresent) {
+            optionalDuplicateProblem?.let { insertProblem(problems, freeVariable, it) }
+            if (optionalDuplicateProblem != null) {
                 try {
                     validated.add(
-                        InvalidFreeVariableProblem.tryToConvertToValid(
-                            freeVariable,
-                            typesByName, variableMap
-                        )
+                        InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName, variableMap)
                     )
                 } catch (problem: InvalidFreeVariableProblem) {
                     insertProblem(problems, freeVariable, problem)
                 }
             }
-        })
+        }
 
         validFreeVariablesProperty.setAll(validated)
         this.problemsProperty.set(problems)

@@ -30,7 +30,8 @@ class InvalidFreeVariableProblem protected constructor(errorMessage: String?) : 
          */
         @Throws(InvalidFreeVariableProblem::class)
         fun tryToConvertToValid(
-            freeVariable: FreeVariable, typesByName: Map<String?, Type>,
+            freeVariable: FreeVariable,
+            typesByName: Map<String, Type>,
             variableMap: Map<String, Type>
         ): ValidFreeVariable {
             val validName = tryToGetValidName(freeVariable)
@@ -45,7 +46,7 @@ class InvalidFreeVariableProblem protected constructor(errorMessage: String?) : 
         @Throws(InvalidFreeVariableProblem::class)
         private fun tryToGetValidName(freeVariable: FreeVariable): String {
             val varName = freeVariable.name
-            if (VariableExpr.IDENTIFIER_PATTERN.matcher(varName!!).matches()) {
+            if (VariableExpr.IDENTIFIER_PATTERN.matcher(varName).matches()) {
                 return varName
             } else {
                 throw InvalidFreeVariableProblem(
@@ -56,11 +57,8 @@ class InvalidFreeVariableProblem protected constructor(errorMessage: String?) : 
         }
 
         @Throws(InvalidFreeVariableProblem::class)
-        private fun tryToGetValidType(
-            freeVariable: FreeVariable?,
-            typesByName: Map<String?, Type>
-        ): Type {
-            val foundType = typesByName[freeVariable!!.type]
+        private fun tryToGetValidType(freeVariable: FreeVariable, typesByName: Map<String, Type>): Type {
+            val foundType = typesByName[freeVariable.type]
                 ?: throw InvalidFreeVariableProblem(
                     "Variable has unknown type: " + StringEscapeUtils
                         .escapeJava(freeVariable.type)
@@ -70,11 +68,11 @@ class InvalidFreeVariableProblem protected constructor(errorMessage: String?) : 
 
         @Throws(InvalidFreeVariableProblem::class)
         private fun trytoGetValidConstraint(
-            freeVariable: FreeVariable?,
-            typeContext: Map<String?, Type>,
+            freeVariable: FreeVariable,
+            typeContext: Map<String, Type>,
             variableMap: Map<String, Type>
         ): Expression {
-            if (freeVariable!!.constraint!!.isEmpty()) {
+            if (freeVariable.constraint.isEmpty()) {
                 return LiteralExpr(ValueBool.TRUE)
             }
             val parser = ExpressionParser(

@@ -37,14 +37,13 @@ class XmlConcreteSpecExporterTest {
         val typeContext =
             Arrays.asList<Type>(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/concrete_spec_valid_1.xml"), ImporterFacade
+            loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"), ImporterFacade
                 .ImportFormat.XML, typeContext
         )
         val result: ByteArrayOutputStream = exporter.export(concreteSpec)
         val resultString = String(result.toByteArray(), charset("utf-8"))
         val expectedString: String = IOUtils.toString(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/concrete_spec_valid_1.xml"),
+            loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"),
             "UTF-8"
         )
         Assert.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(resultString))

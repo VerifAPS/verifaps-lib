@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.view.editor
 
 import edu.kit.iti.formal.stvs.Demo
+import edu.kit.iti.formal.stvs.TestUtils.loadCodeFromFile
 import edu.kit.iti.formal.stvs.model.code.Code
-import edu.kit.iti.formal.stvs.model.code.CodeTest
 import edu.kit.iti.formal.stvs.model.code.SyntaxError
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
@@ -12,9 +12,8 @@ import javafx.scene.Node
 import javafx.scene.control.TextArea
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import org.junit.jupiter.api.Test
 import org.junit.experimental.categories.Category
-import java.util.*
+import org.junit.jupiter.api.Test
 import java.util.function.Consumer
 
 /**
@@ -24,16 +23,16 @@ import java.util.function.Consumer
 class EditorDemo {
     @Test
     fun javaFxTest() {
-        JavaFxTest.runSplitView({ this.editorAndModelSplit() })
+        JavaFxTest.runSplitView { this.editorAndModelSplit() }
     }
 
-    private fun editorAndModelSplit(): List<Node?> {
-        val code: Code = CodeTest.loadCodeFromFile("define_type.st")
+    private fun editorAndModelSplit(): List<Node> {
+        val code: Code = loadCodeFromFile("define_type.st")
         val controller = EditorPaneController(code, GlobalConfig())
 
         val rightPane = createExtractedVarsTextArea(code)
 
-        return Arrays.asList<Node?>(controller.view, rightPane)
+        return listOf<Node>(controller.view, rightPane)
     }
 
     private fun updateSyntaxErrors(textField: TextArea, code: Code) {

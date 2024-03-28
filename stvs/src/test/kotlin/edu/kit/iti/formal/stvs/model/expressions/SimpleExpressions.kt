@@ -43,11 +43,11 @@ object SimpleExpressions {
     }
 
 
-    fun `var`(name: String?): Expression {
+    fun variable(name: String?): Expression {
         return VariableExpr(name)
     }
 
-    fun `var`(name: String?, index: Int): Expression {
+    fun variable(name: String?, index: Int): Expression {
         return VariableExpr(name, index)
     }
 

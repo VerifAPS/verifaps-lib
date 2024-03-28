@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.expressions.parser
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.builder.maximum
 import edu.kit.iti.formal.automation.testtables.builder.minimum
+import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval
 import org.antlr.v4.runtime.*
 import java.util.*
@@ -28,7 +28,14 @@ class IntervalParser {
         @Throws(ParseException::class)
         fun parse(intervalAsString: String): LowerBoundedInterval {
             val duration = GetetaFacade.parseDuration(intervalAsString)
-            return LowerBoundedInterval(duration.minimum, Optional.ofNullable(duration.maximum))
+            return LowerBoundedInterval(duration.minimum, duration.upper)
         }
     }
 }
+
+private val Duration.upper: Int?
+    get() = when (this) {
+        is Duration.OpenInterval -> null
+        is Duration.ClosedInterval -> upper
+        is Duration.Omega -> null
+    }

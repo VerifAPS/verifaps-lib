@@ -40,8 +40,7 @@ class GeTeTaImporterTest {
         )
         val importer: GeTeTaImporter = GeTeTaImporter(typeContext, constraintSpec)
         val verificationResult: VerificationResult = importer.doImport(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/counterexample_1/geteta_report_counterexample_1.xml")
+            loadFromTestSets("/counterexample_1/geteta_report_counterexample_1.xml")
         )
         Assert.assertThat(
             verificationResult, CoreMatchers.instanceOf(
@@ -67,11 +66,11 @@ class GeTeTaImporterTest {
             )
         )
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"),
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
             ImporterFacade.ImportFormat.XML
         )
         val result: VerificationResult = GeTeTaImporter(typeContext, constraintSpec).doImport(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml")
+            loadFromTestSets("/valid_1/geteta_report_valid_1.xml")
         )
         Assert.assertThat(
             result, CoreMatchers.instanceOf(
@@ -91,8 +90,7 @@ class GeTeTaImporterTest {
             ImporterFacade.ImportFormat.XML
         )
         val result = importVerificationResult(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/problematic_1/geteta_report_unknown_error_1.xml"),
+            loadFromTestSets("/problematic_1/geteta_report_unknown_error_1.xml"),
             ImporterFacade.ImportFormat.GETETA, typeContext, constraintSpec
         )
         Assert.assertThat(

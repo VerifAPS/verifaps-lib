@@ -46,9 +46,8 @@ class StvsRootModel @JvmOverloads constructor(
      * file dialog or other applications when it may be useful to know where a session was
      * loaded from, or where it ought to be stored
      */
-
     val isFirstStart: Boolean
-        get() = (GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_SESSION_FILENAME).exists()
+        get() = (GlobalConfig.CONFIG_DIRPATH / GlobalConfig.AUTOLOAD_CONFIG_FILENAME).exists().not()
 
     /**
      * Saves the current session to [StvsRootModel.AUTOLOAD_SESSION_FILENAME] in the directory
@@ -90,7 +89,7 @@ class StvsRootModel @JvmOverloads constructor(
     }
 
     companion object {
-        private const val AUTOLOAD_SESSION_FILENAME = "stvs-session.xml"
+        private const val AUTOLOAD_SESSION_FILENAME = "stvs-session.json"
 
         /**
          * Loads the last session saved via [StvsRootModel.autosaveSession] (see

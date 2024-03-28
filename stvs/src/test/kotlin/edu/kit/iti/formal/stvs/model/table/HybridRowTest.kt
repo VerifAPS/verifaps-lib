@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.StvsApplication
+import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool
@@ -23,7 +24,7 @@ class HybridRowTest {
     @Throws(Exception::class)
     fun setUp() {
         constraintSpec = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!,
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!,
         )
         hybridRow = HybridRow(constraintSpec!!.rows[1], constraintSpec!!.durations[1])
     }
@@ -38,8 +39,7 @@ class HybridRowTest {
         Assertions.assertEquals(0, hybridRow!!.duration.counterExamplesProperty.size)
         val typeContext = listOf(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
-            StvsApplication::class.java
-                .getResourceAsStream("testSets/valid_1/concrete_spec_valid_1.xml")!!, typeContext
+            loadFromTestSets("/valid_1/concrete_spec_valid_1.xml")!!, typeContext
         )
         hybridRow!!.updateCounterExampleCells(1, concreteSpec)
         for (columnId in hybridRow!!.cells.keys) {

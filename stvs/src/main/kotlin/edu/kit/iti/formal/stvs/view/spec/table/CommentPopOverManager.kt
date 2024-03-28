@@ -5,27 +5,18 @@ import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.scene.Node
 
-class CommentPopOverManager @JvmOverloads constructor(
-    commentable: Commentable?,
-    editable: Boolean,
-    node: Node?,
-    x: Double = 0.0,
-    y: Double = 0.0
+class CommentPopOverManager(
+    private val commentable: Commentable,
+    private val editable: Boolean,
+    private val node: Node,
+    private val x: Double = 0.0,
+    private val y: Double = 0.0
 ) {
-    private val commentable: Commentable?
-    private val editable: Boolean
-    private val commentPopOver: CommentPopOver
-
     init {
-        if (node == null) {
-            throw NullPointerException("Node node cannot be null")
-        }
-        this.commentable = commentable
-        this.editable = editable
-        this.commentPopOver = CommentPopOver()
+        val commentPopOver = CommentPopOver()
         commentPopOver.show(node)
-        commentPopOver.textArea.text = commentable!!.comment
-        commentPopOver.saveButton.onAction = EventHandler { actionEvent: ActionEvent? ->
+        commentPopOver.textArea.text = commentable.comment
+        commentPopOver.saveButton.onAction = EventHandler { _ ->
             commentable.comment = commentPopOver.textArea.text
             commentPopOver.hide()
         }

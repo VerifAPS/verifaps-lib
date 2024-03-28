@@ -27,9 +27,9 @@ import kotlin.math.min
  */
 class VariableCollectionController(
     codeTypes: ListProperty<Type>,
-    val freeVariableList: FreeVariableList?
+    val freeVariableList: FreeVariableList
 ) : Controller {
-    val validator: FreeVariableListValidator = FreeVariableListValidator(codeTypes, freeVariableList!!)
+    val validator: FreeVariableListValidator = FreeVariableListValidator(codeTypes, freeVariableList)
     override val view: VariableCollection = VariableCollection()
 
     private var contextMenu = ContextMenu()
@@ -46,7 +46,7 @@ class VariableCollectionController(
         this.contextMenu = ContextMenu()
 
         val menuItemAdd = MenuItem("Add Variable")
-        menuItemAdd.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked(actionEvent) }
+        menuItemAdd.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked() }
         menuItemAdd.accelerator = KeyCodeCombination(KeyCode.ADD)
         contextMenu.items.add(menuItemAdd)
 
@@ -70,10 +70,10 @@ class VariableCollectionController(
         view.constraintTableColumn.cellFactory =
             Callback { tableColumn: TableColumn<FreeVariable?, String?> -> this.cellFactory(tableColumn) }
 
-        view.freeVariableTableView.items = freeVariableList!!.variables
+        view.freeVariableTableView.items = freeVariableList.variables
 
 
-        view.btnAddRow.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked(actionEvent) }
+        view.btnAddRow.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked() }
         view.btnRemoveRow.onAction =
             EventHandler { actionEvent: ActionEvent -> this.onDeleteVariableClicked(actionEvent) }
     }
@@ -94,8 +94,8 @@ class VariableCollectionController(
         tableView.selectionModel.clearSelection()
     }
 
-    private fun onAddVariableClicked(actionEvent: ActionEvent) {
-        freeVariableList!!.variables.add(FreeVariable("variable", "BOOL"))
+    private fun onAddVariableClicked() {
+        freeVariableList.variables.add(FreeVariable("variable", "BOOL"))
     }
 
     private fun cellFactory(tableColumn: TableColumn<FreeVariable?, String?>): TableCell<FreeVariable?, String?> {

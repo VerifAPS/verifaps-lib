@@ -85,9 +85,9 @@ class SpecificationTableCell(private val validator: ConstraintSpecificationValid
                 return null
             }
             val row = tableRow.item ?: return null
-            val columnId = tableColumn.userData as String
+            val columnId = tableColumn.userData as String?
             return if (columnId != null) {
-                row.cells!![columnId]
+                row.cells[columnId]
             } else { // we are a duration cell
                 row.duration
             }

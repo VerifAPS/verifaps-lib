@@ -27,8 +27,10 @@ dependencies {
     implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '11.3'
     implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.11.2'
     implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1'
+    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1")
     implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
     implementation 'com.pixelduke:fxribbon:1.2.2'
+    implementation("org.jfxtras:jmetro:11.6.15")
 
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2'

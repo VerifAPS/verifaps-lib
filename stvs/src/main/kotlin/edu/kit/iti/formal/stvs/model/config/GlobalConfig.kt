@@ -180,7 +180,7 @@ class GlobalConfig {
 
     companion object {
         const val AUTOLOAD_CONFIG_FILENAME: String = "stvs-config.json"
-        val CONFIG_DIRPATH = Paths.get(System.getProperty("user.home"), ".config")
+        val CONFIG_DIRPATH = Paths.get(System.getProperty("user.home"), ".config", "stvs")
 
         /**
          * If the file at <tt>[.CONFIG_DIRPATH]/[.AUTOLOAD_CONFIG_FILENAME]</tt> exists,

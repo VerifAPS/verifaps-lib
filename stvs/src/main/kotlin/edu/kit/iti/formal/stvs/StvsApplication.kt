@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs
 
 import edu.kit.iti.formal.stvs.StvsVersion.windowTitle
 import edu.kit.iti.formal.stvs.view.StvsMainScene
-import edu.kit.iti.formal.stvs.view.StvsPreloader
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton
 import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard
 import javafx.application.Application
@@ -69,8 +68,7 @@ class StvsApplication : Application() {
         }
 
         if (mainScene.rootController.rootModel.isFirstStart) {
-            WelcomeWizard(mainScene.rootController.rootModel.globalConfig)
-                .showAndWait()
+            WelcomeWizard(mainScene.rootController.rootModel.globalConfig).showAndWait()
         }
 
         primaryStage.show()

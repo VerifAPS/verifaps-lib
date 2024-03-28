@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.verification
 
 import edu.kit.iti.formal.stvs.*
+import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade.importStCode
@@ -28,7 +29,7 @@ import kotlin.concurrent.Volatile
  * Created by bal on 26.02.17.
  */
 class VerificationScenarioTest {
-    private var scenario: VerificationScenario? = null
+    private lateinit var scenario: VerificationScenario
     private var constraintSpec: ConstraintSpecification? = null
     private var config: GlobalConfig? = null
     private var code: Code? = null
@@ -45,7 +46,7 @@ class VerificationScenarioTest {
         scenario = VerificationScenario()
         code = importStCode(File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st").toURI()).toPath())
         constraintSpec = ImporterFacade.importConstraintSpec(
-            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml"))
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
         scenario!!.code = code
         config = autoloadConfig()
     }
@@ -105,10 +106,10 @@ class VerificationScenarioTest {
             val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
             try {
                 val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-                    StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!,
+                    loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!,
                 )
                 val expectedResult = importVerificationResult(
-                    StvsApplication::class.java.getResourceAsStream("testSets/valid_1/geteta_report_valid_1.xml")!!,
+                    loadFromTestSets("/valid_1/geteta_report_valid_1.xml")!!,
                     typeContext,
                     constraintSpec
                 )

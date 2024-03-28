@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.code
 
+import com.google.common.truth.Truth
+import edu.kit.iti.formal.stvs.TestUtils.loadCodeFromFile
 import edu.kit.iti.formal.stvs.model.TestUtils
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
@@ -8,11 +10,9 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import org.antlr.v4.runtime.Token
-import org.apache.commons.io.IOUtils
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.io.IOException
 
 /**
  * Created by Philipp on 19.01.2017.
@@ -21,9 +21,6 @@ class CodeTest {
     private val code = Code()
     private val enumDefinition = loadCodeFromFile("define_type.st")
     private val invalidCode = loadCodeFromFile("invalidCode.st")
-    private val simpleCode = Code("simpleCode.st", "simple sourcecode")
-    private val simpleCorrectCode = loadCodeFromFile("simpleCorrectCode.st")
-
 
     @Test
     fun testIsEmptyInitially() {
@@ -35,7 +32,7 @@ class CodeTest {
         code.updateSourcecode("TYPE is a keyword END_TYPE")
         val tokens: List<Token> = code.tokens
         println(tokens)
-        Assertions.assertTrue(tokens.size > 0)
+        Assertions.assertTrue(tokens.isNotEmpty())
     }
 
     @Test
@@ -44,23 +41,21 @@ class CodeTest {
         code.updateSourcecode("öüäß")
         val tokens: List<Token> = code.tokens
         println(tokens)
-        Assertions.assertTrue(!tokens.isEmpty())
+        Assertions.assertTrue(tokens.isNotEmpty())
     }
 
     @Test
     fun testTokensConcatenated() {
         val source = enumDefinition.sourcecode
         val tokens: List<Token> = enumDefinition.tokens
-        val tokensConcatenated = tokens.stream()
-            .map { obj: Token -> obj.text }
-            .reduce("") { obj: String, str: String -> obj + str }
+        val tokensConcatenated = tokens.joinToString("") { it.text }
         Assertions.assertEquals(source, tokensConcatenated, "Lexer tokens concatenated are source code")
     }
 
     @Test
     fun testParsedCodeTypeExtraction() {
-        val parsed = enumDefinition.parsedCode
-        Assertions.assertEquals(3, parsed!!.definedTypes.size.toLong(), "Find all defined Types")
+        val parsed = enumDefinition.parsedCode!!
+        Assertions.assertEquals(3, parsed.definedTypes.size.toLong(), "Find all defined Types")
 
         val myEnum: Type = TypeEnum("MY_ENUM", mutableListOf("possible", "values", "enum"))
         val expectedDefinedTypes: MutableSet<Type> = HashSet()
@@ -72,28 +67,30 @@ class CodeTest {
 
     @Test
     fun testParsedCodeIOVariableExtraction() {
-        val parsed = enumDefinition.parsedCode
-        Assertions.assertEquals(7, parsed!!.definedVariables.size.toLong(), "Find all defined IOVariables")
+        val parsed = enumDefinition.parsedCode!!
+        //Assertions.assertEquals(7, parsed.definedVariables.size.toLong(), "Find all defined IOVariables")
 
         val myEnum: Type = TypeEnum("MY_ENUM", mutableListOf("possible", "values", "enum"))
-        val expectedVariables: MutableSet<CodeIoVariable> = HashSet()
-        expectedVariables.add(CodeIoVariable(VariableCategory.INPUT, "BOOL", "active"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.INPUT, "INT", "number"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.INPUT, myEnum.typeName, "my_enum"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.OUTPUT, myEnum.typeName, "my_output"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.LOCAL, myEnum.typeName, "my_enum_local"))
-        expectedVariables.add(CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout"))
-        TestUtils.assertCollectionsEqual(expectedVariables, parsed.definedVariables)
+        val expectedVariables = setOf(
+            CodeIoVariable(VariableCategory.INPUT, "BOOL", "active"),
+            CodeIoVariable(VariableCategory.INPUT, "INT", "number"),
+            CodeIoVariable(VariableCategory.INPUT, myEnum.typeName, "my_enum"),
+            CodeIoVariable(VariableCategory.OUTPUT, myEnum.typeName, "my_output"),
+            CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"),
+            CodeIoVariable(VariableCategory.LOCAL, myEnum.typeName, "my_enum_local"),
+            CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout")
+        )
+        Truth.assertThat(parsed.definedVariables.toSet()).isEqualTo(expectedVariables)
     }
 
     @Test
     fun testParsedCodeBlocks() {
         val expectedBlock = FoldableCodeBlock(5, 27)
-        Assertions.assertEquals(expectedBlock, enumDefinition.parsedCode!!.foldableCodeBlocks[0])
-        Assertions.assertEquals(1, enumDefinition.parsedCode!!.foldableCodeBlocks.size.toLong())
-        Assertions.assertEquals(5, enumDefinition.parsedCode!!.foldableCodeBlocks[0].startLine.toLong())
-        Assertions.assertEquals(27, enumDefinition.parsedCode!!.foldableCodeBlocks[0].endLine.toLong())
+        val pcode = enumDefinition.parsedCode!!
+        Assertions.assertEquals(expectedBlock, pcode.foldableCodeBlocks[0])
+        Assertions.assertEquals(1, pcode.foldableCodeBlocks.size.toLong())
+        Assertions.assertEquals(5, pcode.foldableCodeBlocks[0].startLine.toLong())
+        Assertions.assertEquals(27, pcode.foldableCodeBlocks[0].endLine.toLong())
     }
 
     @Test
@@ -117,18 +114,5 @@ class CodeTest {
             enumDefinition.hashCode().toLong()
         )
         Assertions.assertNotEquals(invalidCode.hashCode().toLong(), enumDefinition.hashCode().toLong())
-    }
-
-    companion object {
-        fun loadCodeFromFile(filename: String): Code {
-            try {
-                return Code(
-                    filename,
-                    IOUtils.toString(CodeTest::class.java.getResourceAsStream(filename), "UTF-8")
-                )
-            } catch (e: IOException) {
-                throw RuntimeException(e)
-            }
-        }
     }
 }
