@@ -8,8 +8,6 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import tornadofx.getValue
 import tornadofx.setValue
 
@@ -18,7 +16,6 @@ import tornadofx.setValue
  *
  * @author Benjamin Alt
  */
-@Serializable
 sealed class IoVariable : Variable {
     abstract override val name: String
     abstract override val type: String
@@ -63,7 +60,6 @@ data class CodeIoVariable(
  *
  * @author Philipp
  */
-@Serializable
 data class ValidIoVariable(
     override val category: VariableCategory,
     override val name: String,
@@ -79,31 +75,23 @@ data class ValidIoVariable(
  * An input/output variable in a specification table.
  * @author Philipp
  */
-@Serializable
-class SpecIoVariable() :
-    IoVariable(), Commentable {
-
-    @Transient
+class SpecIoVariable() : IoVariable(), Commentable {
     val nameProperty: StringProperty = SimpleStringProperty()
-    override var name by nameProperty
+    override var name: String by nameProperty
 
-    @Transient
     val typeProperty: StringProperty = SimpleStringProperty()
-    override var type by typeProperty
+    override var type: String by typeProperty
 
 
-    @Transient
     val categoryProperty: ObjectProperty<VariableCategory> = SimpleObjectProperty()
     override var category by categoryProperty
 
 
-    @Transient
     val roleProperty: ObjectProperty<VariableRole> = SimpleObjectProperty()
     var role by roleProperty
 
     var columnConfig = ColumnConfig()
 
-    @Transient
     override val commentProperty: StringProperty = SimpleStringProperty("")
 
     /**

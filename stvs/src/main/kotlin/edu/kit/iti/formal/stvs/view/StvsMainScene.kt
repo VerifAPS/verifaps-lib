@@ -22,9 +22,8 @@ import java.io.IOException
  * @author Lukas Fritsch
  */
 class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) {
-
     private val rootModelProperty = SimpleObjectProperty(rootModel)
-    var rootModel by rootModelProperty
+    var rootModel: StvsRootModel by rootModelProperty
 
     var rootController: StvsRootController = StvsRootController(rootModelProperty.get())
 
@@ -68,7 +67,7 @@ class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) 
      * Code that should be executed before the scene is destroyed on exit.
      */
     fun onClose() {
-        val stvsRootModel: StvsRootModel = rootModelProperty.get()
+        val stvsRootModel: StvsRootModel? = rootModelProperty.get()
         if (stvsRootModel != null) {
             try {
                 stvsRootModel.globalConfig.autosaveConfig()

@@ -11,6 +11,8 @@ import javafx.scene.control.TitledPane
 import javafx.scene.image.Image
 import javafx.scene.input.MouseEvent
 import javafx.stage.Stage
+import jfxtras.styles.jmetro.JMetro
+import jfxtras.styles.jmetro.Style
 import org.fxmisc.cssfx.CSSFX
 import java.util.*
 import kotlin.system.exitProcess
@@ -41,6 +43,10 @@ class StvsApplication : Application() {
         mainScene.scene.stylesheets.add(
             StvsApplication::class.java.getResource("normal.css")!!.toExternalForm()
         )
+
+        val metro = JMetro(Style.LIGHT)
+        metro.scene = mainScene.scene
+        metro.reApplyTheme()
 
         CSSFX.start(mainScene.scene)
 

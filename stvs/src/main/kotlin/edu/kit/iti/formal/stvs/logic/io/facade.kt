@@ -10,6 +10,7 @@ import edu.kit.iti.formal.stvs.model.expressions.ValueBool
 import edu.kit.iti.formal.stvs.model.table.*
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess
+import javafx.beans.property.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -75,7 +76,7 @@ object ExporterFacade {
      */
     @Throws(ExportException::class)
     fun exportConfig(config: GlobalConfig, ou: OutputStream) {
-        jsonFormat.encodeToStream(config, ou)
+        jsonFormat.encodeToStream(config.serialize(), ou)
     }
 
     /**
@@ -232,18 +233,20 @@ object ImporterFacade {
 
         require(data.isConcrete)
 
-        val free = FreeVariableList(data.freeVariables.toMutableList())
+        val seq = data.freeVariables.map { it.deserialize() }.toMutableList()
+        val free = FreeVariableList(seq)
         val s = ConcreteSpecification(data.isCounterExample)
         s.name = data.name
 
         // Add the columnHeaders (column headers)
         for (v in data.variables) {
-            s.columnHeaders.add(v as ValidIoVariable)
+            s.columnHeaders.add(ValidIoVariable(v.category, v.name,
+                typeContext.find { it.typeName == v.type } ?: error("Could not find type ${v.type}")))
         }
-        val columnNames = data.variables.map { it.name!! }
+        val columnNames = data.variables.map { it.name }
 
         data.rows.forEachIndexed { _, it ->
-            val newDuration = ConcreteDuration(0, it.duration.value.toInt())
+            val newDuration = ConcreteDuration(0, it.duration.toInt())
             s.durations.add(newDuration)
 
             if (it.cells.size != columnNames.size) {
@@ -251,7 +254,7 @@ object ImporterFacade {
             }
 
             val cellsMap =
-                columnNames.zip(it.cells).associate { (col, cell) ->
+                columnNames.zip(it.cells).associate { (col, _) ->
                     val constraintCell = ConcreteCell(ValueBool.TRUE)//TODO weigl
                     col to constraintCell
                 }
@@ -280,7 +283,6 @@ object ImporterFacade {
      * [ImportFormat].
      *
      * @param input The stream from which to import from
-     * @param format The format to use for importing
      * @return The imported specification
      * @throws ImportException if an error occurred during importing
      */
@@ -318,7 +320,7 @@ object ImporterFacade {
     @JvmStatic
     @Throws(ImportException::class)
     fun importConfig(input: InputStream): GlobalConfig {
-        return fromJson<GlobalConfig>(input)
+        return fromJson<GlobalConfigData>(input).deserialize()
     }
 
     private inline fun <reified T> fromJson(input: InputStream): T {
@@ -375,8 +377,8 @@ object ImporterFacade {
                 val s = it.specification.first().asConstraintSpecification()
                 HybridSpecification(s, true)
             }.asObservable(),
-            session.config,
-            session.history
+            currentConfig,
+            currentHistory
         )
     }
 
@@ -487,20 +489,21 @@ object ImporterFacade {
 }
 
 private fun SpecificationTableData.asConstraintSpecification(): ConstraintSpecification {
-    val free = FreeVariableList(freeVariables.toMutableList())
+    val free = FreeVariableList(freeVariables.map { it.deserialize() }.toMutableList())
     val s = ConstraintSpecification(name, free)
     s.comment = comment
 
 
     // Add the columnHeaders (column headers)
     for (v in variables) {
-        s.columnHeaders.add(v as SpecIoVariable)
+        s.columnHeaders.add(SpecIoVariable(v.category, v.role, v.type, v.name)
+            .also { it.comment = v.comment })
     }
-    val columnNames = variables.map { it.name!! }
+    val columnNames = variables.map { it.name }
 
     rows.forEachIndexed { _, it ->
-        val newDuration = ConstraintDuration(it.duration.value)
-        newDuration.comment = it.duration.comment
+        val newDuration = ConstraintDuration(it.duration)
+        //newDuration.comment = it.duration.comment
         s.durations.add(newDuration)
 
         if (it.cells.size != columnNames.size) {
@@ -509,8 +512,8 @@ private fun SpecificationTableData.asConstraintSpecification(): ConstraintSpecif
 
         val cellsMap =
             columnNames.zip(it.cells).associate { (col, cell) ->
-                val constraintCell = ConstraintCell(cell.value)
-                constraintCell.comment = cell.comment
+                val constraintCell = ConstraintCell(cell)
+                //constraintCell.comment = cell.comment
                 col to constraintCell
             }
         val newRow = ConstraintSpecification.createRow(cellsMap)
@@ -520,13 +523,69 @@ private fun SpecificationTableData.asConstraintSpecification(): ConstraintSpecif
     return s
 }
 
+private fun FreeVar.deserialize() = FreeVariable(name, type, constraint)
 
 private fun StvsRootModel.serialize(): Session {
     val tabs = this.serializeTabs()
-    val code: Code = scenario.code
+    val code = scenario.code.serialize()
     return Session(
-        code = code, tabs = tabs, config = this.globalConfig, history = this.history
+        code = code, tabs = tabs//, config = globalConfig.serialize(), history = history.filenames.toList()
     )
+}
+
+@Serializable
+data class CodeData(val fileName: String?, val content: String)
+
+private fun Code.serialize() = CodeData(filename, sourcecode)
+private fun CodeData.deserialize() = Code(fileName, content)
+
+@Serializable
+data class GlobalConfigData(
+    var verificationTimeout: Int,
+    var simulationTimeout: Int,
+    var windowMaximized: Boolean,
+    var windowHeight: Int,
+    var windowWidth: Int,
+    var uiLanguage: String,
+    var maxLineRollout: Int,
+    var editorFontSize: Int,
+    var editorFontFamily: String,
+    var showLineNumbers: Boolean,
+    var nuxmvFilename: String,
+    var z3Path: String,
+    var getetaCommand: String
+)
+
+private fun GlobalConfig.serialize() = GlobalConfigData(
+    verificationTimeout = verificationTimeout,
+    simulationTimeout = simulationTimeout,
+    windowMaximized = windowMaximized,
+    windowHeight = windowHeight,
+    windowWidth = windowWidth,
+    uiLanguage = uiLanguage,
+    maxLineRollout = maxLineRollout,
+    editorFontSize = editorFontSize,
+    editorFontFamily = editorFontFamily,
+    showLineNumbers = showLineNumbers,
+    nuxmvFilename = nuxmvFilename,
+    z3Path = z3Path,
+    getetaCommand = getetaCommand
+)
+
+private fun GlobalConfigData.deserialize(): GlobalConfig = GlobalConfig().also {
+    it.verificationTimeout = verificationTimeout
+    it.simulationTimeout = simulationTimeout
+    it.windowMaximized = windowMaximized
+    it.windowHeight = windowHeight
+    it.windowWidth = windowWidth
+    it.uiLanguage = uiLanguage
+    it.maxLineRollout = maxLineRollout
+    it.editorFontSize = editorFontSize
+    it.editorFontFamily = it.editorFontFamily
+    it.showLineNumbers = showLineNumbers
+    it.nuxmvFilename = nuxmvFilename
+    it.z3Path = z3Path
+    it.getetaCommand = getetaCommand
 }
 
 @Throws(ExportException::class)
@@ -547,8 +606,10 @@ private fun StvsRootModel.serializeTabs(): List<TabData> {
 
 //region conversion
 private fun HybridSpecification.serialize(): SpecificationTableData {
-    val variables = columnHeaders.map { it }
-    val freeVars = freeVariableList.variables
+    val variables = columnHeaders.map {
+        it.serialize()
+    }
+    val freeVars = freeVariableList.variables.map { it.serialize() }
 
     return SpecificationTableData(
         name = this.name,
@@ -561,14 +622,21 @@ private fun HybridSpecification.serialize(): SpecificationTableData {
     )
 }
 
+private fun FreeVariable.serialize() = FreeVar(name, type, constraint)
+private fun SpecIoVariable.serialize() = IOVar(name, type, category, role, comment)
+private fun ValidIoVariable.serialize() = IOVar(name, type, category, category.defaultRole)
+
 private fun makeRows(constraintSpec: ConstraintSpecification) = constraintSpec.rows.mapIndexed { i, row ->
     val duration = constraintSpec.durations[i]
     val cells = constraintSpec.columnHeaders.map {
         val cell = row.cells[it.name]!!
-        CommentableString(cell.asString ?: "", cell.comment)
+        cell.asString?:""
+        //CommentableString(cell.asString ?: "", cell.comment)
     }
     RowData(
-        comment = row.comment, duration = CommentableString(duration.asString ?: "", duration.comment), cells = cells
+        comment = row.comment,
+        duration = duration.asString ?: "" /* CommentableString(duration.asString ?: "", duration.comment)*/,
+        cells = cells
     )
 }
 
@@ -576,15 +644,18 @@ private fun ConcreteSpecification.makeRows() = rows.mapIndexed { i, row ->
     val duration = durations[i]
     val cells = columnHeaders.map {
         val cell = row.cells[it.name]!!
-        CommentableString(cell.asString ?: "")
+        //CommentableString(cell.asString ?: "")
+        cell.asString ?: ""
     }
     RowData(
-        comment = row.comment, duration = CommentableString(duration.duration.toString()), cells = cells
+        comment = row.comment,
+        duration = duration.duration.toString()/* CommentableString(duration.duration.toString())*/,
+        cells = cells
     )
 }
 
 private fun ConcreteSpecification.serialize(): SpecificationTableData {
-    val variables = columnHeaders.map { it }
+    val variables = columnHeaders.map { it.serialize() }
     return SpecificationTableData(
         name = this.name,
         variables = variables,
@@ -598,7 +669,7 @@ private fun ConcreteSpecification.serialize(): SpecificationTableData {
 
 @Serializable
 data class Session(
-    val code: Code, val tabs: List<TabData>, val config: GlobalConfig, val history: History
+    val code: CodeData, val tabs: List<TabData> //, val config: GlobalConfigData, val history: List<String>
 )
 
 @Serializable
@@ -610,9 +681,21 @@ data class TabData(
 )
 
 @Serializable
+data class IOVar(
+    val name: String,
+    val type: String,
+    val category: VariableCategory,
+    val role: VariableRole,
+    val comment: String? = null
+)
+
+@Serializable
+data class FreeVar(val name: String, val type: String, val constraint: String)
+
+@Serializable
 data class SpecificationTableData(
-    val variables: List<Variable> = listOf(),
-    val freeVariables: List<FreeVariable> = listOf(),
+    val variables: List<IOVar> = listOf(),
+    val freeVariables: List<FreeVar> = listOf(),
     val rows: List<RowData> = listOf(),
     val enumTypes: Map<String, List<String>> = mapOf(),
     val isConcrete: Boolean = false,
@@ -621,12 +704,12 @@ data class SpecificationTableData(
     val name: String = "Unnamed Specification"
 )
 
-@Serializable
-data class CommentableString(var value: String, val comment: String? = null)
+//@Serializable
+//data class CommentableString(var value: String, val comment: String? = null)
 
 @Serializable
 data class RowData(
-    val duration: CommentableString, val comment: String? = null, val cells: List<CommentableString>
+    val duration: String, val comment: String? = null, val cells: List<String>
 )
 
 //endregion

@@ -8,7 +8,7 @@ import javafx.scene.Node
 class CommentPopOverManager(
     private val commentable: Commentable,
     private val editable: Boolean,
-    private val node: Node,
+    private val node: Node?,
     private val x: Double = 0.0,
     private val y: Double = 0.0
 ) {

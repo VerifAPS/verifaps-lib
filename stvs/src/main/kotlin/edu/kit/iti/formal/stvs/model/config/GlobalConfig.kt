@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import javafx.beans.property.*
-import kotlinx.serialization.*
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
@@ -19,12 +18,10 @@ import kotlin.io.path.*
  *
  * @author Benjamin Alt
  */
-@Serializable
 class GlobalConfig {
     val validLanguages: List<String> = mutableListOf("EN")
 
     // General
-    @Transient
     val verificationTimeoutProperty: IntegerProperty = SimpleIntegerProperty(3600)
 
     /**
@@ -36,59 +33,47 @@ class GlobalConfig {
      */
     var verificationTimeout by verificationTimeoutProperty
 
-    @Transient
     val simulationTimeoutProperty: IntegerProperty = SimpleIntegerProperty(60)
     var simulationTimeout by simulationTimeoutProperty
 
-    @Transient
     val windowMaximizedProperty: BooleanProperty = SimpleBooleanProperty(true)
     var windowMaximized by windowMaximizedProperty
 
-    @Transient
     val windowHeightProperty: IntegerProperty = SimpleIntegerProperty(600)
     var windowHeight by windowHeightProperty
 
-    @Transient
     val windowWidthProperty: IntegerProperty = SimpleIntegerProperty(800)
     var windowWidth by windowWidthProperty
 
-    @Transient
     val uiLanguageProperty: StringProperty = SimpleStringProperty("EN")
     var uiLanguage by uiLanguageProperty
 
-    @Transient
     val maxLineRolloutProperty: IntegerProperty = SimpleIntegerProperty(50)
     var maxLineRollout by maxLineRolloutProperty
 
     // Editor
-    @Transient
     val editorFontSizeProperty: IntegerProperty = SimpleIntegerProperty(12)
     var editorFontSize by editorFontSizeProperty
 
-    @Transient
     val editorFontFamilyProperty: StringProperty = SimpleStringProperty("DejaVu Sans Mono")
     var editorFontFamily by editorFontFamilyProperty
 
-    @Transient
     val showLineNumbersProperty: BooleanProperty = SimpleBooleanProperty(true)
     var showLineNumbers by showLineNumbersProperty
 
     // Dependency paths
-    @Transient
     val nuxmvFilenameProperty: StringProperty = SimpleStringProperty(
         ExecutableLocator.findExecutableFileAsString("nuXmv")
             .orElse("[Path to nuXmv Executable]")
     )
     var nuxmvFilename by nuxmvFilenameProperty
 
-    @Transient
     val z3PathProperty: StringProperty = SimpleStringProperty(
         ExecutableLocator.findExecutableFileAsString("z3")
             .orElse("[Path to Z3 Executable]")
     )
     var z3Path by z3PathProperty
 
-    @Transient
     val getetaCommandProperty: StringProperty =
         SimpleStringProperty("java -jar /path/to/geteta.jar -c \${code} -t \${spec} -x")
     var getetaCommand by getetaCommandProperty

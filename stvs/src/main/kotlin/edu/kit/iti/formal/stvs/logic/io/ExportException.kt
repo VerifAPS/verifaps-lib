@@ -5,5 +5,4 @@ package edu.kit.iti.formal.stvs.logic.io
  *
  * @author Benjamin Alt
  */
-class ExportException(message: String, originalException: Exception? = null) : Exception(message, originalException) {
-}
+class ExportException(message: String, originalException: Exception? = null) : Exception(message, originalException)
