@@ -13,6 +13,7 @@ dependencies {
     implementation project(':aps-rvt')
     implementation project(':run')
     implementation project(':ide')
+    implementation project(':stvs')
     implementation 'com.github.ajalt.clikt:clikt:4.2.2'
 }
 
@@ -46,6 +47,7 @@ def mainClasses = [
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
 
         , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
+        , "stvs"              : "edu.kit.iti.formal.automation.ide.STVS"
 //        , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
         , "xml2st"           : "edu.kit.iti.formal.automation.Xml2TxtApp"
 ]

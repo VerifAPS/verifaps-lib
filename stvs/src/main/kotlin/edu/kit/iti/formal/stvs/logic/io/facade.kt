@@ -374,7 +374,7 @@ object ImporterFacade {
         val session = fromJson<Session>(input)
         return StvsRootModel(
             session.tabs.map {
-                val s = it.specification.first().asConstraintSpecification()
+                val s = it.specifications.first().asConstraintSpecification()
                 HybridSpecification(s, true)
             }.asObservable(),
             currentConfig,
@@ -623,14 +623,14 @@ private fun HybridSpecification.serialize(): SpecificationTableData {
 }
 
 private fun FreeVariable.serialize() = FreeVar(name, type, constraint)
-private fun SpecIoVariable.serialize() = IOVar(name, type, category, role, comment)
+private fun SpecIoVariable.serialize() = IOVar(name, type, category, role, comment = comment)
 private fun ValidIoVariable.serialize() = IOVar(name, type, category, category.defaultRole)
 
 private fun makeRows(constraintSpec: ConstraintSpecification) = constraintSpec.rows.mapIndexed { i, row ->
     val duration = constraintSpec.durations[i]
     val cells = constraintSpec.columnHeaders.map {
         val cell = row.cells[it.name]!!
-        cell.asString?:""
+        cell.asString ?: ""
         //CommentableString(cell.asString ?: "", cell.comment)
     }
     RowData(
@@ -677,7 +677,7 @@ data class TabData(
     val id: UInt,
     val open: Boolean = true,
     val readOnly: Boolean = false,
-    val specification: List<SpecificationTableData>,
+    val specifications: List<SpecificationTableData>,
 )
 
 @Serializable
@@ -686,6 +686,7 @@ data class IOVar(
     val type: String,
     val category: VariableCategory,
     val role: VariableRole,
+    val colwidth: Int = 0,
     val comment: String? = null
 )
 

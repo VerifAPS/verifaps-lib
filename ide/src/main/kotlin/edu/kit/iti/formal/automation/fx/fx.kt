@@ -3,7 +3,10 @@ package edu.kit.iti.formal.automation.fx
 import com.pixelduke.control.Ribbon
 import com.pixelduke.control.ribbon.RibbonGroup
 import com.pixelduke.control.ribbon.RibbonTab
+import com.pixelduke.transit.Style
+import com.pixelduke.transit.TransitTheme
 import edu.kit.iti.formal.util.info
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
@@ -128,6 +131,11 @@ class IdeFx : App(IdeView::class, IdeStyle::class) {
 
     }
 
+    override fun start(stage: Stage) {
+        super.start(stage)
+        //val theme = TransitTheme(stage.scene, Style.LIGHT);
+        //theme.reApplyTheme()
+    }
 }
 
 object ConfigurationPaths {
@@ -224,7 +232,9 @@ class IdeView : View("VERIFAPS IDE") {
         //if (appData.lastNavigatorPath.value != null)
         //    fileNavigator.rootFile.value = Paths.get(appData.lastNavigatorPath.value)
         subscribe<StatusMessage> { publishMessage(it.text, it.graphic) }
-        open(File("../geteta/examples/NewFile.gtt").absoluteFile)
+        Platform.runLater {
+            open(File("geteta/examples/NewFile.gtt").absoluteFile)
+        }
     }
 
     fun publishMessage(status: String, graphic: Node? = null) {
