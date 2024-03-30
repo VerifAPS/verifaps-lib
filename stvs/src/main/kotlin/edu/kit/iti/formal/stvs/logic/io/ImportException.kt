@@ -6,7 +6,6 @@ package edu.kit.iti.formal.stvs.logic.io
  * @author Benjamin Alt
  */
 class ImportException : Exception {
-    override val message: String? = null
 
     /**
      * Create a new ImportException with a given error message.

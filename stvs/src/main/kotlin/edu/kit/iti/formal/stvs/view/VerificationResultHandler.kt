@@ -33,7 +33,7 @@ class VerificationResultHandler(private val controller: StvsRootController) : Ve
         val readOnlySpec = HybridSpecification(
             ConstraintSpecification(verifiedSpec!!), false
         )
-        readOnlySpec.setCounterExample(result!!.counterexample)
+        readOnlySpec.counterExample = result!!.counterexample
         val newIndex = rootModel.hybridSpecifications.size
         rootModel.hybridSpecifications.add(newIndex, readOnlySpec)
     }

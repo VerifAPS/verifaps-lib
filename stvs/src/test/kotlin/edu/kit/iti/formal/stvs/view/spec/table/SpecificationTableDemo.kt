@@ -1,13 +1,14 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
-import edu.kit.iti.formal.stvs.Demo
+import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
@@ -24,22 +25,19 @@ import javafx.scene.control.TextArea
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
-import org.apache.commons.io.IOUtils
 import org.junit.jupiter.api.Test
-import org.junit.experimental.categories.Category
 import tornadofx.asObservable
-import java.io.*
-import java.util.*
-import java.util.function.Supplier
+import java.io.PrintWriter
+import java.io.StringWriter
 
 /**
  * Created by Philipp on 01.02.2017.
  */
-@Category(Demo::class)
+@Tag("demo")
 class SpecificationTableDemo {
     @Test
     fun testTable() {
-        JavaFxTest.Companion.runSplitView(Supplier<List<Node?>> { this.simpleTableScene() })
+        JavaFxTest.runSplitView { this.simpleTableScene() }
     }
 
     private fun simpleTableScene(): List<Node?> {
@@ -81,7 +79,7 @@ class SpecificationTableDemo {
         updateText(textArea, spec)
 
         val updateButton = Button("Refresh")
-        updateButton.onAction = EventHandler { event: ActionEvent? -> updateText(textArea, spec) }
+        updateButton.onAction = EventHandler { _: ActionEvent -> updateText(textArea, spec) }
 
         val problemsArea = TextArea()
         problemsArea.styleClass.addAll("model-text-area")
@@ -89,7 +87,7 @@ class SpecificationTableDemo {
 
         updateProblemsText(problemsArea, recognizer)
 
-        recognizer.problemsProperty().addListener { o: Observable? -> updateProblemsText(problemsArea, recognizer) }
+        recognizer.problemsProperty.addListener { _: Observable -> updateProblemsText(problemsArea, recognizer) }
 
         val splitPane = SplitPane(textArea, problemsArea)
         splitPane.orientation = Orientation.VERTICAL
@@ -98,16 +96,17 @@ class SpecificationTableDemo {
     }
 
     private fun updateProblemsText(problemsArea: TextArea, recognizer: ConstraintSpecificationValidator) {
-        val error = recognizer.problemsProperty().get()
+        val error = recognizer.problemsProperty.get()
             .joinToString("\n") { (it?.javaClass?.simpleName ?: "") + ": " + (it?.errorMessage ?: "") }
         problemsArea.text = error
     }
 
     private fun updateText(textArea: TextArea, spec: ConstraintSpecification) {
         try {
-            //ExporterFacade.exportSpec(spec)
-            //val output = IOUtils.toString(stream.toByteArray(), "UTF-8")
-            //textArea.text = output
+            val output = edu.kit.iti.formal.stvs.logic.io.xml.TestUtils.stringOutputStream {
+                ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML, it)
+            }
+            textArea.text = output
         } catch (e: Exception) {
             val writeString = StringWriter()
             e.printStackTrace(PrintWriter(writeString))

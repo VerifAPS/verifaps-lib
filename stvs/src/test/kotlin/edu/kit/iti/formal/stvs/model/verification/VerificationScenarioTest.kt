@@ -30,9 +30,9 @@ import kotlin.concurrent.Volatile
  */
 class VerificationScenarioTest {
     private lateinit var scenario: VerificationScenario
-    private var constraintSpec: ConstraintSpecification? = null
-    private var config: GlobalConfig? = null
-    private var code: Code? = null
+    private lateinit var constraintSpec: ConstraintSpecification
+    private lateinit var config: GlobalConfig
+    private lateinit var code: Code
 
     @Volatile
     private var done = false
@@ -44,20 +44,20 @@ class VerificationScenarioTest {
         TestUtils.assumeGetetaExists()
 
         scenario = VerificationScenario()
-        code = importStCode(File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st").toURI()).toPath())
+        code = importStCode(File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI()))
         constraintSpec = ImporterFacade.importConstraintSpec(
             loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
-        scenario!!.code = code
+        scenario.code = code
         config = autoloadConfig()
     }
 
     @Test//(timeout = TIMEOUT)
     @Throws(Exception::class)
     fun testVerify() {
-        scenario!!.verificationResultProperty.addListener(VerificationResultListener())
-        Assertions.assertEquals(VerificationState.NOT_STARTED, scenario!!.verificationState)
-        scenario!!.verify(config!!, constraintSpec!!)
-        Assertions.assertEquals(VerificationState.RUNNING, scenario!!.verificationState)
+        scenario.verificationResultProperty.addListener(VerificationResultListener())
+        Assertions.assertEquals(VerificationState.NOT_STARTED, scenario.verificationState)
+        scenario.verify(config, constraintSpec)
+        Assertions.assertEquals(VerificationState.RUNNING, scenario.verificationState)
         done = false
         val startTime = System.currentTimeMillis()
         while (!done) {
@@ -68,17 +68,17 @@ class VerificationScenarioTest {
     @Test
     @Throws(Exception::class)
     fun testCancel() {
-        Assertions.assertEquals(VerificationState.NOT_STARTED, scenario!!.verificationState)
-        scenario!!.verify(config!!, constraintSpec!!)
-        Assertions.assertEquals(VerificationState.RUNNING, scenario!!.verificationState)
-        scenario!!.cancel()
-        Assertions.assertEquals(VerificationState.CANCELLED, scenario!!.verificationState)
+        Assertions.assertEquals(VerificationState.NOT_STARTED, scenario.verificationState)
+        scenario.verify(config, constraintSpec)
+        Assertions.assertEquals(VerificationState.RUNNING, scenario.verificationState)
+        scenario.cancel()
+        Assertions.assertEquals(VerificationState.CANCELLED, scenario.verificationState)
     }
 
     @Test
     @Throws(Exception::class)
     fun testGetCode() {
-        Assertions.assertEquals(code, scenario!!.code)
+        Assertions.assertEquals(code, scenario.code)
     }
 
     @Test
@@ -93,9 +93,9 @@ class VerificationScenarioTest {
     @Test
     @Throws(Exception::class)
     fun testGetSetActiveSpec() {
-        Assertions.assertNull(scenario!!.activeSpec)
-        scenario!!.activeSpec = constraintSpec
-        Assertions.assertEquals(constraintSpec, scenario!!.activeSpec)
+        Assertions.assertNull(scenario.activeSpec)
+        scenario.activeSpec = constraintSpec
+        Assertions.assertEquals(constraintSpec, scenario.activeSpec)
     }
 
     private inner class VerificationResultListener : ChangeListener<VerificationResult> {
@@ -106,10 +106,10 @@ class VerificationScenarioTest {
             val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
             try {
                 val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-                    loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")!!,
+                    loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
                 )
                 val expectedResult = importVerificationResult(
-                    loadFromTestSets("/valid_1/geteta_report_valid_1.xml")!!,
+                    loadFromTestSets("/valid_1/geteta_report_valid_1.xml"),
                     typeContext,
                     constraintSpec
                 )

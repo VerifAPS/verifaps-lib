@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.expressions.Expression
 import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.expressions.parser.ExpressionParser
@@ -17,38 +17,14 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell
  *
  * @author Benjamin Alt
  */
-class CellParseProblem(exception: ParseException, column: String?, row: Int) :
-    CellProblem(createErrorMessage(exception), column, row) {
+data class CellParseProblem(val exception: ParseException, override val column: String, override val row: Int) : CellProblem {
+    override val errorMessage: String = createErrorMessage(exception)
+    override val location: Selection = Selection(column, row)
     val parseException: ParseException = exception
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        if (!super.equals(obj)) {
-            return false
-        }
-
-        val that = obj as CellParseProblem
-
-        return if (parseException != null) parseException == that.parseException else that.parseException == null
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + (if (parseException != null) parseException.hashCode() else 0)
-        return result
-    }
 
     companion object {
         /**
-         *
-         *
          * Tries to create an [Expression] from the given string and context information.
-         *
          *
          * @param typeContext the type context needed for parsing enums
          * @param columnId the column of the cell to check
@@ -59,23 +35,22 @@ class CellParseProblem(exception: ParseException, column: String?, row: Int) :
          * @throws CellUnsupportedExpressionProblem if the expression contains unsupported grammar
          * features (for example function calls)
          */
-        @Throws(CellParseProblem::class, CellUnsupportedExpressionProblem::class)
+        @Throws(SpecProblemException::class)
         fun tryParseCellExpression(
-            typeContext: List<Type>, columnId: String?, row: Int,
-            cell: ConstraintCell?
+            typeContext: List<Type>, columnId: String, row: Int, cell: ConstraintCell
         ): Expression {
             val parser = ExpressionParser(columnId, typeContext)
             try {
-                return parser.parseExpression(cell?.asString?:"")
+                return parser.parseExpression(cell.asString ?: "")
             } catch (parseException: ParseException) {
-                throw CellParseProblem(parseException, columnId, row)
+                throw CellParseProblem(parseException, columnId, row).asException()
             } catch (unsupportedException: UnsupportedExpressionException) {
-                throw CellUnsupportedExpressionProblem(unsupportedException, columnId, row)
+                throw CellUnsupportedExpressionProblem(unsupportedException, columnId, row).asException()
             }
         }
 
-        private fun createErrorMessage(exception: ParseException): String? {
-            return exception.message
+        private fun createErrorMessage(exception: ParseException): String {
+            return exception.message ?: ""
         }
     }
 }

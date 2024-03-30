@@ -74,9 +74,9 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
             }
             val value: List<String> = counterExample.getConcreteDurationForConstraintRow(rowIndex)
                 ?.duration?.toString().toSingleton() ?: listOf()
-            duration!!.counterExamplesProperty.setAll(value)
+            duration.counterExamplesProperty.setAll(value)
         } else {
-            duration!!.clearCounterExample()
+            duration.clearCounterExample()
         }
     }
 

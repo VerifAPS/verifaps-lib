@@ -9,24 +9,20 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig.Companion.autoloadConfig
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool
+import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
-import javafx.stage.FileChooser
 import org.junit.Assume
-import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
-import org.powermock.api.mockito.PowerMockito
-import org.testfx.util.WaitForAsyncUtils
 import tornadofx.asObservable
-import java.io.*
-import java.net.URL
-import java.util.*
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
+import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
 
 /**
  * Created by bal on 10.02.17.
@@ -70,11 +66,11 @@ object TestUtils {
                 validFreeVariables.asObservable(),
                 constraintSpec
             )
-            val validSpec = validator.getValidSpecification()
+            val validSpec = validator.validSpecification
             if (validSpec == null) {
                 System.err.println("ConstraintSpecification could not be validated:")
-                validator.problemsProperty().get().map { it?.errorMessage }.forEach { System.err.println(it) }
-                throw RuntimeException("Couldn't validate Specification")
+                validator.problemsProperty.get().map { it?.errorMessage }.forEach { System.err.println(it) }
+                throw RuntimeException("Couldn't validate specification")
             }
             return validSpec
         } catch (cause: ImportException) {
@@ -100,7 +96,7 @@ object TestUtils {
     }
 
     fun importValidFreeVariables(freeVariableList: FreeVariableList, typeContext: List<Type>): List<ValidFreeVariable> {
-        val validator = FreeVariableListValidator(SimpleListProperty(typeContext.asObservable()), freeVariableList!!)
+        val validator = FreeVariableListValidator(SimpleListProperty(typeContext.asObservable()), freeVariableList)
         if (validator.problemsProperty.get().isNotEmpty()) {
             System.err.println("Could not validate free variables:")
             validator.problemsProperty.get().map { (k, v) ->
@@ -109,25 +105,6 @@ object TestUtils {
             throw RuntimeException("Couldn't validate")
         }
         return validator.validFreeVariablesProperty.get()
-    }
-
-    fun gimmeTime() {
-        WaitForAsyncUtils.sleep(5, TimeUnit.SECONDS)
-    }
-
-    @Throws(Exception::class)
-    fun mockFiles(vararg urls: URL) {
-        val files = Arrays.stream(urls)
-            .map { obj: URL -> obj.path }
-            .map { pathname: String? -> File(pathname) }
-            .collect(Collectors.toList())
-        val chooser = Mockito.mock(FileChooser::class.java)
-        var stub = Mockito.`when`(chooser.showOpenDialog(ArgumentMatchers.any()))
-        for (file in files) {
-            stub = stub.thenReturn(file)
-        }
-        Mockito.`when`(chooser.extensionFilters).thenReturn(FXCollections.observableList(ArrayList()))
-        PowerMockito.whenNew(FileChooser::class.java).withAnyArguments().thenReturn(chooser)
     }
 
     private fun assumeFileExists(message: String, executable: String) {

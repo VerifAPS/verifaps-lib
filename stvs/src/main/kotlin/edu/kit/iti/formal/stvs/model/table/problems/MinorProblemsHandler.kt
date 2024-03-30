@@ -14,5 +14,5 @@ fun interface MinorProblemsHandler {
      * [edu.kit.iti.formal.stvs.model.common.SpecIoVariable] to a
      * [edu.kit.iti.formal.stvs.model.common.ValidIoVariable]
      */
-    fun handle(minorProblem: InvalidIoVarProblem?)
+    fun handle(minorProblem: InvalidIoVarProblem)
 }

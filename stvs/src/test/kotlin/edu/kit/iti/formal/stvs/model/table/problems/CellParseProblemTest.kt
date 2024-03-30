@@ -27,7 +27,7 @@ class CellParseProblemTest {
         typeMap["B"] = TypeBool.BOOL
         val typeChecker = TypeChecker(typeMap)
         val problematicCell = ConstraintCell("3<<>4")
-        assertFailsWith<CellParseProblem> {
+        assertFailsWith<SpecProblemException> {
             ConstraintSpecificationValidator.tryValidateCellExpression(
                 typeContext, typeChecker, "A", 4,
                 problematicCell

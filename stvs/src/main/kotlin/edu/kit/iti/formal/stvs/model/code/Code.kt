@@ -6,8 +6,6 @@ import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import org.antlr.v4.runtime.Token
 import tornadofx.getValue
 import tornadofx.setValue
@@ -18,7 +16,6 @@ import tornadofx.setValue
  * @author Lukas
  * @author Philipp
  */
-@Serializable
 class Code {
     @Transient
     val filenameProperty: StringProperty = SimpleStringProperty(null)

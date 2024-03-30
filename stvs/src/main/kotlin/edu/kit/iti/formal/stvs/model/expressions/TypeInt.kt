@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import java.util.*
-
 /**
  * Runtime-representation for int types.
  * This class is a singleton, since it does not hold any state at all.
@@ -23,13 +21,7 @@ class TypeInt private constructor() : Type {
     override val typeName: String
         get() = "INT"
 
-    override fun parseLiteral(literal: String): Optional<Value> {
-        return try {
-            Optional.of(ValueInt(literal.toInt()))
-        } catch (e: NumberFormatException) {
-            Optional.empty()
-        }
-    }
+    override fun parseLiteral(literal: String) = literal.toIntOrNull()?.let { ValueInt(it) }
 
     override fun generateDefaultValue(): Value {
         return ValueInt(1)

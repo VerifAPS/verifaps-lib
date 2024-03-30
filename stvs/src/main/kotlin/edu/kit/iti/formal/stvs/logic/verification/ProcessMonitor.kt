@@ -41,10 +41,6 @@ class ProcessMonitor(process: Process?, timeout: Int) : Thread() {
         }
     }
 
-    fun getError(): Optional<Exception> {
-        return Optional.ofNullable(error)
-    }
-
     /**
      * runs an external process and wait until `timeout` or until it is interrupted.
      */

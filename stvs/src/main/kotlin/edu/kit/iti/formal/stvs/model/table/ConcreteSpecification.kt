@@ -128,27 +128,30 @@ class ConcreteSpecification(
         return durations.indexOf(durationWithCycle)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConcreteSpecification
+
+        if (isCounterExample != other.isCounterExample) return false
+        if (name != other.name) return false
+        if (rows != other.rows) return false
+        if (durations != other.durations) return false
+        if (columnHeaders != other.columnHeaders) return false
+        return true
+    }
+
     override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + (if (isCounterExample) 1 else 0)
+        var result = isCounterExample.hashCode()
+        result = 31 * result + columnHeaders.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + rows.hashCode()
+        result = 31 * result + durations.hashCode()
         return result
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        if (!super.equals(obj)) {
-            return false
-        }
 
-        val that = obj as ConcreteSpecification
-
-        return isCounterExample == that.isCounterExample
-    }
 
     companion object {
         private fun isCycleInDuration(cycle: Int, duration: ConcreteDuration): Boolean {

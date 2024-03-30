@@ -22,20 +22,20 @@
 
     <!-- region Config -->
     <complexType name="Config">
-        <sequence>
+        <all>
             <element name="general" minOccurs="0" maxOccurs="1">
                 <complexType>
-                    <sequence>
+                    <all>
                         <element name="uiLanguage" type="string" minOccurs="0" maxOccurs="1"/>
                         <element name="windowSize" minOccurs="0" maxOccurs="1">
                             <complexType>
-                                <sequence>
+                                <all>
                                     <element name="width" type="positiveInteger" minOccurs="0"
                                              maxOccurs="1"/>
                                     <element name="height" type="positiveInteger" minOccurs="0"
                                              maxOccurs="1"/>
                                     <element name="maximized" type="boolean" minOccurs="0" maxOccurs="1"/>
-                                </sequence>
+                                </all>
                             </complexType>
                         </element>
                         <element name="verificationTimeout" type="positiveInteger" minOccurs="0"
@@ -43,29 +43,29 @@
                         <element name="simulationTimeout" type="positiveInteger" minOccurs="0" maxOccurs="1"/>
                         <element name="maxLineRollout" type="positiveInteger" minOccurs="0"
                                  maxOccurs="1"/>
-                    </sequence>
+                    </all>
                 </complexType>
             </element>
             <element name="editor" minOccurs="0" maxOccurs="1">
                 <complexType>
-                    <sequence>
+                    <all>
                         <element name="showLineNumbers" type="boolean" minOccurs="0" maxOccurs="1"
                                  default="true"/>
                         <element name="fontFamily" type="string" minOccurs="0" maxOccurs="1"/>
                         <element name="fontSize" type="positiveInteger" minOccurs="0" maxOccurs="1"/>
-                    </sequence>
+                    </all>
                 </complexType>
             </element>
             <element name="dependencies" minOccurs="0" maxOccurs="1">
                 <complexType>
-                    <sequence>
+                    <all>
                         <element name="z3Path" type="string" minOccurs="0" maxOccurs="1"/>
                         <element name="getetaCommand" type="string" minOccurs="0" maxOccurs="1"/>
                         <element name="nuxmvFilename" type="string" minOccurs="0" maxOccurs="1"/>
-                    </sequence>
+                    </all>
                 </complexType>
             </element>
-        </sequence>
+        </all>
     </complexType>
     <!-- endregion Config -->
 

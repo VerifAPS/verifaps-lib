@@ -2,23 +2,23 @@
 <config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
     <general>
         <uiLanguage>EN</uiLanguage>
+        <simulationTimeout>60</simulationTimeout>
+        <verificationTimeout>3600</verificationTimeout>
+        <maxLineRollout>50</maxLineRollout>
         <windowSize>
-            <width>800</width>
             <height>600</height>
+            <width>800</width>
             <maximized>true</maximized>
         </windowSize>
-        <verificationTimeout>3600</verificationTimeout>
-        <simulationTimeout>60</simulationTimeout>
-        <maxLineRollout>50</maxLineRollout>
     </general>
     <editor>
-        <showLineNumbers>true</showLineNumbers>
         <fontFamily>DejaVu Sans Mono</fontFamily>
         <fontSize>12</fontSize>
+        <showLineNumbers>true</showLineNumbers>
     </editor>
     <dependencies>
         <z3Path>[Path to Z3 Executable]</z3Path>
-        <getetaCommand>java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x</getetaCommand>
         <nuxmvFilename>[Path to NuXmv Executable]</nuxmvFilename>
+        <getetaCommand>java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x</getetaCommand>
     </dependencies>
 </config>

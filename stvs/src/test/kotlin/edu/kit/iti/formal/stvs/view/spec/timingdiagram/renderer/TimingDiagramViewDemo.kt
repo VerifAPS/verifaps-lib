@@ -1,17 +1,16 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import edu.kit.iti.formal.stvs.Demo
+import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.view.JavaFxTest
 import javafx.scene.Scene
 import org.junit.Ignore
 import org.junit.jupiter.api.Test
-import org.junit.experimental.categories.Category
 import java.util.function.Supplier
 
 /**
  * Created by leonk on 02.02.2017.
  */
-@Category(Demo::class)
+@Tag("demo")
 class TimingDiagramViewDemo {
     @Ignore
     @Test

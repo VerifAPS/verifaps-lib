@@ -30,4 +30,25 @@ class HybridCell<C : CellOperationProvider?>(val cell: C) : CellOperationProvide
     fun clearCounterExample() {
         counterExamplesProperty.setAll()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as HybridCell<*>
+
+        if (asString != other.asString) return false
+        if (comment != other.comment) return false
+        if (counterExamples != other.counterExamples) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = asString.hashCode()
+        result = 31 * result + comment.hashCode()
+        result = 31 * result + counterExamples.hashCode()
+        return result
+    }
+
 }

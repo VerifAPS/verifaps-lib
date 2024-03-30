@@ -1,29 +1,27 @@
 package edu.kit.iti.formal.stvs.model.config
 
-import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import tornadofx.getValue
-import tornadofx.setValue
 
 /**
  * Configuration for table column. Contains GUI-related information about a column.
  *
  * @author Philipp
  */
-@Serializable
 class ColumnConfig {
-    @Transient
     private val widthProperty = SimpleDoubleProperty(100.0)
-    var width by widthProperty
+    var width: Double
+        get() = widthProperty.get()
+        set(value) {
+            require(value >= 0)
+            widthProperty.set(value)
+        }
 
     /**
      * Create a new ColumnConfig.
      *
      * @param colwidth The initial column width
      */
-    constructor(colwidth: Double=100.0) {
+    constructor(colwidth: Double = 100.0) {
         require(!(colwidth <= 0)) { "Column width must be positive" }
         width = colwidth
     }

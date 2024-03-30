@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
+import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import edu.kit.iti.formal.stvs.model.expressions.*
@@ -13,48 +14,20 @@ import edu.kit.iti.formal.stvs.model.expressions.*
  * @author Benjamin Alt
  * @author Philipp
  */
-class InvalidIoVarProblem private constructor(val specIoVariable: SpecIoVariable?, private val errorType: ErrorType) :
-    ColumnProblem(
-        createMessageForType(
-            errorType
-        ), specIoVariable!!.name
-    ) {
+data class InvalidIoVarProblem(
+    val specIoVariable: SpecIoVariable, private val errorType: ErrorType
+) : ColumnProblem {
+    override val column: String
+        get() = specIoVariable.name
+    override val errorMessage: String
+        get() = createMessageForType(errorType)
+
+    override val location: Selection = Selection(specIoVariable.name)
+
     enum class ErrorType {
         NAME_INVALID, TYPE_UNKNOWN,
-
-        NAME_MISMATCH, TYPE_MISMATCH, CATEGORY_MISMATCH
-    }
-
-    fun getErrorType(): ErrorType? {
-        return errorType
-    }
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        if (!super.equals(obj)) {
-            return false
-        }
-
-        val that = obj as InvalidIoVarProblem
-
-        if (if (specIoVariable != null) specIoVariable != that.specIoVariable
-            else that.specIoVariable != null
-        ) {
-            return false
-        }
-        return getErrorType() == that.getErrorType()
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + (if (specIoVariable != null) specIoVariable.hashCode() else 0)
-        result = 31 * result + (if (getErrorType() != null) getErrorType().hashCode() else 0)
-        return result
+        NAME_MISMATCH, TYPE_MISMATCH,
+        CATEGORY_MISMATCH
     }
 
     companion object {
@@ -73,25 +46,23 @@ class InvalidIoVarProblem private constructor(val specIoVariable: SpecIoVariable
          * @throws InvalidIoVarProblem if there was a fatal error while creating a formal model
          * for column headers (for example the type is not defined in code)
          */
-        @Throws(InvalidIoVarProblem::class)
+        @Throws(SpecProblemException::class)
         fun tryGetValidIoVariable(
-            specIoVariable: SpecIoVariable?,
+            specIoVariable: SpecIoVariable,
             codeIoVariables: Collection<CodeIoVariable>, typesByName: Map<String, Type>,
             minorProblemsHandler: MinorProblemsHandler
         ): ValidIoVariable {
             val name = tryGetValidName(specIoVariable, codeIoVariables, minorProblemsHandler)
             val type = tryGetValidType(specIoVariable, typesByName, codeIoVariables, minorProblemsHandler)
-
-            return ValidIoVariable(specIoVariable!!.category, name!!, type)
+            return ValidIoVariable(specIoVariable.category, name, type)
         }
 
-        @Throws(InvalidIoVarProblem::class)
+        @Throws(SpecProblemException::class)
         private fun tryGetValidType(
-            specIoVariable: SpecIoVariable?, typesByName: Map<String, Type>,
+            specIoVariable: SpecIoVariable, typesByName: Map<String, Type>,
             codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler
         ): Type {
-            val type = typesByName[specIoVariable!!.type]
-                ?: throw InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_UNKNOWN)
+            val type = typesByName[specIoVariable.type] ?: throw InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_UNKNOWN).asException()
             codeIoVariables.stream()
                 .filter { codeIoVariable: CodeIoVariable -> codeIoVariable.name == specIoVariable.name }
                 .findAny().ifPresent { codeIoVariable: CodeIoVariable ->
@@ -103,17 +74,12 @@ class InvalidIoVarProblem private constructor(val specIoVariable: SpecIoVariable
             return type
         }
 
-        @Throws(InvalidIoVarProblem::class)
-        private fun tryGetValidName(
-            ioVar: SpecIoVariable?,
-            codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler
-        ): String? {
-            if (!VariableExpr.Companion.IDENTIFIER_PATTERN.matcher(ioVar!!.name).matches()) {
-                throw InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID)
+        @Throws(SpecProblemException::class)
+        private fun tryGetValidName(ioVar: SpecIoVariable, codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler): String {
+            if (!VariableExpr.IDENTIFIER_PATTERN.matcher(ioVar.name).matches()) {
+                throw InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID).asException()
             }
-            if (!codeIoVariables.stream()
-                    .anyMatch { codeIoVar: CodeIoVariable -> codeIoVar.name == ioVar.name }
-            ) {
+            if (!codeIoVariables.any { it.name == ioVar.name }) {
                 minorProblemsHandler.handle(InvalidIoVarProblem(ioVar, ErrorType.NAME_MISMATCH))
             }
             return ioVar.name

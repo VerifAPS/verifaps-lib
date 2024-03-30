@@ -25,8 +25,8 @@ class SpecificationTableCell(private val validator: ConstraintSpecificationValid
      * @param validator The validator for this cell
      */
     init {
-        validator.problemsProperty().addListener { observable: Observable? -> this.onProblemsChanged() }
-        emptyProperty().addListener { observable: Observable? -> this.onProblemsChanged() }
+        validator.problemsProperty.addListener { _: Observable -> this.onProblemsChanged() }
+        emptyProperty().addListener { _: Observable -> this.onProblemsChanged() }
         styleClass.add("spec-cell")
         ViewUtils.setupClass(this)
         onProblemsChanged()
@@ -59,17 +59,18 @@ class SpecificationTableCell(private val validator: ConstraintSpecificationValid
 
     private fun onProblemsChanged() {
         if (!isEmpty) {
-            val problems = validator.problemsProperty().get()
+            val problems = validator.problems
             for (problem in problems) {
-                if (problem is CellProblem && !isDurationCell) {
-                    val cellProblem = problem
-                    val col = cellProblem.column
-                    if (col == columnId && cellProblem.row == rowIndex) {
+                if (problem is DurationProblem) {
+                    if (problem.row == rowIndex) {
                         configureProblem(problem)
                         return
                     }
-                } else if (problem is DurationProblem) {
-                    if (problem.row == rowIndex) {
+                }
+
+                if (problem is CellProblem && !isDurationCell) {
+                    val col = problem.column
+                    if (col == columnId && problem.row == rowIndex) {
                         configureProblem(problem)
                         return
                     }

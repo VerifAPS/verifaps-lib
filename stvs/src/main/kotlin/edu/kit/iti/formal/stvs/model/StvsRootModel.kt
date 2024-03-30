@@ -63,7 +63,7 @@ class StvsRootModel @JvmOverloads constructor(
             configDir.createDirectories()
         }
         val sessionFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_SESSION_FILENAME
-        ExporterFacade.exportSession(this, sessionFile)
+        ExporterFacade.exportSession(this, sessionFile.toFile())
     }
 
     /**
@@ -89,7 +89,8 @@ class StvsRootModel @JvmOverloads constructor(
     }
 
     companion object {
-        private const val AUTOLOAD_SESSION_FILENAME = "stvs-session.json"
+        private const val AUTOLOAD_SESSION_FILENAME = "stvs-session.xml"
+        val sessionFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_SESSION_FILENAME
 
         /**
          * Loads the last session saved via [StvsRootModel.autosaveSession] (see
@@ -99,9 +100,8 @@ class StvsRootModel @JvmOverloads constructor(
          */
         @JvmStatic
         fun autoloadSession(): StvsRootModel {
-            val sessionFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_SESSION_FILENAME
             return try {
-                ImporterFacade.importSession(sessionFile, GlobalConfig(), History())
+                ImporterFacade.importSession(sessionFile.toFile(), GlobalConfig(), History())
             } catch (e: Exception) {
                 StvsRootModel()
             }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
+import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.expressions.*
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell
 
@@ -8,31 +9,11 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell
  *
  * @author Benjamin Alt
  */
-class CellTypeProblem(exception: TypeCheckException, column: String?, row: Int) :
-    CellProblem(createErrorMessage(exception), column, row) {
-    val typeCheckException: TypeCheckException? = exception
+data class CellTypeProblem(val exception: TypeCheckException, override val column: String, override val row: Int) :
+    CellProblem {
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        if (!super.equals(obj)) {
-            return false
-        }
-
-        val that = obj as CellTypeProblem
-
-        return if (typeCheckException != null) typeCheckException == that.typeCheckException else that.typeCheckException == null
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + (if (typeCheckException != null) typeCheckException.hashCode() else 0)
-        return result
-    }
+    override val errorMessage: String = createErrorMessage(exception)
+    override val location: Selection = Selection(column, row)
 
     companion object {
         /**
@@ -51,11 +32,13 @@ class CellTypeProblem(exception: TypeCheckException, column: String?, row: Int) 
          * ill-typed
          */
         @JvmStatic
-        @Throws(CellTypeProblem::class)
+        @Throws(SpecProblemException::class)
         fun tryTypeCheckCellExpression(
-            typeChecker: TypeChecker, columnId: String?,
-            row: Int, expr: Expression?
-        ): Expression? {
+            typeChecker: TypeChecker,
+            columnId: String,
+            row: Int,
+            expr: Expression
+        ): Expression {
             try {
                 val type = typeChecker.typeCheck(expr)
                 if (type!!.checksAgainst(TypeBool.Companion.BOOL)) {
@@ -67,15 +50,13 @@ class CellTypeProblem(exception: TypeCheckException, column: String?, row: Int) 
                                     + "instead it evaluates to: " + type.typeName
                         ),
                         columnId, row
-                    )
+                    ).asException()
                 }
             } catch (typeCheckException: TypeCheckException) {
-                throw CellTypeProblem(typeCheckException, columnId, row)
+                throw CellTypeProblem(typeCheckException, columnId, row).asException()
             }
         }
 
-        private fun createErrorMessage(exception: TypeCheckException): String? {
-            return exception.message
-        }
+        private fun createErrorMessage(exception: TypeCheckException) = exception.message ?: ""
     }
 }

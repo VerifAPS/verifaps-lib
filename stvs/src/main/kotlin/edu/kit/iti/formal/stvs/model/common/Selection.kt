@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.model.common
 
+import tornadofx.getValue
+import tornadofx.setValue
 import java.util.*
 
 /**
@@ -9,46 +11,28 @@ import java.util.*
  *
  * @author Leon Kaucher
  */
-class Selection {
-    private var column: NullableProperty<String?>
-    private var row: NullableProperty<Int?>
-    private var clickListener = SelectionClickListener { s: String?, i: Int? -> }
+class Selection
+/**
+ * Create a new Selection for a given column and row.
+ * @param column The selected column
+ * @param row The selected row
+ */
+    (column: String? = null, row: Int? = null) {
 
-    /**
-     * Create a new Selection for a given column and row.
-     * @param column The selected column
-     * @param row The selected row
-     */
-    constructor(column: String?, row: Int) {
-        this.column = NullableProperty(column)
-        this.row = NullableProperty(row)
-    }
+    val columnProperty = NullableProperty<String?>(column)
+    var column: String? by columnProperty
 
-    /**
-     * Create a new Selection for a given column.
-     * @param column The selected column
-     */
-    constructor(column: String?) {
-        this.column = NullableProperty(column)
-        this.row = NullableProperty()
-    }
+    val rowProperty = NullableProperty<Int?>(row)
+    var row: Int? by rowProperty
+
+    private var clickListener = SelectionClickListener { _: String?, _: Int? -> }
+
 
     /**
      * Create a new Selection for a given row.
      * @param row The selected row
      */
-    constructor(row: Int) {
-        this.column = NullableProperty()
-        this.row = NullableProperty(row)
-    }
-
-    /**
-     * Create a new empty selection ("nothing was selected").
-     */
-    constructor() {
-        this.column = NullableProperty()
-        this.row = NullableProperty()
-    }
+    constructor(row: Int) : this(null, row)
 
     /**
      * Specify a listener which is invoked when the user clicks on the selection in the timing
@@ -69,36 +53,12 @@ class Selection {
         clickListener.clicked(column, row)
     }
 
-    fun getColumn(): Optional<String> {
-        return Optional.ofNullable(column.get())
-    }
-
-    fun columnProperty(): NullableProperty<String?> {
-        return column
-    }
-
-    fun setColumn(column: String?) {
-        this.column.set(column)
-    }
-
-    fun getRow(): Optional<Int> {
-        return Optional.ofNullable(row.get())
-    }
-
-    fun rowProperty(): NullableProperty<Int?> {
-        return row
-    }
-
-    fun setRow(row: Int) {
-        this.row.set(row)
-    }
-
     /**
      * Turn the selection into an empty selection (i.e. no row/column selected).
      */
     fun clear() {
-        row.set(null)
-        column.set(null)
+        rowProperty.set(null)
+        columnProperty.set(null)
     }
 
 
@@ -111,17 +71,17 @@ class Selection {
         }
 
         val selection = obj as Selection
-        if (if (column.get() == null) selection.column.get() != null
-            else column.get() != selection.column.get()
+        if (if (columnProperty.get() == null) selection.columnProperty.get() != null
+            else columnProperty.get() != selection.columnProperty.get()
         ) {
             return false
         }
-        return if (row.get() == null) selection.row.get() == null else row.get() == selection.row.get()
+        return if (rowProperty.get() == null) selection.rowProperty.get() == null else rowProperty.get() == selection.rowProperty.get()
     }
 
     override fun hashCode(): Int {
-        var result = Objects.hashCode(column.get())
-        result = 31 * result + Objects.hashCode(row.get())
+        var result = Objects.hashCode(columnProperty.get())
+        result = 31 * result + Objects.hashCode(rowProperty.get())
         return result
     }
 }

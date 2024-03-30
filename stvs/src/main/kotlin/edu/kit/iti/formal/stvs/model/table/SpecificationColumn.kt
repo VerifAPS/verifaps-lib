@@ -13,4 +13,24 @@ data class SpecificationColumn<C>(val cells: List<C>) : Commentable {
     override fun toString(): String {
         return "SpecificationColumn(cells: $cells, comment: $comment)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SpecificationColumn<*>
+
+        if (cells != other.cells) return false
+        if (comment != other.comment) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = cells.hashCode()
+        result = 31 * result + comment.hashCode()
+        return result
+    }
+
+
 }

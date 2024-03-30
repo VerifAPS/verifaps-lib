@@ -13,7 +13,6 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow
-import org.apache.commons.io.IOUtils
 import java.io.*
 import java.util.function.Consumer
 import java.util.regex.Pattern
@@ -43,35 +42,28 @@ class Z3Solver(config: GlobalConfig) {
      */
     @Throws(ConcretizationException::class)
     private fun concretize(smtString: String, ioVariables: List<ValidIoVariable>): ConcreteSpecification {
-        val processBuilder = ProcessBuilder(z3Path, "-in", "-smt2")
+        val processBuilder = ProcessBuilder(z3Path, "-in", "-smt2") //TODO timeout
         try {
             val process = processBuilder.start()
             this.process = process
-            IOUtils.write(smtString, process.outputStream, "utf-8")
-            process.outputStream.close()
-            val reader =
-                BufferedReader(InputStreamReader(process.inputStream, "utf-8"))
-            var line: String
-            val z3Result = StringBuilder("")
-            while ((reader.readLine().also { line = it }) != null && !Thread.currentThread().isInterrupted) {
-                z3Result.append(line + "\n")
+            process.outputStream.writer().use {
+                it.write(smtString)
             }
-            reader.close()
-            val error = IOUtils.toString(process.errorStream, "utf-8")
+
+            var exitValue = process.waitFor() // handles interrupts
+            val z3Result = process.inputStream.bufferedReader().readText()
+            val error = process.errorStream.bufferedReader().readText()
+
             if (Thread.currentThread().isInterrupted) {
                 process.destroyForcibly()
                 throw ConcretizationException("Interrupted Concretization")
             }
-            try {
-                val exitValue = process.waitFor()
-                if (exitValue == 0 || error.length == 0) {
-                    val expression = solverStringToSexp(z3Result.toString())
-                    return buildConcreteSpecFromSExp(expression, ioVariables)
-                } else {
-                    throw ConcretizationException("Z3 process failed. Output: \n$error")
-                }
-            } catch (e: InterruptedException) {
-                throw ConcretizationException("Interrupted Concretization")
+
+            if (exitValue == 0 || error.isEmpty()) {
+                val expression = solverStringToSexp(z3Result)
+                return buildConcreteSpecFromSExp(expression, ioVariables)
+            } else {
+                throw ConcretizationException("Z3 process failed. Output: \n$error")
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -110,12 +102,12 @@ class Z3Solver(config: GlobalConfig) {
 
     @Throws(ConcretizationException::class, SexpParserException::class)
     private fun solverStringToSexp(z3String: String): Sexp {
-        var z3String = z3String
-        if (!z3String.startsWith("sat")) {
+        var z3 = z3String
+        if (!z3.startsWith("sat")) {
             throw ConcretizationException("Solver returned status: Unsatisfiable")
         }
-        z3String = z3String.substring(z3String.indexOf('\n') + 1)
-        return (SexpFactory.parse(z3String))
+        z3 = z3.substring(z3.indexOf('\n') + 1)
+        return SexpFactory.parse(z3)
     }
 
     companion object {
@@ -180,7 +172,7 @@ class Z3Solver(config: GlobalConfig) {
         ) {
             for (cycle in 0 until duration.duration) {
                 val rawRow: Map<String?, String>? = rawRows[duration.beginCycle + cycle]
-                val newRow= hashMapOf<String, ConcreteCell>()
+                val newRow = hashMapOf<String, ConcreteCell>()
                 validIoVariables.forEach(Consumer { validIoVariable: ValidIoVariable? ->
                     if (rawRow == null) {
                         newRow[validIoVariable!!.name] = ConcreteCell(validIoVariable.validType.generateDefaultValue())

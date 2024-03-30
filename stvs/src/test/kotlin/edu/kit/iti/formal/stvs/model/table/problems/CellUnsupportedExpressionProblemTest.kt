@@ -21,7 +21,7 @@ class CellUnsupportedExpressionProblemTest {
 
     @Test
     fun unsupportedExpression() {
-        Assertions.assertEquals(unsupportedExpressionEx, problem!!.unsupportedExpression)
+        Assertions.assertEquals(unsupportedExpressionEx, problem!!.exception)
     }
 
     @Test

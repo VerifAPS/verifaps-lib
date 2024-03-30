@@ -16,7 +16,7 @@ import java.util.*
 class ThrowingErrorListener : ANTLRErrorListener {
     override fun syntaxError(
         recognizer: Recognizer<*, *>?, offendingSymbol: Any, line: Int,
-        charPositionInLine: Int, msg: String, e: RecognitionException
+        charPositionInLine: Int, msg: String, e: RecognitionException?
     ) {
         throw ParseRuntimeException(ParseException(line, charPositionInLine, msg))
     }

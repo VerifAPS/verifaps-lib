@@ -76,11 +76,11 @@ class SpecificationController(
         this.specificationInvalid = SimpleBooleanProperty(true)
         specificationInvalid.bind(
             variableCollectionController.validator.validProperty().not()
-                .or(tableController.validator.validProperty().not()).or(codeInvalid)
+                .or(tableController.validator.validProperty.not()).or(codeInvalid)
         )
         this.specificationConcretizable = SimpleBooleanProperty(true)
         specificationConcretizable
-            .bind(tableController.validator.validSpecificationProperty().isNotNull())
+            .bind(tableController.validator.validSpecificationProperty.isNotNull())
         this.concretizationHandler = ConcretizationTaskHandler()
 
         // use event trigger to generate timing-diagram, to minimize code-duplication
@@ -101,7 +101,7 @@ class SpecificationController(
         view.startConcretizerButton.onAction =
             EventHandler { actionEvent: ActionEvent -> this.startConcretizer(actionEvent) }
 
-        spec.concreteInstanceProperty()
+        spec.concreteInstanceProperty
             .addListener { observable: ObservableValue<out ConcreteSpecification?>?, old: ConcreteSpecification?, newVal: ConcreteSpecification? ->
                 this.onConcreteInstanceChanged(
                     newVal
@@ -127,7 +127,7 @@ class SpecificationController(
         spec.rows.addListener(ListChangeListener { change -> this.specChanged(change) })
         spec.freeVariableList.variables
             .addListener(ListChangeListener { change -> this.specChanged(change) })
-        spec.setConcreteInstance(null)
+        spec.concreteInstance = null
     }
 
     private fun specChanged(change: ListChangeListener.Change<*>) {
@@ -148,7 +148,7 @@ class SpecificationController(
     private fun onConcretizationActive() {
         view.setConcretizerButtonStop()
         view.startConcretizerButton.onAction =
-            EventHandler { actionEvent: ActionEvent -> this.stopConcretizer(actionEvent) }
+            EventHandler { actionEvent: ActionEvent -> this.stopConcretizer() }
     }
 
     private fun onConcretizationInactive() {
@@ -159,21 +159,21 @@ class SpecificationController(
 
     private fun startConcretizer(actionEvent: ActionEvent) {
         val runner = ConcretizationRunner(
-                tableController.validator.getValidSpecification()!!,
-                variableCollectionController.validator.validFreeVariables
-            )
-         val task = JavaFxAsyncTask(
+            tableController.validator.validSpecification!!,
+            variableCollectionController.validator.validFreeVariables
+        )
+        val task = JavaFxAsyncTask(
             globalConfig.simulationTimeout,
             runner, this.concretizationHandler
         )
 
-        this.concretizingTask=task
+        this.concretizingTask = task
         concretizingTask!!.start()
 
         onConcretizationActive()
     }
 
-    private fun stopConcretizer(actionEvent: ActionEvent) {
+    private fun stopConcretizer() {
         if (concretizingTask != null) {
             concretizingTask!!.terminate()
             concretizingTask = null
@@ -182,7 +182,7 @@ class SpecificationController(
     }
 
     private val concreteSpecification: ConcreteSpecification?
-        get() = spec.getCounterExample() ?: spec.getConcreteInstance()
+        get() = spec.counterExample ?: spec.concreteInstance
 
     private fun onVerificationButtonClicked(actionEvent: ActionEvent) {
         when (stateProperty.get()) {
@@ -193,7 +193,7 @@ class SpecificationController(
 
     private inner class ConcretizationTaskHandler : AsyncTaskCompletedHandler<ConcreteSpecification> {
         override fun onSuccess(concreteSpec: ConcreteSpecification) {
-            spec.setConcreteInstance(concreteSpec)
+            spec.concreteInstance= concreteSpec
             timingDiagramCollectionController!!.activated = true
             onConcretizationInactive()
         }

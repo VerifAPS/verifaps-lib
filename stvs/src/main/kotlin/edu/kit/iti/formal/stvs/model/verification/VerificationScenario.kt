@@ -33,7 +33,7 @@ class VerificationScenario() {
 
     @Transient
     val codeProperty: ObjectProperty<Code> = SimpleObjectProperty(Code())
-    var code by codeProperty
+    var code: Code by codeProperty
 
     @Transient
     val verificationStateProperty = SimpleObjectProperty(VerificationState.NOT_STARTED)

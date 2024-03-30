@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import edu.kit.iti.formal.stvs.StvsApplication
 import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade

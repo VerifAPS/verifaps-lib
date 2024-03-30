@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.logic.io
 
 import edu.kit.iti.formal.stvs.*
 import edu.kit.iti.formal.stvs.logic.io.ExecutableLocator.findExecutableFile
-import org.junit.Assert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -18,7 +17,7 @@ class ExecutableLocatorTest {
         TestUtils.assumeZ3Exists()
 
         val z3 = findExecutableFile("z3")
-        Assertions.assertEquals(Optional.of(File("/usr/bin/z3")), z3)
+        Assertions.assertEquals(File("/usr/bin/z3"), z3)
         println(z3.toString())
     }
 
@@ -28,7 +27,7 @@ class ExecutableLocatorTest {
         TestUtils.assumeNuXmvExists()
 
         val nuXmv = findExecutableFile("nuXmv")
-        Assertions.assertEquals(Optional.of(File("/usr/local/bin/nuXmv")), nuXmv)
+        Assertions.assertEquals(File("/usr/local/bin/nuXmv"), nuXmv)
         println(nuXmv.toString())
     }
 
@@ -36,6 +35,6 @@ class ExecutableLocatorTest {
     @Throws(Exception::class)
     fun name() {
         val empty = findExecutableFile("other")
-        Assertions.assertEquals(Optional.empty<Any>(), empty)
+        Assertions.assertEquals(null, empty)
     }
 }

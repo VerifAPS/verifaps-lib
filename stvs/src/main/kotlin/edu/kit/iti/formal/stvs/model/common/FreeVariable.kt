@@ -3,8 +3,6 @@ package edu.kit.iti.formal.stvs.model.common
 import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.util.Callback
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import tornadofx.getValue
 import tornadofx.setValue
 
@@ -13,17 +11,13 @@ import tornadofx.setValue
  * constraint expressions.
  * @author Philipp
  */
-@Serializable
 class FreeVariable : Variable {
-    @Transient
     val nameProperty: StringProperty = SimpleStringProperty("<unknown>")
     override var name: String by nameProperty
 
-    @Transient
     val typeProperty: StringProperty = SimpleStringProperty("BOOL")
     override var type: String by typeProperty
 
-    @Transient
     val constraintProperty: StringProperty = SimpleStringProperty(DONTCARE)
     var constraint: String by constraintProperty
 
@@ -55,6 +49,25 @@ class FreeVariable : Variable {
     constructor(freeVar: FreeVariable) : this(freeVar.name, freeVar.type, freeVar.constraint)
 
     override fun toString(): String = "FreeVariable{name=$name, type=$type, constraint=$constraint}"
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FreeVariable
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (constraint != other.constraint) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + constraint.hashCode()
+        return result
+    }
 
     companion object {
         /**

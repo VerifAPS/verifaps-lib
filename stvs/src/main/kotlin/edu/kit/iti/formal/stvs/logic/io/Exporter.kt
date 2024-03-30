@@ -18,5 +18,5 @@ interface Exporter<F> {
      * @throws ExportException Exception while exporting
      */
     @Throws(ExportException::class)
-    fun export(source: F): ByteArrayOutputStream?
+    fun export(source: F, target: OutputStream)
 }

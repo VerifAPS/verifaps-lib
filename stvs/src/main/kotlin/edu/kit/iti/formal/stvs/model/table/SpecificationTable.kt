@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringEscapeUtils
 import tornadofx.getValue
 import tornadofx.setValue
 import java.util.*
-import java.util.function.Consumer
 
 /**
  * A specification table.
@@ -24,7 +23,7 @@ import java.util.function.Consumer
  * @author Philipp
 </D></C></H> */
 open class SpecificationTable<H : Named?, C, D>(
-    name: String?,
+    name: String = "unnamed",
     columnHeaderExtractor: Callback<H, Array<Observable>>,
     durationExtractor: Callback<D, Array<Observable>>
 ) {
@@ -41,7 +40,7 @@ open class SpecificationTable<H : Named?, C, D>(
     var durations: ObservableList<D> = FXCollections.observableArrayList(durationExtractor)
 
     val nameProperty: StringProperty = SimpleStringProperty(name)
-    var name by nameProperty
+    var name: String by nameProperty
 
     /**
      * Construct a new SpecificationTable with a default name, no rows or columns and the specified
@@ -255,28 +254,42 @@ open class SpecificationTable<H : Named?, C, D>(
 
     protected fun onDurationRemoved(removed: List<D>) {}
 
-    override fun toString(): String {
-        val str = StringBuilder(javaClass.simpleName)
-        str.append("\nDurations: ")
-        durations.stream().map { obj: D -> obj.toString() }.forEach { string: String? ->
-            str.append(string)
-            str.append(',')
+    override fun toString(): String = buildString {
+        append(javaClass.simpleName)
+        append("\nDurations: ")
+        durations.joinTo(this, ", ") { it.toString() }
+        append("\nColumns: ")
+        columnHeaders.joinTo(this, ", ") { it.toString() }
+        append("\nRows:\n")
+        rows.joinTo(this, "\n") { row ->
+            columnHeaders.joinTo(this, ",") { header ->
+                row!!.cells[header!!.name].toString()
+            }
         }
-        str.append("\nColumns: ")
-        columnHeaders.stream().map { obj: H -> obj.toString() }.forEach { string: String? ->
-            str.append(string)
-            str.append(',')
-        }
-        str.append("\nRows:\n")
-        rows.stream().forEachOrdered { row ->
-            columnHeaders.forEach(Consumer { header: H ->
-                str.append(row!!.cells[header!!.name])
-                str.append(',')
-            })
-            str.append('\n')
-        }
-        return str.toString()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SpecificationTable<*, *, *>
+
+        if (columnHeaders != other.columnHeaders) return false
+        if (rows != other.rows) return false
+        if (durations != other.durations) return false
+        if (name != other.name) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = columnHeaders.hashCode()
+        result = 31 * result + rows.hashCode()
+        result = 31 * result + durations.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
+
 
     companion object {
         const val DEFAULT_NAME: String = "Unnamed Specification"

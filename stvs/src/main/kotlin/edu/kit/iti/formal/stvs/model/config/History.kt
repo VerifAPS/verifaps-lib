@@ -8,8 +8,6 @@ import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
@@ -24,8 +22,14 @@ import kotlin.io.path.isDirectory
  *
  * @author Benjamin Alt
  */
-@Serializable
-class History {
+class History// Don't silently cut off the part of the input collection that doesn't fit
+/**
+ * Creates a history of recently opened files from the given collection.
+ * The Collections' size must be less then or equal to [.HISTORY_DEPTH].
+ *
+ * @param filenames the most recently opened files.
+ * @throws IllegalArgumentException if the given collection is bigger than [.HISTORY_DEPTH]
+ */(filenames: Collection<String> = listOf()) {
     /**
      * Get the current file history.
      *
@@ -36,14 +40,7 @@ class History {
     var filenames: ObservableList<String> by filenamesProperty
 
 
-    /**
-     * Creates a history of recently opened files from the given collection.
-     * The Collections' size must be less then or equal to [.HISTORY_DEPTH].
-     *
-     * @param filenames the most recently opened files.
-     * @throws IllegalArgumentException if the given collection is bigger than [.HISTORY_DEPTH]
-     */
-    constructor(filenames: Collection<String> = listOf()) {
+    init {
         require(filenames.size <= HISTORY_DEPTH) {
             // Don't silently cut off the part of the input collection that doesn't fit
             "List of filenames exceeds history size"
@@ -85,8 +82,7 @@ class History {
         if (!configDir.isDirectory() || !configDir.exists()) {
             Files.createDirectories(configDir)
         }
-        val historyFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_HISTORY_FILENAME
-        ExporterFacade.exportHistory(this, historyFile)
+        ExporterFacade.exportHistory(this, historyFile.toFile())
     }
 
     /**
@@ -115,7 +111,9 @@ class History {
 
 
     companion object {
-        private const val AUTOLOAD_HISTORY_FILENAME = "stvs-history.json"
+        private const val AUTOLOAD_HISTORY_FILENAME = "stvs-history.xml"
+        private val historyFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_HISTORY_FILENAME
+
         const val HISTORY_DEPTH: Int = 15
 
         /**
@@ -127,9 +125,8 @@ class History {
          */
         @JvmStatic
         fun autoloadHistory(): History {
-            val historyFile = GlobalConfig.CONFIG_DIRPATH / AUTOLOAD_HISTORY_FILENAME
             return try {
-                ImporterFacade.importHistory(historyFile)
+                ImporterFacade.importHistory(historyFile.toFile())
             } catch (e: ImportException) {
                 History()
             }

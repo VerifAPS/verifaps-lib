@@ -4,7 +4,9 @@ import edu.kit.iti.formal.stvs.model.expressions.*
 import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.collections.FXCollections
+import javafx.collections.ObservableList
 import tornadofx.getValue
+import tornadofx.setValue
 import java.util.*
 
 /**
@@ -19,11 +21,11 @@ class FreeVariableListValidator(
     private val typeContext: ListProperty<Type>,
     private val freeVariables: FreeVariableList
 ) {
-    val problemsProperty: ObjectProperty<Map<FreeVariable?, MutableList<FreeVariableProblem>>> =
-        SimpleObjectProperty(HashMap())
+    val problemsProperty = SimpleMapProperty<FreeVariable, MutableList<FreeVariableProblem>>(FXCollections.observableHashMap())
+    var problems by problemsProperty
 
     val validFreeVariablesProperty = SimpleListProperty(FXCollections.observableArrayList<ValidFreeVariable>())
-    val validFreeVariables by validFreeVariablesProperty
+    val validFreeVariables: ObservableList<ValidFreeVariable> by validFreeVariablesProperty
 
     private val valid: BooleanProperty = SimpleBooleanProperty(false)
 
@@ -50,38 +52,27 @@ class FreeVariableListValidator(
         val variableMap = freeVariables.variables
             .associate { it.name to (typesByName[it.type] ?: error("Type ${it.type} is unknown")) }
 
-        val problems = hashMapOf<FreeVariable?, MutableList<FreeVariableProblem>>()
         val validated = arrayListOf<ValidFreeVariable>()
 
         freeVariables.variables.forEach { freeVariable: FreeVariable ->
-            val optionalDuplicateProblem =
-                DuplicateFreeVariableProblem.checkForDuplicates(freeVariable, freeVariables.variables)
-            optionalDuplicateProblem?.let { insertProblem(problems, freeVariable, it) }
-            if (optionalDuplicateProblem != null) {
+            val problem = DuplicateFreeVariableProblem.checkForDuplicates(
+                freeVariable, freeVariables.variables
+            )
+            if (problem == null) {
                 try {
                     validated.add(
                         InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName, variableMap)
                     )
                 } catch (problem: InvalidFreeVariableProblem) {
-                    insertProblem(problems, freeVariable, problem)
+                    problems.computeIfAbsent(freeVariable) { arrayListOf() }.add(problem)
                 }
+            } else {
+                problems.computeIfAbsent(freeVariable) { arrayListOf() }.add(problem)
             }
         }
 
         validFreeVariablesProperty.setAll(validated)
-        this.problemsProperty.set(problems)
         valid.set(problems.isEmpty())
-    }
-
-    private fun <K, V> insertProblem(map: MutableMap<K, MutableList<V>>, key: K, item: V) {
-        val items = map[key]
-        if (items == null) {
-            val newItemsList: MutableList<V> = ArrayList()
-            newItemsList.add(item)
-            map[key] = newItemsList
-        } else {
-            items.add(item)
-        }
     }
 
     fun validProperty(): ReadOnlyBooleanProperty {

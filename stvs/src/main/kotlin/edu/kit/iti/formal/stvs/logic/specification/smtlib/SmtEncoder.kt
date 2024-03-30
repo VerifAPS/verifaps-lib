@@ -35,10 +35,10 @@ class SmtEncoder(
      * @param validFreeVariables The free variables that are referred to in `specification`
      */
     constructor(
-        maxDuration: Int, specification: ValidSpecification?,
+        maxDuration: Int, specification: ValidSpecification,
         validFreeVariables: List<ValidFreeVariable>
     ) : this(
-        generateAllSameList(maxDuration, specification!!.rows.size),
+        generateAllSameList(maxDuration, specification.rows.size),
         specification, validFreeVariables
     )
 

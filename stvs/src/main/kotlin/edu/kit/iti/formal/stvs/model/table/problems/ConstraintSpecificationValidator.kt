@@ -13,9 +13,10 @@ import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import javafx.beans.InvalidationListener
 import javafx.beans.Observable
 import javafx.beans.property.*
+import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import java.util.function.Function
-import java.util.stream.Collectors
+import tornadofx.getValue
+import tornadofx.setValue
 
 /**
  * The validator for [ConstraintSpecification]s. It converts these into the formal model:
@@ -31,12 +32,16 @@ class ConstraintSpecificationValidator(
     private val validFreeVariables: ObservableList<ValidFreeVariable>,
     private val specification: ConstraintSpecification
 ) {
-    private val problems: ObjectProperty<List<SpecProblem?>> = SimpleObjectProperty(ArrayList())
-    private val valid: BooleanProperty = SimpleBooleanProperty(false)
+    val problemsProperty = SimpleListProperty<SpecProblem>(FXCollections.observableArrayList())
+    var problems: ObservableList<SpecProblem> by problemsProperty
 
-    private val validSpecification = NullableProperty<ValidSpecification?>()
+    val validProperty: BooleanProperty = SimpleBooleanProperty(false)
+    var valid: Boolean by validProperty
 
-    private val listenToSpecUpdate = InvalidationListener { observable: Observable -> this.onSpecUpdated(observable) }
+    val validSpecificationProperty = NullableProperty<ValidSpecification?>()
+    var validSpecification: ValidSpecification? by validSpecificationProperty
+
+    private val listenToSpecUpdate = InvalidationListener { _: Observable -> this.onSpecUpdated() }
 
     /**
      * Creates a validator with given observable models as context information.
@@ -66,11 +71,7 @@ class ConstraintSpecificationValidator(
         recalculateSpecProblems()
     }
 
-    fun problemsProperty(): ObjectProperty<List<SpecProblem?>> {
-        return problems
-    }
-
-    private fun onSpecUpdated(observable: Observable) {
+    private fun onSpecUpdated() {
         recalculateSpecProblems()
     }
 
@@ -80,35 +81,19 @@ class ConstraintSpecificationValidator(
      */
     fun recalculateSpecProblems() {
         val validSpec = ValidSpecification()
+        val minorSpecProblems = arrayListOf<SpecProblem>()
+        val majorSpecProblems = arrayListOf<SpecProblem>()
+        val typesByName = typeContext.get().associateBy { it.typeName }
 
-        val minorSpecProblems: MutableList<SpecProblem?> = ArrayList()
-        val majorSpecProblems: MutableList<SpecProblem?> = ArrayList()
-
-        var specificationIsValid: Boolean
-
-        val typesByName = typeContext.get().stream()
-            .collect(
-                Collectors.toMap(
-                    { obj: Type -> obj.typeName }, Function.identity()
-                )
-            )
-
-        specificationIsValid =
-            areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName)
-
-        specificationIsValid = areDurationsValid(validSpec, majorSpecProblems, specificationIsValid)
-
-        val specProblems = ArrayList<SpecProblem?>()
-        specProblems.addAll(minorSpecProblems)
-        specProblems.addAll(majorSpecProblems)
-        problems.set(specProblems)
+        var specificationIsValid = areCellsValid(validSpec, minorSpecProblems, majorSpecProblems, typesByName)
+        specificationIsValid = areDurationsValid(validSpec, majorSpecProblems) && specificationIsValid
 
         if (specificationIsValid) {
-            validSpecification.set(validSpec)
+            validSpecification = validSpec
         } else {
-            validSpecification.set(null)
+            validSpecification = null
         }
-        valid.set(specProblems.isEmpty())
+        valid = specificationIsValid
     }
 
     /**
@@ -123,24 +108,24 @@ class ConstraintSpecificationValidator(
      */
     private fun areDurationsValid(
         validSpec: ValidSpecification,
-        majorSpecProblems: MutableList<SpecProblem?>, specificationIsValid: Boolean
+        majorSpecProblems: MutableList<SpecProblem>
     ): Boolean {
-        var specificationIsValid = specificationIsValid
+        var valid = true
         for (durIndex in specification.durations.indices) {
             try {
                 val interval: LowerBoundedInterval = DurationParseProblem.tryParseDuration(
                     durIndex,
                     specification.durations[durIndex]!!
                 )
-                if (specificationIsValid) {
+                if (valid) {
                     validSpec.durations.add(interval)
                 }
-            } catch (problem: DurationProblem) {
-                majorSpecProblems.add(problem)
-                specificationIsValid = false
+            } catch (e: SpecProblemException) {
+                majorSpecProblems.add(e.problem)
+                valid = false
             }
         }
-        return specificationIsValid
+        return valid
     }
 
     /**
@@ -153,8 +138,8 @@ class ConstraintSpecificationValidator(
      * @return returns if cells are valid
      */
     private fun areCellsValid(
-        validSpec: ValidSpecification, minorSpecProblems: MutableList<SpecProblem?>,
-        majorSpecProblems: MutableList<SpecProblem?>, typesByName: Map<String, Type>
+        validSpec: ValidSpecification, minorSpecProblems: MutableList<SpecProblem>,
+        majorSpecProblems: MutableList<SpecProblem>, typesByName: Map<String, Type>
     ): Boolean {
         val variableTypes =
             createVariableTypes(validSpec, minorSpecProblems, majorSpecProblems, typesByName)
@@ -171,8 +156,8 @@ class ConstraintSpecificationValidator(
                 try {
                     expressionsForRow[columnId] =
                         tryValidateCellExpression(typeContext.get(), typeChecker, columnId, rowIndex, cell)
-                } catch (problem: CellProblem) {
-                    majorSpecProblems.add(problem)
+                } catch (e: SpecProblemException) {
+                    majorSpecProblems.add(e.problem)
                 }
             }
 
@@ -199,10 +184,10 @@ class ConstraintSpecificationValidator(
      */
     private fun createVariableTypes(
         validSpec: ValidSpecification,
-        minorSpecProblems: MutableList<SpecProblem?>, majorSpecProblems: MutableList<SpecProblem?>,
+        minorSpecProblems: MutableList<SpecProblem>, majorSpecProblems: MutableList<SpecProblem>,
         typesByName: Map<String, Type>
     ): Map<String, Type> {
-        val variableTypes = validFreeVariables.asSequence().associate { it.name to it.type }.toMutableMap()
+        val variableTypes = validFreeVariables.associate { it.name to it.type }.toMutableMap()
 
         for (specIoVariable in specification.columnHeaders) {
             // Check column header for problem
@@ -212,30 +197,19 @@ class ConstraintSpecificationValidator(
                 val validIoVariable: ValidIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
                     specIoVariable,
                     codeIoVariables.get(),
-                    typesByName,
-                    { e: InvalidIoVarProblem? -> minorSpecProblems.add(e) })
+                    typesByName
+                ) { e -> minorSpecProblems.add(e) }
                 variableTypes[validIoVariable.name] = validIoVariable.validType
                 if (majorSpecProblems.isEmpty()) {
                     validSpec.columnHeaders.add(validIoVariable)
                 }
-            } catch (invalidIoVarProblem: InvalidIoVarProblem) { // Fatal problem (like invalid type, etc)
-                majorSpecProblems.add(invalidIoVarProblem)
+            } catch (invalidIoVarProblem: SpecProblemException) { // Fatal problem (like invalid type, etc)
+                majorSpecProblems.add(invalidIoVarProblem.problem)
             }
         }
         return variableTypes
     }
 
-    fun validProperty(): ReadOnlyBooleanProperty {
-        return valid
-    }
-
-    fun getValidSpecification(): ValidSpecification? {
-        return validSpecification.get()
-    }
-
-    fun validSpecificationProperty(): NullableProperty<ValidSpecification?> {
-        return validSpecification
-    }
 
     companion object {
         /**
@@ -255,12 +229,11 @@ class ConstraintSpecificationValidator(
          * @throws CellProblem if the cell could not be parsed ([CellParseProblem]) or if the cell
          * is ill-typed ([CellTypeProblem]).
          */
-        @Throws(CellProblem::class)
+        @Throws(SpecProblemException::class)
         fun tryValidateCellExpression(
-            typeContext: List<Type>,
-            typeChecker: TypeChecker, columnId: String?, row: Int, cell: ConstraintCell?
-        ): Expression? {
-            val expr: Expression = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell)
+            typeContext: List<Type>, typeChecker: TypeChecker, columnId: String, row: Int, cell: ConstraintCell
+        ): Expression {
+            val expr = CellParseProblem.tryParseCellExpression(typeContext, columnId, row, cell)
             return CellTypeProblem.tryTypeCheckCellExpression(typeChecker, columnId, row, expr)
         }
     }

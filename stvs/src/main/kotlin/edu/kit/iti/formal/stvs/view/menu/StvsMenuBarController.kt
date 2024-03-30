@@ -52,7 +52,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
         view.openCode.onAction = EventHandler { t: ActionEvent -> this.openCode(t) }
         view.openSpec.onAction = EventHandler { t: ActionEvent -> this.openSpec(t) }
         view.saveAll.onAction = EventHandler { t: ActionEvent -> this.saveAll(t) }
-        view.saveSessionAs.onAction = EventHandler { actionEvent: ActionEvent -> this.saveSessionAs(actionEvent) }
+        view.saveSessionAs.onAction = EventHandler { actionEvent: ActionEvent -> this.saveSessionAs() }
         view.saveCode.onAction = EventHandler { t: ActionEvent -> this.saveCode(t) }
         view.saveSpec.onAction = EventHandler { t: ActionEvent -> this.saveSpec(t) }
         view.config.onAction = EventHandler { t: ActionEvent -> this.openConfigDialog(t) }
@@ -114,7 +114,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
 
     private fun doOpenFile(file: File) {
         try {
-            ImporterFacade.importFile(file.toPath(), rootModel.get().globalConfig,
+            ImporterFacade.importFile(file, rootModel.get().globalConfig,
                 rootModel.get().history, ImportHybridSpecificationHandler { hybridSpecification: HybridSpecification? ->
                     // handle hybridspecification
                     rootModel.get().hybridSpecifications
@@ -124,7 +124,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
                     rootModel.workingdir = file.getParentFile()
                     rootModel.filename = file.getName()
                     this.rootModel.setValue(rootModel)
-                }, (ImportCodeHandler { code: Code? ->
+                }, (ImportCodeHandler { code: Code ->
                     // handle code
                     rootModel.get().scenario.code = code
                 })
@@ -150,13 +150,12 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
     }
 
 
-    private fun saveSessionAs(actionEvent: ActionEvent) {
+    private fun saveSessionAs() {
         val fileChooser = FileChooserFactory.createSaveFileChooser(
             FileChooserFactory.FileType.SESSION,
             rootModel.get().workingdir
         )
-        val chosenFile: File = fileChooser
-            .showSaveDialog(view.scene.window)
+        val chosenFile: File? = fileChooser.showSaveDialog(view.scene.window)
         if (chosenFile != null) {
             handleSaveAll(chosenFile)
             setWorkingDir(chosenFile)
@@ -214,7 +213,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
             return
         }
         try {
-            val code: Code = ImporterFacade.importStCode(chosenFile.toPath())
+            val code: Code = ImporterFacade.importStCode(chosenFile)
             rootModel.get().scenario.code = code
             rootModel.get().history
                 .addFilename(chosenFile.absolutePath)
@@ -237,8 +236,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
         }
         try {
             val model: StvsRootModel = ImporterFacade.importSession(
-                chosenFile.toPath(),
-                rootModel.get().globalConfig,
+                chosenFile, rootModel.get().globalConfig,
                 rootModel.get().history
             )
             setWorkingDir(chosenFile)
@@ -263,7 +261,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
             return
         }
         try {
-            val spec: HybridSpecification = ImporterFacade.importHybridSpec(chosenFile.toPath())
+            val spec: HybridSpecification = ImporterFacade.importHybridSpec(chosenFile)
             rootModel.get().hybridSpecifications.add(spec)
             rootModel.get().history
                 .addFilename(chosenFile.absolutePath)
@@ -313,7 +311,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
             rootModel.get().filename = path.getName()
             ExporterFacade.exportSession(
                 rootModel.get(),
-                path.toPath()
+                path
             )
         } catch (exception: IOException) {
             createAlert(exception).showAndWait()
@@ -338,7 +336,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
         }
         // Export the code to the file
         try {
-            ExporterFacade.exportCode(code, false)
+            ExporterFacade.exportCode(code)
             return true
         } catch (e: IOException) {
             createAlert(e).showAndWait()
@@ -362,7 +360,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
                 )
                 val specFile = fileChooser.showSaveDialog(view.scene.window)
                 specFile?.let {
-                    ExporterFacade.exportSpec(spec, it)
+                    ExporterFacade.exportSpec(spec, ExporterFacade.ExportFormat.XML, it)
                 }
             }
         } catch (e: ExportException) {

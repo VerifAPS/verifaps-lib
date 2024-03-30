@@ -15,7 +15,6 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
 import javafx.beans.property.*
-import org.junit.experimental.categories.Category
 import org.junit.jupiter.api.*
 import tornadofx.asObservable
 import java.io.IOException
@@ -59,14 +58,14 @@ class Z3SolverTest {
             (freeVariables).asObservable(),
             constraintSpec
         )
-        val specProblems = recognizer.problemsProperty().get()
+        val specProblems = recognizer.problemsProperty.get()
         specProblems.map { it?.errorMessage }.forEach { System.err.println(it) }
 
-        return recognizer.getValidSpecification()!!
+        return recognizer.validSpecification!!
     }
 
     @Test
-    @Category(Performance::class)
+    @Tag("performance")
     @Throws(Exception::class)
     fun testLongExample() {
         val config = autoloadConfig()
@@ -75,7 +74,7 @@ class Z3SolverTest {
         val encoder = SmtEncoder(3000, spec, ArrayList())
 
         println(encoder.constraint!!.toText())
-        val concreteSpecification = solver.concretizeSmtModel(encoder.constraint, spec!!.columnHeaders)
+        val concreteSpecification = solver.concretizeSmtModel(encoder.constraint, spec.columnHeaders)
         Assertions.assertNotNull(concreteSpecification)
     }
 
@@ -85,7 +84,7 @@ class Z3SolverTest {
         val spec = importSpec("testSpec.xml")
 
         val maxDurations = listOf(7, 1, 2)
-        val preprocessor = SmtEncoder(maxDurations, spec!!, freeVariables!!)
+        val preprocessor = SmtEncoder(maxDurations, spec, freeVariables!!)
         val concretized = solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
         Assertions.assertNotNull(concretized)
         val durations = concretized.durations
@@ -99,7 +98,7 @@ class Z3SolverTest {
         Assertions.assertNull(solver!!.process)
         val spec = importSpec("testSpec.xml")
         val preprocessor = SmtEncoder(5, spec, freeVariables!!)
-        solver!!.concretizeSmtModel(preprocessor.constraint, spec!!.columnHeaders)
+        solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
 
         Assertions.assertNotNull(solver!!.process)
     }
@@ -121,7 +120,7 @@ class Z3SolverTest {
             try {
                 val spec = importSpec("spec_long_single_variable_example.xml")
                 val preprocessor = SmtEncoder(5, spec, freeVariables!!)
-                solver!!.concretizeSmtModel(preprocessor.constraint, spec!!.columnHeaders)
+                solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
                 println("finished")
             } catch (e: Exception) {
                 e.printStackTrace()

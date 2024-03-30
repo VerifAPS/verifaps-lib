@@ -24,14 +24,14 @@ class SmtConcretizer(private val config: GlobalConfig) : SpecificationConcretize
      */
     @Throws(ConcretizationException::class)
     override fun calculateConcreteSpecification(
-        validSpecification: ValidSpecification?,
+        validSpecification: ValidSpecification,
         freeVariables: List<ValidFreeVariable>
     ): ConcreteSpecification {
         val encoder =
             SmtEncoder(config.maxLineRollout, validSpecification, freeVariables)
         return z3Solver.concretizeSmtModel(
             encoder.constraint,
-            validSpecification!!.columnHeaders
+            validSpecification.columnHeaders
         )
     }
 

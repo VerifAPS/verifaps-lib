@@ -1,28 +1,23 @@
 package edu.kit.iti.formal.stvs.model.table
 
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
 /**
  * @author Benjamin Alt
  */
 class ConcreteDurationTest {
-    private var durationA: ConcreteDuration? = null
-
-    @BeforeEach
-    fun setUp() {
-        durationA = ConcreteDuration(1, 2)
-    }
+    private var durationA = ConcreteDuration(1, 2)
 
     @Test
     fun testGetDuration() {
-        Assertions.assertEquals(2, durationA!!.duration.toLong())
+        Assertions.assertEquals(2, durationA.duration.toLong())
     }
 
     @Test
     fun testGetBeginCycle() {
-        Assertions.assertEquals(1, durationA!!.beginCycle.toLong())
+        Assertions.assertEquals(1, durationA.beginCycle.toLong())
     }
 
     @Test
@@ -42,12 +37,16 @@ class ConcreteDurationTest {
 
     @Test//(expected = IllegalArgumentException::class)
     fun testConstructorInvalidBeginCycle() {
-        val duration = ConcreteDuration(-1, 1)
+        assertFailsWith<IllegalArgumentException> {
+            ConcreteDuration(-1, 1)
+        }
     }
 
     @Test//(expected = IllegalArgumentException::class)
     fun testConstructorInvalidDuration() {
-        val duration = ConcreteDuration(1, -1)
+        assertFailsWith<IllegalArgumentException> {
+            ConcreteDuration(1, -1)
+        }
     }
 
     @Test

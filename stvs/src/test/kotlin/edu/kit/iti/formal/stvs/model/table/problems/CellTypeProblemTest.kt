@@ -29,28 +29,21 @@ class CellTypeProblemTest {
     @Test
     @Throws(Exception::class)
     fun tryTypeCheckCellExpression() {
-        val typeMap: MutableMap<String, Type> = HashMap()
-        typeMap["A"] = TypeInt.INT
-        typeMap["B"] = TypeBool.BOOL
+        val typeMap = mapOf("A" to TypeInt.INT, "B" to TypeBool.BOOL)
         val typeChecker = TypeChecker(typeMap)
         val problematicCell = SimpleExpressions.and(SimpleExpressions.literal(2), SimpleExpressions.literal(true))
         try {
             tryTypeCheckCellExpression(
                 typeChecker, "A", 4, problematicCell
             )
-        } catch (exc: Exception) {
-            MatcherAssert.assertThat(
-                exc, CoreMatchers.instanceOf(
-                    CellTypeProblem::class.java
-                )
-            )
-            Assertions.assertEquals(problem, exc)
+        } catch (exc: SpecProblemException) {
+            Assertions.assertEquals(problem, exc.problem)
         }
     }
 
     @Test
     fun typeCheckException() {
-        Assertions.assertEquals(typeCheckEx, problem!!.typeCheckException)
+        Assertions.assertEquals(typeCheckEx, problem!!.exception)
     }
 
     @Test

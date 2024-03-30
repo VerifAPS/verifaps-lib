@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io
 
-import edu.kit.iti.formal.stvs.model.code.*
+import edu.kit.iti.formal.stvs.model.code.Code
 
 /**
  * An `ImportCodeHandler` is notified when [Code] is loaded by
@@ -13,5 +13,5 @@ fun interface ImportCodeHandler {
      *
      * @param code Code that was loaded
      */
-    fun accept(code: Code?)
+    fun accept(code: Code)
 }

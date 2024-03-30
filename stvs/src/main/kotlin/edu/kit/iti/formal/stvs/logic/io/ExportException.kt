@@ -5,4 +5,18 @@ package edu.kit.iti.formal.stvs.logic.io
  *
  * @author Benjamin Alt
  */
-class ExportException(message: String, originalException: Exception? = null) : Exception(message, originalException)
+class ExportException : Exception {
+
+    /**
+     * Create a new ExportException with a given error message.
+     * @param message The error message
+     */
+    constructor(message: String?) : super(message, null)
+
+    /**
+     * Create a new ExportException from an exception (e.g. an exception that was thrown and caught
+     * during export).
+     * @param exception The original exception
+     */
+    constructor(exception: Exception?) : super(exception)
+}

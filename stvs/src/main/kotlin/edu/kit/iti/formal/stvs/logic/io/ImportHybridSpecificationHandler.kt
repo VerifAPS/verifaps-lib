@@ -14,5 +14,5 @@ fun interface ImportHybridSpecificationHandler {
      *
      * @param hybridSpecification HybridSpecification that was loaded
      */
-    fun accept(hybridSpecification: HybridSpecification?)
+    fun accept(hybridSpecification: HybridSpecification)
 }

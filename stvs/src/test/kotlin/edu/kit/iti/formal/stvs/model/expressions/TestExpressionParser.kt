@@ -118,7 +118,7 @@ class TestExpressionParser {
 
     @Test
     fun testInvalidPlus() {
-        assertFailsWith<SyntaxErrorReporter.ParserException> { parser.parseExpression("= +3") }
+        assertFailsWith<ParseException> { parser.parseExpression("= +3") }
     }
 
     @Test
@@ -141,7 +141,6 @@ class TestExpressionParser {
     }
 
     @Test//(expected = UnsupportedExpressionException::class)
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testUnsupportedFunctioncall() {
         assertFailsWith<UnsupportedExpressionException> {
             parser.parseExpression("function(1, 2)")
@@ -149,13 +148,11 @@ class TestExpressionParser {
     }
 
     @Test//(expected = UnsupportedExpressionException::class)
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testUnsupportedGuardedIf() {
         assertFailsWith<ParseException> { assertFailsWith<ParseException> { parser.parseExpression("if :: TRUE -> FALSE :: FALSE -> TRUE fi") } }
     }
 
     @Test
-    @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun testRecognizeEnum() {
         val colorsEnum = TypeEnum("COLORS", mutableListOf("red", "green", "blue"))
         val typeContext: MutableSet<Type> = HashSet()
@@ -167,25 +164,16 @@ class TestExpressionParser {
     }
 
     @Test//(expected = ParseException::class)
-    @Throws(
-        UnsupportedExpressionException::class, ParseException::class
-    )
     fun testLongIntegerLiteral0() {
         assertFailsWith<ParseException> { assertFailsWith<ParseException> { parser.parseExpression("1324574839294857") } }
     }
 
     @Test//(expected = ParseException::class)
-    @Throws(
-        UnsupportedExpressionException::class, ParseException::class
-    )
     fun testLongIntegerLiteral1() {
         assertFailsWith<ParseException> { parser.parseExpression("" + (Short.MAX_VALUE + 1)) }
     }
 
     @Test//(expected = ParseException::class)
-    @Throws(
-        UnsupportedExpressionException::class, ParseException::class
-    )
     fun testLongIntegerLiteral2() {
         assertFailsWith<ParseException> { parser.parseExpression("" + (Short.MIN_VALUE - 1)) }
     }

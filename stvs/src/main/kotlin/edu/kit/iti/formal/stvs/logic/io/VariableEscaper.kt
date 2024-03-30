@@ -38,7 +38,6 @@ object VariableEscaper {
      * @param expr expression to be escaped.
      * @return escaped expression
      */
-    @JvmStatic
     fun escapeCellExpression(expr: String): String {
         return expr
         /*CharStream charStream = new ANTLRInputStream(expr);
@@ -64,11 +63,10 @@ object VariableEscaper {
      * @param code code that should be escaped
      * @return escaped code
      */
-    @JvmStatic
     fun escapeCode(code: Code): String {
         val res = StringBuilder("")
         for (token in code.tokens) {
-            if (token!!.type == IEC61131Lexer.IDENTIFIER) {
+            if (token.type == IEC61131Lexer.IDENTIFIER) {
                 res.append(escapeIdentifier(token.text))
             } else if (token.type == IEC61131Lexer.CAST_LITERAL) {
                 res.append(escapeEnumReference(token.text))

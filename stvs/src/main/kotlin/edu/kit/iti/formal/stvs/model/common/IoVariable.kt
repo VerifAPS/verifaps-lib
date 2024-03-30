@@ -103,7 +103,7 @@ class SpecIoVariable() : IoVariable(), Commentable {
      */
     constructor(
         category: VariableCategory,
-        role: VariableRole = category.defaultRole,
+        role: VariableRole,
         typeIdentifier: String,
         name: String
     ) : this() {
@@ -112,6 +112,9 @@ class SpecIoVariable() : IoVariable(), Commentable {
         this.type = typeIdentifier
         this.name = name
     }
+
+    constructor(category: VariableCategory, typeIdentifier: String, name: String)
+            : this(category, category.defaultRole, typeIdentifier, name)
 
     /**
      * Copy constructor: Create a deep copy of a given SpecIoVariable.
@@ -123,5 +126,31 @@ class SpecIoVariable() : IoVariable(), Commentable {
     override fun toString(): String {
         return "SpecIoVariable($category $name : $type)"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as SpecIoVariable
+
+        if (name != other.name) return false
+        if (type != other.type) return false
+        if (category != other.category) return false
+        if (role != other.role) return false
+        if (comment != other.comment) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (category?.hashCode() ?: 0)
+        result = 31 * result + (role?.hashCode() ?: 0)
+        result = 31 * result + comment.hashCode()
+        return result
+    }
+
+
 }
 

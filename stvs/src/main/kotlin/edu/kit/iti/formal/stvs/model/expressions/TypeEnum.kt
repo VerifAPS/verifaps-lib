@@ -38,22 +38,16 @@ class TypeEnum(enumTypeName: String, values: List<String>) : Type {
     override fun <R> match(
         matchIntType: TypeIntegerHandler<R>, matchBoolType: TypeBooleanHandler<R>,
         matchEnumType: TypeEnumHandler<R>
-    ): R? {
-        return matchEnumType.handle(this)
-    }
+    ): R? = matchEnumType.handle(this)
 
     override fun checksAgainst(other: Type): Boolean {
         return other.match({ false }, { false },
             { otherEnum: TypeEnum? -> otherEnum!!.typeName == typeName })!!
     }
 
-    override fun parseLiteral(literal: String): Optional<Value> {
-        return Optional.ofNullable(valueMap[literal])
-    }
+    override fun parseLiteral(literal: String): Value? = valueMap[literal]
 
-    override fun generateDefaultValue(): Value {
-        return valueMap.values.iterator().next()
-    }
+    override fun generateDefaultValue(): Value = valueMap.values.iterator().next()
 
     val values: List<ValueEnum>
         get() = valueList
@@ -73,9 +67,7 @@ class TypeEnum(enumTypeName: String, values: List<String>) : Type {
         }
     }
 
-    fun equals(other: TypeEnum): Boolean {
-        return typeName == other.typeName
-    }
+    fun equals(other: TypeEnum): Boolean = typeName == other.typeName
 
     override fun equals(obj: Any?): Boolean {
         if (this === obj) {
@@ -99,7 +91,5 @@ class TypeEnum(enumTypeName: String, values: List<String>) : Type {
         return result
     }
 
-    override fun toString(): String {
-        return "TypeEnum(" + typeName + " : " + valueMap.keys + ")"
-    }
+    override fun toString(): String = "TypeEnum(" + typeName + " : " + valueMap.keys + ")"
 }

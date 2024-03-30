@@ -4,7 +4,6 @@ plugins {
     //id 'net.saliman.cobertura' version '2.3.1'
     id("application")
     id 'org.openjfx.javafxplugin' version '0.1.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.22'
 }
 
 version = "1.5.0-beta"
@@ -23,6 +22,10 @@ dependencies {
     implementation project(':lang')
     implementation project(':geteta')
 
+    implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6.1'
+    implementation group: 'jaxen', name: 'jaxen', version: '2.0.0'
+
+
     implementation("no.tornado:tornadofx:1.7.20")
     implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '11.3'
     implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.11.2'
@@ -32,20 +35,21 @@ dependencies {
     implementation 'com.pixelduke:fxribbon:1.2.2'
     implementation("org.jfxtras:jmetro:11.6.15")
 
-    implementation 'org.apache.commons:commons-collections4:4.4'
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation 'de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2'
+
+    implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'org.apache.commons:commons-lang3:3.1'
     implementation 'commons-io:commons-io:2.9.0'
+
     implementation 'org.fxmisc.cssfx:cssfx:1.0.0'
     implementation 'org.controlsfx:controlsfx:8.40.13'
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-
-    testImplementation "org.testfx:testfx-core:4.0.+"
+/*    testImplementation "org.testfx:testfx-core:4.0.+"
     testImplementation "org.testfx:testfx-junit:4.0.+"
     testImplementation "org.mockito:mockito-core:2.4.0"
     testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC2'
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC2'
+    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC2'*/
 }
 
 def getVersionName = { ->
@@ -76,16 +80,8 @@ ext.sharedManifest = manifest {
 }
 
 test {
-    filter {
-        includeTestsMatching "edu.kit.iti.formal.stvs.model.*"
-        includeTestsMatching "edu.kit.iti.formal.stvs.logic.*"
-    }
-
-
     useJUnitPlatform() {
-        exclude 'edu.kit.iti.formal.stvs.Performance'
-        exclude 'edu.kit.iti.formal.stvs.Demo'
-        exclude 'edu.kit.iti.formal.stvs.RandomTest'
+        excludeTags("performance", "demo", "random")
     }
 
     testLogging {

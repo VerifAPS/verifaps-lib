@@ -2,9 +2,12 @@ package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.model.common.*
 import javafx.beans.Observable
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
+import tornadofx.getValue
+import tornadofx.setValue
 import java.util.*
 
 /**
@@ -17,9 +20,53 @@ import java.util.*
  */
 class HybridSpecification(name: String, freeVariableList: FreeVariableList, val isEditable: Boolean) :
     ConstraintSpecification(name, freeVariableList) {
-    private val counterExample = NullableProperty<ConcreteSpecification?>()
-    private val concreteInstance = NullableProperty<ConcreteSpecification?>()
-    val hybridRows: ObservableList<HybridRow> = FXCollections.observableArrayList()
+    val counterExampleProperty = NullableProperty<ConcreteSpecification?>()
+    var counterExample: ConcreteSpecification?
+        get() = counterExampleProperty.get()
+        /**
+         * Sets the counterexample for this hybrid specification. This will automatically update
+         * the [HybridRow]'s counterexample cells in [.getHybridRows] from the given
+         * counterexample.
+         *
+         * @param counterExample the concrete specification to be shown in-place in the gui
+         * @throws IllegalArgumentException if the given concrete instance's column headers don't match
+         * this specification's column headers
+         */
+        set(value) {
+            if (value != null) {
+                require(columnHeadersMatch(value.columnHeaders)) {
+                    ("The column headers of the concrete instance are not "
+                            + "compatible with this hybrid specification")
+                }
+            }
+            this.counterExampleProperty.set(value)
+        }
+
+    val concreteInstanceProperty = NullableProperty<ConcreteSpecification?>()
+    var concreteInstance: ConcreteSpecification?
+        get() = concreteInstanceProperty.get()
+        /**
+         *
+         * Set the generated concrete instance for this hybrid specification, that is the
+         * concretized constraint specification. This is concrete instance is then used from
+         * the [TimingDiagramCollectionController] to view a timing diagram.
+         *
+         * @param concreteInstance the concretized constraint specification
+         * @throws IllegalArgumentException if the given concrete instance's column headers don't match
+         * this specification's column headers
+         */
+        set(value) {
+            if (value != null) {
+                require(columnHeadersMatch(value.columnHeaders)) {
+                    ("The column headers of the concrete instance are not "
+                            + "compatible with this hybrid specification")
+                }
+            }
+            this.concreteInstanceProperty.set(value)
+        }
+
+    val hybridRowsProperty = SimpleListProperty<HybridRow>(FXCollections.observableArrayList())
+    var hybridRows: ObservableList<HybridRow> by hybridRowsProperty
 
     /**
      * Stores which cell in the table is currently highlighted in the view. This is saved here in
@@ -36,20 +83,16 @@ class HybridSpecification(name: String, freeVariableList: FreeVariableList, val 
     constructor(
         freeVariableList: FreeVariableList,
         editable: Boolean
-    ) : this(SpecificationTable.Companion.DEFAULT_NAME, freeVariableList, editable)
+    ) : this(DEFAULT_NAME, freeVariableList, editable)
 
     /**
      * Create a new, empty hybrid specification with a given name and a list of free variables.
-     *
-     * @param name The name of the HybridSpecification
-     * @param freeVariableList A list of initial free variables
-     * @param editable True if this HybridSpecification is editable, false otherwise
      */
     init {
-        hybridRows.addListener(ListChangeListener<HybridRow> { change ->
+        hybridRowsProperty.addListener(ListChangeListener<HybridRow> { change ->
             this.onHybridRowChanged(change)
         })
-        counterExample.addListener { event: Observable? -> onCounterExampleChanged() }
+        counterExampleProperty.addListener { event: Observable? -> onCounterExampleChanged() }
     }
 
     /**
@@ -70,14 +113,14 @@ class HybridSpecification(name: String, freeVariableList: FreeVariableList, val 
                 sourceSpec.rows[rowIndex],
                 sourceSpec.durations[rowIndex]
             )
-            row.updateCounterExampleCells(rowIndex, getCounterExample())
-            hybridRows.add(row)
+            row.updateCounterExampleCells(rowIndex, counterExample)
+            hybridRowsProperty.add(row)
         }
     }
 
     private fun onCounterExampleChanged() {
         for (rowIndex in rows.indices) {
-            hybridRows[rowIndex]!!.updateCounterExampleCells(rowIndex, getCounterExample())
+            hybridRowsProperty[rowIndex]!!.updateCounterExampleCells(rowIndex, counterExample)
         }
     }
 
@@ -102,54 +145,9 @@ class HybridSpecification(name: String, freeVariableList: FreeVariableList, val 
         }
     }
 
-    fun getCounterExample() = counterExample.get()
-
-    /**
-     * Sets the counterexample for this hybrid specification. This will automatically update
-     * the [HybridRow]'s counterexample cells in [.getHybridRows] from the given
-     * counterexample.
-     *
-     * @param counterExample the concrete specification to be shown in-place in the gui
-     * @throws IllegalArgumentException if the given concrete instance's column headers don't match
-     * this specification's column headers
-     */
-    fun setCounterExample(counterExample: ConcreteSpecification?) {
-        if (counterExample != null) {
-            require(columnHeadersMatch(counterExample.columnHeaders)) {
-                ("The column headers of the concrete instance are not "
-                        + "compatible with this hybrid specification")
-            }
-            this.counterExample.set(counterExample)
-        }
-    }
 
     fun getSelection(): Selection = selection
 
-    fun getConcreteInstance(): ConcreteSpecification? = concreteInstance.get()
-
-    fun concreteInstanceProperty(): NullableProperty<ConcreteSpecification?> = concreteInstance
-
-    fun counterExampleProperty(): NullableProperty<ConcreteSpecification?> = counterExample
-
-    /**
-     *
-     * Set the generated concrete instance for this hybrid specification, that is the
-     * concretized constraint specification. This is concrete instance is then used from
-     * the [TimingDiagramCollectionController] to view a timing diagram.
-     *
-     * @param concreteInstance the concretized constraint specification
-     * @throws IllegalArgumentException if the given concrete instance's column headers don't match
-     * this specification's column headers
-     */
-    fun setConcreteInstance(concreteInstance: ConcreteSpecification?) {
-        if (concreteInstance != null) {
-            require(columnHeadersMatch(concreteInstance.columnHeaders)) {
-                ("The column headers of the concrete instance are not "
-                        + "compatible with this hybrid specification")
-            }
-            this.concreteInstance.set(concreteInstance)
-        }
-    }
 
     private fun columnHeadersMatch(columnHeaders: ObservableList<ValidIoVariable>): Boolean {
         if (this.columnHeaders.size != columnHeaders.size) {
@@ -164,50 +162,49 @@ class HybridSpecification(name: String, freeVariableList: FreeVariableList, val 
     }
 
     fun removeConcreteInstance() {
-        concreteInstance.set(null)
+        concreteInstanceProperty.set(null)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        if (!super.equals(other)) return false
+
+        other as HybridSpecification
+
+        if (isEditable != other.isEditable) return false
+        if (counterExample != other.counterExample) return false
+        if (concreteInstance != other.concreteInstance) return false
+        if (hybridRows != other.hybridRows) return false
+        if (selection != other.selection) return false
+        if (columnHeaders != other.columnHeaders) return false
+        if (comment != other.comment) return false
+        if (rows != other.rows) return false
+        if (freeVariableList != other.freeVariableList) return false
+        if (durations != other.durations) return false
+        if (name != other.name) return false
+        if (concreteInstance != other.concreteInstance) return false
+        if (counterExample != other.counterExample) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + (if (getCounterExample() != null) getCounterExample().hashCode() else 0)
-        result = 31 * result + (if (getConcreteInstance() != null) getConcreteInstance().hashCode() else 0)
-        result = 31 * result + (if (isEditable) 1 else 0)
-        result = 31 * result + (if (hybridRows != null) hybridRows.hashCode() else 0)
-        result = 31 * result + (if (getSelection() != null) getSelection().hashCode() else 0)
+        result = 31 * result + isEditable.hashCode()
+        result = 31 * result + (counterExample?.hashCode() ?: 0)
+        result = 31 * result + (concreteInstance?.hashCode() ?: 0)
+        result = 31 * result + hybridRows.hashCode()
+        result = 31 * result + selection.hashCode()
+        result = 31 * result + columnHeaders.hashCode()
+        result = 31 * result + rows.hashCode()
+        result = 31 * result + freeVariableList.hashCode()
+        result = 31 * result + durations.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + counterExample.hashCode()
+        result = 31 * result + concreteInstance.hashCode()
         return result
     }
 
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        if (!super.equals(obj)) {
-            return false
-        }
 
-        val that = obj as HybridSpecification
-
-        if (isEditable != that.isEditable) {
-            return false
-        }
-        if (if (getCounterExample() != null) getCounterExample() != that.getCounterExample()
-            else that.getCounterExample() != null
-        ) {
-            return false
-        }
-        if (if (getConcreteInstance() != null) getConcreteInstance() != that.getConcreteInstance()
-            else that.getConcreteInstance() != null
-        ) {
-            return false
-        }
-        if (if (hybridRows != null) hybridRows != that.hybridRows
-            else that.hybridRows != null
-        ) {
-            return false
-        }
-        return if (getSelection() != null) getSelection() == that.getSelection() else that.getSelection() == null
-    }
 }

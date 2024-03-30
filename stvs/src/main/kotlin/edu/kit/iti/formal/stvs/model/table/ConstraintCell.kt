@@ -11,7 +11,7 @@ import javafx.beans.property.StringProperty
  * @author Benjamin Alt
  */
 class ConstraintCell(stringRepresentation: String?) : CellOperationProvider {
-    override val stringRepresentationProperty: StringProperty = SimpleStringProperty()
+    override val stringRepresentationProperty: StringProperty = SimpleStringProperty(stringRepresentation)
     override val commentProperty: StringProperty = SimpleStringProperty()
 
     constructor(constraintCell: ConstraintCell?) : this(constraintCell!!.asString) {
@@ -21,4 +21,24 @@ class ConstraintCell(stringRepresentation: String?) : CellOperationProvider {
     override fun toString(): String {
         return debuggingString()!!
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConstraintCell
+
+        if (asString != other.asString) return false
+        if (comment != other.comment) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = asString.hashCode()
+        result = 31 * result + comment.hashCode()
+        return result
+    }
+
+
 }

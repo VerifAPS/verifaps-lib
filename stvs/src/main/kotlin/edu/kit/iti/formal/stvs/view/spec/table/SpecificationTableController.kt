@@ -83,7 +83,7 @@ class SpecificationTableController(
         hybridSpecification.columnHeaders
             .forEach(Consumer { specIoVariable: SpecIoVariable -> this.addColumnToView(specIoVariable) })
 
-        validator.problemsProperty().addListener { o: Observable? -> onProblemsChange() }
+        validator.problemsProperty.addListener { _: Observable -> onProblemsChange() }
         validator.recalculateSpecProblems()
 
         hybridSpecification.getSelection()
@@ -92,11 +92,11 @@ class SpecificationTableController(
             })
 
         hybridSpecification.getSelection()
-            .columnProperty().addListener { obs, before: String?, columnNow: String? ->
+            .columnProperty.addListener { obs, before: String?, columnNow: String? ->
                 this.onColumnSelectionChanged(obs, before, columnNow)
             }
 
-        tableView.setItems(hybridSpecification.hybridRows)
+        tableView.setItems(hybridSpecification.hybridRowsProperty)
     }
 
     private fun onColumnSelectionChanged(
@@ -127,16 +127,12 @@ class SpecificationTableController(
     }
 
     private fun onProblemsChange() {
-        val columnProblems = validator.problemsProperty().get()
-            .filterIsInstance<ColumnProblem>()
+        val columnProblems = validator.problems.filterIsInstance<ColumnProblem>()
         for (column in tableView.columns) {
             if (column.userData == null) {
                 continue
             }
-            val problemsForColumn = columnProblems.stream()
-                .filter { problem: ColumnProblem -> problem.column == column.userData }
-                .collect(Collectors.toList())
-
+            val problemsForColumn = columnProblems.filter { it.column == column.userData }
             val columnHeader = column.graphic as ColumnHeader
 
             if (problemsForColumn.isEmpty()) {
@@ -171,7 +167,7 @@ class SpecificationTableController(
     fun deleteRow() {
         val toRemove: MutableList<HybridRow?> = ArrayList()
         toRemove.addAll(tableView.selectionModel.selectedItems)
-        removeByReference(hybridSpecification!!.hybridRows, toRemove)
+        removeByReference(hybridSpecification!!.hybridRowsProperty, toRemove)
     }
 
     fun addNewColumn() {
@@ -266,7 +262,7 @@ class SpecificationTableController(
                 wildcardCells[specIoVariable.name] = ConstraintCell("-")
             })
         val wildcardRow = ConstraintSpecification.createRow(wildcardCells)
-        hybridSpecification.hybridRows.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
+        hybridSpecification.hybridRowsProperty.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
     }
 
     /**
@@ -276,12 +272,12 @@ class SpecificationTableController(
      */
     fun addNewColumn(specIoVariable: SpecIoVariable) {
         // Add column to model:
-        if (hybridSpecification!!.hybridRows.isEmpty()) {
+        if (hybridSpecification!!.hybridRowsProperty.isEmpty()) {
             hybridSpecification.columnHeaders.add(specIoVariable)
         } else {
             val dataColumn =
                 SpecificationColumn(
-                    hybridSpecification.hybridRows.stream()
+                    hybridSpecification.hybridRowsProperty.stream()
                         .map<ConstraintCell>({ row: HybridRow? -> ConstraintCell("-") })
                         .collect(Collectors.toList())
                 )
@@ -332,7 +328,7 @@ class SpecificationTableController(
         val row: TableRow<HybridRow?> = object : TableRow<HybridRow?>() {
             init {
                 hybridSpecification!!.getSelection()
-                    .rowProperty().addListener { obs, before: Int?, now: Int? ->
+                    .rowProperty.addListener { obs, before: Int?, now: Int? ->
                         this.rowSelectionChanged(before, now)
                     }
             }

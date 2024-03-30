@@ -9,10 +9,12 @@ import org.junit.jupiter.api.Test
  * Created by bal on 26.02.17.
  */
 class SpecificationColumnTest {
-    private val column= SpecificationColumn(mutableListOf(1, 2, 3, 4, 5))
+    private val column = SpecificationColumn(mutableListOf(1, 2, 3, 4, 5))
+
 
     @Test
     fun testEquals() {
+        val column = SpecificationColumn(mutableListOf(1, 2, 3, 4, 5))
         val identical: SpecificationColumn<*> = SpecificationColumn(mutableListOf(1, 2, 3, 4, 5))
         Assertions.assertEquals(identical, column)
         column.comment = "Comment"

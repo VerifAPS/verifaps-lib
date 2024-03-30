@@ -115,6 +115,37 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ConstraintSpecification
+
+        if (freeVariableList != other.freeVariableList) return false
+        if (comment != other.comment) return false
+        if (name != other.name) return false
+        if (rows != other.rows) return false
+        if (durations != other.durations) return false
+        if (columnHeaders != other.columnHeaders) return false
+
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = freeVariableList.hashCode()
+        result = 31 * result + comment.hashCode()
+        result = 31 * result + columnHeaders.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + rows.hashCode()
+        result = 31 * result + durations.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return super.toString()
+    }
+
     companion object {
         /**
          * Construct a new specification row containing ConstraintCells.

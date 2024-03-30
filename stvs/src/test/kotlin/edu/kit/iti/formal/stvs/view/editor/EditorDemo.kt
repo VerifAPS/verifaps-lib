@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.view.editor
 
-import edu.kit.iti.formal.stvs.Demo
+import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.TestUtils.loadCodeFromFile
 import edu.kit.iti.formal.stvs.model.code.Code
 import edu.kit.iti.formal.stvs.model.code.SyntaxError
@@ -12,14 +12,13 @@ import javafx.scene.Node
 import javafx.scene.control.TextArea
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import org.junit.experimental.categories.Category
 import org.junit.jupiter.api.Test
 import java.util.function.Consumer
 
 /**
  * Created by Lukas on 20.01.2017.
  */
-@Category(Demo::class)
+@Tag("demo")
 class EditorDemo {
     @Test
     fun javaFxTest() {

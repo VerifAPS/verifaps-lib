@@ -159,7 +159,7 @@ chunk :
 	| variable      #cvariable
 	| constant      #cconstant
 	| singlesided   #csinglesided
-  | interval      #cinterval
+    | interval      #cinterval
 	| expr          #cexpr
 ;
 

@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import java.util.*
-
 /**
  * The super-interface for all Types.
  *
@@ -47,7 +45,7 @@ sealed interface Type {
      * @param literal the literal string to parse
      * @return optionally a resulting value
      */
-    fun parseLiteral(literal: String): Optional<Value>
+    fun parseLiteral(literal: String): Value?
 
     /**
      * For any <tt>[Type] type</tt> the following must be true:

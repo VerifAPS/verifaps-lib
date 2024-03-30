@@ -145,8 +145,8 @@ class TimingDiagramController : Controller {
             cycleSelectionRectangle!!.onMouseEntered = EventHandler { event: MouseEvent? ->
                 if (activated.get()) {
                     cycleSelectionRectangle.opacity = 1.0
-                    selection!!.setRow(concreteSpec.cycleToRowNumber(finalCycleIndex))
-                    selection.setColumn(ioVariable.name)
+                    selection!!.row = concreteSpec.cycleToRowNumber(finalCycleIndex)
+                    selection.column = ioVariable.name
                 }
             }
             cycleSelectionRectangle.onMouseExited = EventHandler { event: MouseEvent? ->

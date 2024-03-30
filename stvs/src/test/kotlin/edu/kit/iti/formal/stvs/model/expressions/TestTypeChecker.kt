@@ -4,17 +4,12 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeFactory.enumOfName
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
 class TestTypeChecker {
-    private val checker: TypeChecker
-    private val varTypeCtx: MutableMap<String, Type> =
-        HashMap()
+    private val varTypeCtx = mapOf("X" to TypeInt.INT)
+    private val checker = TypeChecker(varTypeCtx)
 
-    init {
-        varTypeCtx["X"] = TypeInt.INT
-
-        checker = TypeChecker(varTypeCtx)
-    }
 
     @Test
     @Throws(TypeCheckException::class)
@@ -59,6 +54,8 @@ class TestTypeChecker {
     fun testInvalidArgumentType() {
         val invalidExpression =
             SimpleExpressions.and(SimpleExpressions.literal(false), SimpleExpressions.literal(2))
-        checker.typeCheck(invalidExpression)
+        assertFailsWith<TypeCheckException> {
+            checker.typeCheck(invalidExpression)
+        }
     }
 }

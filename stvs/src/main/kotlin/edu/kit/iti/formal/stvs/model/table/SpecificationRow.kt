@@ -103,7 +103,7 @@ open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C,
         if (other !is SpecificationRow<*>) return false
 
         if (cells != other.cells) return false
-        if (commentProperty != other.commentProperty) return false
+        if (comment != other.comment) return false
 
         return true
     }
@@ -113,6 +113,7 @@ open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C,
         result = 31 * result + commentProperty.hashCode()
         return result
     }
+
 
 
     companion object {

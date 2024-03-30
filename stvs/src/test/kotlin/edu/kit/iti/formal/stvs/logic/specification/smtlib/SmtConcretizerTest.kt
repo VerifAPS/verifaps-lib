@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import edu.kit.iti.formal.stvs.*
-import edu.kit.iti.formal.stvs.logic.io.ImportException
+import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
@@ -13,15 +12,12 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
-import javafx.beans.property.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.Rule
+import javafx.beans.property.SimpleListProperty
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.rules.Stopwatch
 import tornadofx.asObservable
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Created by csicar on 13.02.17.
@@ -29,7 +25,7 @@ import java.util.concurrent.TimeUnit
 class SmtConcretizerTest {
     private var freeVariables: List<ValidFreeVariable>? = null
 
-    private fun importSpec(name: String): ValidSpecification? {
+    private fun importSpec(name: String): ValidSpecification {
         val typeContext = listOf(
             TypeInt.INT, TypeBool.BOOL, TypeEnum(
                 "colors",
@@ -40,25 +36,19 @@ class SmtConcretizerTest {
 
         val constraintSpec: ConstraintSpecification =
             ImporterFacade.importConstraintSpec(javaClass.getResourceAsStream(name)!!)
-        val freeVariableListValidator =
-            FreeVariableListValidator(SimpleListProperty(typeContext.asObservable()), constraintSpec.freeVariableList)
-        val freeVariables: List<ValidFreeVariable> = freeVariableListValidator.validFreeVariablesProperty.get()
+        val tc = SimpleListProperty(typeContext.asObservable())
+        val freeVariableListValidator = FreeVariableListValidator(tc, constraintSpec.freeVariableList)
+        val freeVariables: List<ValidFreeVariable> = freeVariableListValidator.validFreeVariables
         this.freeVariables = freeVariables
         val validator = ConstraintSpecificationValidator(
-            SimpleListProperty(typeContext.asObservable()),
+            tc,
             SimpleListProperty(codeIoVariables.asObservable()),
             freeVariables.asObservable(),
             constraintSpec
         )
-        val specProblems = validator.problemsProperty().get()
-        specProblems.map { it?.errorMessage }.forEach { println(it) }
-
-        return validator.getValidSpecification()
+        validator.problems.map { it?.errorMessage }.forEach { println(it) }
+        return validator.validSpecification!!
     }
-
-    @JvmField
-    @Rule
-    var stopwatch: Stopwatch = Stopwatch()
 
     @BeforeEach
     fun before() {
@@ -69,12 +59,11 @@ class SmtConcretizerTest {
     fun testTermination() {
         val spec = importSpec("testSpec.xml")
         val maxDurations = mapOf(0 to 3000, 1 to 1, 2 to 2)
-
         val concretizer = SmtConcretizer(autoloadConfig())
         concretizer.calculateConcreteSpecification(spec, freeVariables!!)
-        val start = stopwatch.runtime(TimeUnit.MILLISECONDS)
+        val start = System.currentTimeMillis()
         concretizer.terminate()
-        val end = stopwatch.runtime(TimeUnit.MILLISECONDS)
+        val end = System.currentTimeMillis()
         val maxTime: Long = 5
         Assertions.assertTrue(
             end - start < maxTime,

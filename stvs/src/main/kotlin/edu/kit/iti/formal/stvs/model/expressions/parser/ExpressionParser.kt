@@ -70,6 +70,9 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
      */
     @Throws(ParseException::class, UnsupportedExpressionException::class)
     fun parseExpression(expressionAsString: String): Expression {
+        if (expressionAsString.isBlank()) {
+            return LiteralExpr(ValueBool.TRUE)
+        }
         val charStream = CharStreams.fromString(expressionAsString)
         val lexer = TestTableLanguageLexer(charStream)
         val tokens = CommonTokenStream(lexer)
@@ -77,7 +80,8 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         parser.removeErrorListeners()
         parser.addErrorListener(ThrowingErrorListener())
         try {
-            return parser.cell().accept(this)
+            val ctx = parser.cell()
+            return ctx.accept(this)
         } catch (runtimeException: ParseRuntimeException) {
             throw runtimeException.parseException
         } catch (runtimeException: UnsupportedExpressionRuntimeException) {
@@ -85,14 +89,6 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         }
     }
 
-    fun getColumnName(): String? {
-        return columnName
-    }
-
-    fun setColumnName(columnName: String?) {
-        this.columnName = columnName
-        this.columnAsVariable = VariableExpr(columnName)
-    }
 
     fun setTypeContext(context: Set<Type>) {
         this.enumValues = computeEnumValuesByName(context)
@@ -112,6 +108,29 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         return optionalExpression
     }
 
+    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): Expression =
+        BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, ctx.constant().accept(this))
+
+    override fun visitCsinglesided(ctx: TestTableLanguageParser.CsinglesidedContext): Expression {
+        val op = binaryOperationFromToken(ctx.singlesided().op.start)
+        return BinaryFunctionExpr(op, columnAsVariable, ctx.singlesided().expr().accept(this))
+    }
+
+    override fun visitCellEOF(ctx: TestTableLanguageParser.CellEOFContext) = ctx.cell().accept(this)
+
+    override fun visitCdontcare(ctx: TestTableLanguageParser.CdontcareContext) = LiteralExpr(ValueBool.TRUE)
+
+    override fun visitCinterval(ctx: TestTableLanguageParser.CintervalContext): BinaryFunctionExpr {
+        val lower =
+            BinaryFunctionExpr(BinaryFunctionExpr.Op.LESS_EQUALS, ctx.interval().lower.accept(this), columnAsVariable)
+        val upper =
+            BinaryFunctionExpr(BinaryFunctionExpr.Op.LESS_EQUALS, columnAsVariable, ctx.interval().upper.accept(this))
+        return BinaryFunctionExpr(BinaryFunctionExpr.Op.AND, lower, upper)
+    }
+
+
+    override fun visitCexpr(ctx: TestTableLanguageParser.CexprContext) = ctx.expr().accept(this)
+
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): Expression {
         return LiteralExpr(ValueBool.TRUE)
     }
@@ -121,7 +140,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     }
 
     override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext?): Expression {
-        return LiteralExpr(ValueBool.TRUE)
+        return LiteralExpr(ValueBool.FALSE)
 
     }
 
@@ -132,8 +151,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): Expression {
         // If we come here, its a top-level variable.
         // In this case there's an implicit equality with the column variable.
-        val variableExpr = parseOccuringString(ctx)
-        return BinaryFunctionExpr(BinaryFunctionExpr.Op.EQUALS, columnAsVariable, variableExpr)
+        return  parseOccuringString(ctx)
     }
 
     override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext): Expression {
@@ -142,7 +160,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
 
     // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
     private fun parseOccuringString(ctx: TestTableLanguageParser.VariableContext): Expression {
-        return parseArrayIndex(ctx).let { index: Int ->
+        return parseArrayIndex(ctx)?.let { index: Int ->
             // If it has an index to it, like A[-2], its a variable for sure
             // (indices don't make sense for enums!)
             VariableExpr(parseIdentifier(ctx), index)
@@ -162,7 +180,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     }
 
     private fun parseArrayIndex(ctx: TestTableLanguageParser.VariableContext) =
-        ctx.i().text.toInt().let { getArrayIndex(it) }
+        ctx.i()?.text?.toInt()?.let { getArrayIndex(it) }
 
     private fun parseIdentifier(ctx: TestTableLanguageParser.VariableContext): String {
         return ctx.IDENTIFIER().text

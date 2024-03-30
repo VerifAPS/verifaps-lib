@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.variables
 
-import edu.kit.iti.formal.stvs.Demo
 import edu.kit.iti.formal.stvs.model.common.FreeVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
@@ -8,13 +7,14 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.view.JavaFxTest
+import javafx.beans.Observable
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.ListChangeListener
 import javafx.geometry.Orientation
 import javafx.scene.Node
 import javafx.scene.control.SplitPane
 import javafx.scene.control.TextArea
-import org.junit.experimental.categories.Category
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import tornadofx.asObservable
 import java.util.function.Consumer
@@ -22,7 +22,7 @@ import java.util.function.Consumer
 /**
  * Created by Philipp on 29.01.2017.
  */
-@Category(Demo::class)
+@Tag("demo")
 class VariableCollectionDemo {
     @Test
     fun testVariableView() {
@@ -35,7 +35,7 @@ class VariableCollectionDemo {
             TypeBool.BOOL,
             TypeEnum("COLORS", mutableListOf("red", "green", "blue"))
         )
-        val vars = listOf(FreeVariable("blah", "INT"), FreeVariable("xyz", "BOOL"))
+        val vars = arrayListOf(FreeVariable("blah", "INT"), FreeVariable("xyz", "BOOL"))
         val varlist = FreeVariableList(vars)
 
         val controller = VariableCollectionController(SimpleListProperty(types.asObservable()), varlist)
@@ -66,7 +66,7 @@ class VariableCollectionDemo {
 
         updateProblemsText(problemsArea, validator)
 
-        validator.problemsProperty.addListener { _ -> updateProblemsText(problemsArea, validator) }
+        validator.problemsProperty.addListener { _: Observable -> updateProblemsText(problemsArea, validator) }
 
         val splitPane = SplitPane(textArea, problemsArea)
         splitPane.orientation = Orientation.VERTICAL

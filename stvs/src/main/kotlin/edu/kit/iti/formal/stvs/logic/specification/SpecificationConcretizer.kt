@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.specification
 
-import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
@@ -23,9 +22,9 @@ interface SpecificationConcretizer {
      */
     @Throws(ConcretizationException::class)
     fun calculateConcreteSpecification(
-        validSpecification: ValidSpecification?,
+        validSpecification: ValidSpecification,
         freeVariables: List<ValidFreeVariable>
-    ): ConcreteSpecification?
+    ): ConcreteSpecification
 
     /**
      * Terminates the calculation of the concrete specification.

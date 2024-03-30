@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import java.util.*
-
 /**
  * Runtime-representation for boolean types.
  * This is a singleton since this class does not have any state.
@@ -23,18 +21,18 @@ class TypeBool private constructor() : Type {
     override val typeName: String
         get() = "BOOL"
 
-    override fun parseLiteral(literal: String): Optional<Value> {
+    override fun parseLiteral(literal: String): Value? {
         if ("true".equals(literal, ignoreCase = true)) {
-            return Optional.of<Value>(ValueBool.Companion.TRUE)
+            return ValueBool.TRUE
         }
         if ("false".equals(literal, ignoreCase = true)) {
-            return Optional.of<Value>(ValueBool.Companion.FALSE)
+            return ValueBool.FALSE
         }
-        return Optional.empty()
+        return null
     }
 
     override fun generateDefaultValue(): Value {
-        return ValueBool.Companion.FALSE
+        return ValueBool.FALSE
     }
 
     override fun toString(): String {

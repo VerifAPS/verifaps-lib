@@ -10,16 +10,18 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.InputStream
 import java.util.*
 
 /**
  * @author Benjamin Alt
  */
 class HybridSpecificationTest {
-    private val hybridSpec = ImporterFacade.importHybridSpec(
-        loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")
-    )
+    private lateinit var hybridSpec: HybridSpecification
+
+    @BeforeEach
+    fun before() {
+        hybridSpec = ImporterFacade.importHybridSpec(loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
+    }
 
     private val concreteInstance = ImporterFacade.importConcreteSpec(
         loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"),
@@ -27,40 +29,41 @@ class HybridSpecificationTest {
             TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo")
         )
     )
+
     @Test
-    fun testGetCounterExample() {
-        Assertions.assertEquals(Optional.empty<Any>(), hybridSpec.getCounterExample())
+    fun testcounterExample(){
+        Assertions.assertEquals(null, hybridSpec.counterExample)
     }
 
     @Test
-    fun testGetSetConcreteInstance() {
-        Assertions.assertEquals(Optional.empty<Any>(), hybridSpec.getConcreteInstance())
-        hybridSpec.setConcreteInstance(concreteInstance)
-        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.getConcreteInstance())
+    fun testGetconcreteInstance() {
+        Assertions.assertEquals(null, hybridSpec.concreteInstance)
+        hybridSpec.concreteInstance = (concreteInstance)
+        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.concreteInstance)
     }
 
     @Test
-    fun testGetSetCounterExample() {
-        Assertions.assertEquals(Optional.empty<Any>(), hybridSpec.getCounterExample())
-        hybridSpec.setCounterExample(concreteInstance)
-        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.getCounterExample())
+    fun testGetcounterExample() {
+        Assertions.assertEquals(null, hybridSpec.counterExample)
+        hybridSpec.counterExample = (concreteInstance)
+        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.counterExample)
     }
 
     @Test
     fun testGetSetSelection() {
         Assertions.assertEquals(Selection(), hybridSpec.getSelection())
-        hybridSpec.getSelection().setRow(3)
-        hybridSpec.getSelection().setColumn("A")
+        hybridSpec.getSelection().row=(3)
+        hybridSpec.getSelection().column=("A")
         Assertions.assertEquals(Selection("A", 3), hybridSpec.getSelection())
     }
 
     @Test//(expected = IllegalArgumentException::class)
-    fun testSetConcreteInstanceInvalid() {
+    fun testconcreteInstanceInvalid() {
         val badConcreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             StvsApplication::class.java.getResourceAsStream("spec_concrete_empty.xml")!!,
             listOf(TypeInt.INT, TypeBool.BOOL)
         )
-        hybridSpec.setConcreteInstance(badConcreteSpec)
+        hybridSpec.concreteInstance = (badConcreteSpec)
     }
 
     @Test
@@ -70,10 +73,10 @@ class HybridSpecificationTest {
 
     @Test
     fun testRemoveConcreteInstance() {
-        hybridSpec.setConcreteInstance(concreteInstance)
-        Assertions.assertNotNull(hybridSpec.getConcreteInstance())
+        hybridSpec.concreteInstance = (concreteInstance)
+        Assertions.assertNotNull(hybridSpec.concreteInstance)
         hybridSpec.removeConcreteInstance()
-        Assertions.assertNotNull(hybridSpec.getConcreteInstance())
+        Assertions.assertNotNull(hybridSpec.concreteInstance)
     }
 
     @Test
@@ -89,9 +92,9 @@ class HybridSpecificationTest {
             )
         )
         Assertions.assertEquals(hybridSpec, identical)
-        hybridSpec.setConcreteInstance(concreteInstance)
+        hybridSpec.concreteInstance = concreteInstance
         Assertions.assertNotEquals(hybridSpec, identical)
-        identical.setConcreteInstance(identicalConcrete)
+        identical.concreteInstance = identicalConcrete
         Assertions.assertEquals(hybridSpec, identical)
         Assertions.assertNotEquals(hybridSpec, null)
         Assertions.assertEquals(hybridSpec, hybridSpec)
