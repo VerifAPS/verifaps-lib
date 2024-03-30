@@ -1,11 +1,13 @@
 package edu.kit.iti.formal.stvs.logic.verification
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
-import edu.kit.iti.formal.stvs.model.common.NullableProperty
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
+import edu.kit.iti.formal.stvs.model.verification.VerificationResultEmpty
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
 import edu.kit.iti.formal.stvs.util.ProcessCreationException
+import javafx.beans.property.SimpleObjectProperty
+import tornadofx.getValue
 import java.io.IOException
 
 /**
@@ -13,7 +15,7 @@ import java.io.IOException
  *
  * @author Benjamin Alt
  */
-interface VerificationEngine {
+abstract class VerificationEngine {
     /**
      * Starts a verification in its own thread.
      *
@@ -24,24 +26,14 @@ interface VerificationEngine {
      * @throws ProcessCreationException exception while creating a process for verification
      */
     @Throws(IOException::class, ExportException::class, ProcessCreationException::class)
-    fun startVerification(scenario: VerificationScenario, spec: ConstraintSpecification)
+    abstract fun startVerification(scenario: VerificationScenario, spec: ConstraintSpecification)
 
-    val verificationResultProperty: NullableProperty<VerificationResult?>
-    val verificationResult: VerificationResult?
-        get() = verificationResultProperty.get()
-
-    /**
-     * Get the last specification for which a verification was triggered.
-     * This value is null before any calls of
-     * [.startVerification], but will never
-     * be null once that method is called once.
-     *
-     * @return The last specification for which a verification was triggered
-     */
-    val verificationSpecification: ConstraintSpecification?
+    val verificationResultProperty = SimpleObjectProperty<VerificationResult>(VerificationResultEmpty)
+    val verificationResult: VerificationResult by verificationResultProperty
 
     /**
      * Cancels a running verification.
      */
-    fun cancelVerification()
+    abstract fun cancelVerification()
+
 }

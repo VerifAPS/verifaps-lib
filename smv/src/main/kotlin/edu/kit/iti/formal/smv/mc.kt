@@ -75,7 +75,6 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
     var executablePath = "nuXmv"
     var workingDirectory = moduleFile.parentFile
     var outputFile = File(workingDirectory, "nuxmv.log")
-    var result: NuXMVOutput? = null
     var outputParser: NuXMVOutputParser = ::parseXmlOutput
 
     override fun call(): NuXMVOutput {
@@ -90,8 +89,8 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
                     workingDirectory,
                     outputFile)
             val output = pr.call()
-            result = outputParser(output)
-            return result!!
+            val result = outputParser(output)
+            return result
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
@@ -134,7 +133,7 @@ data class CounterExample(
         fun load(text: String): CounterExample {
             val ce = CounterExample()
             val saxBuilder = SAXBuilder()
-            val doc = saxBuilder.build(StringReader(text));
+            val doc = saxBuilder.build(StringReader(text))
             val root = doc.rootElement
             ce.type = Integer.parseInt(root.getAttributeValue("type"))
             ce.id = Integer.parseInt(root.getAttributeValue("id"))

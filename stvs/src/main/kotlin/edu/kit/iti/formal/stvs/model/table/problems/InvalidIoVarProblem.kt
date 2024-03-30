@@ -54,7 +54,8 @@ data class InvalidIoVarProblem(
         ): ValidIoVariable {
             val name = tryGetValidName(specIoVariable, codeIoVariables, minorProblemsHandler)
             val type = tryGetValidType(specIoVariable, typesByName, codeIoVariables, minorProblemsHandler)
-            return ValidIoVariable(specIoVariable.category, name, type)
+            val role = specIoVariable.role
+            return ValidIoVariable(specIoVariable.category, name, type, role)
         }
 
         @Throws(SpecProblemException::class)

@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.view.common.AlertFactory
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.IntegerProperty
+import javafx.beans.property.LongProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
@@ -16,16 +17,8 @@ import javafx.util.Callback
 import java.io.IOException
 
 /**
- *
- *
  * The manager for the Config dialog view (with its model being the [GlobalConfig]).
- *
- *
- *
- *
  * Created by csicar on 11.01.17.
- *
- *
  * @author Carsten Csiky
  */
 class ConfigDialogManager(private val config: GlobalConfig) : Controller {
@@ -75,7 +68,7 @@ class ConfigDialogManager(private val config: GlobalConfig) : Controller {
         config.editorFontSize = (view.editorFontSize.integer!!)
         config.showLineNumbers = (view.showLineNumbers.isSelected)
         config.simulationTimeout = (view.simulationTimeout.integer!!)
-        config.verificationTimeout = (view.verificationTimeout.integer!!)
+        config.verificationTimeout = (view.verificationTimeout.integer!!.toLong())
         config.uiLanguage = (view.uiLanguage.valueProperty().get()!!)
         config.maxLineRollout = (view.maxLineRollout.integer!!)
         config.nuxmvFilename = (view.nuxmvFilename.textField.text)
@@ -104,6 +97,10 @@ class ConfigDialogManager(private val config: GlobalConfig) : Controller {
     }
 
     private fun bind(stringProperty: StringProperty, integerProperty: IntegerProperty) {
+        stringProperty.set(integerProperty.value.toString())
+    }
+
+    private fun bind(stringProperty: StringProperty, integerProperty: LongProperty) {
         stringProperty.set(integerProperty.value.toString())
     }
 

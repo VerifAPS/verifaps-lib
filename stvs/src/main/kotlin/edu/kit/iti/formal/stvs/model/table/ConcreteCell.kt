@@ -11,7 +11,7 @@ import javafx.beans.property.SimpleStringProperty
  * @author Benjamin Alt
  */
 data class ConcreteCell(val value: Value) : StringReadable {
-    override val stringRepresentationProperty: ReadOnlyStringProperty = SimpleStringProperty()
+    override val stringRepresentationProperty: ReadOnlyStringProperty = SimpleStringProperty(value.toString())
 
     override fun toString(): String = value.toString()
 }

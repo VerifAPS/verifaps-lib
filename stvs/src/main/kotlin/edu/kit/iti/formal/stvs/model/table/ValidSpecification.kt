@@ -12,6 +12,6 @@ import javafx.util.Callback
  *
  * @author Benjamin Alt
  */
-class ValidSpecification : SpecificationTable<ValidIoVariable, Expression?, LowerBoundedInterval?>(
+class ValidSpecification : SpecificationTable<ValidIoVariable, Expression, LowerBoundedInterval>(
     Callback { _: ValidIoVariable? -> arrayOf() },
     Callback { _: LowerBoundedInterval? -> arrayOf() })

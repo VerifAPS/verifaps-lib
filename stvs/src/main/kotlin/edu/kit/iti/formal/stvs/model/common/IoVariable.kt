@@ -63,7 +63,8 @@ data class CodeIoVariable(
 data class ValidIoVariable(
     override val category: VariableCategory,
     override val name: String,
-    val validType: Type
+    val validType: Type,
+    val role: VariableRole
 ) :
     IoVariable() {
     override val type: String

@@ -16,11 +16,8 @@ class ValidFreeVariable
  * @param name The name of this FreeVariable
  * @param type The type of this FreeVariable
  * @param defaultValue The default value of this FreeVariable
- */(@JvmField val name: String, @JvmField val type: Type, val constraint: Expression?) {
+ */(val name: String, val type: Type, val constraint: Expression?) {
     fun asIOVariable(): ValidIoVariable {
-        return ValidIoVariable(VariableCategory.INPUT, name, type)
+        return ValidIoVariable(VariableCategory.INPUT, name, type, VariableRole.ASSUME)
     }
-
-    val sMTName: SAtom
-        get() = SAtom(String.format("|%s|", name))
 }

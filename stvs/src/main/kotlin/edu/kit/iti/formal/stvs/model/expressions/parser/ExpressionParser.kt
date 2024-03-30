@@ -42,25 +42,6 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         this.enumValues = computeEnumValuesByName(typeContext)
     }
 
-    private fun computeEnumValuesByName(typeSet: Collection<Type>): Map<String, ValueEnum> {
-        val byName =
-            typeSet.asSequence()
-                .map { type -> this.filterEnumType(type) }
-                .filterNotNull()
-                .flatMap {
-                    it.values.map { value -> value.valueString to value }
-                }
-                .toMap()
-        return byName
-    }
-
-    private fun filterEnumType(type: Type): TypeEnum? {
-        if (type is TypeEnum) {
-            return type
-        }
-        return null
-    }
-
     /**
      * @param expressionAsString the String to interpret as cell-expression
      * @return the expression covering the semantics of the given string interpreted as
@@ -151,7 +132,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): Expression {
         // If we come here, its a top-level variable.
         // In this case there's an implicit equality with the column variable.
-        return  parseOccuringString(ctx)
+        return parseOccuringString(ctx)
     }
 
     override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext): Expression {
@@ -340,4 +321,16 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
             return index
         }
     }
+}
+
+
+fun computeEnumValuesByName(typeSet: Collection<Type>): Map<String, ValueEnum> {
+    val byName =
+        typeSet.asSequence()
+            .filterIsInstance<TypeEnum>()
+            .flatMap {
+                it.values.map { value -> value.valueString to value }
+            }
+            .toMap()
+    return byName
 }

@@ -2,6 +2,8 @@ package edu.kit.iti.formal.stvs.logic.verification
 
 import javafx.beans.property.*
 import org.apache.commons.io.IOUtils
+import tornadofx.getValue
+import tornadofx.setValue
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -17,7 +19,10 @@ class ProcessMonitor(process: Process?, timeout: Int) : Thread() {
      * The process for which we have to detect the end.
      */
     var process: Process? = null
-    private var processFinished: BooleanProperty? = null
+
+    val processFinishedProperty: BooleanProperty = SimpleBooleanProperty(false)
+    var finished by processFinishedProperty
+
     private var timeout = 0
     var isAborted: Boolean = false
         private set
@@ -36,7 +41,6 @@ class ProcessMonitor(process: Process?, timeout: Int) : Thread() {
             throw IllegalArgumentException("The process has already finished.")
         } catch (exc: IllegalThreadStateException) {
             this.process = process
-            this.processFinished = SimpleBooleanProperty(false)
             this.timeout = timeout
         }
     }
@@ -58,21 +62,13 @@ class ProcessMonitor(process: Process?, timeout: Int) : Thread() {
 ${IOUtils.toString(process!!.errorStream, "utf-8")}"""
                 )
             }
-            processFinished!!.set(true)
+            processFinishedProperty.set(true)
         } catch (e: InterruptedException) {
             // intentionally left empty. Process is destroyed somewhere else
         } catch (e: IOException) {
             error = e
             e.printStackTrace()
-            processFinished!!.set(true)
+            processFinishedProperty.set(true)
         }
-    }
-
-    fun isProcessFinished(): Boolean {
-        return processFinished!!.get()
-    }
-
-    fun processFinishedProperty(): BooleanProperty? {
-        return processFinished
     }
 }

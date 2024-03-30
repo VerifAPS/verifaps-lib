@@ -8,5 +8,5 @@ package edu.kit.iti.formal.stvs.model.common
  * ASSERT can be used for VariableCategories OUTPUT, INOUT, LOCAl
  */
 enum class VariableRole {
-    ASSUME, ASSERT
+    ASSUME, ASSERT;
 }

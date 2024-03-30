@@ -6,6 +6,7 @@ import edu.kit.iti.formal.stvs.model.code.*
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.expressions.*
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
 import edu.kit.iti.formal.stvs.util.ProcessCreationException
 import edu.kit.iti.formal.stvs.view.StvsRootView
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
@@ -68,7 +69,7 @@ class StvsRootController(
 
         this.view = StvsRootView(editorPaneController.view, specificationsPaneController.view)
         this.verificationResultHandler = VerificationResultHandler(this)
-        view.addEventHandler<VerificationEvent>(VerificationEvent.Companion.EVENT_TYPE) { event: VerificationEvent ->
+        view.addEventHandler(VerificationEvent.Companion.EVENT_TYPE) { event: VerificationEvent ->
             this.onVerificationEvent(
                 event
             )

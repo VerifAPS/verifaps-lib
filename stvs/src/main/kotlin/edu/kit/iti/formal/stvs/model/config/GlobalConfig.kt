@@ -24,7 +24,7 @@ class GlobalConfig {
     val validLanguages: List<String> = mutableListOf("EN")
 
     // General
-    val verificationTimeoutProperty: IntegerProperty = SimpleIntegerProperty(3600)
+    val verificationTimeoutProperty: SimpleLongProperty = SimpleLongProperty(3600)
 
     /**
      * Set the verification timeout in milliseconds.
@@ -155,7 +155,7 @@ class GlobalConfig {
         result = 31 * result + nuxmvFilename.hashCode()
         result = 31 * result + z3Path.hashCode()
         result = 31 * result + getetaCommand.hashCode()
-        return result
+        return result.toInt()
     }
 
 

@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringEscapeUtils
  *
  * @author Philipp
  */
-class InvalidFreeVariableProblem protected constructor(errorMessage: String?) : FreeVariableProblem(errorMessage) {
+class InvalidFreeVariableProblem(errorMessage: String?) : FreeVariableProblem(errorMessage) {
     override val problemName: String
         get() = "invalid free variable"
 

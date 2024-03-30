@@ -75,7 +75,7 @@ class SpecificationController(
         )
         this.specificationInvalid = SimpleBooleanProperty(true)
         specificationInvalid.bind(
-            variableCollectionController.validator.validProperty().not()
+            variableCollectionController.validator.validProperty.not()
                 .or(tableController.validator.validProperty.not()).or(codeInvalid)
         )
         this.specificationConcretizable = SimpleBooleanProperty(true)

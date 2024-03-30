@@ -21,13 +21,15 @@ class FreeVariableListValidator(
     private val typeContext: ListProperty<Type>,
     private val freeVariables: FreeVariableList
 ) {
-    val problemsProperty = SimpleMapProperty<FreeVariable, MutableList<FreeVariableProblem>>(FXCollections.observableHashMap())
+    val problemsProperty =
+        SimpleMapProperty<FreeVariable, MutableList<FreeVariableProblem>>(FXCollections.observableHashMap())
     var problems by problemsProperty
 
     val validFreeVariablesProperty = SimpleListProperty(FXCollections.observableArrayList<ValidFreeVariable>())
     val validFreeVariables: ObservableList<ValidFreeVariable> by validFreeVariablesProperty
 
-    private val valid: BooleanProperty = SimpleBooleanProperty(false)
+    val validProperty: BooleanProperty = SimpleBooleanProperty(false)
+    var valid by validProperty
 
     /**
      * Creates a validator with the given formal type context model for the effective
@@ -50,7 +52,8 @@ class FreeVariableListValidator(
     fun revalidate() {
         val typesByName = typeContext.get().associateBy { obj -> obj.typeName }
         val variableMap = freeVariables.variables
-            .associate { it.name to (typesByName[it.type] ?: error("Type ${it.type} is unknown")) }
+            .associate { it.name to (typesByName[it.type]
+                ?: throw InvalidFreeVariableProblem("Type ${it.type} is unknown")) }
 
         val validated = arrayListOf<ValidFreeVariable>()
 
@@ -72,11 +75,6 @@ class FreeVariableListValidator(
         }
 
         validFreeVariablesProperty.setAll(validated)
-        valid.set(problems.isEmpty())
+        validProperty.set(problems.isEmpty())
     }
-
-    fun validProperty(): ReadOnlyBooleanProperty {
-        return valid
-    }
-
 }

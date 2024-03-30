@@ -23,27 +23,20 @@ import java.io.IOException
  *
  * @author Benjamin Alt
  */
-class VerificationScenario() {
-    @Transient
+class VerificationScenario {
     val verificationResultProperty = NullableProperty<VerificationResult>()
     var verificationResult by verificationResultProperty
 
-    @Transient
     var verificationEngine: VerificationEngine? = null
 
-    @Transient
     val codeProperty: ObjectProperty<Code> = SimpleObjectProperty(Code())
     var code: Code by codeProperty
 
-    @Transient
     val verificationStateProperty = SimpleObjectProperty(VerificationState.NOT_STARTED)
     val verificationState by verificationStateProperty
 
-
-    @Transient
-    val activeSpecProperty = NullableProperty<ConstraintSpecification?>()
-    var activeSpec by activeSpecProperty
-
+    val activeSpecProperty = NullableProperty<ConstraintSpecification>()
+    var activeSpec: ConstraintSpecification? by activeSpecProperty
 
     /**
      * Constructs a VerificationScenario from a given [Code].
@@ -65,10 +58,10 @@ class VerificationScenario() {
     @Throws(IOException::class, ExportException::class, ProcessCreationException::class)
     fun verify(config: GlobalConfig, spec: ConstraintSpecification) {
         activeSpec = spec
-        val ve = GeTeTaVerificationEngine(config, codeProperty.get().parsedCode!!.definedTypes)
+        val ve = GeTeTaVerificationEngine(config, codeProperty.get().parsedCode!!)
         ve.verificationResultProperty.addListener(VerificationChangedListener())
         verificationStateProperty.value = VerificationState.RUNNING
-        ve.startVerification(this, spec)
+        ve.startVerification(this, ConstraintSpecification(spec))
 
         verificationEngine = ve
     }

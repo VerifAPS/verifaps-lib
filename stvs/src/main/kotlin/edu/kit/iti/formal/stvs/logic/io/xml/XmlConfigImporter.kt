@@ -21,7 +21,7 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      */
     @Throws(ImportException::class)
     override fun doImportFromXmlNode(source: Element): GlobalConfig {
-        val config: GlobalConfig = GlobalConfig()
+        val config = GlobalConfig()
         setGeneralSettings(source.getChild("general"), config)
         setEditorSettings(source.getChild("editor"), config)
         setDependencies(source.getChild("dependencies"), config)
@@ -36,15 +36,15 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      * @param config The config to modify
      */
     private fun setDependencies(deps: Element?, config: GlobalConfig) {
-        if (deps != null) {
-            if (deps.getChildText("getetaCommand") != null) {
-                config.getetaCommand = deps.getChildText("getetaCommand")
+        deps?.let {
+            deps.getChildText("getetaCommand")?.let {
+                config.getetaCommand = it
             }
-            if (deps.getChildText("nuxmvFilename") != null) {
-                config.nuxmvFilename = deps.getChildText("nuxmvFilename")
+            deps.getChildText("nuxmvFilename")?.let {
+                config.nuxmvFilename = it
             }
-            if (deps.getChildText("z3Path") != null) {
-                config.z3Path = deps.getChildText("z3Path")
+            deps.getChildText("z3Path")?.let {
+                config.z3Path = it
             }
         }
     }
@@ -57,29 +57,31 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      * @param config  The config to modify
      */
     private fun setGeneralSettings(general: Element?, config: GlobalConfig) {
-        if (general != null) {
-            if (general.getChildText("uiLanguage") != null) {
+        general?.let {
+            general.getChildText("uiLanguage")?.let {
                 config.uiLanguage = general.getChildText("uiLanguage")
             }
-            if (general.getChildText("simulationTime") != null) {
-                config.simulationTimeout = general.getChildText("simulationTimeout").toInt()
+            general.getChildText("simulationTime")?.let {
+                config.simulationTimeout = it.toInt()
             }
-            if (general.getChildText("verificationTimeout") != null) {
-                config.verificationTimeout = general.getChildText("verificationTimeout").toInt()
+
+            general.getChildText("verificationTimeout")?.let {
+                config.verificationTimeout = it.toLong()
             }
+
             general.getChild("windowSize")?.let { windowSize ->
-                if (windowSize.getChildText("height") != null) {
-                    config.windowHeight = windowSize.getChildText("height").toInt()
+                windowSize.getChildText("height")?.let {
+                    config.windowHeight = it.toInt()
                 }
-                if (windowSize.getChildText("width") != null) {
-                    config.windowWidth = windowSize.getChildText("width").toInt()
+                windowSize.getChildText("width")?.let {
+                    config.windowWidth = it.toInt()
                 }
-                if (windowSize.getChildText("maximized") != null) {
-                    config.windowMaximized = windowSize.getChildText("maximized").toBoolean()
+                windowSize.getChildText("maximized")?.let {
+                    config.windowMaximized = it.toBoolean()
                 }
             }
-            if (general.getChildText("maxLineRollout") != null) {
-                config.maxLineRollout = general.getChildText("maxLineRollout").toInt()
+            general.getChildText("maxLineRollout")?.let {
+                config.maxLineRollout = it.toInt()
             }
         }
     }
@@ -92,14 +94,14 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      * @param config The config to modify
      */
     private fun setEditorSettings(editor: Element?, config: GlobalConfig) {
-        if (editor != null) {
-            if (editor.getChildText("fontSize") != null) {
-                config.editorFontSize = editor.getChildText("fontSize").toInt()
+        editor?.let {
+            editor.getChildText("fontSize")?.let {
+                config.editorFontSize = it.toInt()
             }
-            if (editor.getChildText("fontFamily") != null) {
-                config.editorFontFamily = editor.getChildText("fontFamily")
+            editor.getChildText("fontFamily")?.let {
+                config.editorFontFamily = it
             }
-            config.showLineNumbers = editor.getChildText("showLineNumbers") == "true"
+            config.showLineNumbers = editor.getChildText("showLineNumbers").toBoolean()
         }
     }
 

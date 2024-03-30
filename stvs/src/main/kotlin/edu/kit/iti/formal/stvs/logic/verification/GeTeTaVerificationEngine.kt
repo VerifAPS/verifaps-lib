@@ -1,40 +1,48 @@
 package edu.kit.iti.formal.stvs.logic.verification
 
+import edu.kit.iti.formal.automation.IEC61131Facade
+import edu.kit.iti.formal.automation.SymbExFacade
+import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.testtables.GetetaFacade
+import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
+import edu.kit.iti.formal.automation.testtables.model.*
+import edu.kit.iti.formal.automation.visitors.findFirstProgram
+import edu.kit.iti.formal.smv.CounterExample
+import edu.kit.iti.formal.smv.NuXMVOutput
+import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.stvs.logic.io.*
-import edu.kit.iti.formal.stvs.model.common.NullableProperty
+import edu.kit.iti.formal.stvs.model.code.ParsedCode
+import edu.kit.iti.formal.stvs.model.common.*
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.expressions.*
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
-import edu.kit.iti.formal.stvs.model.verification.VerificationError
-import edu.kit.iti.formal.stvs.model.verification.VerificationResult
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
+import edu.kit.iti.formal.stvs.model.expressions.parser.computeEnumValuesByName
+import edu.kit.iti.formal.stvs.model.table.*
+import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
+import edu.kit.iti.formal.stvs.model.verification.*
 import edu.kit.iti.formal.stvs.util.ProcessCreationException
 import javafx.application.Platform
-import javafx.beans.Observable
-import org.apache.commons.io.IOUtils
+import javafx.beans.property.SimpleListProperty
+import org.antlr.v4.runtime.CharStreams
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import tornadofx.asObservable
 import java.io.*
 import java.io.FileNotFoundException
-import java.nio.charset.StandardCharsets
+import java.util.*
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Handles communication with the GeTeTa verification engine.
  *
  * @author Benjamin Alt
  */
-class GeTeTaVerificationEngine(config: GlobalConfig, typeContext: List<Type>) : VerificationEngine {
+class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) : VerificationEngine() {
+    private var drawAutomaton: Boolean = false
+    private var disableSimplify: Boolean = false
     private var getetaProcess: Process?
-
-    override val verificationResultProperty: NullableProperty<VerificationResult?> = NullableProperty()
-    override val verificationResult: VerificationResult?
-        get() = verificationResultProperty.get()
-
-    private val typeContext: List<Type>
-    private val config: GlobalConfig
-    private var getetaOutputFile: File? = null
-    private var processMonitor: ProcessMonitor? = null
-    override var verificationSpecification: ConstraintSpecification? = null
 
     /**
      * Creates an instance based on given [GlobalConfig] and `typeContext`. The
@@ -46,9 +54,6 @@ class GeTeTaVerificationEngine(config: GlobalConfig, typeContext: List<Type>) : 
      */
     init {
         getetaProcess = null
-        this.typeContext = typeContext
-        this.config = config
-
         /* Check if nuXmv executable exists */
         val nuxmvFile = File(config.nuxmvFilename)
         //TODO check if nuXmv is executable by running it.
@@ -65,121 +70,215 @@ class GeTeTaVerificationEngine(config: GlobalConfig, typeContext: List<Type>) : 
      */
     @Throws(IOException::class, ExportException::class, ProcessCreationException::class)
     override fun startVerification(scenario: VerificationScenario, spec: ConstraintSpecification) {
-        /*
-     * This will create a deep copy, so that modifying the original ConstraintSpecification between
-     * calling tartVerification() and getVerificationSpecification() will have no effect on the
-     * possibly newly opened counter example tab.
-     */
+        val (pous, error) = IEC61131Facade.fileResolve(CharStreams.fromString(scenario.code.sourcecode), true)
 
-        verificationSpecification = ConstraintSpecification(spec!!)
-        // Write ConstraintSpecification and Code to temporary input files for GeTeTa
-        val tempSpecFile = File.createTempFile("verification-spec", ".xml")
-        val tempCodeFile = File.createTempFile("verification-code", ".st")
+        val code = pous.findFirstProgram() ?: error("No program found")
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
+        val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
 
-        /*val process = createNuXMVProcess(
-            folder, modules, nuXmv, VerificationTechnique.IC3
-        )
-        val output = process.call()
-        */
 
-        // Start verification engine in new child process
-        if (getetaProcess != null) {
+        val (freeVars, validTT) = spec.validate(this.code.definedVariables, this.code.definedTypes)
+
+        val gtt: GeneralizedTestTable = validTT.asGtt(freeVars)
+
+
+        val tt = GetetaFacade.constructSMV(gtt, superEnumType)
+
+        if (drawAutomaton) {
+            //Getata.drawAutomaton(gtt, tt)
+        }
+
+        val modTable = tt.tableModule
+        val mainModule = MultiModelGluer().apply {
+            val pn = gtt.programRuns.first() // only one run in geteta
+            addProgramRun(pn, modCode)
+            addTable("_" + tt.testTable.name, tt.ttType!!)
+        }
+        val modules = arrayListOf(mainModule.product, modCode, modTable)
+        modules.addAll(tt.helperModules)
+
+        val folder = File.createTempFile("gtt_", ".smv").absolutePath
+
+
+        val process =
+            GetetaFacade.createNuXMVProcess(
+                folder, modules, config.nuxmvFilename,
+                VerificationTechnique.IC3
+            )
+
+        val op = process.outputParser
+        var output = ""
+        process.outputParser = {
+            output = it
+            op(it)
+        }
+
+        val executor = Executors.newSingleThreadScheduledExecutor()
+        val future = executor.submit(process as Callable<NuXMVOutput>)
+
+        try {
+            val b = future.get(config.verificationTimeout, TimeUnit.SECONDS)
+
+            val result =
+                when (b) {
+                    NuXMVOutput.Verified -> {
+                        VerificationSuccess(output)
+                    }
+
+                    is NuXMVOutput.Error -> {
+                        b.errors
+                        VerificationError(VerificationError.Reason.VERIFICATION_LAUNCH_ERROR, output)
+                    }
+
+                    is NuXMVOutput.Cex -> {
+                        b.counterExample
+                        Counterexample(
+                            spec,
+                            b.counterExample.asConcreteSpecification(validTT),
+                            output
+                        )
+                    }
+                }
+
+            Platform.runLater { verificationResultProperty.set(result) }
+
+            if (b is NuXMVOutput.Cex) {
+                /*if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
+            else info("Use `--cexout' to print a cex analysation.")
+
+            if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
+            else info("Use `--cexjson' to print a cex analysation as json.")
+
+            if (cexAnalysation.runAnalyzer) createRowMapping(b, tt)
+            else info("Use `--row-map' to print possible row mappings.")*/
+            }
+            //exitProcess(errorLevel)
+        } catch (e: TimeoutException) {
             cancelVerification()
         }
 
-        val processBuilder: ProcessBuilder = ProcessBuilder("")//getetaCommand.split(" "))
-        //System.out.println(getetaCommand)
-        processBuilder.environment()["NUXMV"] = config.nuxmvFilename
-        getetaOutputFile = File.createTempFile("verification-result", ".log")
-        LOGGER.info("Code file: {}", tempCodeFile)
-        LOGGER.info("Specification file: {}", tempSpecFile)
-        //LOGGER.info("Verification log file: {}", getetaOutputFile.getAbsoluteFile())
-        processBuilder.redirectOutput(getetaOutputFile)
-        try {
-            getetaProcess = processBuilder.start()
-            // Find out when process finishes to set verification result property
-            processMonitor = ProcessMonitor(getetaProcess, config.verificationTimeout)
-            processMonitor!!.processFinishedProperty()!!.addListener { observable: Observable? -> onVerificationDone() }
-            // Starts the verification process in another thread
-            processMonitor!!.start()
-        } catch (exception: IllegalArgumentException) {
-            exception.printStackTrace()
-            throw ProcessCreationException("The verification could not be launched")
-        } catch (exception: ArrayIndexOutOfBoundsException) {
-            exception.printStackTrace()
-            throw ProcessCreationException("The verification could not be launched")
-        }
     }
 
     override fun cancelVerification() {
         if (getetaProcess != null) {
-            getetaProcess!!.destroy()
+            getetaProcess!!.destroyForcibly()
             getetaProcess = null
         }
     }
 
-    /**
-     * Handles the output of the GeTeTa verification engine.
-     */
-    private fun onVerificationDone() {
-        if (getetaProcess == null) { // Verification was cancelled
-            return
-        }
-        var result: VerificationResult?
-        var logFile: File? = null
-        val processError = processMonitor!!.error
-        if (processError != null) {
-            result = VerificationError(processError)
-        } else {
-            try {
-                val processOutput = IOUtils.toString(FileInputStream(getetaOutputFile), "utf-8")
-                logFile = writeLogFile(processOutput)
-                val cleanedProcessOutput = cleanProcessOutput(processOutput)
-                // Set the verification result depending on the GeTeTa output
-                result = if (processMonitor!!.isAborted) {
-                    VerificationError(VerificationError.Reason.TIMEOUT, logFile)
-                } else {
-                    ImporterFacade.importVerificationResult(
-                        ByteArrayInputStream(cleanedProcessOutput.toByteArray(charset("utf-8"))),
-                        typeContext!!, verificationSpecification!!
-                    )
-                }
-            } catch (exception: IOException) {
-                result = VerificationError(exception, logFile)
-            } catch (exception: ImportException) {
-                result = VerificationError(exception, logFile)
-            }
-        }
-        // Set the verification result back in the javafx thread:
-        val finalResult = result // have to do this because of lambda restrictions...
-        try {
-            Platform.runLater { verificationResultProperty.set(finalResult) }
-        } catch (exception: IllegalStateException) {
-            verificationResultProperty.set(finalResult)
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun writeLogFile(processOutput: String): File {
-        val logFile = File.createTempFile("log-verification-", ".xml")
-        getetaOutputFile!!.deleteOnExit()
-        val writer = PrintWriter(
-            OutputStreamWriter(FileOutputStream(logFile), StandardCharsets.UTF_8), true
-        )
-        writer.println(processOutput)
-        writer.close()
-        return logFile
-    }
-
-    private fun cleanProcessOutput(processOutput: String): String {
-        val xmlStartIndex = processOutput.indexOf("<")
-        if (xmlStartIndex >= 0) {
-            return processOutput.substring(xmlStartIndex)
-        }
-        return processOutput
-    }
 
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(GeTeTaVerificationEngine::class.java)
+    }
+
+
+    private fun ConstraintSpecification.validate(
+        codeIoVariables: List<CodeIoVariable>,
+        typeContext: List<Type>
+    ): Pair<List<ValidFreeVariable>, ValidSpecification> {
+        val tc = SimpleListProperty(typeContext.asObservable())
+        val freeVariableListValidator = FreeVariableListValidator(tc, freeVariableList)
+        val freeVariables: List<ValidFreeVariable> = freeVariableListValidator.validFreeVariables
+        val validator = ConstraintSpecificationValidator(
+            tc, SimpleListProperty(codeIoVariables.asObservable()),
+            freeVariables.asObservable(), this
+        )
+
+        // TODO throw exception
+        validator.problems.map { it?.errorMessage }.forEach { println(it) }
+        return freeVariables to validator.validSpecification!!
+    }
+
+    val enumValues by lazy { computeEnumValuesByName(this.code.definedTypes) }
+
+    private fun CounterExample.asConcreteSpecification(origin: ValidSpecification): ConcreteSpecification {
+        val ioVars = origin.columnHeaders.toMutableList()
+        val durations = List(this.states.size) { idx -> ConcreteDuration(idx, 1) }
+        val rows = this.states.map {
+            SpecificationRow.createUnobservableRow(
+                it.map { (k, v) -> k to ConcreteCell(v.nxAsValue()) }.toMap()
+            )
+        }
+        return ConcreteSpecification(ioVars, rows, durations, true)
+    }
+
+    private val INT_VALUE_PATTERN = "-?0[su]d(\\d+)_([0-9]+)".toRegex()
+
+    /**
+     * From nuxmv to value
+     */
+    private fun String.nxAsValue(): Value {
+        if (this == "TRUE") return ValueBool.TRUE
+        if (this == "FALSE") return ValueBool.FALSE
+        val matcher = INT_VALUE_PATTERN.matchEntire(this)
+        if (matcher != null) {
+            val (_, radix, v) = matcher.groupValues
+            var intVal = v.toInt(radix.toInt())
+            if (this[0] == '-') {
+                intVal = -intVal
+            }
+            return ValueInt(intVal)
+        }
+        if (this in enumValues) {
+            return enumValues[this]!!
+        }
+        error("Could not find type for value $this")
+    }
+
+    private fun ValidSpecification.asGtt(freeVars: List<ValidFreeVariable>): GeneralizedTestTable {
+        val columnVars = this.columnHeaders.map { it.asColumnVariable() as ColumnVariable }.toMutableList()
+        val cvars = columnVars.associateBy { it.name }
+        val gtt = GeneralizedTestTable(
+            name = this.name,
+            programVariables = columnVars,
+            constraintVariables = freeVars.map { it.asConstraintVariable() }.toMutableList(),
+            region = Region(
+                "0",
+                rows.mapIndexed { idx, it -> it.asTableNode(idx + 1, cvars, durations[idx]!!) }.toMutableList()
+            )
+        )
+
+        return gtt
+    }
+
+    private fun SpecificationRow<Expression>.asTableNode(
+        id: Int,
+        columnVars: Map<String, ColumnVariable>,
+        duration: LowerBoundedInterval
+    ): TableNode {
+        return TableRow(id).also {
+            this.cells.forEach { (t, u) ->
+                val v = columnVars[t]!!
+                it.rawFields[v] = GetetaFacade.parseCell(u.asString ?: "TRUE").cell()
+                it.duration = duration.asDuration()
+            }
+        }
+    }
+
+    private fun LowerBoundedInterval.asDuration(): Duration = GetetaFacade.parseDuration(toString())
+
+    private fun ValidFreeVariable.asConstraintVariable() = ConstraintVariable(
+        name, type.asDT(), type.asSmvType(),
+        GetetaFacade.parseCell(this.constraint.toString()).cell()
+    )
+
+    private fun ValidIoVariable.asColumnVariable() =
+        ProgramVariable(name, validType.asDT(), validType.asSmvType(), role.asCCategory())
+
+    private fun VariableRole.asCCategory() = when (this) {
+        VariableRole.ASSUME -> ColumnCategory.ASSUME
+        VariableRole.ASSERT -> ColumnCategory.ASSERT
+    }
+
+    private fun Type.asSmvType() = when (this) {
+        is TypeInt -> SMVTypes.signed(16)
+        is TypeBool -> SMVTypes.BOOLEAN
+        else -> SMVTypes.GENERIC_ENUM
+    }
+
+    private fun Type.asDT(): AnyDt = when (this) {
+        is TypeInt -> INT
+        is TypeBool -> AnyBit.BOOL
+        else -> EnumerateType("super")
     }
 }

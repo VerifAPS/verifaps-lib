@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.equal
 import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.lessThan
 import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.literal
@@ -127,9 +126,8 @@ class TestExpressionParser {
         assertParseExpressionEqual(
             "[4, 1]",
             SimpleExpressions.and(
-                SimpleExpressions.greaterEqual(
-                    variable(columnName),
-                    literal(4)
+                SimpleExpressions.lessEqual(
+                    literal(4), variable(columnName)
                 ), SimpleExpressions.lessEqual(variable(columnName), literal(1))
             )
         )
