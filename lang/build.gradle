@@ -14,7 +14,7 @@ dependencies {
     api project(':util')
     api project(':xml')
 
-    api 'com.github.ajalt.clikt:clikt:4.2.2'
+    api 'com.github.ajalt.clikt:clikt:4.3.0'
 
     testImplementation 'org.mdkt.compiler:InMemoryJavaCompiler:1.3.0'
     implementation group: 'com.squareup', name: 'javapoet', version: '1.13.0'
