@@ -18,6 +18,7 @@ import tornadofx.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import edu.kit.iti.formal.fxutils.item
 
 
 fun main(args: Array<String>) {
@@ -361,19 +362,19 @@ class IdeMenu(val ide: IdeView) : View() {
             ribbon {
                 tab("test") {
                     group("File") {
-                        item("New", "ctrl-n", null, ide::createCodeEditor)
-                        item("Open", "ctrl-o", "fas-folder-open", ide::open)
+                        item("New", "ctrl-n", null, event = ide::createCodeEditor)
+                        item("Open", "ctrl-o", "fas-folder-open", event = ide::open)
                         //val recentFiles = item("Recent files")
-                        item("Save", "ctrl-s", "far-save", ide::save)
-                        item("Save As...", "ctrl-shift-s", "fas-save", ide::saveAs)
-                        item("Close", null, null, ide::close)
+                        item("Save", "ctrl-s", "far-save", event = ide::save)
+                        item("Save As...", "ctrl-shift-s", "fas-save", event = ide::saveAs)
+                        item("Close", null, null, event = ide::close)
                     }
                     group("Edit") {}
                     group("View") {
                         item("Larger texts", "ctrl-PLUS", "fas-folder-open") {}
                         item("Smaller texts", "ctrl-MINUS", "fas-folder-open") {}
-                        item("Editor to Left", "ctrl-LEFT", null, ide::editorToTheLeft)
-                        item("Editor to Right", "ctrl-RIGHT", null, ide::editorToTheRight)
+                        item("Editor to Left", "ctrl-LEFT", null, event = ide::editorToTheLeft)
+                        item("Editor to Right", "ctrl-RIGHT", null, event = ide::editorToTheRight)
                     }
                     group("Tools") {
                         item("Translate SFC to ST", null, null) {
