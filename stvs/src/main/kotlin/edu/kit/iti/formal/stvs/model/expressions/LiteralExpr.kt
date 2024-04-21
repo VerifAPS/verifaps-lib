@@ -6,7 +6,7 @@ package edu.kit.iti.formal.stvs.model.expressions
  * @author Philipp
  */
 data class LiteralExpr(val value: Value) : Expression() {
-    override fun <R> takeVisitor(visitor: ExpressionVisitor<R>): R {
+    override fun <R> accept(visitor: ExpressionVisitor<R>): R {
         return visitor.visitLiteral(this)
     }
 

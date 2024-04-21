@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import edu.kit.iti.formal.stvs.StvsApplication
 import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
+import edu.kit.iti.formal.stvs.logic.io.xml.TestUtils
 import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
+import kotlin.test.assertFailsWith
 
 /**
  * @author Benjamin Alt
@@ -31,26 +32,26 @@ class HybridSpecificationTest {
     )
 
     @Test
-    fun testcounterExample(){
+    fun counterExample(){
         Assertions.assertEquals(null, hybridSpec.counterExample)
     }
 
     @Test
-    fun testGetconcreteInstance() {
+    fun getConcreteInstance() {
         Assertions.assertEquals(null, hybridSpec.concreteInstance)
-        hybridSpec.concreteInstance = (concreteInstance)
-        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.concreteInstance)
+        hybridSpec.concreteInstance = concreteInstance
+        Assertions.assertEquals(concreteInstance, hybridSpec.concreteInstance)
     }
 
     @Test
-    fun testGetcounterExample() {
+    fun getCounterExample() {
         Assertions.assertEquals(null, hybridSpec.counterExample)
         hybridSpec.counterExample = (concreteInstance)
         Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.counterExample)
     }
 
     @Test
-    fun testGetSetSelection() {
+    fun getSetSelection() {
         Assertions.assertEquals(Selection(), hybridSpec.getSelection())
         hybridSpec.getSelection().row=(3)
         hybridSpec.getSelection().column=("A")
@@ -58,21 +59,24 @@ class HybridSpecificationTest {
     }
 
     @Test//(expected = IllegalArgumentException::class)
-    fun testconcreteInstanceInvalid() {
-        val badConcreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
-            StvsApplication::class.java.getResourceAsStream("spec_concrete_empty.xml")!!,
-            listOf(TypeInt.INT, TypeBool.BOOL)
-        )
-        hybridSpec.concreteInstance = (badConcreteSpec)
+    fun concreteInstanceInvalid() {
+        val xmlFile = TestUtils.getResource("spec_concrete_empty.xml")
+        assertFailsWith<IllegalArgumentException> {
+            val badConcreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
+                xmlFile,
+                listOf(TypeInt.INT, TypeBool.BOOL)
+            )
+            hybridSpec.concreteInstance = badConcreteSpec
+        }
     }
 
     @Test
-    fun testIsEditable() {
+    fun isEditable() {
         Assertions.assertTrue(hybridSpec.isEditable)
     }
 
     @Test
-    fun testRemoveConcreteInstance() {
+    fun removeConcreteInstance() {
         hybridSpec.concreteInstance = (concreteInstance)
         Assertions.assertNotNull(hybridSpec.concreteInstance)
         hybridSpec.removeConcreteInstance()

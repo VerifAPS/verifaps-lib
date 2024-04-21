@@ -29,7 +29,7 @@ abstract class Expression : StringReadable {
      * @param <R> the return type that the expression visitor produces
      * @return the return value that the expression visitor produced
     </R> */
-    abstract fun <R> takeVisitor(visitor: ExpressionVisitor<R>): R
+    abstract fun <R> accept(visitor: ExpressionVisitor<R>): R
 
     override val stringRepresentationProperty = SimpleStringProperty()
 }

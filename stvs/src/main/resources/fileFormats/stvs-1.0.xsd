@@ -78,7 +78,7 @@
                     <attribute name="io" type="string" use="required"/>
                     <attribute name="name" type="string" use="required"/>
                     <attribute name="data-type" type="string" use="required"/>
-                    <attribute name="colwidth" type="positiveInteger" use="optional"/>
+                    <attribute name="colwidth" type="float" use="optional"/>
                     <attribute name="comment" type="string" use="optional"/>
                 </complexType>
             </element>

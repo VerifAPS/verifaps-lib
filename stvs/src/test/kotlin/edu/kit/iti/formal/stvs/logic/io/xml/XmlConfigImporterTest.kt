@@ -13,20 +13,18 @@ class XmlConfigImporterTest {
     private var importer = XmlConfigImporter()
 
     @Test
-    @Throws(Exception::class)
     fun testDoImport() {
         val inputStream = XmlConfigImporter::class.java.getResourceAsStream("config_valid_nodeps.xml")!!
         val config: GlobalConfig = importer.doImport(inputStream)
         Assertions.assertEquals("EN", config.uiLanguage)
-        Assertions.assertEquals(100, config.verificationTimeout.toLong())
-        Assertions.assertEquals(100, config.simulationTimeout.toLong())
+        Assertions.assertEquals(100, config.verificationTimeout)
+        Assertions.assertEquals(100, config.simulationTimeout)
         Assertions.assertEquals("Comic Sans", config.editorFontFamily)
         Assertions.assertEquals(12, config.editorFontSize.toLong())
         Assertions.assertEquals(true, config.showLineNumbers)
     }
 
     @Test
-    @Throws(Exception::class)
     fun testDoImportDefault() {
         val inputStream =
             javaClass.getResourceAsStream("/edu/kit/iti/formal/stvs/logic/io/xml/config_valid_default.xml")!!
@@ -38,7 +36,6 @@ class XmlConfigImporterTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun testDoImportInvalidData() {
         assertFailsWith<ImportException> {
             val inputStream = this.javaClass.getResourceAsStream("config_invalid_1.xml")!!

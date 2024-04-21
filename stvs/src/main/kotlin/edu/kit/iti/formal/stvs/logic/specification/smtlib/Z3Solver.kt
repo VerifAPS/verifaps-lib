@@ -48,9 +48,10 @@ class Z3Solver(config: GlobalConfig) {
             this.process = process
             process.outputStream.writer().use {
                 it.write(smtString)
+                it.close()
             }
 
-            var exitValue = process.waitFor() // handles interrupts
+            val exitValue = process.waitFor() // handles interrupts
             val z3Result = process.inputStream.bufferedReader().readText()
             val error = process.errorStream.bufferedReader().readText()
 
@@ -86,10 +87,10 @@ class Z3Solver(config: GlobalConfig) {
      */
     @Throws(ConcretizationException::class)
     fun concretizeSmtModel(
-        smtModel: SmtModel?,
+        smtModel: SmtModel,
         validIoVariables: List<ValidIoVariable>
     ): ConcreteSpecification {
-        val constraintString = smtModel!!.globalConstraintsToText()
+        val constraintString = smtModel.globalConstraintsToText()
         val headerString = smtModel.headerToText()
         val commands = "(check-sat)\n(get-model)\n(exit)"
         val z3Input = """
@@ -271,9 +272,11 @@ class Z3Solver(config: GlobalConfig) {
          * @return Map from row to duration
          */
         private fun extractRawDurations(sexpr: Sexp): Map<Int, Int> {
-            val rawDurations: MutableMap<Int, Int> = HashMap()
-            sexpr.forEach(Consumer { varAssign: Sexp -> addDurationToMap(rawDurations, varAssign) })
-            return rawDurations
+            return sexpr.filter { isDurationLength(it) }
+                .associate {
+                    val cycleCount = it[1].toString().substring(2).toInt()
+                    cycleCount to BitvectorUtils.intFromHex(it[4].toIndentedString(), false)
+                }
         }
 
         /**
@@ -283,16 +286,12 @@ class Z3Solver(config: GlobalConfig) {
          * @param rawDurations raw durations (mapping from ro to duration)
          * @param varAssign solver assignment
          */
-        private fun addDurationToMap(rawDurations: MutableMap<Int, Int>, varAssign: Sexp) {
+        private fun isDurationLength(varAssign: Sexp): Boolean {
             if (varAssign.length == 0 || varAssign[0].toIndentedString() != "define-fun") {
-                return
+                return false
             }
             val durationMatcher = DURATION_PATTERN.matcher(varAssign[1].toIndentedString())
-            if (durationMatcher.matches()) {
-                // is duration
-                val cycleCount = durationMatcher.group("cycleCount").toInt()
-                rawDurations[cycleCount] = BitvectorUtils.intFromHex(varAssign[4].toIndentedString(), false)
-            }
+            return durationMatcher.matches()
         }
     }
 }

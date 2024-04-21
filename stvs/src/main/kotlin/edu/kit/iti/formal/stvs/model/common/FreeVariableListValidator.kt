@@ -46,14 +46,19 @@ class FreeVariableListValidator(
     }
 
     /**
-     * Starts the validation algorithm and updates the [.validFreeVariablesProperty] and
-     * the [.problemsProperty].
+     * Starts the validation algorithm and updates the [validFreeVariablesProperty] and
+     * the [problemsProperty].
      */
     fun revalidate() {
         val typesByName = typeContext.get().associateBy { obj -> obj.typeName }
-        val variableMap = freeVariables.variables
-            .associate { it.name to (typesByName[it.type]
-                ?: throw InvalidFreeVariableProblem("Type ${it.type} is unknown")) }
+        val variableMap = freeVariables.variables.associate {
+            val type = typesByName[it.type]
+            if (type == null) {
+                addProblem(it, InvalidFreeVariableProblem("Type ${it.type} is unknown"))
+                return
+            }
+            it.name to type
+        }
 
         val validated = arrayListOf<ValidFreeVariable>()
 
@@ -67,14 +72,17 @@ class FreeVariableListValidator(
                         InvalidFreeVariableProblem.tryToConvertToValid(freeVariable, typesByName, variableMap)
                     )
                 } catch (problem: InvalidFreeVariableProblem) {
-                    problems.computeIfAbsent(freeVariable) { arrayListOf() }.add(problem)
+                    addProblem(freeVariable, problem)
                 }
             } else {
-                problems.computeIfAbsent(freeVariable) { arrayListOf() }.add(problem)
+                addProblem(freeVariable, problem)
             }
         }
 
         validFreeVariablesProperty.setAll(validated)
         validProperty.set(problems.isEmpty())
     }
+
+    private fun addProblem(freeVariable: FreeVariable, problem: FreeVariableProblem) =
+        problems.computeIfAbsent(freeVariable) { arrayListOf() }.add(problem)
 }

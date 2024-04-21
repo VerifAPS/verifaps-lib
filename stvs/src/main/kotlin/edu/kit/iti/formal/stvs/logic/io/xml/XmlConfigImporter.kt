@@ -61,7 +61,7 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
             general.getChildText("uiLanguage")?.let {
                 config.uiLanguage = general.getChildText("uiLanguage")
             }
-            general.getChildText("simulationTime")?.let {
+            general.getChildText("simulationTimeout")?.let {
                 config.simulationTimeout = it.toInt()
             }
 

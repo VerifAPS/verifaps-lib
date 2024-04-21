@@ -8,11 +8,13 @@ package edu.kit.iti.formal.stvs.model.expressions
  * @author Philipp
 </R> */
 interface ExpressionVisitor<R> {
-    fun visitBinaryFunction(binaryFunctionExpr: BinaryFunctionExpr): R
+    fun visitBinaryFunction(binary: BinaryFunctionExpr): R
 
-    fun visitUnaryFunction(unaryFunctionExpr: UnaryFunctionExpr): R
+    fun visitUnaryFunction(unary: UnaryFunctionExpr): R
 
-    fun visitLiteral(literalExpr: LiteralExpr): R
+    fun visitLiteral(literal: LiteralExpr): R
 
-    fun visitVariable(variableExpr: VariableExpr): R
+    fun visitVariable(expr: VariableExpr): R
+
+    fun visit(expr: GuardedExpression): R
 }

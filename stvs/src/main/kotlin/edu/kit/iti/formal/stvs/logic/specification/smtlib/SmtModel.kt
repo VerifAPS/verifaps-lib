@@ -11,10 +11,7 @@ import java.util.stream.Collectors
  * @author Carsten Csiky
  */
 class SmtModel : SExpression {
-    @JvmField
     val globalConstraints: MutableList<SExpression> = arrayListOf()
-
-    @JvmField
     val variableDefinitions: MutableList<SExpression> = arrayListOf()
 
     /**

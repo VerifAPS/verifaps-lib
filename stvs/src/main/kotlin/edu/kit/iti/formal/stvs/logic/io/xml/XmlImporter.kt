@@ -84,8 +84,9 @@ abstract class XmlImporter<T> : Importer<T> {
     protected abstract val xsdResource: URL?
 
     companion object {
-        private const val INPUT_ENCODING = "utf8"
-        fun readXml(source: InputStream): Document {
+        fun readXml(source: InputStream) = readXml(InputStreamReader(source))
+
+        fun readXml(source: Reader): Document {
             val xsdResource = javaClass.getResource("/fileFormats/stvs-1.0.xsd")
             val factory = SAXHandlerFactory { _ ->
                 object : SAXHandler() {

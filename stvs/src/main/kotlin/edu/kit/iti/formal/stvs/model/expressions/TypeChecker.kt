@@ -30,7 +30,7 @@ class TypeChecker
     @Throws(TypeCheckException::class)
     fun typeCheck(expr: Expression?): Type? {
         try {
-            return expr!!.takeVisitor(this)
+            return expr!!.accept(this)
         } catch (runtimeException: InternalTypeCheckException) {
             throw TypeCheckException(
                 runtimeException.mistypedExpression,
@@ -39,53 +39,53 @@ class TypeChecker
         }
     }
 
-    override fun visitUnaryFunction(unaryFunctionExpr: UnaryFunctionExpr): Type {
-        val argType = unaryFunctionExpr.argument!!.takeVisitor(this)
-        when (unaryFunctionExpr.operation) {
+    override fun visitUnaryFunction(unary: UnaryFunctionExpr): Type {
+        val argType = unary.argument!!.accept(this)
+        when (unary.operation) {
             UnaryFunctionExpr.Op.NOT -> {
-                assertTypeEquality(TypeBool.BOOL, argType, unaryFunctionExpr)
+                assertTypeEquality(TypeBool.BOOL, argType, unary)
                 return TypeBool.BOOL
             }
 
             UnaryFunctionExpr.Op.UNARY_MINUS -> {
-                assertTypeEquality(TypeInt.INT, argType, unaryFunctionExpr)
+                assertTypeEquality(TypeInt.INT, argType, unary)
                 return TypeInt.INT
             }
 
-            else -> return throwUnkownOperation(unaryFunctionExpr.operation.toString(), unaryFunctionExpr)
+            else -> return throwUnkownOperation(unary.operation.toString(), unary)
         }
     }
 
-    override fun visitBinaryFunction(binaryFunctionExpr: BinaryFunctionExpr): Type {
-        val firstArgType = binaryFunctionExpr.firstArgument.takeVisitor(this)
-        val secondArgType = binaryFunctionExpr.secondArgument.takeVisitor(this)
-        when (binaryFunctionExpr.operation) {
+    override fun visitBinaryFunction(binary: BinaryFunctionExpr): Type {
+        val firstArgType = binary.firstArgument.accept(this)
+        val secondArgType = binary.secondArgument.accept(this)
+        when (binary.operation) {
             BinaryFunctionExpr.Op.PLUS, BinaryFunctionExpr.Op.MINUS, BinaryFunctionExpr.Op.MULTIPLICATION, BinaryFunctionExpr.Op.DIVISION, BinaryFunctionExpr.Op.MODULO, BinaryFunctionExpr.Op.POWER -> {
-                assertTypeEquality(TypeInt.INT, firstArgType, binaryFunctionExpr)
-                assertTypeEquality(TypeInt.INT, secondArgType, binaryFunctionExpr)
+                assertTypeEquality(TypeInt.INT, firstArgType, binary)
+                assertTypeEquality(TypeInt.INT, secondArgType, binary)
                 return TypeInt.INT
             }
 
             BinaryFunctionExpr.Op.AND, BinaryFunctionExpr.Op.OR, BinaryFunctionExpr.Op.XOR -> {
-                assertTypeEquality(TypeBool.BOOL, firstArgType, binaryFunctionExpr)
-                assertTypeEquality(TypeBool.BOOL, secondArgType, binaryFunctionExpr)
+                assertTypeEquality(TypeBool.BOOL, firstArgType, binary)
+                assertTypeEquality(TypeBool.BOOL, secondArgType, binary)
                 return TypeBool.BOOL
             }
 
             BinaryFunctionExpr.Op.GREATER_THAN, BinaryFunctionExpr.Op.GREATER_EQUALS, BinaryFunctionExpr.Op.LESS_THAN, BinaryFunctionExpr.Op.LESS_EQUALS -> {
-                assertTypeEquality(TypeInt.INT, firstArgType, binaryFunctionExpr)
-                assertTypeEquality(TypeInt.INT, secondArgType, binaryFunctionExpr)
+                assertTypeEquality(TypeInt.INT, firstArgType, binary)
+                assertTypeEquality(TypeInt.INT, secondArgType, binary)
                 return TypeBool.BOOL
             }
 
             BinaryFunctionExpr.Op.EQUALS, BinaryFunctionExpr.Op.NOT_EQUALS -> {
-                assertEqualTypes(firstArgType, secondArgType, binaryFunctionExpr)
+                assertEqualTypes(firstArgType, secondArgType, binary)
                 return TypeBool.BOOL
             }
 
             else -> return throwUnkownOperation(
-                binaryFunctionExpr.operation.toString(),
-                binaryFunctionExpr
+                binary.operation.toString(),
+                binary
             )
         }
     }
@@ -114,19 +114,27 @@ class TypeChecker
         throw InternalTypeCheckException(expr, "Unknown Operation \"$operationName\"")
     }
 
-    override fun visitLiteral(literalExpr: LiteralExpr): Type {
-        return literalExpr.value.type
+    override fun visitLiteral(literal: LiteralExpr): Type {
+        return literal.value.type
     }
 
-    override fun visitVariable(variableExpr: VariableExpr): Type {
-        val varType = variableTypeContext[variableExpr.variableName]
+    override fun visitVariable(expr: VariableExpr): Type {
+        val varType = variableTypeContext[expr.variableName]
         if (varType == null) {
             throw InternalTypeCheckException(
-                variableExpr,
-                "Don't know type of variable: " + variableExpr.variableName
+                expr,
+                "Don't know type of variable: " + expr.variableName
             )
         } else {
             return varType
         }
+    }
+
+    override fun visit(expr: GuardedExpression): Type {
+        val types = expr.branches.map { (_, b) -> b.accept(this) }
+        if (types.any { it != types.first() }) {
+            throw TypeCheckException(expr, "Types of cases must be equal")
+        }
+        return types.first()
     }
 }

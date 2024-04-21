@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.io.IOException
 import java.util.*
+import kotlin.test.assertFailsWith
 
 /**
  * Created by csicar on 09.02.17.
@@ -23,7 +24,6 @@ class SmtEncoderTest {
         val freeVariables = TestUtils.importValidFreeVariables(sourceFileGetter())
         val smtEncoder = SmtEncoder(3000, validSpec, freeVariables)
         val model = smtEncoder.constraint
-        val constrains: List<SExpression?> = model!!.globalConstraints
         println(model.toString())
     }
 
@@ -38,7 +38,6 @@ class SmtEncoderTest {
         val smtEncoder = SmtEncoder(3000, validSpec, freeVariables)
         val model = smtEncoder.constraint
 
-        val constrains: Collection<SExpression?> = model!!.globalConstraints
         val header: Collection<SExpression?> = model.variableDefinitions
         println(model.toString())
         println(model.toText().length)
@@ -59,7 +58,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val definitions: Collection<SExpression?> = output!!.distinctVariableDefinitions
+        val definitions: Collection<SExpression?> = output.distinctVariableDefinitions
         val nonDuplicate: Set<SExpression?> = LinkedHashSet(definitions)
         Assertions.assertEquals(nonDuplicate, definitions)
     }
@@ -82,7 +81,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
+        val constraints = output.globalConstraints
 
         println(output.toString())
 
@@ -123,7 +122,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
+        val constraints = output.globalConstraints
 
         println(output.toString())
 
@@ -162,7 +161,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
+        val constraints = output.globalConstraints
 
         println(output.toString())
 
@@ -200,10 +199,6 @@ class SmtEncoderTest {
     }
 
     @Test
-    fun testUnsupportedOperation() {
-    }
-
-    @Test//(expected = IllegalStateException::class)
     fun testMismatchingUsedVariablesAndVariableDefinitions() {
         val sourceFile = loaderFor("spec_freevariable.xml")
 
@@ -222,15 +217,12 @@ class SmtEncoderTest {
         )
 
         val maxDuration = 5
-
-
-        val smtEncoder = SmtEncoder(maxDuration, spec, emptyList())
-        val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
-        val definitions: Collection<SExpression?> = output.variableDefinitions
+        assertFailsWith<IllegalStateException> {
+            SmtEncoder(maxDuration, spec, emptyList())
+        }
     }
 
-    @Test//(expected = IllegalArgumentException::class)
+    @Test
     fun testDifferentLengthInputs() {
         val sourceFile = loaderFor("spec_all.xml")
 
@@ -241,7 +233,9 @@ class SmtEncoderTest {
             )
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
-        val smtEncoder = SmtEncoder(listOf(3), spec, freeVariables)
+        assertFailsWith<IllegalArgumentException> {
+            SmtEncoder(listOf(3), spec, freeVariables)
+        }
     }
 
     @Test
@@ -254,7 +248,7 @@ class SmtEncoderTest {
         val maxDuration = 3
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
-        val output = smtEncoder.constraint!!
+        val output = smtEncoder.constraint
         val constraints = output.globalConstraints
 
 
@@ -293,7 +287,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
+        output.globalConstraints
         val definitions = output.variableDefinitions
 
         println(output.toString())
@@ -315,7 +309,6 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints = output!!.globalConstraints
         val definitions = output.variableDefinitions
 
         println(output.toString())
@@ -351,7 +344,7 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDurations, spec, freeVariables)
         val output = smtEncoder.constraint
-        val constraints= output!!.globalConstraints
+        val constraints = output.globalConstraints
 
         println(output)
 

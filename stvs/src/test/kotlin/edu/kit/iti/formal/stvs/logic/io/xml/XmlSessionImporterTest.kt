@@ -14,27 +14,25 @@ import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
 
 /**
  * @author Benjamin Alt
  */
 class XmlSessionImporterTest {
     @Test
-    @Throws(Exception::class)
     fun testDoImportValid1() {
         val importedSession: StvsRootModel = ImporterFacade.importSession(
-            File(
-                StvsApplication::class.java
-                    .getResource("testSets/valid_1/session_valid_with_concrete_instance_1.xml")!!.toURI().path
-            ), GlobalConfig(), History()
+            StvsApplication::class.java
+                .getResourceAsStream("testSets/valid_1/session_valid_with_concrete_instance_1.xml")!!,
+            GlobalConfig(), History()
         )
         val hybridSpec: HybridSpecification = ImporterFacade.importHybridSpec(
-            File(StvsApplication::class.java.getResource("testSets/valid_1/constraint_spec_valid_1.xml")!!.toURI()),
+            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!
         )
+
         val typeContext = listOf(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
-            File(StvsApplication::class.java.getResource("testSets/valid_1/concrete_spec_valid_1.xml")!!.toURI()),
+            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/concrete_spec_valid_1.xml")!!,
             typeContext
         )
         hybridSpec.concreteInstance = concreteSpec
@@ -45,10 +43,8 @@ class XmlSessionImporterTest {
             ), "utf-8"
         )
         Assertions.assertEquals(
-            TestUtils.removeWhitespace(code), TestUtils.removeWhitespace(
-                importedSession.scenario
-                    .code.sourcecode
-            )
+            code.replace("\\s+".toRegex(), " ").trim(),
+            importedSession.scenario.code.sourcecode.replace("\\s+".toRegex(), " ").trim()
         )
     }
 }

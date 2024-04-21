@@ -55,26 +55,26 @@ class SmtConvertExpressionVisitor(
     }
 
 
-    override fun visitBinaryFunction(binaryFunctionExpr: BinaryFunctionExpr): SExpression {
-        val left = binaryFunctionExpr.firstArgument.takeVisitor(this)
-        val right = binaryFunctionExpr.secondArgument.takeVisitor(this)
+    override fun visitBinaryFunction(binary: BinaryFunctionExpr): SExpression {
+        val left = binary.firstArgument.accept(this)
+        val right = binary.secondArgument.accept(this)
 
-        when (binaryFunctionExpr.operation) {
+        when (binary.operation) {
             BinaryFunctionExpr.Op.NOT_EQUALS -> return SList("not", SList("=", left, right))
             else -> {
-                val name = smtlibBinOperationNames[binaryFunctionExpr.operation]
+                val name = smtlibBinOperationNames[binary.operation]
                     ?: throw IllegalArgumentException(
-                        "Operation " + binaryFunctionExpr.operation + " is " + "not supported"
+                        "Operation " + binary.operation + " is " + "not supported"
                     )
                 return SList(name, left, right)
             }
         }
     }
 
-    override fun visitUnaryFunction(unaryFunctionExpr: UnaryFunctionExpr): SExpression {
-        val argument = unaryFunctionExpr.argument!!.takeVisitor(this)
-        val name = smtlibUnaryOperationNames[unaryFunctionExpr.operation]
-            ?: if (unaryFunctionExpr.operation == UnaryFunctionExpr.Op.UNARY_MINUS) {
+    override fun visitUnaryFunction(unary: UnaryFunctionExpr): SExpression {
+        val argument = unary.argument!!.accept(this)
+        val name = smtlibUnaryOperationNames[unary.operation]
+            ?: if (unary.operation == UnaryFunctionExpr.Op.UNARY_MINUS) {
                 return SList(
                     "-",
                     SAtom("0"),
@@ -82,16 +82,16 @@ class SmtConvertExpressionVisitor(
                 )
             } else {
                 throw IllegalArgumentException(
-                    "Operation " + unaryFunctionExpr.operation + "is " + "not supported"
+                    "Operation " + unary.operation + "is " + "not supported"
                 )
             }
 
         return SList(name, argument)
     }
 
-    override fun visitLiteral(literalExpr: LiteralExpr): SExpression {
+    override fun visitLiteral(literal: LiteralExpr): SExpression {
         val literalAsString =
-            literalExpr.value.match({ integer: Int -> BitvectorUtils.hexFromInt(integer, 4) },
+            literal.value.match({ integer: Int -> BitvectorUtils.hexFromInt(integer, 4) },
                 { bool: Boolean -> if (bool) "true" else "false" },
                 { enumeration: ValueEnum? -> this.getEnumValueAsBitvector(enumeration) })
         return SAtom(literalAsString)
@@ -106,9 +106,9 @@ class SmtConvertExpressionVisitor(
    * 
    * }
    */
-    override fun visitVariable(variableExpr: VariableExpr): SExpression {
-        val variableName = variableExpr.variableName
-        val variableReferenceIndex = variableExpr.getIndex()!!.orElse(0)
+    override fun visitVariable(expr: VariableExpr): SExpression {
+        val variableName = expr.variableName
+        val variableReferenceIndex = expr.getIndex()!!.orElse(0)
 
         // Check if variable is in getTypeForVariable
         checkNotNull(smtEncoder.getTypeForVariable(variableName)) { "Wrong Context: No variable of name '$variableName' in getTypeForVariable" }
@@ -141,6 +141,10 @@ class SmtConvertExpressionVisitor(
         } else {
             return SAtom("|$variableName|")
         }
+    }
+
+    override fun visit(expr: GuardedExpression): SExpression {
+        TODO("Not yet implemented")
     }
 
     private fun sumRowIterations(j: Int): SExpression {

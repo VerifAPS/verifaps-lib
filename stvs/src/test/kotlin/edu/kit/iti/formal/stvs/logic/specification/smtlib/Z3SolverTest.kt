@@ -24,13 +24,8 @@ import java.util.*
  * Created by leonk on 09.02.2017.
  */
 class Z3SolverTest {
-    private var freeVariables: List<ValidFreeVariable>? = null
-
-    private var solver: Z3Solver? = null
-
-    @BeforeEach
-    fun initialize() {
-        this.solver = Z3Solver(autoloadConfig())
+    private var freeVariables: List<ValidFreeVariable> = listOf()
+    private var solver = Z3Solver(autoloadConfig()).also {
         TestUtils.assumeZ3Exists()
     }
 
@@ -79,13 +74,12 @@ class Z3SolverTest {
     }
 
     @Test
-    @Throws(ImportException::class, IOException::class, InterruptedException::class, ConcretizationException::class)
     fun testImported() {
         val spec = importSpec("testSpec.xml")
 
         val maxDurations = listOf(7, 1, 2)
-        val preprocessor = SmtEncoder(maxDurations, spec, freeVariables!!)
-        val concretized = solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
+        val preprocessor = SmtEncoder(maxDurations, spec, freeVariables)
+        val concretized = solver.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
         Assertions.assertNotNull(concretized)
         val durations = concretized.durations
         Assertions.assertTrue(durations[0].duration in 5..7)
@@ -95,21 +89,21 @@ class Z3SolverTest {
 
     @Test
     fun process() {
-        Assertions.assertNull(solver!!.process)
+        Assertions.assertNull(solver.process)
         val spec = importSpec("testSpec.xml")
-        val preprocessor = SmtEncoder(5, spec, freeVariables!!)
-        solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
+        val preprocessor = SmtEncoder(5, spec, freeVariables)
+        solver.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
 
-        Assertions.assertNotNull(solver!!.process)
+        Assertions.assertNotNull(solver.process)
     }
 
     @Test
     @Throws(Exception::class)
     fun setZ3Path() {
-        solver!!.z3Path = "testValue"
-        Assertions.assertEquals("testValue", solver!!.z3Path)
-        solver!!.z3Path = "otherValue"
-        Assertions.assertEquals("otherValue", solver!!.z3Path)
+        solver.z3Path = "testValue"
+        Assertions.assertEquals("testValue", solver.z3Path)
+        solver.z3Path = "otherValue"
+        Assertions.assertEquals("otherValue", solver.z3Path)
     }
 
     @Test
@@ -119,8 +113,8 @@ class Z3SolverTest {
         val thread = Thread {
             try {
                 val spec = importSpec("spec_long_single_variable_example.xml")
-                val preprocessor = SmtEncoder(5, spec, freeVariables!!)
-                solver!!.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
+                val preprocessor = SmtEncoder(5, spec, freeVariables)
+                solver.concretizeSmtModel(preprocessor.constraint, spec.columnHeaders)
                 println("finished")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -131,7 +125,7 @@ class Z3SolverTest {
         println("started")
         Thread.sleep(400)
         println("waiting for process")
-        while (solver!!.process == null) {
+        while (solver.process == null) {
         }
         println("interrupt")
         thread.interrupt()

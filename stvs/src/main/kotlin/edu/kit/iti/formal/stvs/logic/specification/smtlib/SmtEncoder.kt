@@ -23,8 +23,7 @@ class SmtEncoder(
     private val freeVariablesContext: Map<String, Type>
     private val ioVariableTypes: List<String?>
 
-    var constraint: SmtModel?
-        private set
+    var constraint: SmtModel
 
     /**
      * Creates an encoder for a specification. Each row is unrolled at most maxDuration times. This is
@@ -52,11 +51,11 @@ class SmtEncoder(
      */
     init {
         require(maxDurations.size == specification.rows.size) { "Size of maxDurations and size of specification rows do not match" }
-        this.ioVariables = specification.columnHeaders
-        this.freeVariablesContext = validFreeVariables.associate { it.name to it.type }
-        this.ioVariableTypes = ioVariables.map { it.name }
+        ioVariables = specification.columnHeaders
+        freeVariablesContext = validFreeVariables.associate { it.name to it.type }
+        ioVariableTypes = ioVariables.map { it.name }
 
-        this.constraint = SmtModel()
+        constraint = SmtModel()
             .addHeaderDefinitions(createFreeVariables())
             .addHeaderDefinitions(setFreeVariablesDefaultValues())
 
@@ -82,7 +81,7 @@ class SmtEncoder(
             for (z in column.cells.indices) {
                 val expression = column.cells[z]
                 // Add n_x to const declaration
-                constraint!!.addHeaderDefinitions(
+                constraint.addHeaderDefinitions(
                     SList.sexpr("declare-const", "n_$z", "(_ BitVec 16)")
                 )
                 // Iterate over potential backward steps
@@ -90,7 +89,7 @@ class SmtEncoder(
                     // Iterate over possible cycles in last row
                     for (k in 0..getMaxDuration(z - 1)) {
                         // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
-                        constraint!!.addGlobalConstrains(
+                        constraint.addGlobalConstrains(
                             SList.sexpr(
                                 "implies",
                                 SList.sexpr(
@@ -106,7 +105,7 @@ class SmtEncoder(
                             )
                         )
                         // Add backward reference to const declaration
-                        constraint!!.addHeaderDefinitions(
+                        constraint.addHeaderDefinitions(
                             SList.sexpr(
                                 "declare-const",
                                 "|" + variableName + "_" + (z - 1) + "_"
@@ -118,7 +117,7 @@ class SmtEncoder(
                         )
                     }
                     // Add backward reference to const declaration
-                    constraint!!.addHeaderDefinitions(
+                    constraint.addHeaderDefinitions(
                         SList.sexpr(
                             "declare-const",
                             "|" + variableName + "_" + z + "_" + (-i) + "|",
@@ -140,20 +139,20 @@ class SmtEncoder(
         for (ioVariable in ioVariables) {
             val column = specification.getColumnByName(ioVariable.name)
             for (z in column.cells.indices) {
-                val expression = column.cells[z]!!
+                val expression = column.cells[z]
 
                 for (i in 0 until getMaxDuration(z)) {
                     val visitor = SmtConvertExpressionVisitor(
                         this, z, i, ioVariable
                     )
-                    val expressionConstraint = expression.takeVisitor(visitor)
+                    val expressionConstraint = expression.accept(visitor)
                     // n_z >= i => ExpressionVisitor(z,i,...)
                     this.constraint = SmtModel(
                         visitor.constraint.globalConstraints,
                         visitor.constraint.variableDefinitions
                     )
                         .combine(this.constraint)
-                    constraint!!.addGlobalConstrains(
+                    constraint.addGlobalConstrains(
                         SList.sexpr(
                             "implies",
                             SList.sexpr(
@@ -178,7 +177,7 @@ class SmtEncoder(
         for (z in specification.durations.indices) {
             val interval = specification.durations.get(z)!!
             // n_z >= lowerBound_z
-            constraint!!.addGlobalConstrains(
+            constraint.addGlobalConstrains(
                 SList.sexpr(
                     "bvuge", "n_$z",
                     BitvectorUtils.hexFromInt(interval.lowerBound, 4)
@@ -187,7 +186,7 @@ class SmtEncoder(
             )
             // n_z <= upperBound_z
             if (interval.upperBound != null) {
-                constraint!!.addGlobalConstrains(
+                constraint.addGlobalConstrains(
                     SList.sexpr(
                         "bvule", "n_$z",
                         BitvectorUtils.hexFromInt(
@@ -199,7 +198,7 @@ class SmtEncoder(
                     )
                 )
             } else {
-                constraint!!.addGlobalConstrains(
+                constraint.addGlobalConstrains(
                     SList.sexpr(
                         "bvule", "n_$z",
                         BitvectorUtils.hexFromInt(getMaxDuration(z), 4)
@@ -223,7 +222,7 @@ class SmtEncoder(
             this,
             0, 0, variable.asIOVariable()
         )
-        return constraint!!.takeVisitor(scev)
+        return constraint!!.accept(scev)
 
         /*return defaultValue.match((integerVal) -> sexpr("=",
                         "|" + variable.getName() + "|",

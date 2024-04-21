@@ -1,35 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
     <code>
-        <plaintext>TYPE
-            enumD : (literalOne, literalTwo);
-            END_TYPE
+        <plaintext><![CDATA[TYPE
+ enumD : (literalOne, literalTwo);
+ END_TYPE
 
-            PROGRAM constantprogram
-            VAR_INPUT
-            A : INT;
-            B : BOOL;
-            END_VAR
+ PROGRAM constantprogram
+ VAR_INPUT
+ A : INT;
+ B : BOOL;
+ END_VAR
 
-            VAR_OUTPUT
-            C : INT;
-            D : enumD;
-            END_VAR
+ VAR_OUTPUT
+ C : INT;
+ D : enumD;
+ END_VAR
 
-            C := 52;
-            END_PROGRAM
-        </plaintext>
+ C := 52;
+ END_PROGRAM]]></plaintext>
     </code>
     <tabs>
         <tab id="0" open="false" readOnly="false">
-            <specification comment="" isConcrete="false" name="Unnamed Specification">
+            <specification isConcrete="false" name="Unnamed Specification">
                 <variables>
-                    <ioVariable colwidth="100" data-type="INT" io="input" name="A"/>
-                    <ioVariable colwidth="100" data-type="BOOL" io="input" name="B"/>
-                    <ioVariable colwidth="100" data-type="INT" io="output" name="C"/>
-                    <ioVariable colwidth="100" data-type="enumD" io="output" name="D"/>
-                    <freeVariable data-type="BOOL" default="-" name="p"/>
-                    <freeVariable data-type="INT" default="42" name="q"/>
+                    <ioVariable data-type="INT" io="input" name="A" colwidth="100.0" />
+                    <ioVariable data-type="BOOL" io="input" name="B" colwidth="100.0" />
+                    <ioVariable data-type="INT" io="output" name="C" colwidth="100.0" />
+                    <ioVariable data-type="enumD" io="output" name="D" colwidth="100.0" />
+                    <freeVariable name="p" data-type="BOOL" default="-" />
+                    <freeVariable name="q" data-type="INT" default="42" />
                 </variables>
                 <rows>
                     <row comment="">

@@ -94,6 +94,7 @@ class ConstraintSpecificationValidator(
             validSpecification = null
         }
         valid = specificationIsValid
+        problems.setAll(majorSpecProblems + minorSpecProblems)
     }
 
     /**

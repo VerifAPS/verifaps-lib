@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.model.table
 
+import com.google.common.truth.Truth
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
@@ -26,8 +27,7 @@ class ConstraintSpecificationValidatorTest {
         invalid_iovar_type.json
         invalid_cell_grammar.json
         unsupported_cell_grammar.json
-        invalid_duration_grammar.json
-    """
+        invalid_duration_grammar.json"""
     )
     fun testProblems(testfile: String) {
         val testJson = JsonTableParser.jsonFromResource(testfile, ConstraintSpecificationValidatorTest::class.java)
@@ -50,18 +50,9 @@ class ConstraintSpecificationValidatorTest {
 
         val expectedProblems = JsonTableParser.expectedSpecProblemsFromJson(testJson)
 
-        println("Expecting problems: " + expectedProblems.map { it.simpleName })
-        println("Actual Problems: ")
-        recognizer.problemsProperty.get().forEach { println(it) }
+        val exp = expectedProblems.map { it.simpleName }.toSortedSet()
+        val act = recognizer.problems.map { it.javaClass.simpleName }.toSortedSet()
 
-        Assertions.assertEquals(
-            expectedProblems.isEmpty(),
-            recognizer.problemsProperty.get().isEmpty(),
-            "Problem list emptiness: "
-        )
-
-        Assertions.assertTrue(expectedProblems.all { clazz ->
-            recognizer.problemsProperty.get().any { clazz.isInstance(it) }
-        })
+        Truth.assertThat(act).isEqualTo(exp)
     }
 }

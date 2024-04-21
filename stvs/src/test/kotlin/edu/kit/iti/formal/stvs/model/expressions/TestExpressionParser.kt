@@ -138,16 +138,16 @@ class TestExpressionParser {
         assertFailsWith<ParseException> { parser.parseExpression("[1,3") }
     }
 
-    @Test//(expected = UnsupportedExpressionException::class)
+    @Test
     fun testUnsupportedFunctioncall() {
         assertFailsWith<UnsupportedExpressionException> {
             parser.parseExpression("function(1, 2)")
         }
     }
 
-    @Test//(expected = UnsupportedExpressionException::class)
+    @Test
     fun testUnsupportedGuardedIf() {
-        assertFailsWith<ParseException> { assertFailsWith<ParseException> { parser.parseExpression("if :: TRUE -> FALSE :: FALSE -> TRUE fi") } }
+        parser.parseExpression("if :: TRUE -> FALSE :: FALSE -> TRUE fi")
     }
 
     @Test
@@ -161,18 +161,18 @@ class TestExpressionParser {
         //assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
     }
 
-    @Test//(expected = ParseException::class)
+    @Test
     fun testLongIntegerLiteral0() {
-        assertFailsWith<ParseException> { assertFailsWith<ParseException> { parser.parseExpression("1324574839294857") } }
+        assertFailsWith<NumberFormatException> { parser.parseExpression("1324574839294857") }
     }
 
-    @Test//(expected = ParseException::class)
+    @Test
     fun testLongIntegerLiteral1() {
-        assertFailsWith<ParseException> { parser.parseExpression("" + (Short.MAX_VALUE + 1)) }
+        parser.parseExpression("" + (Short.MAX_VALUE + 1))
     }
 
-    @Test//(expected = ParseException::class)
+    @Test
     fun testLongIntegerLiteral2() {
-        assertFailsWith<ParseException> { parser.parseExpression("" + (Short.MIN_VALUE - 1)) }
+        parser.parseExpression("" + (Short.MIN_VALUE - 1))
     }
 }

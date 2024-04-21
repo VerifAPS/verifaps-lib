@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.runners.Parameterized
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
@@ -17,8 +16,7 @@ import java.net.URISyntaxException
  */
 class XmlConstraintSpecRoundtripTest() {
     @ParameterizedTest
-    @MethodSource("testFiles")
-    @Throws(URISyntaxException::class, ImportException::class, IOException::class, ExportException::class)
+    @MethodSource("specificationFiles")
     fun constraintSpecRoundtripTest(file: File) {
         val fileContentsBefore = TestUtils.readFromFile(file.absolutePath)
         val importedSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(file)
@@ -34,9 +32,7 @@ class XmlConstraintSpecRoundtripTest() {
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters
-        @Throws(URISyntaxException::class)
-        fun testFiles() =
+        fun specificationFiles() =
             TestUtils.getTestFiles(TestUtils.FileType.CONSTRAINT, TestUtils.Status.VALID).map { Arguments.of(it) }
     }
 }

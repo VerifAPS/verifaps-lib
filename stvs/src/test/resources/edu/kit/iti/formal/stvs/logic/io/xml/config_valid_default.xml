@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
-    <general>
-        <uiLanguage>EN</uiLanguage>
-        <simulationTimeout>60</simulationTimeout>
-        <verificationTimeout>3600</verificationTimeout>
-        <maxLineRollout>50</maxLineRollout>
-        <windowSize>
-            <height>600</height>
-            <width>800</width>
-            <maximized>true</maximized>
-        </windowSize>
-    </general>
-    <editor>
-        <fontFamily>DejaVu Sans Mono</fontFamily>
-        <fontSize>12</fontSize>
-        <showLineNumbers>true</showLineNumbers>
-    </editor>
-    <dependencies>
-        <z3Path>[Path to Z3 Executable]</z3Path>
-        <nuxmvFilename>[Path to NuXmv Executable]</nuxmvFilename>
-        <getetaCommand>java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x</getetaCommand>
-    </dependencies>
+	<general>
+		<uiLanguage>EN</uiLanguage>
+		<simulationTimeout>60</simulationTimeout>
+		<verificationTimeout>3600</verificationTimeout>
+		<maxLineRollout>50</maxLineRollout>
+		<windowSize>
+			<height>600</height>
+			<width>800</width>
+			<maximized>true</maximized>
+		</windowSize>
+	</general>
+	<editor>
+		<fontFamily>DejaVu Sans Mono</fontFamily>
+		<fontSize>12</fontSize>
+		<showLineNumbers>true</showLineNumbers>
+	</editor>
+	<dependencies>
+		<z3Path>[Path to Z3 Executable]</z3Path>
+		<nuxmvFilename>[Path to NuXmv Executable]</nuxmvFilename>
+		<getetaCommand>java -jar /path/to/geteta.jar -c ${code} -t ${spec} -x</getetaCommand>
+	</dependencies>
 </config>

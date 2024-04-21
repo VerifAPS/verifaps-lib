@@ -219,6 +219,6 @@ variable:
 // fi
 guardedcommand
 : 
-      IF (GUARD c=expr ARROW_RIGHT t=expr )+
+      IF (GUARD c+=expr ARROW_RIGHT t+=expr )+
       FI    // guarded command (case)
 ;

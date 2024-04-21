@@ -27,8 +27,7 @@ class SmtConcretizer(private val config: GlobalConfig) : SpecificationConcretize
         validSpecification: ValidSpecification,
         freeVariables: List<ValidFreeVariable>
     ): ConcreteSpecification {
-        val encoder =
-            SmtEncoder(config.maxLineRollout, validSpecification, freeVariables)
+        val encoder = SmtEncoder(config.maxLineRollout, validSpecification, freeVariables)
         return z3Solver.concretizeSmtModel(
             encoder.constraint,
             validSpecification.columnHeaders

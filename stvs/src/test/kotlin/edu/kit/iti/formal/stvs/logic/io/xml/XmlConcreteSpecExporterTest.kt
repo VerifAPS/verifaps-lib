@@ -27,10 +27,6 @@ class XmlConcreteSpecExporterTest {
     private var exporter = XmlConcreteSpecExporter()
 
     @Test
-    @Throws(
-        ExportException::class, IOException::class, UnsupportedExpressionException::class, ParseException::class,
-        ImportException::class
-    )
     fun testExportConcreteValid1() {
         val json: JsonElement =
             JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest::class.java)
@@ -47,7 +43,6 @@ class XmlConcreteSpecExporterTest {
     }
 
     @Test
-    @Throws(ExportException::class, IOException::class)
     fun testExportConcreteEmpty() {
         val concreteSpec = ConcreteSpecification(false)
         val result = TestUtils.stringOutputStream { exporter.export(concreteSpec, it) }

@@ -66,8 +66,8 @@ class ConcreteSpecification(
      */
     init {
         columnHeaders.setAll(ioVariables)
-        rows.addAll(rows)
-        durations.addAll(durations)
+        this.rows.addAll(rows)
+        this.durations.addAll(durations)
     }
 
     /**

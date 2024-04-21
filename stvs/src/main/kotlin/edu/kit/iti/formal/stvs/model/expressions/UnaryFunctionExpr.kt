@@ -20,7 +20,7 @@ class UnaryFunctionExpr
         UNARY_MINUS,
     }
 
-    override fun <R> takeVisitor(visitor: ExpressionVisitor<R>): R {
+    override fun <R> accept(visitor: ExpressionVisitor<R>): R {
         return visitor.visitUnaryFunction(this)
     }
 

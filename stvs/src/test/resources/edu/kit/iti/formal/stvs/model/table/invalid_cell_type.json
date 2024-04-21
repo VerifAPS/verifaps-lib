@@ -11,11 +11,23 @@
       "type": "BOOL"
     }
   ],
+  "durations": [
+    "[0,-]",
+    "1"
+  ],
+  "expected_problems": [
+    "CellTypeProblem"
+  ],
   "freevariables": [
     {
       "name": "c",
       "type": "INT"
     }
+  ],
+  "rows": [
+    "Active = 0 | TRUE",
+    "> 10       | TRUE",
+    "c          | FALSE"
   ],
   "variables": [
     {
@@ -28,17 +40,5 @@
       "name": "Active",
       "type": "BOOL"
     }
-  ],
-  "expected_problems": [
-    "CellTypeProblem"
-  ],
-  "rows": [
-    "Active = 0 | TRUE",
-    "> 10       | TRUE",
-    "c          | FALSE"
-  ],
-  "durations": [
-    "[0,-]",
-    "1"
   ]
 }

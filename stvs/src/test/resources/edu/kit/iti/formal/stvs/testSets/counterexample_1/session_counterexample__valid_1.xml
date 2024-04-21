@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
     <code>
-        <plaintext>PROGRAM Monitor_Start_Stop // Actual Program
-            VAR_INPUT
-            Start_Stop : BOOL;
-            ON_OFF : BOOL;
-            END_VAR
-            VAR_OUTPUT
-            ONS_Trig : BOOL;
-            Rising_ONS : BOOL;
-            END_VAR
+        <plaintext><![CDATA[PROGRAM Monitor_Start_Stop // Actual Program
+ VAR_INPUT
+ Start_Stop : BOOL;
+ ON_OFF : BOOL;
+ END_VAR
+ VAR_OUTPUT
+ ONS_Trig : BOOL;
+ Rising_ONS : BOOL;
+ END_VAR
 
-            // Start of Logic
-            // Catch the Rising Edge One Shot of the Start_Stop input
-            ONS_Trig := Start_Stop AND NOT Rising_ONS;
+ // Start of Logic
+ // Catch the Rising Edge One Shot of the Start_Stop input
+ ONS_Trig := Start_Stop AND NOT Rising_ONS;
 
-            // Main Logic for Run_Contact -- Toggle ON / Toggle OFF ---
-            ON_OFF := (ONS_Trig AND NOT ON_OFF) OR (ON_OFF AND NOT ONS_Trig);
+ // Main Logic for Run_Contact -- Toggle ON / Toggle OFF ---
+ ON_OFF := (ONS_Trig AND NOT ON_OFF) OR (ON_OFF AND NOT ONS_Trig);
 
-            // Rising One Shot logic
-            Rising_ONS := Start_Stop;
-            END_PROGRAM
-        </plaintext>
+ // Rising One Shot logic
+ Rising_ONS := Start_Stop;
+ END_PROGRAM]]></plaintext>
     </code>
     <tabs>
         <tab id="0" open="false" readOnly="false">
-            <specification comment="" isConcrete="false" name="Unnamed Specification">
+            <specification isConcrete="false" name="Unnamed Specification">
                 <variables>
-                    <ioVariable colwidth="171" data-type="BOOL" io="input" name="Start_Stop"/>
-                    <ioVariable colwidth="172" data-type="BOOL" io="output" name="ONS_Trig"/>
-                    <freeVariable data-type="INT" default="-" name="freeVarA"/>
-                    <freeVariable data-type="BOOL" default="TRUE" name="freeVarB"/>
+                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="171.0" />
+                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="172.0" />
+                    <freeVariable name="freeVarA" data-type="INT" default="-" />
+                    <freeVariable name="freeVarB" data-type="BOOL" default="TRUE" />
                 </variables>
                 <rows>
                     <row comment="">

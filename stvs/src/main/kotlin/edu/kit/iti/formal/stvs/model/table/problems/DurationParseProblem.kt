@@ -37,6 +37,9 @@ data class DurationParseProblem
                 return IntervalParser.parse(duration.asString ?: "")
             } catch (parseException: ParseException) {
                 throw DurationParseProblem(parseException, row).asException()
+            } catch (exception: IllegalStateException) {
+                val parseException = ParseException(0, 0, exception.message!!)
+                throw DurationParseProblem(parseException, row).asException()
             }
         }
 

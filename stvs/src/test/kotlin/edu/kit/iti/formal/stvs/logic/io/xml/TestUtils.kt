@@ -3,38 +3,33 @@ package edu.kit.iti.formal.stvs.logic.io.xml
 import edu.kit.iti.formal.stvs.StvsApplication
 import org.apache.commons.io.output.WriterOutputStream
 import java.io.File
-import java.io.IOException
 import java.io.OutputStream
 import java.io.StringWriter
 import java.net.URISyntaxException
-import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
-import java.util.regex.Pattern
+import kotlin.io.path.bufferedReader
 
 /**
  * @author Benjamin Alt
  */
 object TestUtils {
-    private val prefixes: MutableMap<FileType, String>
-    private val statuses: MutableMap<Status, Pattern>
+    private val prefixes =
+        hashMapOf(
+            FileType.SESSION to "session",
+            FileType.CONCRETE to "concrete_spec",
+            FileType.CONSTRAINT to "constraint_spec",
+            FileType.CONFIG to "config",
+        )
 
-    init {
-        prefixes = EnumMap(FileType::class.java)
-        prefixes[FileType.SESSION] = "session"
-        prefixes[FileType.CONCRETE] = "concrete_spec"
-        prefixes[FileType.CONSTRAINT] = "constraint_spec"
-        prefixes[FileType.CONFIG] = "config"
-        statuses = EnumMap(Status::class.java)
-        statuses[Status.VALID] =
-            Pattern.compile("(?!.*invalid.*).*valid.*")
-        statuses[Status.ALL] = Pattern.compile(".*")
-    }
+    private val statuses: HashMap<Status, Regex> = hashMapOf(
+        Status.VALID to "(?!.*invalid.*).*valid.*".toRegex(),
+        Status.ALL to ".*".toRegex()
+    )
 
-    fun removeWhitespace(input: String): String {
-        return input.replace(" {2,}".toRegex(), " ")
-            .replace("\n[ ]+", "\n")
-    }
+    fun removeWhitespace(input: String) = input.replace("[\t ]+".toRegex(), " ").replace("\r\n", "\n").trim()
+
+    fun getResource(name: String) = javaClass.getResourceAsStream(name) ?: error("Could not find resource file: $name")
 
     @Throws(URISyntaxException::class)
     fun getTestFiles(type: FileType, status: Status): List<File> {
@@ -43,9 +38,8 @@ object TestUtils {
             val children = testSet.list()
             if (children != null) {
                 for (childName in children) {
-                    if (childName.startsWith(prefixes[type]!!) && statuses[status]!!
-                            .matcher(childName)
-                            .matches()
+                    if (childName.startsWith(prefixes[type]!!)
+                        && statuses[status]!!.matches(childName)
                     ) {
                         res.add(File(testSet.absolutePath + File.separator + childName))
                     }
@@ -68,24 +62,11 @@ object TestUtils {
             return res
         }
 
-    @Throws(IOException::class)
-    fun readFromFile(path: String?): String {
-        return String(Files.readAllBytes(Paths.get(path)), charset("utf-8"))
-    }
-
-    @Throws(URISyntaxException::class)
-    @JvmStatic
-    fun main(args: Array<String>) {
-        for (type in FileType.entries) {
-            for (file in getTestFiles(type, Status.ALL)) {
-                println(file.name)
-            }
-        }
-    }
+    fun readFromFile(path: String) = Paths.get(path).bufferedReader().readText()
 
     fun stringOutputStream(block: (OutputStream) -> Unit): String {
         val sw = StringWriter()
-        block(WriterOutputStream(sw))
+        block(WriterOutputStream(sw,"utf-8"))
         return sw.toString()
     }
 

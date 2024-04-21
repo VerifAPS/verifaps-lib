@@ -29,7 +29,7 @@ data class BinaryFunctionExpr(
         PLUS, MINUS, MULTIPLICATION, DIVISION, MODULO, POWER
     }
 
-    override fun <R> takeVisitor(visitor: ExpressionVisitor<R>): R {
+    override fun <R> accept(visitor: ExpressionVisitor<R>): R {
         return visitor.visitBinaryFunction(this)
     }
 

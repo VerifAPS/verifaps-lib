@@ -13,12 +13,9 @@ class XmlSessionExporterTest {
     private var exporter = XmlSessionExporter()
 
     @Test
-    @Throws(Exception::class)
     fun exportDefault() {
         val result = TestUtils.stringOutputStream { exporter.export(StvsRootModel(), it) }
-        val resultString = String(result.toByteArray(), charset("utf-8"))
-        val expectedString =
-            FileUtils.readFileToString(File(this.javaClass.getResource("session_empty.xml")!!.toURI()), "utf-8")
-        Assertions.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(resultString))
+        val expectedString = javaClass.getResourceAsStream("session_empty.xml")!!.bufferedReader().readText()
+        Assertions.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(result))
     }
 }
