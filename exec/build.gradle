@@ -55,6 +55,7 @@ def mainClasses = [
 
 mainClasses.each { a, b ->
     def t = task("createStart$a", type: CreateStartScripts) {
+        duplicatesStrategy = "exclude"
         group = "start-script"
         applicationName = a
         classpath = startScripts.classpath
