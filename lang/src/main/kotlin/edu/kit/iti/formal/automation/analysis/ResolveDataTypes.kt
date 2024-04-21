@@ -119,13 +119,13 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
                 }
                 is StringLit -> literal.dataType.resolve(scope::resolveDataType0)
                 is BitLit -> literal.dataType.resolve(scope::resolveDataType0)
-                is BooleanLit -> TODO()
                 is DateAndTimeLit -> TODO()
                 is DateLit -> TODO()
                 is NullLit -> TODO()
                 is TimeLit -> TODO()
                 is ToDLit -> TODO()
                 is UnindentifiedLit -> TODO()
+                else -> {} // nohting todo, e.g., boolean literals
             }
         } catch (_: ClassCastException) {
         }
@@ -136,7 +136,6 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     }
 
     override fun visit(it: VariableDeclaration) {
-        //super.visit(it)
         it.typeDeclaration?.accept(this)
         ignoreDataTypeNotDefined { it.dataType = it.typeDeclaration?.getDataType(scope) }
     }

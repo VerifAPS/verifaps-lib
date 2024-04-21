@@ -1,0 +1,25 @@
+#WizardView{
+    -fx-min-width: 600;
+    -fx-min-height: 400;
+}
+
+
+#WizardView .header, #WizardView .footer{
+    -fx-background-color: lightgray;
+}
+
+#WizardView .header{
+    -fx-pref-height: 50px;
+}
+
+#WizardView .header .title{
+    -fx-font-size: 30px;
+}
+
+#WizardView .footer{
+    -fx-pref-height: 50px;
+}
+
+#WizardView #FileSelectionField{
+    -fx-pref-width: 600px;
+}

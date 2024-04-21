@@ -1,0 +1,44 @@
+{
+  "codeiovars": [
+    {
+      "kind": "INPUT",
+      "name": "Counter",
+      "type": "INT"
+    },
+    {
+      "kind": "OUTPUT",
+      "name": "Active",
+      "type": "BOOL"
+    }
+  ],
+  "durations": [
+    "[0,-]",
+    "1"
+  ],
+  "expected_problems": [
+    "CellTypeProblem"
+  ],
+  "freevariables": [
+    {
+      "name": "c",
+      "type": "INT"
+    }
+  ],
+  "rows": [
+    "Active = 0 | TRUE",
+    "> 10       | TRUE",
+    "c          | FALSE"
+  ],
+  "variables": [
+    {
+      "iotype": "INPUT",
+      "name": "Counter",
+      "type": "INT"
+    },
+    {
+      "iotype": "OUTPUT",
+      "name": "Active",
+      "type": "BOOL"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+dependencies:
+  override:
+    - ./gradlew dependencies
+
+test:
+  override:
+    - ./gradlew test
+    - ./gradlew jacocoTestReport
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    - mkdir -p $CIRCLE_ARTIFACTS/coverage-report
+    - cp -r build/reports/jacoco $CIRCLE_ARTIFACTS/coverage-report
+    - cp -r build/reports/tests/test/ $CIRCLE_ARTIFACTS/test-report/
+
+
+deployment:
+  allInOneJar:
+    branch: [master, development]
+    commands:
+      - ./gradlew fatJar
+      - cp build/libs/*.jar $CIRCLE_ARTIFACTS/stverificationstudio.jar

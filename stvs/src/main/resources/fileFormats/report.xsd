@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:tns="http://formal.iti.kit.edu/exteta-1.0/report/"
+        targetNamespace="http://formal.iti.kit.edu/exteta-1.0/report/">
+    <element name="message">
+        <complexType>
+            <sequence>
+                <element name="log" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <sequence>
+                            <element name="entry" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <simpleContent>
+                                        <extension base="string">
+                                            <attribute name="time" type="int"
+                                                       use="optional"/>
+                                            <attribute name="level"
+                                                       type="string" use="optional">
+                                            </attribute>
+                                        </extension>
+                                    </simpleContent>
+                                </complexType>
+                            </element>
+                        </sequence>
+                    </complexType>
+                </element>
+
+                <element name="counterexample" minOccurs="0" maxOccurs="1">
+                    <complexType>
+                        <all>
+                            <element minOccurs="1" maxOccurs="1" name="trace" type="tns:counterexample"/>
+                            <element minOccurs="0" maxOccurs="1" name="row-mappings">
+                                <complexType>
+                                    <sequence maxOccurs="unbounded" minOccurs="1">
+                                        <element name="row-map" type="string"/>
+                                    </sequence>
+                                </complexType>
+                            </element>
+                        </all>
+                    </complexType>
+                </element>
+
+            </sequence>
+            <attribute name="returncode" type="string">
+            </attribute>
+        </complexType>
+    </element>
+
+
+    <complexType name="assignment">
+        <attribute name="name" type="string"></attribute>
+        <attribute name="value" type="string"></attribute>
+    </complexType>
+
+    <complexType name="counterexample">
+        <sequence minOccurs="0" maxOccurs="unbounded">
+            <element name="step">
+                <complexType>
+                    <sequence>
+                            <element name="input" type="tns:assignment" minOccurs="0"
+                                     maxOccurs="unbounded"/>
+                            <element name="state" type="tns:assignment" minOccurs="0"
+                                     maxOccurs="unbounded"/>
+                    </sequence>
+                    <attribute name="counter" type="int"></attribute>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+</schema>

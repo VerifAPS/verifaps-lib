@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=ST Verification Studio
+Comment=Graphical Structured Text verifier
+Icon=/opt/stverificationstudio/src/resources/edu/kit/iti/formal/stvs/logo.svg
+Exec=/opt/stverificationstudio/stverificationstudio
+Terminal=false
+Type=Application
+Categories=Application
+StartupNotify=false

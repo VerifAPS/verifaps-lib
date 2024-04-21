@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+    <code>
+        <plaintext><![CDATA[
+TYPE
+  OpMode : (Op , Teach);
+  TeachStatus :  (Ok, NoTeachPoints, Teaching, InvalidTeachPoints, InvalidInputValue);
+END_TYPE
+
+PROGRAM Integration
+
+VAR_INPUT
+  inOpmode : OpMode;
+  inSignal : INT;
+  inTPSet : BOOL;
+  inTPy : INT;
+  inTON : TIME;
+  inTOFF : TIME;
+  Margin : INT;
+END_VAR
+
+VAR_OUTPUT
+  Warning : BOOL;
+END_VAR
+
+VAR
+  sd : SensorDelay;
+  as : AnalogSensor;
+END_VAR
+
+as.OperationMode := inOpmode;
+as.SensorInput := inSignal;
+as.TPSet := inTPSet;
+as.TPy := inTPy;
+as();
+
+IF as.OperationMode = OpMode.Op THEN
+  sd(Signal := as.SensorOutput >= Margin, T_on := inTon, T_off := inToff);
+  Warning := sd.Sensor;
+ELSE
+  Warning := TRUE;
+END_IF
+
+END_PROGRAM
+
+
+FUNCTION_BLOCK TOF
+
+VAR_INPUT
+    IN : BOOL;
+    PT : USINT;
+END_VAR
+
+VAR_OUTPUT
+    Q  : BOOL;
+    ET : USINT;
+END_VAR
+
+IF IN THEN
+    Q  := TRUE;
+    ET := 0;
+ELSE
+    IF ET < PT THEN
+        ET := ET + USINT#1;
+    ELSE
+        ET := PT;
+        Q := FALSE;
+    END_IF
+END_IF;
+
+
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK TON
+
+VAR_INPUT
+    IN : BOOL;
+    PT : USINT;
+END_VAR
+
+VAR_OUTPUT
+    Q  : BOOL;
+    ET : USINT;
+END_VAR
+
+IF IN THEN
+    Q := ET = USINT#0;
+    IF ET > USINT#0 THEN
+        ET := ET - USINT#1
+    ELSE
+        ET := USINT#0
+    END_IF
+ELSE
+    Q  := FALSE;
+    ET := PT;
+END_IF;
+
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK AnalogSensor
+
+VAR CONSTANT
+  SENSORINPUT_MIN : INT := 0;
+  SENSORINPUT_MAX : INT := 4095;
+  TEACHTIMEOUT : TIME := TIME#20s;
+  ICONST : INT := 1000;
+END_VAR
+
+VAR_INPUT
+   TPy : INT;
+   TPSet : BOOL;
+   OperationMode : OpMode;
+   SensorInput : INT;
+ END_VAR
+
+VAR_OUTPUT
+  SensorOutput :INT;
+  Status : TeachStatus;
+END_VAR
+
+VAR
+  init : BOOL;
+  teachstep : INT;
+  x1, x2, y1, y2, x_temp, y_temp, m, t : INT;
+  lastmode : OpMode;
+  timeout : TON;
+END_VAR
+
+IF NOT init THEN
+  x1 := 0;
+  y1 := 0;
+  x2 := 0;
+  y2 := 0;
+  Status := TeachStatus.NoTeachPoints;
+  init := TRUE;
+ELSE
+  IF OperationMode = OpMode.Op THEN
+    IF Status = TeachStatus.Ok AND SensorInput >= SENSORINPUT_MIN AND SensorInput <= SENSORINPUT_MAX THEN
+      SensorOutput := m * SensorInput / ICONST + t;
+    ELSE
+      SensorOutput := 0;
+    END_IF
+  ELSIF OperationMode = OpMode.Teach THEN
+    IF lastmode <> OperationMode THEN
+      teachstep := 0;
+      timeout(IN := FALSE);
+    END_IF;
+
+    CASE teachstep OF
+      0:
+        Status := TeachStatus.Teaching;
+
+        timeout(IN := TRUE, PT:=TEACHTIMEOUT);
+        IF timeout.Q THEN
+          OperationMode := OpMode.Op;
+        END_IF;
+
+        IF TPSet AND SensorInput >= SENSORINPUT_MIN AND SensorInput <= SENSORINPUT_MAX THEN
+          y1 := TPy;
+          x1 := SensorInput;
+          teachstep := 1;
+          timeout(IN := FALSE);
+        END_IF
+      1:
+        IF TPSet = FALSE THEN
+          teachstep := 2;
+        END_IF
+      2:
+        timeout(IN := TRUE, PT:=TEACHTIMEOUT);
+        IF timeout.Q THEN
+          OperationMode := OpMode.Op;
+        END_IF;
+
+        IF TPSet AND SensorInput >= SENSORINPUT_MIN AND SensorInput <= SENSORINPUT_MAX THEN
+          y2 := TPy;
+          x2 := SensorInput;
+          teachstep := 3;
+          timeout(IN := FALSE);
+        END_IF
+      3:
+        IF x1 > x2 THEN
+          x_temp := x1;
+          y_temp := y1;
+          x1 := x2;
+          y1 := y2;
+          x2 := x_temp;
+          y2 := y_temp;
+        END_IF;
+
+        IF x2 - x1 <> 0 THEN
+          m := (y2 - y1) * ICONST / (x2 - x1);
+          t := y1 - m * x1 / ICONST;
+          Status := TeachStatus.Ok;
+        ELSE
+          Status := TeachStatus.InvalidTeachPoints;
+          OperationMode := OpMode.Op;
+        END_IF
+    END_CASE
+  END_IF;
+
+  lastmode := OperationMode;
+END_IF
+END_FUNCTION_BLOCK
+
+
+
+FUNCTION_BLOCK SensorDelay
+
+VAR_INPUT
+  Signal : BOOL;
+  T_on, T_off : TIME;
+END_VAR
+
+VAR_OUTPUT
+  Sensor : BOOL;
+END_VAR
+
+VAR
+  FF : SR_selfmade;
+  Timer_on   : TON;
+  Timer_off  : TOF;
+END_VAR
+
+Timer_on(IN := Signal, PT := T_on);
+Timer_off(IN := Signal, PT := T_off);
+FF(Set := Timer_on.Q, Reset := NOT Timer_off.Q);
+Sensor := FF.Q1;
+
+END_FUNCTION_BLOCK
+
+
+FUNCTION_BLOCK SR_selfmade
+
+VAR_INPUT
+  Set, Reset : BOOL;
+END_VAR
+
+VAR_OUTPUT
+  Q1 : BOOL;
+END_VAR
+
+Q1 := Set OR ( Q1 AND NOT Reset);
+
+END_FUNCTION_BLOCK
+        ]]></plaintext>
+    </code>
+</session>

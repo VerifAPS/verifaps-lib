@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" isConcrete="false" name="Unnamed Specification">
+    <variables>
+        <ioVariable data-type="INT" io="input" name="Counter" colwidth="100.0" />
+        <ioVariable data-type="BOOL" io="output" name="Active" colwidth="100.0" />
+        <freeVariable name="c" data-type="INT" default="-" />
+    </variables>
+    <rows>
+        <row>
+            <duration>[10,-]</duration>
+            <cell>0</cell>
+            <cell>TRUE</cell>
+        </row>
+        <row>
+            <duration>1</duration>
+            <cell>&gt; 10</cell>
+            <cell>TRUE</cell>
+        </row>
+        <row>
+            <duration>4</duration>
+            <cell>c</cell>
+            <cell>FALSE</cell>
+        </row>
+    </rows>
+</specification>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+	<general>
+		<uiLanguage>EN</uiLanguage>
+		<simulationTimeout>60</simulationTimeout>
+		<verificationTimeout>10</verificationTimeout>
+		<maxLineRollout>50</maxLineRollout>
+		<windowSize>
+			<height>884</height>
+			<width>1566</width>
+			<maximized>false</maximized>
+		</windowSize>
+	</general>
+	<editor>
+		<fontFamily>Courier</fontFamily>
+		<fontSize>12</fontSize>
+		<showLineNumbers>true</showLineNumbers>
+	</editor>
+	<dependencies>
+		<z3Path>/opt/z3-4.5.0-x64-ubuntu-14.04/bin/z3</z3Path>
+		<nuxmvFilename>/opt/nuXmv-1.1.1-Linux/bin/nuXmv</nuxmvFilename>
+		<getetaCommand>java -jar /opt/geteta/geteta-0.4.1-exe.jar -c ${code} -t ${spec} -x</getetaCommand>
+	</dependencies>
+</config>

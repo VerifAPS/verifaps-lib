@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<test-table xmlns="http://formal.iti.kit.edu/exteta-1.0">
+    <variables>
+        <variable data-type="INT" io="input" name="A"/>
+        <variable data-type="BOOLEAN" io="input" name="B"/>
+        <variable data-type="INT" io="output" name="C"/>
+        <variable data-type="ENUM" io="output" name="D"/>
+        <constraint constraint="-" data-type="BOOLEAN" name="p"/>
+        <constraint constraint="42" data-type="INT" name="q"/>
+    </variables>
+    <steps>
+        <step duration="[2,3]">
+            <cell>q</cell>
+            <cell>= NOT p</cell>
+            <cell>-</cell>
+            <cell>literalOne</cell>
+        </step>
+        <step duration="-">
+            <cell>= C[-1] - 1</cell>
+            <cell>B[-1]</cell>
+            <cell>52</cell>
+            <cell>-</cell>
+        </step>
+        <step duration="1">
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+            <cell>-</cell>
+        </step>
+    </steps>
+</test-table>

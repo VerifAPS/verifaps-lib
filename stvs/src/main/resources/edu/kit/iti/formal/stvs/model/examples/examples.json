@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Conveyor Belt",
+    "description": "A conveyor belt with multiple light barriers for error detection.",
+    "sessionFile": "conveyorbelt.xml",
+    "htmlHelp": "conveyorbelt.html"
+  },
+  {
+    "name": "Elevator",
+    "description": "Simple Demonstration",
+    "htmlHelp": "elevator.html",
+    "sessionFile": "elevator.xml"
+  },
+  {
+    "name": "Linear Regression in Combination",
+    "description": "presented at INDIN 2017",
+    "htmlHelp": "lrcombined.html",
+    "sessionFile": "lrcombined.xml"
+  },
+  {
+    "name": "Linear Regression",
+    "description": "presented at INDIN 2017",
+    "htmlHelp": "linearregression.html",
+    "sessionFile": "linearregression.xml"
+  },
+  {
+    "name": "MinMaxWarning",
+    "description": "Example of iFM'17 Paper",
+    "htmlHelp": "minmax.html",
+    "sessionFile": "minmax.xml"
+  },
+  {
+    "name": "Pedestrian Light",
+    "description": "Demo",
+    "htmlHelp": "light.html",
+    "sessionFile": "light.xml"
+  }
+]
+

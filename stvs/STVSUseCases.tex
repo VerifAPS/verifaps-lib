@@ -1,0 +1,29 @@
+\documentclass[10pt]{article}
+\usepackage{german}
+\begin{document}
+\title{STVS Use Cases}
+\maketitle
+\section{•}
+\subsection{Task:}
+Check ST-Code for wrong behaviour. Mulitple individual concrete testtables would be expensive.
+\subsection{Support by STVS:}
+STVS supports generalised test tables that you can use to check multiple Cases at once.
+re F"alle auf einmal pr"ufen kann.
+\subsection{Possible expiration:}
+Alice opens the file 'ElevatorCode.st'. She wants to verify this Code with the help of a generalised test table. She writes the generalised test table (GTT) 'InvariantTable.xml'. In this, she states that the elevator should be stationary or the door must be locked (for any number of cycles). She clicks the 'Verify'-Button to verify the code. It fails and a counterexamplpe will be displayed. In this counterexample a case is displayed where the door is open, but the elevator goes down. Alice emends the concrete test table (CTT), which represents the counterexample, that it agrees with the GTT (door closed in this state). Alice understood what she had to look for in the code. She finds the bug in the code (missing initialization of the value of the door state) and fixes it. Now she verifies again and this time it succeeds.
+\section{•}
+\subsection{Task:}
+Understand ST-Code; Quality assurance before delivery.
+\subsection{Support by STVS:}
+STVS allows fast generation of exemplary test tables (or simulation of ST-Code).
+\subsection{Possible expiration:}
+Bob opens the file 'ElevatorCode.st'. He doesn't know much about this scenario but he must understand what the code does. He clicks on the button 'Create CTT' and sets values for the input columns (This creates a table with inputs only. This table is used to simulate the code.). He gets a concrete test table (CTT) which is easier to understand than the code. Bob creates more CTTs (with different input values) until he thinks he got what 'ElevatorCode.st' does. Another way would be to use the input values for a generalised test table (GTT) (e.g. as intervals). Then he could click on 'Create CTTs from GTT'. This button creates multiple CTTs with the general inputs from the GTT. So Bob wouldn't has to type in all different inputs. (Another way would be the timing diagram)
+\section{•}
+\subsection{Task:}
+Refactoring of code from a different person than from the original programmer.
+\subsection{Support by STVS:}
+STVS allows to evaluate concrete test tables with the code / check if the inputs from the table lead to the exact same outputs from the table with usage of the code.
+\subsection{Possible expiration:}
+Charlie should write an alternative to 'Elevator.st'. The new code should behave exactly like 'Elevator.st'. To test if he is on the right track, Charlie uses Bob's concrete test tables (CTT) to check his new code. He clicks on 'Evaluate CTT'. It is now checked whether, when inputs from the CTT pass through the code, the same outputs are generated. So Charlie can check if his code is doing the same like 'Elevator.st' (for all cases from Bob). The actual outputs do not matter, the main thing they are the same like in the CTTs described.
+
+\end{document}

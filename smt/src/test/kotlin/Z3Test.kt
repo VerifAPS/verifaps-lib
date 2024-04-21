@@ -78,13 +78,9 @@ class Z3Test {
                 (check-sat)""")
 
         solver.run(10, TimeUnit.SECONDS)
-        val (isSat1, model1, isSat2) = solver.readAll()
+        val (isSat1, _, isSat2) = solver.readAll()
 
         Assertions.assertEquals("sat", isSat1.toString())
         Assertions.assertEquals("unsat", isSat2.toString())
-
-        println(isSat1)
-        println(model1)
-        println(isSat2)
     }
 }
