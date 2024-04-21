@@ -1,30 +1,19 @@
 package edu.kit.iti.formal.automation.fx
 
-import com.pixelduke.control.Ribbon
-import com.pixelduke.control.ribbon.RibbonGroup
-import com.pixelduke.control.ribbon.RibbonTab
-import com.pixelduke.transit.Style
-import com.pixelduke.transit.TransitTheme
+import edu.kit.iti.formal.fxutils.*
 import edu.kit.iti.formal.util.info
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
-import javafx.event.EventHandler
-import javafx.event.EventTarget
 import javafx.geometry.Side
 import javafx.scene.Node
-import javafx.scene.control.Button
-import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
-import javafx.scene.input.KeyCombination
 import javafx.scene.paint.Color
 import javafx.scene.text.FontWeight
 import javafx.stage.FileChooser
 import javafx.stage.Stage
-import org.kordamp.ikonli.javafx.FontIcon
-import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.*
 import java.io.File
 import java.nio.file.Files
@@ -404,43 +393,4 @@ class IdeMenu(val ide: IdeView) : View() {
                 }
             }
         }
-}
-
-fun Menu.item(name: String, key: String?, ikon: String? = null, event: () -> Unit) {
-    val icon = ikon?.let { ref ->
-        val resolver = IkonResolver.getInstance()
-        resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }
-    }
-    item(name, key?.let { KeyCombination.keyCombination(it) }, icon) {
-        onAction = EventHandler { _ -> event() }
-    }
-}
-
-fun EventTarget.ribbon(op: Ribbon.() -> Unit = {}) = Ribbon().attachTo(this, op)
-
-fun Ribbon.tab(title: String = "", op: RibbonTab.() -> Unit = {}) = RibbonTab(title).also {
-    op(it)
-    this.tabs.add(it)
-}
-
-fun RibbonTab.group(title:String="",op: RibbonGroup.() -> Unit = {}) = RibbonGroup().also {
-    it.title = title
-    op(it)
-    this.ribbonGroups.add(it)
-}
-
-fun RibbonGroup.item(name: String, key: String?, ikon: String? = null, event: () -> Unit) {
-    val icon = ikon?.let { ref ->
-        val resolver = IkonResolver.getInstance()
-        resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }
-    }
-
-    val k = key?.let { KeyCombination.keyCombination(it) }
-
-    val item = Button(name, graphic).also {
-        //it.accelerator = k
-        it.graphic = icon
-        it.onAction = EventHandler { _ -> event() }
-    }
-    this.nodes.add(item)
 }

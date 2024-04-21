@@ -5,13 +5,13 @@ import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
-import edu.kit.iti.formal.stvs.view.menu.StvsMenuBarController
+import edu.kit.iti.formal.stvs.view.menu.StvsRibbonController
+import edu.kit.iti.formal.stvs.view.menu.StvsToolbarController
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Scene
 import javafx.scene.control.Alert
-import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
+import javafx.scene.layout.BorderPane
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
@@ -27,7 +27,10 @@ class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) 
 
     var rootController: StvsRootController = StvsRootController(rootModelProperty.get())
 
-    val menuBarController: StvsMenuBarController = StvsMenuBarController(rootModelProperty)
+    //val menuBarController: StvsMenuBarController = StvsMenuBarController(rootModelProperty)
+
+    // val menuBarController = StvsRibbonController(rootModelProperty)
+    val menuBarController = StvsToolbarController(rootModelProperty)
 
     val scene: Scene
 
@@ -42,7 +45,8 @@ class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) 
         rootModelProperty.addListener { obs, oldModel, rootModel -> this.rootModelChanged(rootModel) }
 
         this.scene = Scene(
-            createVBox(), rootModel.globalConfig.windowWidth.toDouble(),
+            createVBox(),
+            rootModel.globalConfig.windowWidth.toDouble(),
             rootModel.globalConfig.windowHeight.toDouble()
         )
 
@@ -50,13 +54,7 @@ class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) 
         rootModel.globalConfig.windowHeightProperty.bind(scene.heightProperty())
     }
 
-    private fun createVBox(): VBox {
-        val vbox = VBox()
-        vbox.children.addAll(menuBarController.view, rootController.view)
-        VBox.setVgrow(rootController.view, Priority.ALWAYS)
-
-        return vbox
-    }
+    private fun createVBox() = BorderPane(rootController.view, menuBarController.view, null, null, null)
 
     private fun rootModelChanged(rootModel: StvsRootModel) {
         this.rootController = StvsRootController(rootModel)

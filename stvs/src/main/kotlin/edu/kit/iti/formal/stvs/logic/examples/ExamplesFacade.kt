@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.examples
 
-import edu.kit.iti.formal.stvs.model.examples.Example
+import com.google.gson.GsonBuilder
 import java.util.*
 
 /**
@@ -8,10 +8,10 @@ import java.util.*
  * @version 1 (01.04.17)
  */
 object ExamplesFacade {
-    @JvmStatic
-    val examples: List<Example>
-        get() {
-            val loader = ServiceLoader.load(Example::class.java)
-            return loader.iterator().asSequence().toList()
-        }
+    fun examples(): List<Example> {
+        val res = javaClass.getResourceAsStream("/edu/kit/iti/formal/stvs/model/examples/examples.json")!!
+            .reader()
+        val json = GsonBuilder().setPrettyPrinting().create().fromJson(res, Array<Example>::class.java)
+        return json.iterator().asSequence().toList()
+    }
 }

@@ -25,16 +25,6 @@ dependencies {
     implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6.1'
     implementation group: 'jaxen', name: 'jaxen', version: '2.0.0'
 
-
-    implementation("no.tornado:tornadofx:1.7.20")
-    implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '11.3'
-    implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.11.2'
-    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1'
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1")
-    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
-    implementation 'com.pixelduke:fxribbon:1.2.2'
-    implementation("org.jfxtras:jmetro:11.6.15")
-
     implementation("com.google.code.gson:gson:2.10.1")
     implementation 'de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2'
 
@@ -43,7 +33,9 @@ dependencies {
     implementation 'commons-io:commons-io:2.9.0'
 
     implementation 'org.fxmisc.cssfx:cssfx:1.0.0'
-    implementation 'org.controlsfx:controlsfx:8.40.13'
+    implementation(project(":fxutils"))
+
+
 
 /*    testImplementation "org.testfx:testfx-core:4.0.+"
     testImplementation "org.testfx:testfx-junit:4.0.+"

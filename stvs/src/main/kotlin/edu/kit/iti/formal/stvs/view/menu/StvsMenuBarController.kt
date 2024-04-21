@@ -4,7 +4,7 @@ import edu.kit.iti.formal.stvs.logic.examples.ExamplesFacade
 import edu.kit.iti.formal.stvs.logic.io.*
 import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.code.Code
-import edu.kit.iti.formal.stvs.model.examples.Example
+import edu.kit.iti.formal.stvs.logic.examples.Example
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.view.Controller
 import edu.kit.iti.formal.stvs.view.ViewUtils
@@ -60,7 +60,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
         view.about.onAction = EventHandler { actionEvent: ActionEvent -> this.openAboutDialog(actionEvent) }
 
         //popluate examples
-        for (ex in ExamplesFacade.examples) {
+        for (ex in ExamplesFacade.examples()) {
             val a = ex
             val mex = MenuItem(ex.name)
             mex.onAction = EventHandler { value: ActionEvent? -> this.openExample(a) }
@@ -71,7 +71,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
     }
 
     fun openExample(ex: Example) {
-        val url = ex.sessionFile
+        val url = ex.sessionUrl
         try {
             val session: StvsRootModel = ImporterFacade.importSession(
                 url!!.openStream(),

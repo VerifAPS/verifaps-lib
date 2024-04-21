@@ -17,7 +17,7 @@ import java.util.function.Supplier
 class StvsMenuBarDemo {
     @Test
     fun javaFxTest() {
-        JavaFxTest.Companion.setToBeViewed(Supplier<Scene?> { this.simpleScene() })
+        JavaFxTest.setToBeViewed { this.simpleScene() }
         Application.launch(JavaFxTest::class.java)
     }
 

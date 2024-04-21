@@ -16,23 +16,7 @@ dependencies {
     implementation project(':geteta')
     implementation project(':aps-rvt')
     implementation project(':run')
+    implementation(project(":fxutils"))
 
-    implementation 'com.github.ajalt.clikt:clikt:4.2.2'
-
-    implementation("no.tornado:tornadofx:1.7.20")
-    implementation group: 'com.miglayout', name: 'miglayout-javafx', version: '11.3'
-    implementation group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.11.2'
-    implementation 'org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1'
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1")
-    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
-    implementation 'com.pixelduke:fxribbon:1.2.2'
-    implementation("com.pixelduke:transit:1.0.0")
-
+    implementation("com.github.ajalt.clikt:clikt:4.2.2")
 }
-
-repositories {
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
-
