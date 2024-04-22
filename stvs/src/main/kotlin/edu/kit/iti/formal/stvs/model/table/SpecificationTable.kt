@@ -7,7 +7,6 @@ import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.util.Callback
-import org.apache.commons.lang3.StringEscapeUtils
 import tornadofx.getValue
 import tornadofx.setValue
 import java.util.*
@@ -152,9 +151,7 @@ open class SpecificationTable<H : Named?, C, D>(
     fun getColumnHeaderByName(columnHeaderName: String?): H {
         return getOptionalColumnHeaderByName(columnHeaderName)
             .orElseThrow {
-                NoSuchElementException(
-                    "Column does not exist: " + StringEscapeUtils.escapeJava(columnHeaderName)
-                )
+                NoSuchElementException("Column does not exist: $columnHeaderName")
             }
     }
 
@@ -214,14 +211,10 @@ open class SpecificationTable<H : Named?, C, D>(
         for (addedRow in added) {
             // Check correctness of added row
             require(addedRow!!.cells.size == columnHeaders.size) {
-                ("Illegal width for row " + StringEscapeUtils.escapeJava(addedRow.toString())
-                        + ", expected width: " + columnHeaders.size)
+                "Illegal width for row $addedRow, expected width: ${columnHeaders.size}"
             }
-            require(
-                addedRow.cells.keys.stream()
-                    .allMatch { columnId: String? -> getOptionalColumnHeaderByName(columnId).isPresent }) {
-                ("Added row contains unknown IoVariable: "
-                        + StringEscapeUtils.escapeJava(addedRow.toString()))
+            require(addedRow.cells.keys.all { getOptionalColumnHeaderByName(it).isPresent }) {
+                "Added row contains unknown IoVariable: $addedRow"
             }
         }
     }
@@ -238,11 +231,8 @@ open class SpecificationTable<H : Named?, C, D>(
         for (columnHeader in added) {
             val columnId = columnHeader!!.name
             getOptionalColumnHeaderByName(columnId).ifPresent { otherVariableWithSameName: H ->
-                require(
-                    otherVariableWithSameName === columnHeader
-                ) {
-                    ("Cannot add SpecIoVariable that collides with another SpecIoVariable: "
-                            + StringEscapeUtils.escapeJava(columnId))
+                require(otherVariableWithSameName === columnHeader) {
+                    "Cannot add SpecIoVariable that collides with another SpecIoVariable: $columnId"
                 }
             }
         }

@@ -7,7 +7,6 @@ import javafx.beans.binding.Bindings
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.beans.property.StringProperty
 import javafx.beans.value.ObservableBooleanValue
 import javafx.event.EventHandler
 import javafx.scene.control.Alert.AlertType
@@ -16,29 +15,34 @@ import javafx.scene.image.Image
 import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
-import org.apache.commons.lang3.SystemUtils
-import java.io.File
+import tornadofx.getValue
+import tornadofx.setValue
+import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * Created by leonk on 22.03.2017.
  */
 class WelcomeWizard(private val config: GlobalConfig) : WizardManager() {
     private val areAllPathsValid: ObservableBooleanValue
+    val javaPathProperty = SimpleStringProperty(ownJavaPath.toString())
+    var javaPath by javaPathProperty
+
+    val getetaPathProperty = SimpleStringProperty("")
+    val getetaPath by getetaPathProperty
 
     init {
-        val javaPath: StringProperty = SimpleStringProperty(ownJavaPath)
-        val getetaPath: StringProperty = SimpleStringProperty("")
-        config.getetaCommandProperty
-            .bind(Bindings.concat(javaPath, " -jar ", getetaPath, " -c \${code} -t \${spec} -x"))
+        config.getetaCommandProperty.bind(
+            Bindings.concat(javaPath, " -jar ", getetaPath, " -c \${code} -t \${spec} -x"))
 
         val java = WizardFilePathPage(
             "Java",
             "Choose the path to the java executable you would like to use to run the GeTeTa verification engine with.",
-            javaPath
+            javaPathProperty
         )
         val geteta = WizardFilePathPage(
             "GeTeTa",
-            "Choose the path to the GeTeTa verification engine jar package.", getetaPath,
+            "Choose the path to the GeTeTa verification engine jar package.", getetaPathProperty,
             "https://formal.iti.kit.edu/weigl/verifaps/geteta/"
         )
         val getetaCommandPage = WizardUneditableStringPage(
@@ -104,14 +108,13 @@ class WelcomeWizard(private val config: GlobalConfig) : WizardManager() {
             return accu
         }
 
-        private val ownJavaPath: String
+        private val ownJavaPath: Path
             get() {
                 var extension = ""
-                if (SystemUtils.IS_OS_WINDOWS) {
+                if (System.getProperty("os.name").equals("win", ignoreCase = true)) {
                     extension = ".exe"
                 }
-                return (System.getProperty("java.home") + File.separator + "bin" + File.separator + "java"
-                        + extension)
+                return Path(System.getProperty("java.home"), "bin", "java$extension")
             }
     }
 }

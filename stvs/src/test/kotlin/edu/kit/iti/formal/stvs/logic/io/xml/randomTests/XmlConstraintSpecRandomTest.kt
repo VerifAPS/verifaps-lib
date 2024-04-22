@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.logic.io.*
 import edu.kit.iti.formal.stvs.logic.io.xml.RandomTableGenerator
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import junit.framework.TestCase
-import org.apache.commons.io.FileUtils
 import org.junit.Before
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Tag
@@ -52,11 +51,11 @@ class XmlConstraintSpecRandomTest {
             freeVariables
         )
         ExporterFacade.exportSpec(originalSpec, ExporterFacade.ExportFormat.XML, tempFile)
-        val originalFileContents = FileUtils.readFileToString(tempFile, "utf-8")
+        val originalFileContents = tempFile.readText()
         val importedSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(tempFile)
         TestCase.assertEquals(originalSpec, importedSpec)
         ExporterFacade.exportSpec(importedSpec, ExporterFacade.ExportFormat.XML, tempFile)
-        val reexportedFileContents = FileUtils.readFileToString(tempFile, "utf-8")
+        val reexportedFileContents = tempFile.readText()
         TestCase.assertEquals(originalFileContents, reexportedFileContents)
     }
 

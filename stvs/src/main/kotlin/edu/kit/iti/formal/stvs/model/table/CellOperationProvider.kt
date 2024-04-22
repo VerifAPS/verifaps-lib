@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import org.apache.commons.lang3.StringEscapeUtils
-
 /**
  * Interface for classes that Provide commonly needed functionality for editing, like having a
  * string property and being commentable.
@@ -14,8 +12,5 @@ interface CellOperationProvider : Commentable, StringEditable {
      * (should only used for debugging purposes, i.e. in toString methods)
      * @return a minimal string
      */
-    fun debuggingString(): String? {
-        return asString + (if (comment == null) ""
-        else " (comment: \"" + StringEscapeUtils.escapeJava(comment) + "\")")
-    }
+    fun debuggingString() = asString + (comment?.let { " (comment: \"$it\")" } ?: "")
 }

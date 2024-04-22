@@ -8,7 +8,6 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.view.Controller
 import javafx.beans.property.BooleanProperty
 import javafx.collections.FXCollections
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.geometry.Side
 import javafx.scene.chart.Axis
@@ -18,8 +17,6 @@ import javafx.scene.chart.XYChart
 import javafx.scene.control.MenuItem
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
-import org.apache.commons.lang3.tuple.ImmutablePair
-import org.apache.commons.lang3.tuple.Pair
 import kotlin.math.min
 
 /**
@@ -134,22 +131,21 @@ class TimingDiagramController : Controller {
         // view.getyAxis().layoutBoundsProperty().addListener(change -> updateAxisExternalPosition());
         view.onMouseClicked = EventHandler { mouseEvent: MouseEvent -> this.onMouseClicked(mouseEvent) }
         val xpositiveZoomItem = MenuItem("Zoom X+")
-        xpositiveZoomItem.onAction = EventHandler { actionEvent: ActionEvent -> this.onXPositiveZoom(actionEvent) }
+        xpositiveZoomItem.onAction = EventHandler { this.onXPositiveZoom() }
         val xnegativeZoomItem = MenuItem("Zoom X-")
-        xnegativeZoomItem.onAction = EventHandler { actionEvent: ActionEvent -> this.onXNegativeZoom(actionEvent) }
+        xnegativeZoomItem.onAction = EventHandler { this.onXNegativeZoom() }
         view.contextMenu.items.setAll(xpositiveZoomItem, xnegativeZoomItem)
         val cycleSelectionRectangles = view.cycleSelectionRectangles
-        for (i in cycleSelectionRectangles!!.indices) {
+        for (i in cycleSelectionRectangles.indices) {
             val cycleSelectionRectangle = cycleSelectionRectangles[i]
-            val finalCycleIndex = i
-            cycleSelectionRectangle!!.onMouseEntered = EventHandler { event: MouseEvent? ->
+            cycleSelectionRectangle!!.onMouseEntered = EventHandler {
                 if (activated.get()) {
                     cycleSelectionRectangle.opacity = 1.0
-                    selection!!.row = concreteSpec.cycleToRowNumber(finalCycleIndex)
+                    selection!!.row = concreteSpec.cycleToRowNumber(i)
                     selection.column = ioVariable.name
                 }
             }
-            cycleSelectionRectangle.onMouseExited = EventHandler { event: MouseEvent? ->
+            cycleSelectionRectangle.onMouseExited = EventHandler {
                 if (activated.get()) {
                     cycleSelectionRectangle.opacity = 0.0
                     selection!!.clear()
@@ -159,14 +155,14 @@ class TimingDiagramController : Controller {
                 if (event.button == MouseButton.PRIMARY) {
                     selection!!.fireClickEvent(
                         ioVariable.name,
-                        concreteSpec.cycleToRowNumber(finalCycleIndex)
+                        concreteSpec.cycleToRowNumber(i)
                     )
                 }
             }
         }
     }
 
-    private fun onXPositiveZoom(actionEvent: ActionEvent) {
+    private fun onXPositiveZoom() {
         val interval = commonXAxis!!.upperBound - commonXAxis.lowerBound
         val newInterval = interval / 2
         if (newInterval < 1) {
@@ -183,7 +179,7 @@ class TimingDiagramController : Controller {
         commonXAxis.upperBound = newUpperBound
     }
 
-    private fun onXNegativeZoom(actionEvent: ActionEvent) {
+    private fun onXNegativeZoom() {
         val interval = commonXAxis!!.upperBound - commonXAxis.lowerBound
         val newInterval = interval * 2
         if (newInterval < 1) {
@@ -197,7 +193,7 @@ class TimingDiagramController : Controller {
             newLowerBound = 0.0
         }
         commonXAxis.lowerBound = newLowerBound
-        commonXAxis.upperBound = min(newUpperBound, concreteSpec!!.rows!!.size.toDouble())
+        commonXAxis.upperBound = min(newUpperBound, concreteSpec!!.rows.size.toDouble())
     }
 
     private fun onMouseClicked(mouseEvent: MouseEvent) {
@@ -235,7 +231,7 @@ class TimingDiagramController : Controller {
                 globalXAxis,
                 yaxis, concreteSpec, specIoVar, selection, activated
             )
-            return ImmutablePair(timingDiagramController, yaxis)
+            return timingDiagramController to  yaxis
         }
 
         /**
@@ -263,7 +259,7 @@ class TimingDiagramController : Controller {
                 globalXAxis,
                 boolCategoryAxis, concreteSpec, specIoVar, selection, activated
             )
-            return ImmutablePair(timingDiagramController, boolCategoryAxis)
+            return timingDiagramController to  boolCategoryAxis
         }
 
         /**
@@ -292,7 +288,7 @@ class TimingDiagramController : Controller {
                 globalXAxis,
                 categoryAxis, concreteSpec, specIoVar, selection, activated
             )
-            return ImmutablePair(timingDiagramController, categoryAxis)
+            return timingDiagramController to categoryAxis
         }
     }
 }

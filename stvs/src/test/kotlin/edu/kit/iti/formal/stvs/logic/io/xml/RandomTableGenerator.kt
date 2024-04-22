@@ -15,7 +15,6 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow
-import org.apache.commons.lang3.RandomStringUtils
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -346,15 +345,22 @@ class RandomTableGenerator {
 
     private fun randomAlphaNumeric(length: Int): String {
         random.nextInt(10)
-        return RandomStringUtils.random(length, 0, 0, true, true, null, random)
+        return random(length, true, true, random)
     }
 
     private fun randomNonNumeric(length: Int): String {
         val res = StringBuilder("")
         if (length > 0) {
-            res.append(RandomStringUtils.random(length, 0, 0, true, false, null, random))
+            res.append(random(length, true, false, random))
         }
         return res.toString()
+    }
+
+    private fun random(count: Int, letters: Boolean, numbers: Boolean, random: Random): String {
+        val alpha = "abcdefghijklmnopqrstuvwxyz"
+        val num = "0123456789"
+        val chars = ((if (letters) alpha + alpha.uppercase() else "") + (if (numbers) num else "")).toCharArray()
+        return (1..count).joinToString("") { chars[random.nextInt(chars.size - 1)].toString() }
     }
 
     companion object {

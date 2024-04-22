@@ -99,12 +99,12 @@ class TimingDiagramCollectionController(
                     view.xaxis, selection, activatedProperty
                 )
             })!!
-        val timingDiagramView = diagramAxisPair.left.view
+        val timingDiagramView = diagramAxisPair.first.view
 
         if (concreteSpec!!.isCounterExample) {
             timingDiagramView.styleClass.add("counterexample")
         }
-        val externalYAxis = diagramAxisPair.right
+        val externalYAxis = diagramAxisPair.second
         val verticalResizeContainerController =
             VerticalResizeContainerController(timingDiagramView)
 

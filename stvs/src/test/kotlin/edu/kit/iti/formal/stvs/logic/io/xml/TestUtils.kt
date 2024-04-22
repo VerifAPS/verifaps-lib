@@ -1,10 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.StvsApplication
-import org.apache.commons.io.output.WriterOutputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
-import java.io.StringWriter
 import java.net.URISyntaxException
 import java.nio.file.Paths
 import java.util.*
@@ -65,9 +64,9 @@ object TestUtils {
     fun readFromFile(path: String) = Paths.get(path).bufferedReader().readText()
 
     fun stringOutputStream(block: (OutputStream) -> Unit): String {
-        val sw = StringWriter()
-        block(WriterOutputStream(sw,"utf-8"))
-        return sw.toString()
+        val out = ByteArrayOutputStream(4096)
+        block(out)
+        return out.toString("utf-8")
     }
 
     enum class FileType {

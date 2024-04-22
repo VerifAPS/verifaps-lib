@@ -11,12 +11,14 @@ import javafx.scene.control.Label
 import javafx.scene.layout.HBox
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
+import tornadofx.getValue
 import java.io.File
 
 /**
  * Created by leonk on 22.03.2017.
  */
-class WizardFilePathPage(title: String, description: String?, filePath: StringProperty?) : WizardPage(title) {
+class WizardFilePathPage(title: String, description: String, val filePathProperty: StringProperty) : WizardPage(title) {
+    val filePath by filePathProperty
     private val filePathField = FileSelectionField()
     private val valid: BooleanProperty = SimpleBooleanProperty()
     private val notValidContainer = HBox(20.0)
@@ -32,11 +34,11 @@ class WizardFilePathPage(title: String, description: String?, filePath: StringPr
         validator(filePathField.textField.textProperty())
 
         children.addAll(Label(description), filePathField, notValidContainer)
-        filePathField.textField.textProperty().bindBidirectional(filePath)
+        filePathField.textField.textProperty().bindBidirectional(filePathProperty)
     }
 
     constructor(
-        title: String, description: String?, filePath: StringProperty?,
+        title: String, description: String, filePath: StringProperty,
         downloadLink: String
     ) : this(title, description, filePath) {
         children.addAll(

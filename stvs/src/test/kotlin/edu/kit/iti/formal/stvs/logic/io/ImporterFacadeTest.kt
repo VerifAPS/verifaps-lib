@@ -12,7 +12,6 @@ import edu.kit.iti.formal.stvs.model.expressions.*
 import edu.kit.iti.formal.stvs.model.table.*
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess
-import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -131,7 +130,7 @@ class ImporterFacadeTest {
     @Test
     fun importStCode() {
         val file = File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI())
-        val expectedCode: String = FileUtils.readFileToString(file, "utf-8")
+        val expectedCode: String = file.readText()
         val importedCode = ImporterFacade.importStCode(file)
         assertEquals(
             TestUtils.removeWhitespace(expectedCode),

@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.verification
 
 import javafx.beans.property.*
-import org.apache.commons.io.IOUtils
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
@@ -50,17 +49,16 @@ class ProcessMonitor(process: Process?, timeout: Int) : Thread() {
      */
     override fun run() {
         isAborted = false
+        val process = this.process!!
         try {
             // wait for the process to finish
-            if (!process!!.waitFor(timeout.toLong(), TimeUnit.SECONDS)) {
-                process!!.destroy()
+            if (!process.waitFor(timeout.toLong(), TimeUnit.SECONDS)) {
+                process.destroy()
                 isAborted = true
             }
-            if (process!!.exitValue() != 0) {
-                error = IOException(
-                    """Process ended with error ${process!!.exitValue()} and error output:
-${IOUtils.toString(process!!.errorStream, "utf-8")}"""
-                )
+            if (process.exitValue() != 0) {
+                val errorOut = process.errorStream.reader().readText()
+                error = IOException("Process ended with error ${process.exitValue()} and error output: $errorOut")
             }
             processFinishedProperty.set(true)
         } catch (e: InterruptedException) {

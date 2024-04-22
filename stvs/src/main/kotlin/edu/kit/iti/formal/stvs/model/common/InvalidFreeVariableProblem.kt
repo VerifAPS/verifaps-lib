@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.model.common
 
 import edu.kit.iti.formal.stvs.model.expressions.*
 import edu.kit.iti.formal.stvs.model.expressions.parser.*
-import org.apache.commons.lang3.StringEscapeUtils
 
 /**
  *
@@ -49,20 +48,14 @@ class InvalidFreeVariableProblem(errorMessage: String?) : FreeVariableProblem(er
             if (VariableExpr.IDENTIFIER_PATTERN.matcher(varName).matches()) {
                 return varName
             } else {
-                throw InvalidFreeVariableProblem(
-                    "Variable has illegal characters in name: "
-                            + StringEscapeUtils.escapeJava(varName)
-                )
+                throw InvalidFreeVariableProblem("Variable has illegal characters in name: $varName")
             }
         }
 
         @Throws(InvalidFreeVariableProblem::class)
         private fun tryToGetValidType(freeVariable: FreeVariable, typesByName: Map<String, Type>): Type {
             val foundType = typesByName[freeVariable.type]
-                ?: throw InvalidFreeVariableProblem(
-                    "Variable has unknown type: " + StringEscapeUtils
-                        .escapeJava(freeVariable.type)
-                )
+                ?: throw InvalidFreeVariableProblem("Variable has unknown type: ${freeVariable.type}")
             return foundType
         }
 

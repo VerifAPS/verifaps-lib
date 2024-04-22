@@ -9,7 +9,6 @@ import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.table.*
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
-import org.apache.commons.io.IOUtils
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import java.io.*
@@ -243,12 +242,10 @@ object ImporterFacade {
     fun importFile(
         file: File, globalConfig: GlobalConfig, currentHistory: History,
         importHybridSpecificationHandler: ImportHybridSpecificationHandler,
-        importStvsRootModelHandler: ImportStvsRootModelHandler, codeConsumer: ImportCodeHandler
+        importStvsRootModelHandler: ImportStvsRootModelHandler,
+        codeConsumer: ImportCodeHandler
     ) {
-        val writer = StringWriter()
-        val byteArray: ByteArray = IOUtils.toByteArray(FileInputStream(file))
-        IOUtils.copy(ByteArrayInputStream(byteArray), writer, "utf8")
-        val inputString = writer.toString()
+        val inputString = file.bufferedReader().readText()
         val dbf = DocumentBuilderFactory.newInstance()
         dbf.isNamespaceAware = true
         try {

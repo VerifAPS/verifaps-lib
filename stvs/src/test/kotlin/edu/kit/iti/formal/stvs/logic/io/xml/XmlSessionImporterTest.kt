@@ -10,10 +10,8 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeFactory.enumOfName
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification
-import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.io.File
 
 /**
  * @author Benjamin Alt
@@ -37,11 +35,10 @@ class XmlSessionImporterTest {
         )
         hybridSpec.concreteInstance = concreteSpec
         Assertions.assertEquals(hybridSpec, importedSession.hybridSpecifications[0])
-        val code = FileUtils.readFileToString(
-            File(
-                StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI()
-            ), "utf-8"
-        )
+        val code =
+                StvsApplication::class.java.getResourceAsStream("testSets/valid_1/code_valid_1.st")!!
+                    .reader().readText()
+
         Assertions.assertEquals(
             code.replace("\\s+".toRegex(), " ").trim(),
             importedSession.scenario.code.sourcecode.replace("\\s+".toRegex(), " ").trim()

@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.model.StvsRootModel
-import org.apache.commons.io.FileUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.io.*
 
 /**
  * @author Benjamin Alt

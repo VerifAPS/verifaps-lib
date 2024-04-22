@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.common
 
-import org.apache.commons.lang3.StringEscapeUtils
-
 /**
  * A [FreeVariableProblem] that occurs when two free variables with the same name occur.
  *
@@ -13,9 +11,9 @@ class DuplicateFreeVariableProblem
  * method [DuplicateFreeVariableProblem.checkForDuplicates].
  * @param freeVariableName the name of the duplicate variable
  */
-private constructor(freeVariableName: String) : FreeVariableProblem(
-    "More than one free variable with name " + StringEscapeUtils.escapeJava(freeVariableName)
-) {
+private constructor(freeVariableName: String) :
+    FreeVariableProblem("More than one free variable with name $freeVariableName") {
+
     override val problemName: String
         get() = "duplicate variable name"
 

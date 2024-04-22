@@ -8,12 +8,9 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser
-import org.apache.commons.io.IOUtils
-import org.apache.commons.io.output.WriterOutputStream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.IOException
-import java.io.StringWriter
 
 /**
  * @author Benjamin Alt
@@ -35,15 +32,9 @@ class XmlConstraintSpecExporterTest {
         )
 
         val typeContext = listOf(TypeInt.INT, TypeBool.BOOL)
-
         val testSpec = JsonTableParser.constraintTableFromJson(testjson)
-
-        val result = StringWriter()
-        exporter.export(testSpec, WriterOutputStream(result))
-        val resultString = result.toString()
-        val expectedString = IOUtils.toString(
-            this.javaClass.getResourceAsStream("spec_constraint_valid_1.xml"), "UTF-8"
-        )
+        val resultString = TestUtils.stringOutputStream { exporter.export(testSpec, it) }
+        val expectedString = this.javaClass.getResourceAsStream("spec_constraint_valid_1.xml")!!.reader().readText()
         Assertions.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(resultString))
     }
 }
