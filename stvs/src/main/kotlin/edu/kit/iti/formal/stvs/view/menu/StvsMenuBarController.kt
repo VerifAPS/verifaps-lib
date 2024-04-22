@@ -175,7 +175,7 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
                 ButtonType.YES, save, ButtonType.NO
             )
             //request.initOwner();
-            val answer: Optional<ButtonType> = request.showAndWait()
+            val answer = request.showAndWait()
             if (answer.isPresent()) {
                 if (answer.get() == save) {
                     clear = saveCode(actionEvent)

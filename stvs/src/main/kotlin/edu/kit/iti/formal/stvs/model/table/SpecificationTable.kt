@@ -137,10 +137,8 @@ open class SpecificationTable<H : Named?, C, D>(
      * @return An [Optional] containing the corresponding column header or an
      * empty [Optional] there is no such header
      */
-    fun getOptionalColumnHeaderByName(columnHeaderName: String?): Optional<H> {
-        return columnHeaders.stream()
-            .filter { specIoVariable: H -> specIoVariable!!.name == columnHeaderName }.findAny()
-    }
+    fun getOptionalColumnHeaderByName(columnHeaderName: String?): H? =
+        columnHeaders.find { it!!.name == columnHeaderName }
 
     /**
      * Get the column header with a given name.
@@ -148,13 +146,9 @@ open class SpecificationTable<H : Named?, C, D>(
      * @return The corresponding column header
      * @throws NoSuchElementException if there is no such column header
      */
-    fun getColumnHeaderByName(columnHeaderName: String?): H {
-        return getOptionalColumnHeaderByName(columnHeaderName)
-            .orElseThrow {
-                NoSuchElementException("Column does not exist: $columnHeaderName")
-            }
-    }
-
+    fun getColumnHeaderByName(columnHeaderName: String?): H =
+        getOptionalColumnHeaderByName(columnHeaderName)
+            ?: throw NoSuchElementException("Column does not exist: $columnHeaderName")
 
     /**
      * Invoked when the list of row changes.
@@ -213,7 +207,7 @@ open class SpecificationTable<H : Named?, C, D>(
             require(addedRow!!.cells.size == columnHeaders.size) {
                 "Illegal width for row $addedRow, expected width: ${columnHeaders.size}"
             }
-            require(addedRow.cells.keys.all { getOptionalColumnHeaderByName(it).isPresent }) {
+            require(addedRow.cells.keys.all { getOptionalColumnHeaderByName(it) != null}) {
                 "Added row contains unknown IoVariable: $addedRow"
             }
         }
@@ -230,8 +224,8 @@ open class SpecificationTable<H : Named?, C, D>(
     protected open fun onColumnHeaderAdded(added: List<H>) {
         for (columnHeader in added) {
             val columnId = columnHeader!!.name
-            getOptionalColumnHeaderByName(columnId).ifPresent { otherVariableWithSameName: H ->
-                require(otherVariableWithSameName === columnHeader) {
+            getOptionalColumnHeaderByName(columnId)?.let {
+                require(it === columnHeader) {
                     "Cannot add SpecIoVariable that collides with another SpecIoVariable: $columnId"
                 }
             }

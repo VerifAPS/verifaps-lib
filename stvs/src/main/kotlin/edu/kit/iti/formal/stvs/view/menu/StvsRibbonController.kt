@@ -186,7 +186,7 @@ class StvsRibbonController(private val rootModel: ObjectProperty<StvsRootModel>)
                 Alert.AlertType.CONFIRMATION, "Do you really want to throw away your code?",
                 ButtonType.YES, save, ButtonType.NO
             )
-            val answer: Optional<ButtonType> = request.showAndWait()
+            val answer = request.showAndWait()
             if (answer.isPresent) {
                 if (answer.get() == save) {
                     clear = saveCode()

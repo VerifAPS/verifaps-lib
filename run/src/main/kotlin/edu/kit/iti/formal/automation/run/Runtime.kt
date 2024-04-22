@@ -19,8 +19,7 @@ import java.util.*
  * Represents the Runtime of ST-execution
  * changes the [state] depending on the visited Nodes
  */
-class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> = Stack())
-    : DefaultVisitorNN<Unit>() {
+class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> = Stack()) : DefaultVisitorNN<Unit>() {
     constructor(state: State, scope: Scope) : this(state) {
         definitionScopeStack.push(scope)
     }
@@ -36,45 +35,46 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         definitionScopeStack.pop()
     }
 
-    override fun visit(fbc: InvocationStatement) {
-        val fbName = fbc.callee.identifier
+    @Suppress("UNCHECKED_CAST")
+    override fun visit(invocation: InvocationStatement) {
+        val fbName = invocation.callee.identifier
         val innerValue = state[fbName]!! as Value<RecordType, RecordValue>
         val innerState = State(innerValue.value.fieldValues)
         val fbDataType =
-                (peekScope().resolveVariable(fbc.callee)?.dataType) as FunctionBlockDataType?
-                        ?: throw IllegalStateException()
+            (peekScope().resolveVariable(invocation.callee)?.dataType) as FunctionBlockDataType?
+                ?: throw IllegalStateException()
         val fb = fbDataType.functionBlock
 
-        fbc.parameters
-                .filter { it.isInput }
-                .forEach {
-                    val parameterValue = evaluateExpression(it)
-                    innerState[it.name!!] = parameterValue
-                }
+        invocation.parameters
+            .filter { it.isInput }
+            .forEach {
+                val parameterValue = evaluateExpression(it)
+                innerState[it.name!!] = parameterValue
+            }
 
         val innerScope = Stack<Scope>()
         innerScope.push(fb.scope)
         fb.stBody?.accept(Runtime(innerState, innerScope))
 
-        fbc.parameters
-                .filter { it.isOutput }
-                .forEach {
-                    state[it.name!!] =
-                            ExecutionFacade.evaluateExpression(innerState, fb.scope, it.expression)
-                }
+        invocation.parameters
+            .filter { it.isOutput }
+            .forEach {
+                state[it.name!!] =
+                    ExecutionFacade.evaluateExpression(innerState, fb.scope, it.expression)
+            }
 
 
     }
 
     private fun evaluateExpression(it: InvocationParameter) =
-            evaluateExpression(it.expression)
+        evaluateExpression(it.expression)
 
     private fun evaluateExpression(it: Expression) =
-            it.accept(ExpressionVisitor(state, peekScope()))
+        it.accept(ExpressionVisitor(state, peekScope()))
 
 
     fun createCondition(expr: Expression): () -> Boolean =
-            { expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean }
+        { expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean }
 
 
     override fun visit(whileStatement: WhileStatement) {
@@ -96,7 +96,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         val startValue = forStatement.start.accept(ExpressionVisitor(state, peekScope()))
         val stopValue = forStatement.stop.accept(ExpressionVisitor(state, peekScope()))
         val stepValue = forStatement.step?.accept(ExpressionVisitor(state, peekScope()))
-                ?: VAnyInt(UINT, BigInteger.ONE)
+            ?: VAnyInt(UINT, BigInteger.ONE)
 
         state[variableName] = startValue
 
@@ -116,60 +116,10 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         }
     }
 
-    /*
-    public fun defaultValueForDataType(dataType: VariableDeclaration): Optional<EValue> {
-        //(it.value.dataType as FunctionBlockDataType).functionBlock.localScope
-        if (dataType == null) {
-            TODO()
-        }
-        return when (dataType.dataType) {
-            isType FunctionBlockDataType -> {
-                val innerState = TopState()
-                val innerStack = Stack<Scope>()
-                innerStack.push((dataType.dataType as FunctionBlockDataType).functionBlock.scope)
-                val innerRuntime = Runtime(innerState, innerStack)
-                innerRuntime.initializeLocalVariables((dataType.dataType as FunctionBlockDataType).functionBlock.scope);
-
-                val structValue = mutableMapOf<String, EValue>()
-                innerState.forEach {
-                    val key = it.key
-                    it.value.ifPresent {
-                        structValue.put(key, it)
-                    }
-                }
-                return Optional.of(StructValue(dataType.dataType as FunctionBlockDataType, structValue))
-            }
-            else -> Optional.empty();
-        }
-    }
-*/
-
-    /*
-    public fun initializeLocalVariables(localScope: Scope) {
-        val localVariables: Map<out String, VariableDeclaration> = localScope.variables
-        localVariables.map {
-            val stateVal = state[it.key]
-            if (stateVal != null && stateVal.isPresent) {
-                return@map
-            }
-            val initExpr = it.value.init
-            val initialValue : Optional<EValue> = when(initExpr) {
-                null -> defaultValueForDataType(it.value);
-                else -> Optional.of(initExpr.accept<EValue>(
-                        ExpressionVisitor(state, peekScope())
-                ) as EValue)
-            }
-
-            state.put(it.key, initialValue)
-        }
-    }*/
-
     private fun chooseGuardedStatement(ifStatement: IfStatement): GuardedStatement? {
         for (statement in ifStatement.conditionalBranches) {
             val returnValue: EValue = (statement.condition as Visitable)
-                    .accept<EValue>(
-                            ExpressionVisitor(state, peekScope())
-                    )
+                .accept(ExpressionVisitor(state, peekScope()))
             if (returnValue.value is Boolean) {
                 if (returnValue.value == true) {
                     return statement
@@ -206,7 +156,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
     override fun visit(assignmentStatement: AssignmentStatement) {
         val expressionVisitor = ExpressionVisitor(state, peekScope())
         val expressionValue = assignmentStatement.expression.accept(expressionVisitor)
-        val location = (assignmentStatement.location as SymbolicReference)
+        val location = assignmentStatement.location
         val path = location.asPath()
         //var current = state[identifier]
         state[path] = expressionValue
