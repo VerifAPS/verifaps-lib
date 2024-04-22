@@ -29,10 +29,10 @@ dependencies {
     implementation 'de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2'
 
     implementation 'org.apache.commons:commons-collections4:4.4'
-    implementation 'org.apache.commons:commons-lang3:3.1'
-    implementation 'commons-io:commons-io:2.9.0'
+    implementation 'org.apache.commons:commons-lang3:3.14.0'
+    implementation 'commons-io:commons-io:2.16.1'
 
-    implementation 'org.fxmisc.cssfx:cssfx:1.0.0'
+    implementation 'org.fxmisc.cssfx:cssfx:11.2.2'
     implementation(project(":fxutils"))
 
 
