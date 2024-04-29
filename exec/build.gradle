@@ -14,7 +14,7 @@ dependencies {
     implementation project(':run')
     implementation project(':ide')
     implementation project(':stvs')
-    implementation 'com.github.ajalt.clikt:clikt:4.3.0'
+    implementation 'com.github.ajalt.clikt:clikt:4.4.0'
 }
 
 
