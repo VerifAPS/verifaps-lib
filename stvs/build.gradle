@@ -25,7 +25,7 @@ dependencies {
     implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6.1'
     implementation group: 'jaxen', name: 'jaxen', version: '2.0.0'
 
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation 'de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2'
 
     implementation 'org.fxmisc.cssfx:cssfx:11.2.2'
