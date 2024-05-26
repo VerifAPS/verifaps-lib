@@ -46,8 +46,8 @@ def mainClasses = [
         , 'verifaps-versions': "edu.kit.iti.formal.util.Version"
         , "st2cpp"           : "edu.kit.iti.formal.automation.ST2CppApp"
 
-        , "ide"              : "edu.kit.iti.formal.automation.ide.Ide"
-        , "stvs"              : "edu.kit.iti.formal.automation.ide.STVS"
+        , "ide"              : "edu.kit.iti.formal.automation.fx.Main"
+        , "stvs"             : "edu.kit.iti.formal.stvs.Main"
 //        , "smteta"           : "edu.kit.iti.formal.automation.testtables.apps.SMTeta"
         , "xml2st"           : "edu.kit.iti.formal.automation.Xml2TxtApp"
 ]
@@ -75,4 +75,16 @@ applicationDistribution.into("bin") {
     from(createScriptSc12f)
     from(createScriptSc11_rev)*/
     fileMode = 0755
+}
+
+tasks.withType(Tar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType(Zip).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+installDist {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

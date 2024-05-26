@@ -5,6 +5,7 @@ import edu.kit.iti.formal.stvs.view.StvsMainScene
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton
 import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard
 import javafx.application.Application
+import javafx.application.Application.launch
 import javafx.application.Platform
 import javafx.scene.Node
 import javafx.scene.control.TitledPane
@@ -85,18 +86,18 @@ class StvsApplication : Application() {
         primaryStage!!.hide()
         exitProcess(0)
     }
+}
 
-    companion object {
-        /**
-         * Launch the application.
-         *
-         * @param args The command-line arguments passed to the application
-         */
-        @JvmStatic
-        fun main(args: Array<String>) {
-            Locale.setDefault(Locale.ENGLISH)
-            //System.setProperty("javafx.preloader", StvsPreloader::class.java.getCanonicalName())
-            launch(StvsApplication::class.java, *args)
-        }
+object Main {
+    /**
+     * Launch the application.
+     *
+     * @param args The command-line arguments passed to the application
+     */
+    @JvmStatic
+    fun main(args: Array<String>) {
+        Locale.setDefault(Locale.ENGLISH)
+        //System.setProperty("javafx.preloader", StvsPreloader::class.java.getCanonicalName())
+        launch(StvsApplication::class.java, *args)
     }
 }

@@ -108,7 +108,7 @@ class SmtConvertExpressionVisitor(
    */
     override fun visitVariable(expr: VariableExpr): SExpression {
         val variableName = expr.variableName
-        val variableReferenceIndex = expr.getIndex()!!.orElse(0)
+        val variableReferenceIndex = expr.index ?: 0
 
         // Check if variable is in getTypeForVariable
         checkNotNull(smtEncoder.getTypeForVariable(variableName)) { "Wrong Context: No variable of name '$variableName' in getTypeForVariable" }

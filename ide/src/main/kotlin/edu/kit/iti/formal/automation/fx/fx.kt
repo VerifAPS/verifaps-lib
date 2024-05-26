@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.automation.fx
 
-import edu.kit.iti.formal.fxutils.*
+import edu.kit.iti.formal.fxutils.group
+import edu.kit.iti.formal.fxutils.item
+import edu.kit.iti.formal.fxutils.ribbon
+import edu.kit.iti.formal.fxutils.tab
 import edu.kit.iti.formal.util.info
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -18,11 +21,12 @@ import tornadofx.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import edu.kit.iti.formal.fxutils.item
 
-
-fun main(args: Array<String>) {
-    launch<IdeFx>(*args)
+object Main {
+    @JvmStatic
+    fun main(args: Array<String>) {
+        launch<IdeFx>(*args)
+    }
 }
 
 class IdeStyle : Stylesheet() {

@@ -3,11 +3,17 @@ plugins {
 }
 
 javafx {
-    version = "21"
+    version = "22"
     modules = listOf("javafx.controls")
 }
 
 dependencies {
+    for (module in listOf("javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-web")) {
+        for (classifier in listOf("win", "linux", "mac")) {
+            api("org.openjfx:$module:22:$classifier")
+        }
+    }
+
     api("com.pixelduke:fxribbon:1.2.2")
     api("no.tornado:tornadofx:1.7.20")
     api("com.miglayout:miglayout-javafx:11.3")
@@ -17,5 +23,5 @@ dependencies {
     api("org.kordamp.ikonli:ikonli-javafx:12.3.1")
     api("com.pixelduke:fxribbon:1.2.2")
     api("org.jfxtras:jmetro:11.6.15")
-    api("org.controlsfx:controlsfx:8.40.13")
+    api("org.controlsfx:controlsfx:11.0.0")
 }

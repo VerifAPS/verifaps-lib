@@ -13,10 +13,10 @@ javadoc {
     options.charSet = 'UTF-8'
 }
 
-javafx {
+/*javafx {
     version = "21"
     modules = ["javafx.controls", "javafx.controls", "javafx.fxml", "javafx.graphics", "javafx.web"]
-}
+}*/
 
 dependencies {
     implementation project(':lang')
