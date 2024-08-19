@@ -24,7 +24,7 @@ dependencies {
     api 'com.github.jferard:fastods:0.8.1'
     api 'com.github.ajalt.clikt:clikt:4.4.0'
 
-    api 'com.github.doyaaaaaken:kotlin-csv-jvm:1.9.3'
+    api 'com.github.doyaaaaaken:kotlin-csv-jvm:1.10.0'
 
     //compile 'io.github.config4k:config4k:0.4.1'
 
