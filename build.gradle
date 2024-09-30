@@ -111,14 +111,14 @@ subprojects {
         implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0'
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
         implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-        implementation group: "org.jetbrains", name: 'annotations', version: '24.1.0'
+        implementation group: "org.jetbrains", name: 'annotations', version: '25.0.0'
         implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.16'
         implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.16'
         testImplementation 'com.google.truth:truth:1.4.4'
 
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.0'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.0'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.0'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:5.11.1'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.1'
 
         testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit', version: '2.0.20'
         testImplementation project(':utils-test')
