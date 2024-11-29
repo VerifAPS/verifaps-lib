@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -16,6 +17,7 @@ import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
 import java.io.File
+import com.github.ajalt.clikt.core.main
 
 /**
  *
@@ -29,9 +31,8 @@ object Coverage {
     }
 }
 
-class CoverageApp : CliktCommand(
-        epilog = "ttcov -- Program Coverage with Test Tables.",
-        name = "ttcov") {
+class CoverageApp : CliktCommand(name = "ttcov") {
+    override fun helpEpilog(context: Context) = "ttcov -- Program Coverage with Test Tables."
 
     val common by CommonArguments()
 
@@ -41,7 +42,7 @@ class CoverageApp : CliktCommand(
 
     val programOptions by ProgramOptions()
     val library = programOptions.library
-    val program =programOptions.program
+    val program = programOptions.program
 
     override fun run() {
         common()
@@ -66,11 +67,11 @@ class CoverageApp : CliktCommand(
 
 
         gtts.forEach { gtt ->
-            val varRename = hashMapOf<SMVExpr,SMVExpr>()
+            val varRename = hashMapOf<SMVExpr, SMVExpr>()
             gtt.programVariables.forEach {
-                    val internalVariable = it.internalVariable(gtt.programRuns)
+                val internalVariable = it.internalVariable(gtt.programRuns)
                 varRename[internalVariable] =
-                            SVariable(if(it.isAssumption) "old${it.name}" else "new${it.name}", internalVariable.dataType!!)
+                    SVariable(if (it.isAssumption) "old${it.name}" else "new${it.name}", internalVariable.dataType!!)
             }
             var renamer = ExpressionReplacer(varRename)
 
@@ -86,11 +87,13 @@ class CoverageApp : CliktCommand(
                 gtt.region.flat().forEach {
                     val assume = it.inputExpr.values.conjunction(SLiteral.TRUE).accept(renamer).accept(toSmt)
                     val assert = it.outputExpr.values.conjunction(SLiteral.TRUE).accept(renamer).accept(toSmt)
-                    out.write("""
+                    out.write(
+                        """
                         (push)  ;; Table row ${it.id}
                         (assert $assume) ;; pre-condition
                         (assert $assert) ;; post-condition
-                    """.trimIndent())
+                    """.trimIndent()
+                    )
                     lineMap.branchMap.forEach { (t, _) ->
                         val e = definitions[t]?.accept(toSmtState)
                         out.write("\t(push) (assert ${e}) (check-sat) (pop);; check for $t")

@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.convert
@@ -15,6 +16,7 @@ import edu.kit.iti.formal.automation.testtables.print.TextTablePrinter
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.OutputStreamWriter
 import java.util.*
+import com.github.ajalt.clikt.core.main
 
 /**
  *
@@ -26,7 +28,9 @@ object Printer {
     fun main(args: Array<String>) = PrinterApp().main(args)
 }
 
-class PrinterApp : CliktCommand(name="ttprint", help = "generate print files for rtt/gtt ") {
+class PrinterApp : CliktCommand(name="ttprint") {
+    override fun help(context: Context): String = "generate print files for rtt/gtt "
+
     enum class Format { HTML, LATEX, TEXT }
 
     val format by option("-f", "--format")

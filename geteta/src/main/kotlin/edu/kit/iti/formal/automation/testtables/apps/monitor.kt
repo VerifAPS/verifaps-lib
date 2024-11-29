@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
@@ -11,6 +12,7 @@ import edu.kit.iti.formal.automation.testtables.monitor.*
 import edu.kit.iti.formal.util.info
 import java.io.File
 import java.util.*
+import com.github.ajalt.clikt.core.main
 
 /**
  *
@@ -26,8 +28,8 @@ enum class CodeOutput {
     /*STRCUTURED_TEXT, ESTEREL, */CPP//, C
 }
 
-class MonitorApp : CliktCommand(name = "ttmonitor",
-        help = "Construction of monitors from test tables for Runtime Verification") {
+class MonitorApp : CliktCommand(name = "ttmonitor") {
+    override fun help(context: Context) = "Construction of monitors from test tables for Runtime Verification"
 
     val tableOptions by TableArguments()
 

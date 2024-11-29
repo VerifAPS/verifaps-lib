@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
@@ -17,6 +18,7 @@ import edu.kit.iti.formal.automation.testtables.viz.TableUnwinder
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithProgram
 import edu.kit.iti.formal.automation.testtables.viz.createTableWithoutProgram
 import edu.kit.iti.formal.util.info
+import com.github.ajalt.clikt.core.main
 
 /**
  *
@@ -31,9 +33,9 @@ object UnwindODSApp {
     }
 }
 
-class UnwindODS : CliktCommand(
-        epilog = "UnwindODS -- Tooling for Relational Test Tables.",
-        name = "tt-debug.sh") {
+class UnwindODS : CliktCommand(name = "tt-debug.sh") {
+    override fun helpEpilog(context: Context) = "UnwindODS -- Tooling for Relational Test Tables."
+
     val table by argument(help = "the xml file of the table", name = "table")
             .file()
             .multiple()

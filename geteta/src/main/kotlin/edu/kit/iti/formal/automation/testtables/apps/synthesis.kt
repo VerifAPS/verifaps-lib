@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
@@ -32,6 +33,7 @@ import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.math.max
+import com.github.ajalt.clikt.core.main
 
 /**
  * @author Moritz Baumann
@@ -45,10 +47,10 @@ object Synthesis {
     }
 }
 
-class SynthesisApp : CliktCommand(
-        help = "Synthesizes a program for each for each given file",
-        epilog = "ttsynth -- Program Synthesis from Test Tables.",
-        name = "ttsynth") {
+class SynthesisApp : CliktCommand(name = "ttsynth") {
+    override fun helpEpilog(context: Context) = "ttsynth -- Program Synthesis from Test Tables."
+    override fun help(context: Context) = "Synthesizes a program for each for each given file"
+
 
     private val tableFiles by argument("FILE", help = "Test table DSL file")
             .file(mustExist = true, canBeDir = false, mustBeReadable = true)

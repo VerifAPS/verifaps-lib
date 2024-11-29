@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.rvt
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -18,6 +19,7 @@ import edu.kit.iti.formal.util.fail
 import edu.kit.iti.formal.util.info
 import org.antlr.v4.runtime.CharStreams
 import java.io.File
+import com.github.ajalt.clikt.core.main
 
 object RvtAps {
     @JvmStatic
@@ -26,9 +28,8 @@ object RvtAps {
     }
 }
 
-class RvtApsApp : CliktCommand(
-        help = "",
-        name = "rvt-aps.sh") {
+class RvtApsApp : CliktCommand(     name = "rvt-aps.sh") {
+    override fun help(context: Context): String = ""
 
     enum class Miter {
         NONE, UNTIL

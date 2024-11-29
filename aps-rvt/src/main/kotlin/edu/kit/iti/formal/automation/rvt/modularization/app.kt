@@ -11,6 +11,8 @@ import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
 import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.File
+import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.core.main
 
 /**
  *

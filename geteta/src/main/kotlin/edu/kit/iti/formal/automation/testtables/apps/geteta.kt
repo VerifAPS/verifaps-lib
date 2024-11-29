@@ -20,6 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.option
@@ -43,6 +44,7 @@ import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.util.*
 import java.io.File
 import kotlin.system.exitProcess
+import com.github.ajalt.clikt.core.main
 
 object Geteta {
     @JvmStatic
@@ -51,9 +53,8 @@ object Geteta {
     }
 }
 
-class GetetaApp : CliktCommand(
-        epilog = "Geteta -- Tooling for Generalized Test Tables.",
-        name = "geteta") {
+class GetetaApp : CliktCommand(name = "geteta") {
+    override fun helpEpilog(context: Context) = "Geteta -- Tooling for Generalized Test Tables."
 
     val programOptions by ProgramOptions()
     val tableOptions by TableArguments()
@@ -66,7 +67,7 @@ class GetetaApp : CliktCommand(
     val automataOptions by AutomataOptions()
 
     val mode by option("-m", "--mode", help = "verification mode")
-            .convert { Mode.valueOf(it) }
+        .convert { Mode.valueOf(it) }
 
     override fun run() {
         val gtts = tableOptions.readTables()
@@ -76,15 +77,18 @@ class GetetaApp : CliktCommand(
         val code = programOptions.readProgram()
 
         // override mode
-        if (mode != null)
-            gtts.forEach { it.options.mode = mode!! }
+        if (mode != null) {
+        }
+        gtts.forEach { it.options.mode = mode!! }
 
         gtts.forEach {
             info("Mode is ${it.options.mode} for table ${it.name}")
         }
 
-        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code,
-                programOptions.disableSimplify)
+        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(
+            code,
+            programOptions.disableSimplify
+        )
         info("Program evaluation")
 
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
@@ -103,41 +107,42 @@ class GetetaApp : CliktCommand(
         }
 
         val modules =
-                if (tableOptions.enableMesh) {
-                    warn("mesh gtt support is experimental and not well-tested or completely implemented!!!")
-                    warn("YOU HAVE BEEN WARNED.")
-                    val tableJoiner = GetetaFacade.meshTables(tt)
-                    val dummyGtt = GetetaFacade.createMeshedDummy(gtts)
-                    val smv = GetetaFacade.constructSMV(
-                            AutomataTransformerState(dummyGtt, tableJoiner), superEnumType)
+            if (tableOptions.enableMesh) {
+                warn("mesh gtt support is experimental and not well-tested or completely implemented!!!")
+                warn("YOU HAVE BEEN WARNED.")
+                val tableJoiner = GetetaFacade.meshTables(tt)
+                val dummyGtt = GetetaFacade.createMeshedDummy(gtts)
+                val smv = GetetaFacade.constructSMV(
+                    AutomataTransformerState(dummyGtt, tableJoiner), superEnumType
+                )
 
-                    if (automataOptions.drawAutomaton) {
-                        info("Automaton drawing requested. Drawing the meshed automaton.")
-                        drawAutomaton(tt.map { it.testTable }, tableJoiner)
-                    }
-                    val mainModule = MultiModelGluer().apply {
-                        val pn = gtts.first().programRuns.first() // only one run in geteta
-                        addProgramRun(pn, modCode)
-                        addTable("_" + smv.tableModule.name, smv.ttType!!)
-                    }
-                    val m = arrayListOf(mainModule.product, modCode, smv.tableModule)
-                    m.addAll(smv.helperModules)
-                    m
-                } else {
-                    info("Constructing final SMV file.")
-                    val modTable = tt.map { it.tableModule }
-                    val mainModule = MultiModelGluer().apply {
-                        val pn = gtts.first().programRuns.first() // only one run in geteta
-                        addProgramRun(pn, modCode)
-                        tt.forEach {
-                            addTable("_" + it.testTable.name, it.ttType!!)
-                        }
-                    }
-                    val m = arrayListOf(mainModule.product, modCode)
-                    m.addAll(modTable)
-                    tt.forEach { m.addAll(it.helperModules) }
-                    m
+                if (automataOptions.drawAutomaton) {
+                    info("Automaton drawing requested. Drawing the meshed automaton.")
+                    drawAutomaton(tt.map { it.testTable }, tableJoiner)
                 }
+                val mainModule = MultiModelGluer().apply {
+                    val pn = gtts.first().programRuns.first() // only one run in geteta
+                    addProgramRun(pn, modCode)
+                    addTable("_" + smv.tableModule.name, smv.ttType!!)
+                }
+                val m = arrayListOf(mainModule.product, modCode, smv.tableModule)
+                m.addAll(smv.helperModules)
+                m
+            } else {
+                info("Constructing final SMV file.")
+                val modTable = tt.map { it.tableModule }
+                val mainModule = MultiModelGluer().apply {
+                    val pn = gtts.first().programRuns.first() // only one run in geteta
+                    addProgramRun(pn, modCode)
+                    tt.forEach {
+                        addTable("_" + it.testTable.name, it.ttType!!)
+                    }
+                }
+                val m = arrayListOf(mainModule.product, modCode)
+                m.addAll(modTable)
+                tt.forEach { m.addAll(it.helperModules) }
+                m
+            }
 
         val t = this.tableOptions.table.first()
         val folder = File(t.parent, t.nameWithoutExtension).absolutePath
@@ -146,8 +151,10 @@ class GetetaApp : CliktCommand(
         val nuxmv = findProgram(nuxmv)
 
         val process =
-                GetetaFacade.createNuXMVProcess(folder, modules, nuxmv?.absolutePath ?: "n/a",
-                        verificationTechnique)
+            GetetaFacade.createNuXMVProcess(
+                folder, modules, nuxmv?.absolutePath ?: "n/a",
+                verificationTechnique
+            )
 
         if (dryRun) {
             if (nuxmv == null) {
@@ -157,17 +164,17 @@ class GetetaApp : CliktCommand(
 
             val b = process.call()
             val status =
-                    when (b) {
-                        NuXMVOutput.Verified -> "verified"
-                        is NuXMVOutput.Error -> "error"
-                        is NuXMVOutput.Cex -> "not-verified"
-                    }
+                when (b) {
+                    NuXMVOutput.Verified -> "verified"
+                    is NuXMVOutput.Error -> "error"
+                    is NuXMVOutput.Cex -> "not-verified"
+                }
 
             val errorLevel =
-                    when (b) {
-                        is NuXMVOutput.Error -> 1
-                        else -> 0
-                    }
+                when (b) {
+                    is NuXMVOutput.Error -> 1
+                    else -> 0
+                }
 
             if (b is NuXMVOutput.Cex) {
                 if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
@@ -186,44 +193,54 @@ class GetetaApp : CliktCommand(
         }
     }
 
-    private fun useCounterExamplePrinterJson(outputFolder: String,
-                                             result: NuXMVOutput.Cex,
-                                             tt: List<SMVConstructionModel>) {
+    private fun useCounterExamplePrinterJson(
+        outputFolder: String,
+        result: NuXMVOutput.Cex,
+        tt: List<SMVConstructionModel>
+    ) {
         for (model in tt) {
             val file = File(outputFolder, "cex_${model.testTable.name}.json")
             info("Writing JSON counter example to $file")
             val cep = CounterExamplePrinterJson(
-                    automaton = model.automaton,
-                    testTable = model.testTable,
-                    cex = result.counterExample)
+                automaton = model.automaton,
+                testTable = model.testTable,
+                cex = result.counterExample
+            )
             file.writeText(cep.call())
         }
     }
 
     private fun drawAutomaton(gtt: List<GeneralizedTestTable>, tt: TestTableAutomaton) {
-        val ad = AutomatonDrawer(File(outputFolder, "${gtt.first().name}.dot"),
-                gtt.map { it.region }, tt)
+        val ad = AutomatonDrawer(
+            File(outputFolder, "${gtt.first().name}.dot"),
+            gtt.map { it.region }, tt
+        )
         ad.runDot = true
         ad.show = automataOptions.showAutomaton
         ad.run()
-        if (automataOptions.showAutomaton)
-            info("Image viewer should open now")
+        if (automataOptions.showAutomaton) {
+        }
+        info("Image viewer should open now")
     }
 
     private fun drawAutomaton(gtt: GeneralizedTestTable, tt: SMVConstructionModel) {
-        val ad = AutomatonDrawer(File(outputFolder, "${gtt.name}.dot"),
-                listOf(gtt.region), tt.automaton)
+        val ad = AutomatonDrawer(
+            File(outputFolder, "${gtt.name}.dot"),
+            listOf(gtt.region), tt.automaton
+        )
         ad.runDot = true
         ad.show = automataOptions.showAutomaton
         ad.run()
-        if (automataOptions.showAutomaton)
-            info("Image viewer should open now")
+        if (automataOptions.showAutomaton) {
+        }
+        info("Image viewer should open now")
     }
 
     private fun createRowMapping(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
         val mappings = tt.map {
             GetetaFacade.analyzeCounterExample(
-                    it.automaton, it.testTable, result.counterExample)
+                it.automaton, it.testTable, result.counterExample
+            )
         }
 
         mappings.zip(tt).forEach { (m, tt) ->

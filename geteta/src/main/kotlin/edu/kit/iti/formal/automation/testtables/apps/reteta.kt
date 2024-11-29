@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -25,6 +26,7 @@ import edu.kit.iti.formal.util.warn
 import java.io.File
 import java.util.*
 import kotlin.system.exitProcess
+import com.github.ajalt.clikt.core.main
 
 object RetetaApp {
     @JvmStatic
@@ -38,9 +40,8 @@ object RetetaApp {
     }
 }
 
-class Reteta : CliktCommand(
-        epilog = "Reteta -- Tooling for Relational Test Tables.",
-        name = "reteta") {
+class Reteta : CliktCommand(name = "reteta") {
+    override fun helpEpilog(context: Context) = "Reteta -- Tooling for Relational Test Tables."
 
     val common by CommonArguments()
     val tableOptions by TableArguments()
@@ -98,13 +99,16 @@ class Reteta : CliktCommand(
 
             if (automatonOptions.drawAutomaton) {
                 info("Automaton drawing requested. This may took a while.")
-                val ad = AutomatonDrawer(File(outputFolder, "${table.name}.dot"),
-                        listOf(table.region), tt.automaton)
+                val ad = AutomatonDrawer(
+                    File(outputFolder, "${table.name}.dot"),
+                    listOf(table.region), tt.automaton
+                )
                 ad.runDot = true
                 ad.show = automatonOptions.showAutomaton
                 ad.run()
-                if (automatonOptions.showAutomaton)
-                    info("Image viewer should open now")
+                if (automatonOptions.showAutomaton) {
+                }
+                info("Image viewer should open now")
             } else {
                 info("For drawing the automaton use: `--draw-automaton'.")
             }
@@ -126,14 +130,16 @@ class Reteta : CliktCommand(
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
             val pNuxmv = GetetaFacade.createNuXMVProcess(
-                    outputFolder, modules, nuxmv ?: "nuxmv",
-                    table.options.verificationTechnique)
+                outputFolder, modules, nuxmv ?: "nuxmv",
+                table.options.verificationTechnique
+            )
             if (dryRun) {
                 val b = pNuxmv.call()
                 when (b) {
                     NuXMVOutput.Verified -> {
                         info("Verified!")
                     }
+
                     is NuXMVOutput.Cex -> {
                         info("Not verified. Counter example available.")
                         File(outputFolder, "counterexample.txt").bufferedWriter().use {
@@ -145,6 +151,7 @@ class Reteta : CliktCommand(
                              */
                         exitProcess(67)
                     }
+
                     is NuXMVOutput.Error -> {
                         for (e in b.errors) {
                             error(e)

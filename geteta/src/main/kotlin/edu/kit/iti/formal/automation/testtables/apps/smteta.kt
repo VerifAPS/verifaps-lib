@@ -16,6 +16,7 @@ import edu.kit.iti.formal.automation.testtables.builder.ProgMiterConstruction
 import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
+import com.github.ajalt.clikt.core.main
 
 object SMTeta {
     @JvmStatic

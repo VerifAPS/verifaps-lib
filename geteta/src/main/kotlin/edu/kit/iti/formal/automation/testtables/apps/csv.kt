@@ -20,6 +20,7 @@
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
@@ -30,6 +31,7 @@ import com.github.doyaaaaaken.kotlincsv.dsl.context.CsvReaderContext
 import edu.kit.iti.formal.util.CodeWriter
 import java.io.File
 import java.io.Writer
+import com.github.ajalt.clikt.core.main
 
 private const val NOT_FOUND = "/* not given */"
 private const val DURATION_COLUMN = "DURATION"
@@ -40,9 +42,8 @@ object Csv {
     fun main(args: Array<String>) = CsvApp().main(args)
 }
 
-class CsvApp : CliktCommand(
-        epilog = "ttcsv -- Generate table template from csv files.",
-        name = "ttcsv") {
+class CsvApp : CliktCommand(name = "ttcsv") {
+    override fun helpEpilog(context: Context) = "ttcsv -- Generate table template from csv files."
 
     private val outputFile by option("-o", help = "output table file", metavar = "FILE")
             .file()
