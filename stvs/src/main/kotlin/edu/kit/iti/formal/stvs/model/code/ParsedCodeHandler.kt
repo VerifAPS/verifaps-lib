@@ -10,5 +10,5 @@ fun interface ParsedCodeHandler {
      *
      * @param code the parsed code
      */
-    fun accept(code: ParsedCode?)
+    fun accept(code: ParsedCode)
 }

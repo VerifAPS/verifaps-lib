@@ -37,9 +37,6 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      */
     private fun setDependencies(deps: Element?, config: GlobalConfig) {
         deps?.let {
-            deps.getChildText("getetaCommand")?.let {
-                config.getetaCommand = it
-            }
             deps.getChildText("nuxmvFilename")?.let {
                 config.nuxmvFilename = it
             }
@@ -58,9 +55,6 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
      */
     private fun setGeneralSettings(general: Element?, config: GlobalConfig) {
         general?.let {
-            general.getChildText("uiLanguage")?.let {
-                config.uiLanguage = general.getChildText("uiLanguage")
-            }
             general.getChildText("simulationTimeout")?.let {
                 config.simulationTimeout = it.toInt()
             }
@@ -101,7 +95,6 @@ class XmlConfigImporter : XmlImporter<GlobalConfig>() {
             editor.getChildText("fontFamily")?.let {
                 config.editorFontFamily = it
             }
-            config.showLineNumbers = editor.getChildText("showLineNumbers").toBoolean()
         }
     }
 

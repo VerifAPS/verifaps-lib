@@ -1,4 +1,5 @@
 plugins {
+    id("kotlin-convention")
     id("org.openjfx.javafxplugin") version "0.1.0"
 }
 

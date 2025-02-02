@@ -21,9 +21,6 @@ import kotlin.io.path.isDirectory
  * @author Benjamin Alt
  */
 class GlobalConfig {
-    val validLanguages: List<String> = mutableListOf("EN")
-
-    // General
     val verificationTimeoutProperty: SimpleLongProperty = SimpleLongProperty(3600)
 
     /**
@@ -44,9 +41,6 @@ class GlobalConfig {
     val windowWidthProperty: IntegerProperty = SimpleIntegerProperty(800)
     var windowWidth: Int by windowWidthProperty
 
-    val uiLanguageProperty: StringProperty = SimpleStringProperty("EN")
-    var uiLanguage: String by uiLanguageProperty
-
     val maxLineRolloutProperty: IntegerProperty = SimpleIntegerProperty(50)
     var maxLineRollout: Int by maxLineRolloutProperty
 
@@ -57,10 +51,6 @@ class GlobalConfig {
     val editorFontFamilyProperty: StringProperty = SimpleStringProperty("DejaVu Sans Mono")
     var editorFontFamily: String by editorFontFamilyProperty
 
-    val showLineNumbersProperty: BooleanProperty = SimpleBooleanProperty(true)
-    var showLineNumbers: Boolean by showLineNumbersProperty
-
-    // Dependency paths
     val nuxmvFilenameProperty: StringProperty = SimpleStringProperty(
         ExecutableLocator.findExecutableFileAsString("nuXmv") ?: "[Path to nuXmv Executable]"
     )
@@ -70,10 +60,6 @@ class GlobalConfig {
         ExecutableLocator.findExecutableFileAsString("z3") ?: "[Path to Z3 Executable]"
     )
     var z3Path: String by z3PathProperty
-
-    val getetaCommandProperty: StringProperty =
-        SimpleStringProperty("java -jar /path/to/geteta.jar -c \${code} -t \${spec} -x")
-    var getetaCommand: String by getetaCommandProperty
 
     /**
      * Tries to save this configuration to the path
@@ -108,16 +94,8 @@ class GlobalConfig {
         editorFontSize = toBeCopied.editorFontSize
         maxLineRollout = toBeCopied.maxLineRollout
         editorFontFamily = toBeCopied.editorFontFamily
-        showLineNumbers = toBeCopied.showLineNumbers
-        uiLanguage = toBeCopied.uiLanguage
         nuxmvFilename = toBeCopied.nuxmvFilename
         z3Path = toBeCopied.z3Path
-        getetaCommand = toBeCopied.getetaCommand
-    }
-
-
-    override fun toString(): String {
-        return "GlobalConfig(validLanguages=$validLanguages, verificationTimeoutProperty=$verificationTimeoutProperty, simulationTimeoutProperty=$simulationTimeoutProperty, windowMaximizedProperty=$windowMaximizedProperty, windowHeightProperty=$windowHeightProperty, windowWidthProperty=$windowWidthProperty, uiLanguageProperty=$uiLanguageProperty, maxLineRolloutProperty=$maxLineRolloutProperty, editorFontSizeProperty=$editorFontSizeProperty, editorFontFamilyProperty=$editorFontFamilyProperty, showLineNumbersProperty=$showLineNumbersProperty, nuxmvFilenameProperty=$nuxmvFilenameProperty, z3PathProperty=$z3PathProperty, getetaCommandProperty=$getetaCommandProperty)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -129,15 +107,11 @@ class GlobalConfig {
         if (windowMaximized != other.windowMaximized) return false
         if (windowHeight != other.windowHeight) return false
         if (windowWidth != other.windowWidth) return false
-        if (uiLanguage != other.uiLanguage) return false
         if (maxLineRollout != other.maxLineRollout) return false
         if (editorFontSize != other.editorFontSize) return false
         if (editorFontFamily != other.editorFontFamily) return false
-        if (showLineNumbers != other.showLineNumbers) return false
         if (nuxmvFilename != other.nuxmvFilename) return false
         if (z3Path != other.z3Path) return false
-        if (getetaCommand != other.getetaCommand) return false
-
         return true
     }
 
@@ -147,14 +121,11 @@ class GlobalConfig {
         result = 31 * result + windowMaximized.hashCode()
         result = 31 * result + windowHeight
         result = 31 * result + windowWidth
-        result = 31 * result + uiLanguage.hashCode()
         result = 31 * result + maxLineRollout
         result = 31 * result + editorFontSize
         result = 31 * result + editorFontFamily.hashCode()
-        result = 31 * result + showLineNumbers.hashCode()
         result = 31 * result + nuxmvFilename.hashCode()
         result = 31 * result + z3Path.hashCode()
-        result = 31 * result + getetaCommand.hashCode()
         return result.toInt()
     }
 
@@ -175,7 +146,7 @@ class GlobalConfig {
             val configFile = CONFIG_DIRPATH / AUTOLOAD_CONFIG_FILENAME
             return try {
                 ImporterFacade.importConfig(configFile.toFile())
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 GlobalConfig()
             }
         }

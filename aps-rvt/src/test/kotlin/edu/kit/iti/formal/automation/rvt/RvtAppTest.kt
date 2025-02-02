@@ -21,6 +21,7 @@
  */
 package edu.kit.iti.formal.automation.rvt
 
+import com.github.ajalt.clikt.core.parse
 import edu.kit.iti.formal.smv.NuXMVOutput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeFalse

@@ -545,7 +545,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ast = FunctionBlockDeclaration()
         //currentTopLevelScopeElement = ast
         ast.ruleContext = ctx
-        ast.scope = ctx.var_decls().accept(this) as Scope
+        ast.scope = ctx.var_decls()?.accept(this) as Scope
         ast.isFinal = ctx.FINAL() != null
         ast.isAbstract = ctx.ABSTRACT() != null
         ast.name = ctx.identifier.text

@@ -10,5 +10,5 @@ fun interface ParsedSyntaxErrorHandler {
      *
      * @param syntaxErrors A list of found syntax errors.
      */
-    fun accept(syntaxErrors: List<SyntaxError?>?)
+    fun accept(syntaxErrors: List<SyntaxError>)
 }

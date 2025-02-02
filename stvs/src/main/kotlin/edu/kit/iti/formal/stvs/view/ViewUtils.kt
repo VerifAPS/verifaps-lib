@@ -54,22 +54,12 @@ object ViewUtils {
      * @param parent     parent that should be setup
      * @param stylesheet stylesheet's name in the package
      */
-    /**
-     * Adds the style sheet (name "style.css" and located in the same package) to the given parent and
-     * sets the css-id for the parent
-     *
-     * @param parent parent that should be setup
-     */
     @JvmOverloads
     fun setupView(parent: Parent, stylesheet: String? = "style.css") {
         parent.stylesheets.add(parent.javaClass.getResource(stylesheet).toExternalForm())
         setupClass(parent)
     }
 
-    /**
-     * @param parent
-     * @param clazz
-     */
     /**
      * Sets the css-class for the parent.
      *

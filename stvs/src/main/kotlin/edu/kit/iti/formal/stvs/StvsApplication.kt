@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs
 import edu.kit.iti.formal.stvs.StvsVersion.windowTitle
 import edu.kit.iti.formal.stvs.view.StvsMainScene
 import edu.kit.iti.formal.stvs.view.common.HostServiceSingleton
-import edu.kit.iti.formal.stvs.view.menu.WelcomeWizard
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.application.Platform
@@ -29,16 +28,11 @@ class StvsApplication : Application() {
 
     override fun start(primaryStage: Stage) {
         HostServiceSingleton.instance = hostServices
-        this.mainScene = StvsMainScene()
         this.primaryStage = Stage()
         Platform.setImplicitExit(true)
         primaryStage.title = windowTitle
-        primaryStage.scene = mainScene.scene
         primaryStage.isMaximized = mainScene.shouldBeMaximizedProperty().get()
-        primaryStage.icons.addAll(
-            Image(StvsApplication::class.java.getResourceAsStream("logo_large.png")),
-            Image(StvsApplication::class.java.getResourceAsStream("logo.png"))
-        )
+
         mainScene.shouldBeMaximizedProperty().bind(primaryStage.maximizedProperty())
 
         mainScene.scene.stylesheets.add(
@@ -54,16 +48,13 @@ class StvsApplication : Application() {
         //Debugger snippet for finding the styleclasses for the node under cursor.
         mainScene.scene.addEventFilter(MouseEvent.MOUSE_MOVED) { mouseEvent: MouseEvent ->
             if (mouseEvent.isAltDown && mouseEvent.isControlDown) {
-                try {
-                    val node = mouseEvent.target as Node
-                    val classes = node.styleClass
-                    println("Classes of " + node.javaClass.simpleName + " are " + classes)
-                    println("Style of " + node.javaClass.simpleName + ": " + node.style)
+                val node = mouseEvent.target as Node
+                val classes = node.styleClass
+                println("Classes of " + node.javaClass.simpleName + " are " + classes)
+                println("Style of " + node.javaClass.simpleName + ": " + node.style)
 
-                    println((node as TitledPane).alignment)
-                    println(node.textAlignment)
-                } catch (_: ClassCastException) {
-                }
+                println((node as TitledPane).alignment)
+                println(node.textAlignment)
             }
         }
 
@@ -74,8 +65,14 @@ class StvsApplication : Application() {
             )
         }
 
-        if (mainScene.rootController.rootModel.isFirstStart) {
-            WelcomeWizard(mainScene.rootController.rootModel.globalConfig).showAndWait()
+        Platform.runLater {
+            primaryStage.icons.addAll(
+                Image(StvsApplication::class.java.getResourceAsStream("logo_large.png")),
+                Image(StvsApplication::class.java.getResourceAsStream("logo.png"))
+            )
+
+            this.mainScene = StvsMainScene()
+            primaryStage.scene = mainScene.scene
         }
 
         primaryStage.show()
@@ -97,7 +94,6 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
         Locale.setDefault(Locale.ENGLISH)
-        //System.setProperty("javafx.preloader", StvsPreloader::class.java.getCanonicalName())
         launch(StvsApplication::class.java, *args)
     }
 }

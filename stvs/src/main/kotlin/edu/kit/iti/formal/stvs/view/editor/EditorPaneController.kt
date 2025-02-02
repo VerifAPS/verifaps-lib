@@ -37,7 +37,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         code.sourcecode,
         code.syntaxErrorsProperty
     )
-    private val executor: ExecutorService
+    private val executor = Executors.newSingleThreadExecutor()
 
     /**
      *
@@ -47,27 +47,17 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
      * @param globalConfig the global configuration (for font size or style)
      */
     init {
-        globalConfig.showLineNumbersProperty
-            .addListener(ShowLineNumbersListener())
+        globalConfig.showLineNumbersProperty.addListener(ShowLineNumbersListener())
         view.stylesheets
             .add(
                 EditorPane::class.java.getResource("st-keywords.css")
                     .toExternalForm()
             )
-        this.executor = Executors.newSingleThreadExecutor()
         configureTextArea()
         setupContextMenu()
         handleTextChange(computeHighlighting(code.sourcecode))
-        globalConfig.editorFontSizeProperty
-            .addListener { observable: ObservableValue<out Number>?, oldValue: Number?, newValue: Number ->
-                updateFontSize(
-                    newValue.toInt()
-                )
-            }
-        globalConfig.editorFontFamilyProperty
-            .addListener { observable: ObservableValue<out String>?, oldValue: String?, newValue: String ->
-                updateFontFamily(newValue)
-            }
+        globalConfig.editorFontSizeProperty.addListener { _, _, newValue -> updateFontSize(newValue.toInt()) }
+        globalConfig.editorFontFamilyProperty.addListener { _, _, newValue -> updateFontFamily(newValue) }
         updateFontFamily(globalConfig.editorFontFamily)
         updateFontSize(globalConfig.editorFontSize)
         filterAltEvents()
@@ -103,7 +93,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
 
     private fun createMenuItem(name: String, action: Runnable): MenuItem {
         val item = MenuItem(name)
-        item.onAction = EventHandler { t: ActionEvent? -> action.run() }
+        item.onAction = EventHandler { action.run() }
         return item
     }
 
@@ -112,10 +102,11 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         val codeArea = view.codeArea
 
         val menu = ContextMenu()
-        menu.items.addAll(createMenuItem(
-            "Undo", { codeArea.undo() },
-            FontAwesomeSolid.UNDO
-        ), createMenuItem("Redo") { codeArea.redo() },
+        menu.items.addAll(
+            createMenuItem(
+                "Undo", { codeArea.undo() },
+                FontAwesomeSolid.UNDO
+            ), createMenuItem("Redo") { codeArea.redo() },
             SeparatorMenuItem(),
             createMenuItem("Paste", { codeArea.paste() }, FontAwesomeSolid.PASTE),
             createMenuItem("Copy", { codeArea.copy() }, FontAwesomeSolid.COPY),
@@ -160,51 +151,48 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
     private fun computeHighlighting(
         sourcecode: String
     ): StyleSpans<Collection<String>> {
-        val tokens: MutableList<Token?> = ArrayList()
-        val syntaxErrors: MutableList<SyntaxError?> = ArrayList()
+        val spansBuilder = StyleSpansBuilder<Collection<String>>()
+
+        if (sourcecode.isEmpty()) {
+            spansBuilder.add(emptyList(), 0)
+            return spansBuilder.create()
+        }
+
+        val tokens: MutableList<Token> = ArrayList()
+        val syntaxErrors: MutableList<SyntaxError> = ArrayList()
 
         // Short-circuit setting parsed code properties on code, since we're in another thread.
-        parseCode(sourcecode, { newTokens: List<Token?>? ->
-            tokens.addAll(newTokens!!)
-            Platform.runLater { code.tokensProperty.setAll(newTokens) }
-        }, { synErrs: List<SyntaxError?>? ->
-            syntaxErrors.addAll(synErrs!!)
-            Platform.runLater { code.syntaxErrorsProperty.setAll(synErrs) }
-        }, { parsedCode: ParsedCode? ->
-            Platform
-                .runLater { code.parsedCodeProperty.set(parsedCode) }
-        })
+        parseCode(
+            sourcecode,
+            {
+                tokens.addAll(it)
+                Platform.runLater { code.tokensProperty.setAll(it) }
+            }, {
+                syntaxErrors.addAll(it)
+                Platform.runLater { code.syntaxErrorsProperty.setAll(it) }
+            }, { Platform.runLater { code.parsedCodeProperty.set(it) } })
 
-        val spansBuilder = StyleSpansBuilder<Collection<String>>()
 
         if (tokens.isEmpty()) {
             spansBuilder.add(emptyList(), 0)
             return spansBuilder.create()
         }
 
-        tokens.forEach(Consumer { token: Token? ->  // replaceAll is a work-around for a bug when ANTLR has a
+        tokens.forEach { token: Token ->
+            // replaceAll is a work-around for a bug when ANTLR has a
             // different character count than this CodeArea.
             spansBuilder.add(
                 getStyleClassesFor(token, syntaxErrors),
                 token!!.text.replace("\\r".toRegex(), "").length
             )
-        })
+        }
         return spansBuilder.create()
     }
 
-    private fun getStyleClassesFor(
-        token: Token?,
-        syntaxErrors: List<SyntaxError?>
-    ): Collection<String> {
-        // getHightlightingClass(token);
-        return if (syntaxErrors.stream()
-                .anyMatch { syntaxError: SyntaxError? ->
-                    syntaxError!!.isToken(
-                        token!!
-                    )
-                }
-        ) {
-            kotlin.collections.listOf("syntax-error")
+    private fun getStyleClassesFor(token: Token, syntaxErrors: List<SyntaxError>): Collection<String> {
+        val error = syntaxErrors.any { it.isToken(token) }
+        return if (error) {
+            listOf("syntax-error")
         } else {
             getHightlightingClass(token)
         }
@@ -213,35 +201,29 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
     private fun getHightlightingClass(token: Token?): List<String> {
         return when (token!!.type) {
             IEC61131Lexer.COMMENT, IEC61131Lexer.LINE_COMMENT -> listOf("comment")
-            IEC61131Lexer.RETURN, IEC61131Lexer.INTERFACE, IEC61131Lexer.END_INTERFACE, IEC61131Lexer.METHOD, IEC61131Lexer.END_METHOD, IEC61131Lexer.EXTENDS, IEC61131Lexer.IMPLEMENTS, IEC61131Lexer.ELSEIF, IEC61131Lexer.THEN, IEC61131Lexer.OF, IEC61131Lexer.PROGRAM, IEC61131Lexer.END_PROGRAM, IEC61131Lexer.TYPE, IEC61131Lexer.END_TYPE, IEC61131Lexer.IF, IEC61131Lexer.END_IF, IEC61131Lexer.FUNCTION, IEC61131Lexer.END_FUNCTION, IEC61131Lexer.FUNCTION_BLOCK, IEC61131Lexer.END_FUNCTION_BLOCK, IEC61131Lexer.CASE, IEC61131Lexer.END_CASE, IEC61131Lexer.ELSE -> listOf(
-                "keyword"
-            )
+            IEC61131Lexer.RETURN, IEC61131Lexer.INTERFACE, IEC61131Lexer.END_INTERFACE, IEC61131Lexer.METHOD,
+            IEC61131Lexer.END_METHOD, IEC61131Lexer.EXTENDS, IEC61131Lexer.IMPLEMENTS, IEC61131Lexer.ELSEIF,
+            IEC61131Lexer.THEN, IEC61131Lexer.OF, IEC61131Lexer.PROGRAM, IEC61131Lexer.END_PROGRAM, IEC61131Lexer.TYPE,
+            IEC61131Lexer.END_TYPE, IEC61131Lexer.IF, IEC61131Lexer.END_IF, IEC61131Lexer.FUNCTION,
+            IEC61131Lexer.END_FUNCTION, IEC61131Lexer.FUNCTION_BLOCK, IEC61131Lexer.END_FUNCTION_BLOCK,
+            IEC61131Lexer.CASE, IEC61131Lexer.END_CASE, IEC61131Lexer.ELSE -> listOf("keyword")
 
-            IEC61131Lexer.INT, IEC61131Lexer.SINT, IEC61131Lexer.DINT, IEC61131Lexer.LINT, IEC61131Lexer.UINT, IEC61131Lexer.ULINT, IEC61131Lexer.USINT, IEC61131Lexer.UDINT, IEC61131Lexer.BOOL, IEC61131Lexer.BYTE, IEC61131Lexer.WORD, IEC61131Lexer.LWORD, IEC61131Lexer.DWORD -> listOf(
-                "type"
-            )
+            IEC61131Lexer.INT, IEC61131Lexer.SINT, IEC61131Lexer.DINT, IEC61131Lexer.LINT, IEC61131Lexer.UINT,
+            IEC61131Lexer.ULINT, IEC61131Lexer.USINT, IEC61131Lexer.UDINT, IEC61131Lexer.BOOL, IEC61131Lexer.BYTE,
+            IEC61131Lexer.WORD, IEC61131Lexer.LWORD, IEC61131Lexer.DWORD -> listOf("type")
 
             IEC61131Lexer.INTEGER_LITERAL -> listOf("number")
 
-            IEC61131Lexer.STRING_LITERAL, IEC61131Lexer.REAL_LITERAL, IEC61131Lexer.RETAIN, IEC61131Lexer.F_EDGE, IEC61131Lexer.R_EDGE, IEC61131Lexer.VAR_ACCESS, IEC61131Lexer.VAR_TEMP, IEC61131Lexer.VAR_EXTERNAL, IEC61131Lexer.VAR_CONFIG, IEC61131Lexer.REAL, IEC61131Lexer.LREAL -> listOf(
-                "unsupported"
-            )
+            IEC61131Lexer.STRING_LITERAL, IEC61131Lexer.REAL_LITERAL, IEC61131Lexer.RETAIN, IEC61131Lexer.F_EDGE,
+            IEC61131Lexer.R_EDGE, IEC61131Lexer.VAR_ACCESS, IEC61131Lexer.VAR_TEMP, IEC61131Lexer.VAR_EXTERNAL,
+            IEC61131Lexer.VAR_CONFIG, IEC61131Lexer.REAL, IEC61131Lexer.LREAL -> listOf("unsupported")
 
-            IEC61131Lexer.VAR, IEC61131Lexer.VAR_INPUT, IEC61131Lexer.VAR_IN_OUT, IEC61131Lexer.VAR_OUTPUT, IEC61131Lexer.CONSTANT, IEC61131Lexer.END_VAR -> listOf(
-                "vardef"
-            )
+            IEC61131Lexer.VAR, IEC61131Lexer.VAR_INPUT, IEC61131Lexer.VAR_IN_OUT, IEC61131Lexer.VAR_OUTPUT,
+            IEC61131Lexer.CONSTANT, IEC61131Lexer.END_VAR -> listOf("vardef")
 
             IEC61131Lexer.AND, IEC61131Lexer.NOT, IEC61131Lexer.OR, IEC61131Lexer.MOD -> listOf("operation")
             else -> listOf()
         }
-    }
-
-    private fun <E> listOf(vararg elements: E): List<E> {
-        val list = ArrayList<E>()
-        for (element in elements) {
-            list.add(element)
-        }
-        return list
     }
 
     private fun handleTextChange(highlighting: StyleSpans<Collection<String>>) {
@@ -250,7 +232,8 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
 
     private inner class ShowLineNumbersListener : ChangeListener<Boolean> {
         override fun changed(
-            observableValue: ObservableValue<out Boolean>, oldValue: Boolean, newValue: Boolean
+            observableValue: ObservableValue<out Boolean>,
+            oldValue: Boolean, newValue: Boolean
         ) {
             view.setShowLineNumbers(newValue)
         }

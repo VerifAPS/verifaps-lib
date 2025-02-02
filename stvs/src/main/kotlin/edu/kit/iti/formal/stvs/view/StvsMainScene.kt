@@ -7,6 +7,7 @@ import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
 import edu.kit.iti.formal.stvs.view.menu.StvsRibbonController
 import edu.kit.iti.formal.stvs.view.menu.StvsToolbarController
+import javafx.application.Platform
 import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Scene
@@ -21,15 +22,12 @@ import java.io.IOException
  *
  * @author Lukas Fritsch
  */
-class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) {
+class StvsMainScene(rootModel: StvsRootModel = StvsRootModel()) {
     private val rootModelProperty = SimpleObjectProperty(rootModel)
     var rootModel: StvsRootModel by rootModelProperty
 
     var rootController: StvsRootController = StvsRootController(rootModelProperty.get())
 
-    //val menuBarController: StvsMenuBarController = StvsMenuBarController(rootModelProperty)
-
-    // val menuBarController = StvsRibbonController(rootModelProperty)
     val menuBarController = StvsToolbarController(rootModelProperty)
 
     val scene: Scene
@@ -52,6 +50,10 @@ class StvsMainScene(rootModel: StvsRootModel = StvsRootModel.autoloadSession()) 
 
         rootModel.globalConfig.windowWidthProperty.bind(scene.widthProperty())
         rootModel.globalConfig.windowHeightProperty.bind(scene.heightProperty())
+
+        Platform.runLater {
+            this.rootModel = StvsRootModel.autoloadSession()
+        }
     }
 
     private fun createVBox() = BorderPane(rootController.view, menuBarController.view, null, null, null)

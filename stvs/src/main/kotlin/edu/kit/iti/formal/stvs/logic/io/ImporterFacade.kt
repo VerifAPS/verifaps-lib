@@ -133,9 +133,7 @@ object ImporterFacade {
      */
     @Throws(FileNotFoundException::class, ImportException::class)
     fun importConfig(file: File): GlobalConfig =
-        file.inputStream().use {
-            importConfig(it)
-        }
+        file.inputStream().use { importConfig(it) }
 
     /**
      * Imports a [VerificationResult] from an [InputStream] using the specified

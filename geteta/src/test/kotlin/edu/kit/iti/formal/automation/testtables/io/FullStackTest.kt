@@ -19,6 +19,7 @@
  */
 package edu.kit.iti.formal.automation.testtables.io
 
+import com.github.ajalt.clikt.core.main
 import edu.kit.iti.formal.automation.testtables.apps.Geteta
 import edu.kit.iti.formal.automation.testtables.apps.GetetaApp
 import edu.kit.iti.formal.util.findProgram
@@ -85,7 +86,7 @@ object FullStackTest {
     }
 
 
-    data class TestArgument(var wd: String, var status: String, var args: Array<String>) : Arguments {
+    data class TestArgument(var wd: String, var status: String, var args: List<String>) : Arguments {
         override fun get(): Array<Any> = arrayOf(wd, args, status)
     }
 
@@ -110,7 +111,7 @@ object FullStackTest {
         }
 
         private fun addCase(wd: String, status: String, vararg args: String) {
-            CASES += TestArgument(wd, status, args as Array<String>)
+            CASES += TestArgument(wd, status, args.toList())
         }
 
         override fun provideArguments(context: ExtensionContext?) = CASES.stream()

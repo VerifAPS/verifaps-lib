@@ -1,16 +1,14 @@
 plugins {
-    id 'java'
+    id("kotlin-convention")
 }
 
-group 'edu.kit.iti.formal.automation'
-
 dependencies {
-    implementation 'com.github.ajalt.clikt:clikt:5.0.2'
-    implementation group: 'org.graphstream', name: 'gs-core', version: '2.0'
-    implementation group: 'org.graphstream', name: 'gs-ui', version: '1.3'
-    implementation group: 'org.graphstream', name: 'gs-algo', version: '2.0'
+    implementation("com.github.ajalt.clikt:clikt:5.0.2")
+    implementation("org.graphstream:gs-core:2.0")
+    implementation("org.graphstream:gs-ui:1.3")
+    implementation("org.graphstream:gs-algo:2.0")
 
-    implementation project(':lang')
-    implementation project(':xml')
-    implementation project(':symbex')
+    implementation (project(":lang"))
+    implementation (project(":xml"))
+    implementation (project(":symbex"))
 }

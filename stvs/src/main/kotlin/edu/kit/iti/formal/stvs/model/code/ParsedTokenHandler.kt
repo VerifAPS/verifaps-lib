@@ -14,5 +14,5 @@ fun interface ParsedTokenHandler {
      *
      * @param tokenList List of lexed tokens
      */
-    fun accept(tokenList: List<Token?>?)
+    fun accept(tokenList: List<Token>)
 }

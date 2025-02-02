@@ -1,0 +1,36 @@
+# Version catalog is a central place for you to declare and version dependencies
+# https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
+# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
+
+[versions]
+kotlin = "2.0.21"
+kotlinxDatetime = "0.6.1"
+kotlinxSerializationJSON = "1.7.2"
+kotlinxCoroutines = "1.10.1"
+junit = "5.11.4"
+antlr = "4.13.2"
+
+[libraries]
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
+kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+slf4jApi = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
+slf4jSimple = { module = "org.slf4j:slf4j-simple", version = "2.0.16" }
+junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junitParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+truth = { module = "com.google.truth:truth", version = "1.4.4" }
+antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
+antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
+jdom = { module = "org.jdom:jdom2", version = "2.0.6.1" }
+clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.0.2" }
+
+# Libraries can be bundled together for easier import
+[bundles]
+kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
+logging = ["slf4jApi", "slf4jSimple"]
+testing = ["junitApi", "junitEngine", "junitParams", "truth"]
+
+[plugins]
+kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
