@@ -1,0 +1,39 @@
+FUNCTION_BLOCK RS
+	VAR_INPUT    R,S : BOOL; END_VAR
+	VAR_OUTPUT     Q : BOOL; END_VAR
+
+	IF S THEN
+		Q := TRUE;
+	END_IF
+	IF R THEN
+		Q := FALSE;
+	END_IF
+END_FUNCTION_BLOCK
+
+
+
+FUNCTION_BLOCK TON
+
+VAR_INPUT
+    IN : BOOL;
+    PT : UINT;
+END_VAR
+
+VAR_OUTPUT
+    Q  : BOOL;
+    ET : UINT;
+END_VAR
+
+IF IN THEN
+    Q:= ET = UINT#0;
+    IF ET > UINT#0 THEN
+        ET := ET - UINT#1;
+    ELSE
+        ET := UINT#0;
+    END_IF
+ELSE
+    Q  := FALSE;
+    ET := PT;
+END_IF
+
+END_FUNCTION_BLOCK

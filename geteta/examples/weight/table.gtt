@@ -1,0 +1,35 @@
+table Ta {
+    var input fWeightMin : INT
+    var input fWeightMax : INT
+    var input fWeight : INT
+    var output bErrorLow : BOOL
+    var output bErrorHigh : BOOL
+    var output bWeightOK : BOOL
+
+    group 0 [1, 1] {
+        row [10, -]{
+            fWeightMin: 60
+            fWeightMax: 70
+            fWeight: >60
+            bErrorLow: TRUE
+            bErrorHigh: FALSE
+            bWeightOK: FALSE
+        }
+        row [10, -]{
+            fWeightMin: 60
+            fWeightMax: 70
+            fWeight: [60,70]
+            bErrorLow: FALSE
+            bErrorHigh: FALSE
+            bWeightOK: TRUE
+        }
+        row [10, -]{
+            fWeightMin: 60
+            fWeightMax: 70
+            fWeight: >70
+            bErrorLow: FALSE
+            bErrorHigh: TRUE
+            bWeightOK: FALSE
+        }
+    }
+}
