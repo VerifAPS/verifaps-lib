@@ -51,7 +51,7 @@ data class TimeData(var internal: BigDecimal = BigDecimal.ZERO) {
     constructor(textValue: String) : this() {
         var textValue = textValue
         textValue = textValue.replace("_", "")
-        val extractNumbers = Pattern.compile("([.0-9]+)([hmsd]{1,2})")
+        val extractNumbers = Pattern.compile("([.0-9]+)([hmsd]{1,2})", Pattern.CASE_INSENSITIVE)
         val matcher = extractNumbers.matcher(textValue)
 
         while (matcher.find()) {
@@ -67,7 +67,7 @@ data class TimeData(var internal: BigDecimal = BigDecimal.ZERO) {
     }
 
     private fun getModifier(mod: String): Double {
-        when (mod) {
+        when (mod.lowercase()) {
             "d" -> return FACTOR_DAY.toDouble()
             "h" -> return FACTOR_HOUR.toDouble()
             "m" -> return FACTOR_MINUTE.toDouble()
