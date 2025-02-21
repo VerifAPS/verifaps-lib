@@ -124,13 +124,4 @@ object TestUtils {
             autoloadConfig().nuxmvFilename
         )
     }
-
-    fun assumeGetetaExists() {
-        val toks = autoloadConfig().getetaCommand
-            .split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        assumeFileExists(
-            "The geteta command is not set or a non-existing file. Tests are skipped!",
-            toks[0]
-        )
-    }
 }

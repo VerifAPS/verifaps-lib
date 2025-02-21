@@ -75,7 +75,7 @@ class ModularizationApp : CliktCommand() {
 
         NUXMV_PATH_DEFAULT = nuxmvPath
 
-        val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new), builtins)
+        val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new))
         require(oldExec != null) { "Could not find program in $old" }
         require(newExec != null) { "Could not find program in $new" }
 

@@ -41,8 +41,6 @@ class VerificationScenarioTest {
     @Throws(URISyntaxException::class, IOException::class, ImportException::class)
     fun setUp() {
         TestUtils.assumeNuXmvExists()
-        TestUtils.assumeGetetaExists()
-
         scenario = VerificationScenario()
         code = importStCode(File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI()))
         constraintSpec = ImporterFacade.importConstraintSpec(

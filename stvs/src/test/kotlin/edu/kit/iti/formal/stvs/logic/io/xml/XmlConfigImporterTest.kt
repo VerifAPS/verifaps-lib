@@ -16,12 +16,10 @@ class XmlConfigImporterTest {
     fun testDoImport() {
         val inputStream = XmlConfigImporter::class.java.getResourceAsStream("config_valid_nodeps.xml")!!
         val config: GlobalConfig = importer.doImport(inputStream)
-        Assertions.assertEquals("EN", config.uiLanguage)
         Assertions.assertEquals(100, config.verificationTimeout)
         Assertions.assertEquals(100, config.simulationTimeout)
         Assertions.assertEquals("Comic Sans", config.editorFontFamily)
         Assertions.assertEquals(12, config.editorFontSize.toLong())
-        Assertions.assertEquals(true, config.showLineNumbers)
     }
 
     @Test

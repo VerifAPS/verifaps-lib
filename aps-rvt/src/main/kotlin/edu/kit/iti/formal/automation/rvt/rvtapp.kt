@@ -130,7 +130,7 @@ class RvtApsApp : CliktCommand(     name = "rvt-aps.sh") {
 internal fun loadPouExecutable(library: List<File>, file: File, name: String?): PouExecutable {
     info("Parse program ${file.absolutePath} with libraries ${library}")
     val r = if (name != null)
-        IEC61131Facade.readProgramsWLN(library, listOf(file), listOf(name), builtins).first()
+        IEC61131Facade.readProgramsWLN(library, listOf(file), listOf(name)).first()
     else
         IEC61131Facade.readProgramsWLP(library, listOf(file)).first()
     if (r == null) {
