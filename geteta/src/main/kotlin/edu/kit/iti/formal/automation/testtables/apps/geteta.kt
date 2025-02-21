@@ -77,9 +77,9 @@ class GetetaApp : CliktCommand(name = "geteta") {
         val code = programOptions.readProgram()
 
         // override mode
-        if (mode != null) {
+        mode?.let { m ->
+            gtts.forEach { it.options.mode = m }
         }
-        gtts.forEach { it.options.mode = mode!! }
 
         gtts.forEach {
             info("Mode is ${it.options.mode} for table ${it.name}")

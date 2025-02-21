@@ -112,7 +112,6 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
 
 
     private fun openWizard() {
-        WelcomeWizard(rootModel.get().globalConfig).showAndWait()
     }
 
     private fun doOpenFile(file: File) {

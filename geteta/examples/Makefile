@@ -8,7 +8,7 @@
 .EXPORT_ALL_VARIABLES:
 .PHONY: MinMax
 
-NUXMV := $(HOME)/share/nuXmv-1.1.1-Linux/bin/nuXmv
+NUXMV := $(HOME)/share/nuXmv-2.1.0-linux64/bin/nuXmv
 LANG := C
 
 REPO_DIR := $(shell readlink -f ../../)
@@ -30,7 +30,7 @@ endif
 GETETA_FAIL := --row-map  --cexout
 
 prepare:
-	cd $(REPO_DIR) && gradle :exec:installDist --parallel
+	cd $(REPO_DIR) && gradle :exec:installDist --parallel --no-problems-report
 
 $(GETETA): prepare
 $(RETETA): prepare

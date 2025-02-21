@@ -1,5 +1,5 @@
 plugins {
-//    id 'com.google.cloud.tools.jib' version '0.9.6'
+    id("kotlin-convention")
 }
 
 apply plugin: 'application'
@@ -8,7 +8,6 @@ description = ''
 ext.ktor_version = '0.9.3'
 
 repositories {
-    jcenter()
     maven { url "https://dl.bintray.com/kotlin/ktor" }
 }
 
@@ -47,7 +46,7 @@ dependencies {
     compile group: 'com.xenomachina', name: 'kotlin-argparser', version: '2.0.4'
 }
 
-task jarDist(type: Jar) {
+tasks.register('jarDist', Jar) {
     classifier = "exe"
     entryCompression = ZipEntryCompression.DEFLATED
     with jar

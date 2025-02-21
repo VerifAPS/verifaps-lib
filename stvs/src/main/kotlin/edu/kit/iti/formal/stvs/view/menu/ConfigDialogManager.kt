@@ -34,17 +34,13 @@ class ConfigDialogManager(private val config: GlobalConfig) : Controller {
         dialog.title = "Preferences"
         view = ConfigDialogPane()
         // set initial values
-        view.uiLanguage.items = FXCollections.observableList(config.validLanguages)
         bind(view.verificationTimeout.textProperty(), config.verificationTimeoutProperty)
         bind(view.simulationTimeout.textProperty(), config.simulationTimeoutProperty)
         bind(view.editorFontFamily.textProperty(), config.editorFontFamilyProperty)
         bind(view.editorFontSize.textProperty(), config.editorFontSizeProperty)
-        bind(view.showLineNumbers.selectedProperty(), config.showLineNumbersProperty)
-        bind(view.uiLanguage.valueProperty(), config.uiLanguageProperty)
         bind(view.maxLineRollout.textProperty(), config.maxLineRolloutProperty)
         bind(view.nuxmvFilename.textField.textProperty(), config.nuxmvFilenameProperty)
         bind(view.z3Path.textField.textProperty(), config.z3PathProperty)
-        bind(view.getetaCommand.textProperty(), config.getetaCommandProperty)
 
         dialogValid =
             view.verificationTimeout.validProperty().and(view.simulationTimeout.validProperty())
@@ -66,14 +62,11 @@ class ConfigDialogManager(private val config: GlobalConfig) : Controller {
         }
         config.editorFontFamily = (view.editorFontFamily.text)
         config.editorFontSize = (view.editorFontSize.integer!!)
-        config.showLineNumbers = (view.showLineNumbers.isSelected)
         config.simulationTimeout = (view.simulationTimeout.integer!!)
         config.verificationTimeout = (view.verificationTimeout.integer!!.toLong())
-        config.uiLanguage = (view.uiLanguage.valueProperty().get()!!)
         config.maxLineRollout = (view.maxLineRollout.integer!!)
         config.nuxmvFilename = (view.nuxmvFilename.textField.text)
         config.z3Path = (view.z3Path.textField.text)
-        config.getetaCommand = (view.getetaCommand.text)
         try {
             config.autosaveConfig()
         } catch (exception: IOException) {

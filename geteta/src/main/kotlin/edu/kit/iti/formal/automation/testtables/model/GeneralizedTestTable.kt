@@ -277,8 +277,8 @@ class GeneralizedTestTable(
     }
     val maxProgramRun: Int
         get() = programVariables
-            .filterIsInstance(ProgramVariable::class.java)
-            .map { it.programRun }.maxBy { it } ?: 0
+            .filterIsInstance<ProgramVariable>()
+            .map { it.programRun }.maxByOrNull { it } ?: 0
 
     fun getProgramVariables(name: String, run: Int?): ColumnVariable {
         val pv = programVariables.find { it.respondTo(name, run) }

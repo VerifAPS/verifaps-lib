@@ -47,7 +47,6 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
      * @param globalConfig the global configuration (for font size or style)
      */
     init {
-        globalConfig.showLineNumbersProperty.addListener(ShowLineNumbersListener())
         view.stylesheets
             .add(
                 EditorPane::class.java.getResource("st-keywords.css")

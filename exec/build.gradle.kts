@@ -33,7 +33,7 @@ fun entrypoint(name: String, mc: String) {
 
     //val applicationDistribution by tasks
     //println(applicationDistribution)
-    //applicationDistribution.from(t) { into("bin") }
+    application.applicationDistribution.from(t) { into("bin") }
     t.dependsOn(startScripts)
 }
 
@@ -64,3 +64,8 @@ entrypoint("ide", "edu.kit.iti.formal.automation.fx.Main")
 entrypoint("stvs", "edu.kit.iti.formal.stvs.Main")
 entrypoint("smteta", "edu.kit.iti.formal.automation.testtables.apps.SMTeta")
 entrypoint("xml2st", "edu.kit.iti.formal.automation.Xml2TxtApp")
+
+
+application {
+    applicationDistribution.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

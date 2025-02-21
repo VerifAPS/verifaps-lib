@@ -108,7 +108,6 @@ class StvsMenuBarController(rootModel: ObjectProperty<StvsRootModel>) : Controll
 
 
     private fun openWizard(actionEvent: ActionEvent) {
-        WelcomeWizard(rootModel.get().globalConfig).showAndWait()
     }
 
 

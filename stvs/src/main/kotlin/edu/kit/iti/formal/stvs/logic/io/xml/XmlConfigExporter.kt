@@ -24,7 +24,6 @@ class XmlConfigExporter : XmlExporter<GlobalConfig>() {
         return xml("config", NAMESPACE) {
 
             "general" {
-                "uiLanguage" { +source.uiLanguage }
                 "simulationTimeout" { +BigInteger(source.simulationTimeout.toString()) }
                 "verificationTimeout" { +BigInteger(source.verificationTimeout.toString()) }
                 "maxLineRollout" { +BigInteger(source.maxLineRollout.toString()) }
@@ -38,13 +37,11 @@ class XmlConfigExporter : XmlExporter<GlobalConfig>() {
             "editor" {
                 "fontFamily" { +source.editorFontFamily }
                 "fontSize" { +BigInteger(source.editorFontSize.toString()) }
-                "showLineNumbers" { +source.showLineNumbers }
             }
 
             "dependencies" {
                 "z3Path" { +source.z3Path }
                 "nuxmvFilename" { +source.nuxmvFilename }
-                "getetaCommand" { +source.getetaCommand }
             }
         }
     }
