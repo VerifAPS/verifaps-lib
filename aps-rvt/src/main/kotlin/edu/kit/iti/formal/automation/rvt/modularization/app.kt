@@ -9,9 +9,7 @@ import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
-import kotlinx.coroutines.newFixedThreadPoolContext
 import java.io.File
-import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.main
 
 /**
@@ -77,7 +75,7 @@ class ModularizationApp : CliktCommand() {
 
         NUXMV_PATH_DEFAULT = nuxmvPath
 
-        val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new))
+        val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new), builtins)
         require(oldExec != null) { "Could not find program in $old" }
         require(newExec != null) { "Could not find program in $new" }
 

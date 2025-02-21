@@ -163,18 +163,18 @@ object IEC61131Facade {
     /**
      *
      */
-    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>)
+    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>, builtins: Boolean=false)
             : List<PouExecutable?> {
         val selectors = names.map { name ->
             { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
         }
-        return readProgramsWLS(libraryElements, programs, selectors)
+        return readProgramsWLS(libraryElements, programs, selectors, builtins)
     }
 
     /**
      * Read programs with support for common libraries and a selection either by name or PROGRAM_DECLARATION
      */
-    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>)
+    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>, builtins: Boolean=false)
             : List<PouExecutable?> {
         val p = programs.map {
             if ('@' in it) {
@@ -190,7 +190,7 @@ object IEC61131Facade {
             if (name == null) selectorByType
             else selectByName(name)
         }
-        return readProgramsWLS(libraryElements, pfiles, selectors)
+        return readProgramsWLS(libraryElements, pfiles, selectors, builtins)
     }
 
     fun readProgramWLNP(libraryElements: List<File>,
@@ -223,12 +223,15 @@ object IEC61131Facade {
     /**
      *
      */
-    fun readProgramsWLS(libraryElements: List<File>,
-                        programs: List<File>,
-                        selectors: List<(PouElements) -> PouExecutable?>)
+    fun readProgramsWLS(
+        libraryElements: List<File>,
+        programs: List<File>,
+        selectors: List<(PouElements) -> PouExecutable?>,
+        builtins: Boolean=false
+    )
             : List<PouExecutable?> {
         return programs.zip(selectors).map { (it, selector) ->
-            val (elements, error) = filefr(libraryElements + it)
+            val (elements, error) = filefr(libraryElements + it, builtins)
             error.forEach { warn(it.toHuman()) }
             selector(elements)
         }
@@ -239,8 +242,9 @@ object IEC61131Facade {
      *
      */
     fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
-            readProgramsWLS(libraryElements, programs,
-                    programs.map { _ -> ::findProgram })
+            readProgramsWLS(
+                libraryElements, programs,
+                programs.map { _ -> ::findProgram })
 
     /**
      *

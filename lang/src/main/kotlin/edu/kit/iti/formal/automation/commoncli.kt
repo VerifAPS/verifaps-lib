@@ -15,7 +15,7 @@ import kotlin.system.exitProcess
  */
 class ProgramOptions : OptionGroup("options for handling programs") {
     fun readProgram(): PouExecutable {
-        val pous = IEC61131Facade.readProgramsWLPN(library, program)
+        val pous = IEC61131Facade.readProgramsWLPN(library, program, builtins)
         require(pous.isNotEmpty()) { "No program was given" }
         val exec = pous.first()
         require(exec != null) { "Could not find any program by ${program.first()}" }
@@ -23,12 +23,14 @@ class ProgramOptions : OptionGroup("options for handling programs") {
     }
 
     fun readPrograms(): List<PouExecutable> {
-        val pous = IEC61131Facade.readProgramsWLPN(library, program)
+        val pous = IEC61131Facade.readProgramsWLPN(library, program, builtins)
         require(pous.isNotEmpty()) { "No program was given" }
         val exec = pous.first()
         require(exec != null) { "Could not find any program by ${program.first()}" }
         return pous.filterNotNull()
     }
+
+    val builtins by option("--load-builtins", "-b", help = "Load built-ins").flag()
 
     val library by option("-L", "--library", help = "Library files to include in the namespace").file().multiple()
 
