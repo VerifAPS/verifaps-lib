@@ -1,4 +1,4 @@
-table Ta {
+table Ta_cex {
     var input i_fWeight : INT
     var input i_bLightBarrierEnd : BOOL
     var output bErrorLow : BOOL
@@ -35,7 +35,7 @@ table Ta {
                 bErrorHigh:         =(i_fWeight > 70)
             }
 
-            row 3 [5,5] {
+            row 3 [4,4] {
                 i_bLightBarrierEnd: TRUE
                 bErrorLow:          =bErrorLow[-1]
                 bErrorHigh:         =bErrorHigh[-1]

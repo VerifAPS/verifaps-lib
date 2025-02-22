@@ -25,15 +25,13 @@ VAR_OUTPUT
 END_VAR
 
 IF IN THEN
-    Q:= ET = UINT#0;
-    IF ET > UINT#0 THEN
-        ET := ET - UINT#1;
-    ELSE
-        ET := UINT#0;
+    Q:= (ET >= PT);
+    IF NOT Q THEN
+        ET := ET + UINT#1;
     END_IF
 ELSE
     Q  := FALSE;
-    ET := PT;
+    ET := UINT#0;
 END_IF
 
 END_FUNCTION_BLOCK

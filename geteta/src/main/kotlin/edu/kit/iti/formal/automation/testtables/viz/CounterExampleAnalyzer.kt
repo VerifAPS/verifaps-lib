@@ -20,9 +20,6 @@
 package edu.kit.iti.formal.automation.testtables.viz
 
 
-import edu.kit.iti.formal.automation.VisualizeTrace
-import edu.kit.iti.formal.automation.rvt.LineMap
-import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.testtables.builder.stateNameSentinel
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
@@ -32,10 +29,7 @@ import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
 import edu.kit.iti.formal.smv.CounterExample
-import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SVariable
-import edu.kit.iti.formal.util.CodeWriter
-import edu.kit.iti.formal.util.times
 import java.util.*
 import java.util.concurrent.Callable
 
@@ -50,9 +44,10 @@ data class Mapping(private val state2Row: MutableList<Pair<Int, String>> = array
 
 
 private data class SearchNode(
-        val cycle: Int,
-        val state: AutomatonState,
-        val parent: SearchNode? = null) {
+    val cycle: Int,
+    val state: AutomatonState,
+    val parent: SearchNode? = null
+) {
 
     fun jumpTo(to: AutomatonState): SearchNode = SearchNode(cycle + 1, to, this)
 
@@ -80,44 +75,45 @@ val ERRMARK = '\u2717' // ✘
 val QMARK = '\u2753' // ❓
 
 class CounterExamplePrinterJson(
-        val automaton: TestTableAutomaton,
-        val testTable: GeneralizedTestTable,
-        val cex: CounterExample) : Callable<String> {
+    val automaton: TestTableAutomaton,
+    val testTable: GeneralizedTestTable,
+    val cex: CounterExample
+) : Callable<String> {
 
     override fun call(): String =
-            (0 until cex.stateSize - 1).joinToString(", ", "[", "]") {
-                getTableVars(it)
-            }
+        (0 until cex.stateSize - 1).joinToString(", ", "[", "]") {
+            getTableVars(it)
+        }
 
     val tableRows = testTable.region.flat()
     val prfx = "_${testTable.name}."
 
     private fun getTableVars(k: Int) =
-            tableRows.joinToString(", ", "[", "]") { row ->
-                val activateStates = isRowActive(k, row)
-                val rowActive = activateStates.isNotEmpty()
-                val assumption = prfx + row.defInput.name
-                val assertion = prfx + row.defOutput.name
-                val fwd = prfx + row.defForward.name
-                val failed = prfx + row.defFailed.name
+        tableRows.joinToString(", ", "[", "]") { row ->
+            val activateStates = isRowActive(k, row)
+            val rowActive = activateStates.isNotEmpty()
+            val assumption = prfx + row.defInput.name
+            val assertion = prfx + row.defOutput.name
+            val fwd = prfx + row.defForward.name
+            val failed = prfx + row.defFailed.name
 
-                val times =
-                        if (activateStates.isEmpty())
-                            "[]"
-                        else
-                            activateStates.joinToString(", ", "[", "]") { it.toString() }
+            val times =
+                if (activateStates.isEmpty())
+                    "[]"
+                else
+                    activateStates.joinToString(", ", "[", "]") { it.toString() }
 
-                appendJSONObject(
-                        "rowId" to "\"${row.id}\"",
-                        "active" to rowActive,
-                        "assumption" to boolForHuman(k, assumption),
-                        "assertion" to boolForHuman(k, assertion),
-                        "accept" to boolForHuman(k, fwd),
-                        "fail" to boolForHuman(k, failed),
-                        "time" to times,
-                        "cells" to getFields(row, k)
-                )
-            }
+            appendJSONObject(
+                "rowId" to "\"${row.id}\"",
+                "active" to rowActive,
+                "assumption" to boolForHuman(k, assumption),
+                "assertion" to boolForHuman(k, assertion),
+                "accept" to boolForHuman(k, fwd),
+                "fail" to boolForHuman(k, failed),
+                "time" to times,
+                "cells" to getFields(row, k)
+            )
+        }
 
     private fun getFields(row: TableRow, k: Int): Any? {
         fun name(v: SVariable, k: String) = "${prfx}${v.name}_$k"
@@ -139,195 +135,39 @@ class CounterExamplePrinterJson(
 
     private fun isRowActive(k: Int, it: TableRow): List<Int> {
         return automaton.getStates(it)
-                ?.filter { rs ->
-                    cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
-                }
-                ?.map { it.time }
-                ?: listOf()
+            ?.filter { rs ->
+                cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
+            }
+            ?.map { it.time }
+            ?: listOf()
     }
 
 }
 
 private fun appendJSONObject(vararg pairs: Pair<String, Any?>) =
-        pairs.joinToString(", ", "{", "}") { (k, v) ->
-            "\"$k\": $v"
-        }
-
-class CounterExamplePrinterWithProgram(
-        val automaton: TestTableAutomaton,
-        val testTable: GeneralizedTestTable,
-        val cex: CounterExample,
-        lineMap: LineMap,
-        val program: PouExecutable,
-        val stream: CodeWriter = CodeWriter()) {
-
-    val vt = VisualizeTrace(cex, lineMap, program, stream).also { vt ->
-        vt.programVariableToSVar = { "code$.${it}" }
+    pairs.joinToString(", ", "{", "}") { (k, v) ->
+        "\"$k\": $v"
     }
 
-    fun getAll() {
-        for (k in 0 until cex.stateSize - 1) get(k)
-    }
-
-    fun get(k: Int) {
-        vt.get(k, k + 1)
-        printAssertions(k)
-    }
-
-    private fun printAssertions(k: Int) {
-        val stars = ("*" * 79)
-        stream.print("($stars").nl()
-        stream.print(" * Table rows:").nl()
-        printVariables(k)
-        stream.nl().println("$stars)")
-    }
-
-    private fun printVariables(k: Int) {
-        testTable.region.flat()
-                .forEach { row ->
-                    val activateStates = isRowActive(k, row)
-                    val rowActive = if (activateStates.isNotEmpty()) OKMARK else ERRMARK
-                    val prfx = "_${testTable.name}."
-                    val assumption = prfx + row.defInput.name
-                    val assertion = prfx + row.defOutput.name
-                    val fwd = prfx + row.defForward.name
-
-                    val times = activateStates.joinToString(", ") { it.toString() }
-
-                    stream.print(" *     $rowActive Row ${row.id} " +
-                            "${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
-                            " ${boolForHuman(k, fwd)} (Time: $times)").nl()
-                }
-    }
-
-    private fun boolForHuman(k: Int, n: String): Char {
-        val v = cex[k, n]
-        val m = when (v) {
-            "TRUE" -> OKMARK
-            "FALSE" -> ERRMARK
-            else -> QMARK
-        }
-        return m
-    }
-
-    private fun isRowActive(k: Int, it: TableRow): List<Int> {
-        return automaton.getStates(it)
-                ?.filter { rs ->
-                    cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
-                }
-                ?.map { it.time }
-                ?: listOf()
-    }
-}
-
-
-class CounterExampleTablePrinter(
-        val automaton: TestTableAutomaton,
-        val testTable: GeneralizedTestTable,
-        val cex: CounterExample,
-        //lineMap: LineMap,
-        //val program: PouExecutable,
-        val stream: CodeWriter = CodeWriter()) {
-
-    fun print() {
-        for (k in 0 until cex.stateSize - 1) get(k)
-    }
-
-    fun get(k: Int) {
-        printAssertions(k)
-    }
-
-    private fun printAssertions(k: Int) {
-        val stars = ("*" * 79)
-        stream.print("($stars").nl()
-        stream.print(" * Table rows:").nl()
-        printVariables(k)
-        stream.nl().println("$stars)")
-    }
-
-    private fun printVariables(k: Int) {
-        testTable.region.flat()
-                .forEach { row ->
-                    val activateStates = isRowActive(k, row)
-                    val rowActive = if (activateStates.isNotEmpty()) OKMARK else ERRMARK
-                    val prfx = "_${testTable.name}."
-                    val assumption = prfx + row.defInput.name
-                    val assertion = prfx + row.defOutput.name
-                    val fwd = prfx + row.defForward.name
-
-                    val times = activateStates.joinToString(", ") { it.toString() }
-
-                    stream.print(" *     $rowActive Row ${row.id} " +
-                            "${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
-                            " ${boolForHuman(k, fwd)} (Time: $times)").nl()
-
-                    if (activateStates.isNotEmpty() && !bool(k, assumption)) {
-                        val violatedAssumpations = testTable.programVariables.filter { it.isAssumption }
-                                .map {
-                                    SVariable(row.defInput.name + "_" + it.name, SMVTypes.BOOLEAN)
-                                }
-                                .filter { !bool(k, it.name) }
-                                .joinToString { it.name }
-                        stream.print(" *         Violated assumptions: $violatedAssumpations").nl()
-                    }
-
-                    if (activateStates.isNotEmpty() && !bool(k, assertion)) {
-                        val violatedAssertions = testTable.programVariables.filter { it.isAssertion }
-                                .map {
-                                    prfx + row.defOutput.name + "_" + it.internalVariable(testTable.programRuns).name
-                                }
-                                .filter { !bool(k, it) }
-                                .joinToString { it }
-                        stream.print(" *         Violated assertions: $violatedAssertions").nl()
-                    }
-
-                }
-    }
-
-    private fun bool(k: Int, n: String) = when (cex[k, n]) {
-        "TRUE" -> true
-        "FALSE" -> false
-        else -> false
-    }
-
-
-    private fun boolForHuman(k: Int, n: String): Char {
-        val v = cex[k, n]
-        val m = when (v) {
-            "TRUE" -> OKMARK
-            "FALSE" -> ERRMARK
-            else -> QMARK
-        }
-        return m
-    }
-
-    private fun isRowActive(k: Int, it: TableRow): List<Int> {
-        return automaton.getStates(it)
-                ?.filter { rs ->
-                    cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
-                }
-                ?.map { it.time }
-                ?: listOf()
-    }
-}
 
 /**
  * @author Alexander Weigl
  * @version 1 (08.02.17)
  */
 class CounterExampleAnalyzer(
-        val automaton: TestTableAutomaton,
-        val testTable: GeneralizedTestTable,
-        val counterExample: CounterExample,
-        val tableModuleName: String) {
+    val automaton: TestTableAutomaton,
+    val testTable: GeneralizedTestTable,
+    val counterExample: CounterExample,
+    val tableModuleName: String
+) {
 
     private val tableRows = testTable.region.flat()
     val rowMapping: MutableList<Mapping> = arrayListOf()
 
     fun run() {
         val init = tableRows.filter { it.isInitialReachable }
-                .map { automaton.getFirstState(it) as RowState }
-                .map { SearchNode(0, it) }
+            .map { automaton.getFirstState(it) as RowState }
+            .map { SearchNode(0, it) }
 
         val queue = LinkedList(init)
 
@@ -356,16 +196,17 @@ class CounterExampleAnalyzer(
             if (getBoolean(cycle, row.fwd)) {
                 //include every outgoing tableRow
                 automaton.transitions.filter { it.from == row }
-                        .forEach { queue.add(cur.jumpTo(it.to)) } //TODO exclude error?
+                    .forEach { queue.add(cur.jumpTo(it.to)) } //TODO exclude error?
             }
 
             val failed =
-                    when {
-                        testTable.options.mode == Mode.CONCRETE_TABLE ->
-                            getBoolean(cycle, stateNameSentinel)
-                        else ->
-                            getBoolean(cycle, row.fail)
-                    }
+                when {
+                    testTable.options.mode == Mode.CONCRETE_TABLE ->
+                        getBoolean(cycle, stateNameSentinel)
+
+                    else ->
+                        getBoolean(cycle, row.fail)
+                }
             if (failed) {
                 //yuhuuu the counter example
                 rowMapping.add(cur.mapping)

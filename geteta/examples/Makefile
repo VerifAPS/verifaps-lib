@@ -54,7 +54,13 @@ constantprogram-smt: $(GETETA_SMT)
 constantprogram_broken-smt: $(GETETA_SMT)
 	cd constantprogram && $(GETETA_SMT) -t constantprogram_broken.gtt -c constantprogram.st
 
-##
+## Weight
+
+weight_verified: $(GETETA)
+	cd weight && $(GETETA) -L library.st -t table.gtt -c WeightExample.st
+
+weight_broken: $(GETETA)
+	cd weight && $(GETETA) --cexout --row-map -L library.st -t table_broken.gtt -c WeightExample.st
 
 
 ## Counter

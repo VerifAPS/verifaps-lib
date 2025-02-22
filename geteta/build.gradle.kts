@@ -26,6 +26,8 @@ dependencies {
     antlr(libs.antlr)
     api(libs.clickt)
 
+    implementation("io.ktor:ktor-html-builder:1.6.8")
+
     api("com.github.jferard:fastods:0.8.1")
     api("com.github.doyaaaaaken:kotlin-csv-jvm:1.10.0")
 }

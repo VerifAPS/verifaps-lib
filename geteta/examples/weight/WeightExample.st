@@ -2,10 +2,8 @@ PROGRAM WeightExample
 
 VAR CONSTANT
 	// parameters read from the HMI
-	// WEIGHT_EMPTY_MIN: INT := 60;
-	// WEIGHT_EMPTY_MAX: INT := 70;
-	WEIGHT_FULL_MIN: INT := 460;
-	WEIGHT_FULL_MAX: INT := 480;
+	fWeightMin: INT := 60;
+	fWeightMax: INT := 70;
 END_VAR
 
 VAR_INPUT
@@ -15,9 +13,10 @@ VAR_INPUT
 END_VAR
 
 VAR_OUTPUT
-    HMI_bCartonTooLight : BOOL;
-	HMI_bCartonTooHeavy : BOOL;
+    	bErrorLow : BOOL;
+	bErrorHigh : BOOL;
 	q_bMotForward : BOOL;
+	bWeightMeasured: BOOL;
 END_VAR
 
 VAR
@@ -25,9 +24,10 @@ VAR
 	RS_LightBarriers: RS;
 	TON_Weighing: TON;
 	// local vars
-	bWeightMeasured: BOOL;
 	bPackageOnBand: BOOL;
 END_VAR
+
+bWeightMeasured := FALSE;
 
 // NETWORK 1
 IF i_bLightBarrierStart THEN
@@ -41,12 +41,12 @@ END_IF
 q_bMotForward := bPackageOnBand OR (bWeightMeasured AND i_bLightBarrierEnd);
 
 // NETWORK 3
-TON_Weighing(IN := i_bLightBarrierEnd, PT := T#500MS);
+TON_Weighing(IN := i_bLightBarrierEnd, PT := T#20MS);
 IF TON_Weighing.Q THEN
 	bWeightMeasured := TRUE;
-	HMI_bCartonTooHeavy := i_fWeight > WEIGHT_FULL_MAX;
-	HMI_bCartonTooLight := i_fWeight < WEIGHT_FULL_MIN;
-TON_Weighing(IN := FALSE);  // im Screenshot vergessen
+	bErrorHigh := i_fWeight > fWeightMax;
+	bErrorLow := i_fWeight < fWeightMin;
+	TON_Weighing(IN := FALSE, PT := T#20MS);  // im Screenshot vergessen
 END_IF
 
 END_PROGRAM

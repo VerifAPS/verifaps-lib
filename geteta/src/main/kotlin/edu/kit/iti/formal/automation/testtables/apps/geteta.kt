@@ -21,6 +21,7 @@ package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.option
@@ -36,15 +37,11 @@ import edu.kit.iti.formal.automation.testtables.builder.*
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 import edu.kit.iti.formal.automation.testtables.model.options.Mode
-import edu.kit.iti.formal.automation.testtables.viz.AutomatonDrawer
-import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterJson
-import edu.kit.iti.formal.automation.testtables.viz.CounterExamplePrinterWithProgram
-import edu.kit.iti.formal.automation.testtables.viz.ODSCounterExampleWriter
+import edu.kit.iti.formal.automation.testtables.viz.*
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.util.*
 import java.io.File
 import kotlin.system.exitProcess
-import com.github.ajalt.clikt.core.main
 
 object Geteta {
     @JvmStatic
@@ -177,8 +174,10 @@ class GetetaApp : CliktCommand(name = "geteta") {
                 }
 
             if (b is NuXMVOutput.Cex) {
-                if (cexAnalysation.cexPrinter) useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
-                else info("Use `--cexout' to print a cex analysation.")
+                if (cexAnalysation.cexPrinter) {
+                    useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
+                    useCounterExamplePrinterHtml(outputFolder, b, tt, lineMap, code)
+                } else info("Use `--cexout' to print a cex analysation.")
 
                 if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
                 else info("Use `--cexjson' to print a cex analysation as json.")
@@ -267,27 +266,55 @@ class GetetaApp : CliktCommand(name = "geteta") {
 }
 
 internal fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
-        if (tableWhitelist.isNotEmpty())
-            this.filter { it.name in tableWhitelist }
-        else
-            this
+    if (tableWhitelist.isNotEmpty())
+        this.filter { it.name in tableWhitelist }
+    else
+        this
 
 
 fun useCounterExamplePrinter(
-        outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
-        lineMap: LineMap, program: PouExecutable) {
+    outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
+    lineMap: LineMap, program: PouExecutable
+) {
     for (model in tt) {
         val file = File(outputFolder, "cex_${model.testTable.name}.txt")
         file.bufferedWriter().use {
             val stream = CodeWriter(it)
             val cep = CounterExamplePrinterWithProgram(
+                automaton = model.automaton,
+                testTable = model.testTable,
+                cex = result.counterExample,
+                lineMap = lineMap,
+                program = program,
+                stream = stream
+            )
+            cep.getAll()
+        }
+    }
+}
+
+
+fun useCounterExamplePrinterHtml(
+    outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
+    lineMap: LineMap, program: PouExecutable
+) {
+    for (model in tt) {
+        for (k in 0 until result.counterExample.stateSize - 1) {
+            val name = "cex_${model.testTable.name}"
+            val file = File("$outputFolder/cex", "$name.$k.html")
+            file.parentFile.mkdirs()
+            file.bufferedWriter().use {
+                val cep = CounterExamplePrinterWithProgramHtml(
                     automaton = model.automaton,
                     testTable = model.testTable,
                     cex = result.counterExample,
                     lineMap = lineMap,
                     program = program,
-                    stream = stream)
-            cep.getAll()
+                    stream = it,
+                    name = name
+                )
+                cep.print(k)
+            }
         }
     }
 }
@@ -322,7 +349,8 @@ class GetetaSmtApp : CliktCommand() {
 
         //region read program
         val (pous, exec) = IEC61131Facade.readProgramWLNP(
-                programOptions.library, programOptions.program.first())
+            programOptions.library, programOptions.program.first()
+        )
         require(pous.isNotEmpty()) { "No program was given" }
         require(exec != null) { "Could not find any program by ${pous.first()}" }
         //endregion

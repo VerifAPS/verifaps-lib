@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.automation.st
 
-import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.AnyDt
 import edu.kit.iti.formal.automation.datatypes.IECString
@@ -48,9 +47,9 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     }
 
     private fun blockParam(p: MutableList<SymbolicReference>, pre: String, suf: String) =
-            p.joinInto(sb, ", ", pre, suf) {
-                it.accept(this@StructuredTextPrinter)
-            }
+        p.joinInto(sb, ", ", pre, suf) {
+            it.accept(this@StructuredTextPrinter)
+        }
 
 
     override fun visit(empty: EMPTY_EXPRESSION) {
@@ -108,7 +107,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     override fun visit(binaryExpression: BinaryExpression) {
         sb.append('(')
         binaryExpression.leftExpr.accept(this)
-        sb.printf(" ").printf(literals.operator(binaryExpression.operator)).printf(" ")
+        sb.space().printf(literals.operator(binaryExpression.operator)).space()
         binaryExpression.rightExpr.accept(this)
         sb.append(')')
 
@@ -170,7 +169,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
 
     override fun visit(unaryExpression: UnaryExpression) {
-        sb.printf(literals.operator(unaryExpression.operator)!!).printf(" ")
+        sb.printf(literals.operator(unaryExpression.operator)!!).space()
         unaryExpression.expression.accept(this)
 
     }
@@ -245,7 +244,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(programDeclaration: ProgramDeclaration) {
         printComment(programDeclaration.comment)
-        sb.printf("PROGRAM ").printf(programDeclaration.name).increaseIndent()
+        sb.keyword("PROGRAM").space().printf(programDeclaration.name).increaseIndent().nl()
         programDeclaration.scope.accept(this)
 
         sb.nl()
@@ -257,7 +256,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
         printBody(programDeclaration)
 
-        sb.decreaseIndent().nl().printf("END_PROGRAM").nl()
+        sb.decreaseIndent().nl().keyword("END_PROGRAM").nl()
     }
 
 
@@ -302,23 +301,23 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
         printComment(functionBlockDeclaration.comment)
-        sb.printf("FUNCTION_BLOCK ")
+        sb.keyword("FUNCTION_BLOCK ")
         if (functionBlockDeclaration.isFinal)
-            sb.printf("FINAL ")
+            sb.keyword("FINAL ")
         if (functionBlockDeclaration.isAbstract)
-            sb.printf("ABSTRACT ")
+            sb.keyword("ABSTRACT ")
 
         sb.printf(functionBlockDeclaration.name)
 
         if (functionBlockDeclaration.parent.identifier != null) {
-            sb.printf(" EXTENDS ").printf(functionBlockDeclaration.parent.identifier!!)
+            sb.keyword(" EXTENDS ").printf(functionBlockDeclaration.parent.identifier!!)
         }
 
         if (functionBlockDeclaration.interfaces.isNotEmpty()) {
             val interf = functionBlockDeclaration.interfaces
-                    .map { it.identifier!! }
-                    .joinToString(", ")
-            sb.printf(" IMPLEMENTS ").printf(interf)
+                .map { it.identifier!! }
+                .joinToString(", ")
+            sb.keyword(" IMPLEMENTS ").printf(interf)
         }
         sb.increaseIndent().nl()
         functionBlockDeclaration.scope.accept(this)
@@ -348,11 +347,11 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     }
 
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
-        sb.printf("INTERFACE ").printf(interfaceDeclaration.name)
+        sb.keyword("INTERFACE ").printf(interfaceDeclaration.name)
 
         val extendsInterfaces = interfaceDeclaration.interfaces.map { it.identifier }
         if (!extendsInterfaces.isEmpty())
-            sb.printf(" EXTENDS ").print(extendsInterfaces)
+            sb.keyword(" EXTENDS ").print(extendsInterfaces)
 
         sb.increaseIndent().nl()
 
@@ -360,28 +359,28 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
         interfaceDeclaration.methods.forEach { m -> m.accept(this) }
 
-        sb.decreaseIndent().nl().printf("END_INTERFACE").nl().nl()
+        sb.decreaseIndent().nl().keyword("END_INTERFACE").nl().nl()
 
     }
 
     override fun visit(clazz: ClassDeclaration) {
         printComment(clazz.comment)
-        sb.printf("CLASS ")
+        sb.keyword("CLASS ")
 
         if (clazz.isFinal)
-            sb.printf("FINAL ")
+            sb.keyword("FINAL ")
         if (clazz.isAbstract)
-            sb.printf("ABSTRACT ")
+            sb.keyword("ABSTRACT ")
 
         sb.printf(clazz.name)
 
         val parent = clazz.parent.identifier
         if (parent != null)
-            sb.printf(" EXTENDS ").printf(parent)
+            sb.keyword(" EXTENDS ").printf(parent)
 
         val interfaces = clazz.interfaces.map { it.identifier }
         if (!interfaces.isEmpty())
-            sb.printf(" IMPLEMENTS ").printf(interfaces.joinToString(","))
+            sb.keyword(" IMPLEMENTS ").printf(interfaces.joinToString(","))
 
         sb.increaseIndent().nl()
 
@@ -389,19 +388,19 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
         clazz.methods.forEach { m -> m.accept(this) }
 
-        sb.decreaseIndent().nl().printf("END_CLASS").nl().nl()
+        sb.decreaseIndent().nl().keyword("END_CLASS").nl().nl()
 
     }
 
     override fun visit(method: MethodDeclaration) {
-        sb.printf("METHOD ")
+        sb.keyword("METHOD ")
 
         if (method.isFinal)
-            sb.printf("FINAL ")
+            sb.keyword("FINAL ")
         if (method.isAbstract)
-            sb.printf("ABSTRACT ")
+            sb.keyword("ABSTRACT ")
         if (method.isOverride)
-            sb.printf("OVERRIDE ")
+            sb.keyword("OVERRIDE ")
 
         sb.printf(method.accessSpecifier.toString() + " ")
 
@@ -417,13 +416,13 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
         method.stBody.accept(this)
 
-        sb.decreaseIndent().nl().printf("END_METHOD").nl().nl()
+        sb.decreaseIndent().nl().keyword("END_METHOD").nl().nl()
 
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) {
         printComment(functionDeclaration.comment)
-        sb.printf("FUNCTION ").printf(functionDeclaration.name)
+        sb.keyword("FUNCTION ").printf(functionDeclaration.name)
 
         val returnType = functionDeclaration.returnType.identifier
         if (!(returnType == null || returnType.isEmpty()))
@@ -435,7 +434,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
         printBody(functionDeclaration)
 
-        sb.decreaseIndent().nl().printf("END_FUNCTION").nl().nl()
+        sb.decreaseIndent().nl().keyword("END_FUNCTION").nl().nl()
 
     }
 
@@ -446,12 +445,12 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     }
 
     override fun visit(referenceSpecification: ReferenceTypeDeclaration) {
-        sb.printf("REF_TO ")
+        sb.keyword("REF_TO ")
         referenceSpecification.refTo.accept(this)
     }
 
     override fun visit(referenceValue: ReferenceValue) {
-        sb.printf("REF(")
+        sb.keyword("REF(")
         referenceValue.referenceTo.accept(this)
         sb.printf(")")
 
@@ -459,7 +458,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
 
     override fun visit(returnStatement: ReturnStatement) {
-        sb.nl().printf("RETURN;")
+        sb.nl().keyword("RETURN;")
     }
 
 
@@ -467,31 +466,33 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         for (i in 0 until ifStatement.conditionalBranches.size) {
             sb.nl()
 
-            if (i == 0)
-                sb.printf("IF ")
-            else
-                sb.printf("ELSIF ")
-
+            if (i == 0) {
+                sb.keyword("IF")
+                sb.space()
+            } else {
+                sb.keyword("ELSIF ")
+                sb.space()
+            }
             ifStatement.conditionalBranches[i].condition.accept(this)
 
-            sb.printf(" THEN").increaseIndent()
+            sb.space().keyword("THEN").increaseIndent()
             ifStatement.conditionalBranches[i].statements.accept(this)
             sb.decreaseIndent()
         }
 
         if (ifStatement.elseBranch.size > 0) {
-            sb.nl().printf("ELSE").increaseIndent()
+            sb.nl().keyword("ELSE").increaseIndent()
             ifStatement.elseBranch.accept(this)
             sb.decreaseIndent()
         }
-        sb.nl().printf("END_IF")
+        sb.nl().keyword("END_IF")
 
     }
 
     override fun visit(actionDeclaration: ActionDeclaration) {
-        sb.nl().printf("ACTION ").printf(actionDeclaration.name).increaseIndent()
+        sb.nl().keyword("ACTION").space().printf(actionDeclaration.name).increaseIndent()
         printBody(actionDeclaration)
-        sb.decreaseIndent().nl().printf("END_ACTION")
+        sb.decreaseIndent().nl().keyword("END_ACTION")
 
     }
 
@@ -524,12 +525,12 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(structureTypeDeclaration: StructureTypeDeclaration) {
         sb.printf(structureTypeDeclaration.name)
-        sb.printf(": STRUCT").nl().increaseIndent()
+        sb.printf(": ").keyword("STRUCT").nl().increaseIndent()
         structureTypeDeclaration.fields.forEach { it ->
             sb.nl()
             it.accept(this)
         }
-        sb.decreaseIndent().printf("END_STRUCT;").nl()
+        sb.decreaseIndent().keyword("END_STRUCT").write(";").nl()
 
     }
 
@@ -573,11 +574,9 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         if (isPrintComments) {
             sb.nl()
             if ('\n' in commentStatement.comment) {
-                sb.printf(literals.comment_open())
-                sb.printf(commentStatement.comment)
-                sb.printf(literals.comment_close())
+                sb.comment(literals.comment_open()+ commentStatement.comment + literals.comment_close())
             } else {
-                sb.printf("//%s\n", commentStatement.comment)
+                sb.comment("//%s\n", commentStatement.comment)
             }
         }
     }
@@ -585,7 +584,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
 
     override fun visit(literal: Literal) {
         fun print(prefix: Any?, suffix: Any) =
-                (if (prefix != null) "$prefix#" else "") + suffix
+            (if (prefix != null) "$prefix#" else "") + suffix
 
         sb.printf(
             when (literal) {
@@ -624,7 +623,8 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
                 }
 
                 is UnindentifiedLit -> literal.value
-            })
+            }
+        )
     }
 
     override fun visit(arrayinit: ArrayInitialization) {
@@ -636,785 +636,37 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     override fun visit(localScope: Scope) {
         val variables = VariableScope(localScope.variables)
         variables.groupBy { it.type }
-                .forEach { (type, v) ->
-                    val vars = v.toMutableList()
-                    vars.sortWith(compareBy { it.name })
+            .forEach { (type, v) ->
+                val vars = v.toMutableList()
+                vars.sortWith(compareBy { it.name })
 
-                    //By { a, b -> a.compareTo(b) }
-                    sb.nl().printf("VAR")
+                //By { a, b -> a.compareTo(b) }
 
-                    if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
-                        sb.printf("_INOUT")
-                    } else {
-                        when {
-                            VariableDeclaration.INPUT and type != 0 -> sb.printf("_INPUT")
-                            VariableDeclaration.OUTPUT and type != 0 -> sb.printf("_OUTPUT")
-                            VariableDeclaration.EXTERNAL and type != 0 -> sb.printf("_EXTERNAL")
-                            VariableDeclaration.GLOBAL and type != 0 -> sb.printf("_GLOBAL")
-                            VariableDeclaration.TEMP and type != 0 -> sb.printf("_TEMP")
-                        }
+                if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
+                    sb.nl().keyword("VAR_INOUT")
+                } else {
+                    when {
+                        VariableDeclaration.INPUT and type != 0 -> sb.keyword("VAR_INPUT")
+                        VariableDeclaration.OUTPUT and type != 0 -> sb.keyword("VAR_OUTPUT")
+                        VariableDeclaration.EXTERNAL and type != 0 -> sb.keyword("VAR_EXTERNAL")
+                        VariableDeclaration.GLOBAL and type != 0 -> sb.keyword("VAR_GLOBAL")
+                        VariableDeclaration.TEMP and type != 0 -> sb.keyword("VAR_TEMP")
+                        else -> sb.keyword("VAR")
                     }
-                    sb.printf(" ")
-                    if (VariableDeclaration.CONSTANT and type != 0)
-                        sb.printf("CONSTANT ")
-                    if (VariableDeclaration.RETAIN and type != 0)
-                        sb.printf("RETAIN ")
-                    sb.printf(" ")
-                    //sb.printf(type)FUNCTION_BLOCK Crane
-                    //
-                    //    VAR_INPUT
-                    //        CraneDown : BOOL := FALSE;
-                    //        CraneOnConveyor : BOOL := FALSE;
-                    //        CraneOnMagazin : BOOL := FALSE;
-                    //        CraneSucked : BOOL := FALSE;
-                    //        CraneUp : BOOL := FALSE;
-                    //        SFCReset : BOOL := FALSE;
-                    //        SliderMovedOut : BOOL := FALSE;
-                    //        SliderNotMovedOut : BOOL := FALSE;
-                    //        StartButtonMagazin : BOOL := FALSE;
-                    //        StartVar : BOOL := FALSE;
-                    //        WorkpieceReady : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        CraneLower : BOOL := FALSE;
-                    //        CraneTurnClockwise : BOOL := FALSE;
-                    //        CraneTurnCounterclockwise : BOOL := FALSE;
-                    //        MagazinVacuumOff : BOOL := FALSE;
-                    //        MagazinVacuumOn : BOOL := FALSE;
-                    //        StartCommandCrane : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        SFCInit : BOOL := FALSE;
-                    //        TimeDelay_Timer : TON := (Q=FALSE, PT=USINT#0, IN=FALSE, ET=USINT#0);
-                    //        TimeDelay_Timer_Duration : TIME := TIME#50.0ms;
-                    //        TimeDelay_Timer_interconnect : BOOL := FALSE;
-                    //        interconnectCraneStartCommand : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        SFCPause : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        __transit : BOOL := FALSE;
-                    //        _state : STATES_CRANE := STATES_CRANE#INIT;
-                    //    END_VAR
-                    //
-                    //
-                    //    ACTION CraneTurnLeft_active
-                    //        CraneTurnCounterclockwise := TRUE;
-                    //        CraneTurnClockwise := FALSE;
-                    //    END_ACTION
-                    //    ACTION Step0_active
-                    //        CraneTurnClockwise := TRUE;
-                    //        CraneTurnCounterclockwise := FALSE;
-                    //    END_ACTION
-                    //    ACTION CraneOnConveyor_active
-                    //        CraneTurnCounterclockwise := FALSE;
-                    //        CraneTurnClockwise := FALSE;
-                    //        CraneLower := TRUE;
-                    //    END_ACTION
-                    //    ACTION MagazinStop_active
-                    //        CraneTurnClockwise := FALSE;
-                    //        CraneTurnCounterclockwise := FALSE;
-                    //        MagazinVacuumOn := TRUE;
-                    //        MagazinVacuumOff := FALSE;
-                    //        CraneLower := TRUE;
-                    //    END_ACTION
-                    //    ACTION Crane_Init_2_active
-                    //        CraneLower := FALSE;
-                    //    END_ACTION
-                    //    ACTION Start_Crane_active
-                    //        CraneLower := FALSE;
-                    //        MagazinVacuumOff := TRUE;
-                    //        MagazinVacuumOn := FALSE;
-                    //        CraneTurnCounterclockwise := FALSE;
-                    //        CraneTurnClockwise := FALSE;
-                    //        StartVar := FALSE;
-                    //        StartCommandCrane := FALSE;
-                    //        IF (StartButtonMagazin = TRUE) THEN
-                    //            interconnectCraneStartCommand := TRUE;
-                    //        END_IF
-                    //    END_ACTION
-                    //    ACTION CraneLiftMagazine_active
-                    //        CraneLower := FALSE;
-                    //    END_ACTION
-                    //    ACTION Interstep_active
-                    //        StartCommandCrane := TRUE;
-                    //    END_ACTION
-                    //    ACTION release_active
-                    //        MagazinVacuumOff := TRUE;
-                    //        MagazinVacuumOn := FALSE;
-                    //    END_ACTION
-                    //    ACTION Crane_Init_active
-                    //        CraneLower := TRUE;
-                    //        interconnectCraneStartCommand := FALSE;
-                    //    END_ACTION
-                    //    ACTION TimeDelay_active
-                    //        TimeDelay_Timer(IN := TRUE, PT := TimeDelay_Timer_Duration);
-                    //        TimeDelay_Timer_interconnect := TimeDelay_Timer.Q;
-                    //    END_ACTION
-                    //    ACTION CraneLiftConveyor_active
-                    //        CraneLower := FALSE;
-                    //    END_ACTION
-                    //    IF (SFCInit OR SFCReset) THEN
-                    //        CraneDown := FALSE;
-                    //        CraneLower := FALSE;
-                    //        CraneOnConveyor := FALSE;
-                    //        CraneOnMagazin := FALSE;
-                    //        CraneSucked := FALSE;
-                    //        CraneTurnClockwise := FALSE;
-                    //        CraneTurnCounterclockwise := FALSE;
-                    //        CraneUp := FALSE;
-                    //        MagazinVacuumOff := FALSE;
-                    //        MagazinVacuumOn := FALSE;
-                    //        SFCInit := FALSE;
-                    //        SFCReset := FALSE;
-                    //        SliderMovedOut := FALSE;
-                    //        SliderNotMovedOut := FALSE;
-                    //        StartButtonMagazin := FALSE;
-                    //        StartCommandCrane := FALSE;
-                    //        StartVar := FALSE;
-                    //        TimeDelay_Timer.ET := USINT#0;
-                    //        TimeDelay_Timer.IN := FALSE;
-                    //        TimeDelay_Timer.PT := USINT#0;
-                    //        TimeDelay_Timer.Q := FALSE;
-                    //        TimeDelay_Timer_Duration := TIME#50ms;
-                    //        TimeDelay_Timer_interconnect := FALSE;
-                    //        WorkpieceReady := FALSE;
-                    //        __transit := FALSE;
-                    //        _state := STATES_CRANE#INIT;
-                    //        interconnectCraneStartCommand := FALSE;
-                    //    END_IF
-                    //    IF NOT (SFCInit OR SFCPause) THEN
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.IntroduceStateEnumVariable
-                    //
-                    //        //End of: edu.kit.iti.formal.automation.st.IntroduceStateEnumVariable
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$IntroduceTransitVariable
-                    //
-                    //        //End of: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$IntroduceTransitVariable
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$TheBigStateCase
-                    //
-                    //        CASE _state OF
-                    //            STATES_CRANE#Init:
-                    //                __transit := FALSE;
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Start_Crane;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Start_Crane:
-                    //                __transit := FALSE;
-                    //                Start_Crane_active();
-                    //                IF interconnectCraneStartCommand THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Init;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Init:
-                    //                __transit := FALSE;
-                    //                Crane_Init_active();
-                    //                IF CraneDown THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Init_2;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Init_2:
-                    //                __transit := FALSE;
-                    //                Crane_Init_2_active();
-                    //                IF CraneUp THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Interstep;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Interstep:
-                    //                __transit := FALSE;
-                    //                Interstep_active();
-                    //                IF StartVar THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Interstep_2;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Interstep_2:
-                    //                __transit := FALSE;
-                    //                IF SliderMovedOut THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#TimeDelay;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#TimeDelay:
-                    //                __transit := FALSE;
-                    //                TimeDelay_active();
-                    //                IF TimeDelay_Timer_interconnect THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Turn_Right;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Turn_Right:
-                    //                __transit := FALSE;
-                    //                Step0_active();
-                    //                IF CraneOnMagazin THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Interstep_Check_Workpiece;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Interstep_Check_Workpiece:
-                    //                __transit := FALSE;
-                    //                IF WorkpieceReady THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Magazin_Stop;
-                    //                ELSIF NOT WorkpieceReady THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Stop;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Magazin_Stop:
-                    //                __transit := FALSE;
-                    //                MagazinStop_active();
-                    //                IF CraneSucked THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Lift_Magazine;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Lift_Magazine:
-                    //                __transit := FALSE;
-                    //                CraneLiftMagazine_active();
-                    //                IF CraneUp THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Turn_Left;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Turn_Left:
-                    //                __transit := FALSE;
-                    //                CraneTurnLeft_active();
-                    //                IF CraneOnConveyor THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_On_Conveyor;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_On_Conveyor:
-                    //                __transit := FALSE;
-                    //                CraneOnConveyor_active();
-                    //                IF CraneDown THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#release;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#release:
-                    //                __transit := FALSE;
-                    //                release_active();
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Crane_Lift_Conveyor;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Lift_Conveyor:
-                    //                __transit := FALSE;
-                    //                CraneLiftConveyor_active();
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Interstep;
-                    //                END_IF
-                    //
-                    //            STATES_CRANE#Crane_Stop:
-                    //                __transit := FALSE;
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_CRANE#Start_Crane;
-                    //                END_IF
-                    //
-                    //                    END_CASE;
-                    //        //End of: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$TheBigStateCase
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.SfcFlagIntroduction
-                    //
-                    //    END_IF
-                    //    //End of: edu.kit.iti.formal.automation.st.SfcFlagIntroduction
-                    //
-                    //END_FUNCTION_BLOCK
-                    //
-                    //FUNCTION_BLOCK Magazin
-                    //
-                    //    VAR_INPUT
-                    //        CraneDown : BOOL := FALSE;
-                    //        CraneOnConveyor : BOOL := FALSE;
-                    //        CraneOnMagazin : BOOL := FALSE;
-                    //        CraneSucked : BOOL := FALSE;
-                    //        CraneUp : BOOL := FALSE;
-                    //        SFCReset : BOOL := FALSE;
-                    //        SliderMovedOut : BOOL := FALSE;
-                    //        SliderNotMovedOut : BOOL := FALSE;
-                    //        StartButtonMagazin : BOOL := FALSE;
-                    //        StartVar : BOOL := FALSE;
-                    //        WorkpieceReady : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        MagazinGreenLamp : BOOL := FALSE;
-                    //        MagazinSlider : BOOL := FALSE;
-                    //        StartCommandMagazin : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        SFCInit : BOOL := FALSE;
-                    //        interconnectMagazineStartCommand : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        SFCPause : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        __transit : BOOL := FALSE;
-                    //        _state : STATES_MAGAZIN := STATES_MAGAZIN#INIT;
-                    //    END_VAR
-                    //
-                    //
-                    //    ACTION Green_Lamp_active
-                    //        MagazinGreenLamp := TRUE;
-                    //        interconnectMagazineStartCommand := FALSE;
-                    //    END_ACTION
-                    //    ACTION Magazin_Init_2_active
-                    //        MagazinSlider := FALSE;
-                    //    END_ACTION
-                    //    ACTION SliderMoveBack_active
-                    //        IF ((SliderMovedOut = TRUE) AND (SliderNotMovedOut = FALSE)) THEN
-                    //            MagazinSlider := FALSE;
-                    //        END_IF
-                    //    END_ACTION
-                    //    ACTION convey_active
-                    //        IF SliderNotMovedOut THEN
-                    //            MagazinSlider := TRUE;
-                    //        END_IF
-                    //    END_ACTION
-                    //    ACTION Start_Magazin_active
-                    //        MagazinSlider := FALSE;
-                    //        MagazinGreenLamp := FALSE;
-                    //        StartVar := FALSE;
-                    //        StartCommandMagazin := FALSE;
-                    //        IF (StartButtonMagazin = TRUE) THEN
-                    //            interconnectMagazineStartCommand := TRUE;
-                    //        END_IF
-                    //    END_ACTION
-                    //    ACTION Magazin_Init_active
-                    //        MagazinSlider := TRUE;
-                    //    END_ACTION
-                    //    ACTION Interstep_active
-                    //        StartCommandMagazin := TRUE;
-                    //    END_ACTION
-                    //    IF (SFCInit OR SFCReset) THEN
-                    //        CraneDown := FALSE;
-                    //        CraneOnConveyor := FALSE;
-                    //        CraneOnMagazin := FALSE;
-                    //        CraneSucked := FALSE;
-                    //        CraneUp := FALSE;
-                    //        MagazinGreenLamp := FALSE;
-                    //        MagazinSlider := FALSE;
-                    //        SFCInit := FALSE;
-                    //        SFCReset := FALSE;
-                    //        SliderMovedOut := FALSE;
-                    //        SliderNotMovedOut := FALSE;
-                    //        StartButtonMagazin := FALSE;
-                    //        StartCommandMagazin := FALSE;
-                    //        StartVar := FALSE;
-                    //        WorkpieceReady := FALSE;
-                    //        __transit := FALSE;
-                    //        _state := STATES_MAGAZIN#INIT;
-                    //        interconnectMagazineStartCommand := FALSE;
-                    //    END_IF
-                    //    IF NOT (SFCInit OR SFCPause) THEN
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.IntroduceStateEnumVariable
-                    //
-                    //        //End of: edu.kit.iti.formal.automation.st.IntroduceStateEnumVariable
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$IntroduceTransitVariable
-                    //
-                    //        //End of: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$IntroduceTransitVariable
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$TheBigStateCase
-                    //
-                    //        CASE _state OF
-                    //            STATES_MAGAZIN#Init:
-                    //                __transit := FALSE;
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Start_Magazin;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Start_Magazin:
-                    //                __transit := FALSE;
-                    //                Start_Magazin_active();
-                    //                IF interconnectMagazineStartCommand THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Green_Lamp;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Green_Lamp:
-                    //                __transit := FALSE;
-                    //                Green_Lamp_active();
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Magazin_Init;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Magazin_Init:
-                    //                __transit := FALSE;
-                    //                Magazin_Init_active();
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Magazin_Init_2;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Magazin_Init_2:
-                    //                __transit := FALSE;
-                    //                Magazin_Init_2_active();
-                    //                IF TRUE THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Interstep;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Interstep:
-                    //                __transit := FALSE;
-                    //                Interstep_active();
-                    //                IF StartVar THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#convey;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#convey:
-                    //                __transit := FALSE;
-                    //                convey_active();
-                    //                IF CraneOnMagazin THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Step0;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Step0:
-                    //                __transit := FALSE;
-                    //                IF CraneDown THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Slider_Move_Back;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Slider_Move_Back:
-                    //                __transit := FALSE;
-                    //                SliderMoveBack_active();
-                    //                IF CraneUp THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Step1;
-                    //                END_IF
-                    //
-                    //            STATES_MAGAZIN#Step1:
-                    //                __transit := FALSE;
-                    //                IF CraneOnConveyor THEN
-                    //                    __transit := TRUE;
-                    //                    _state := STATES_MAGAZIN#Interstep;
-                    //                END_IF
-                    //
-                    //                    END_CASE;
-                    //        //End of: edu.kit.iti.formal.automation.st.TranslationSfcToStOld$TheBigStateCase
-                    //
-                    //        //Running pipeline step: edu.kit.iti.formal.automation.st.SfcFlagIntroduction
-                    //
-                    //    END_IF
-                    //    //End of: edu.kit.iti.formal.automation.st.SfcFlagIntroduction
-                    //
-                    //END_FUNCTION_BLOCK
-                    //
-                    //PROGRAM Main
-                    //    VAR
-                    //        Actuator_CraneLower : BOOL := FALSE;
-                    //        Actuator_CraneTurnClockwise : BOOL := FALSE;
-                    //        Actuator_CraneTurnCounterclockwise : BOOL := FALSE;
-                    //        Actuator_MagazinGreenLamp : BOOL := FALSE;
-                    //        Actuator_MagazinSlider : BOOL := FALSE;
-                    //        Actuator_MagazinVacuumOff : BOOL := FALSE;
-                    //        Actuator_MagazinVacuumOn : BOOL := FALSE;
-                    //        Actuator_MagazinWhiteLamp : BOOL := FALSE;
-                    //        Crane : Crane := (SliderMovedOut=FALSE, SFCReset=FALSE, CraneTurnCounterclockwise=FALSE, MagazinVacuumOff=FALSE, WorkpieceReady=FALSE, CraneSucked=FALSE, MagazinVacuumOn=FALSE, interconnectCraneStartCommand=FALSE, SFCInit=FALSE, StartCommandCrane=FALSE, TimeDelay_Timer_interconnect=FALSE, TimeDelay_Timer_Duration=TIME#50.0ms, CraneOnConveyor=FALSE, CraneTurnClockwise=FALSE, CraneUp=FALSE, StartVar=FALSE, CraneLower=FALSE, SliderNotMovedOut=FALSE, StartButtonMagazin=FALSE, CraneOnMagazin=FALSE, CraneDown=FALSE, TimeDelay_Timer=(Q=FALSE, PT=USINT#0, IN=FALSE, ET=USINT#0));
-                    //        Mag : Magazin := (SliderMovedOut=FALSE, MagazinGreenLamp=FALSE, SFCReset=FALSE, WorkpieceReady=FALSE, CraneSucked=FALSE, MagazinSlider=FALSE, SFCInit=FALSE, StartCommandMagazin=FALSE, CraneOnConveyor=FALSE, CraneUp=FALSE, interconnectMagazineStartCommand=FALSE, StartVar=FALSE, SliderNotMovedOut=FALSE, StartButtonMagazin=FALSE, CraneOnMagazin=FALSE, CraneDown=FALSE);
-                    //        Sensor_CraneDown : BOOL := FALSE;
-                    //        Sensor_CraneOnConveyor : BOOL := FALSE;
-                    //        Sensor_CraneOnMagazin : BOOL := FALSE;
-                    //        Sensor_CranePosition : BOOL := FALSE;
-                    //        Sensor_CraneSucked : BOOL := FALSE;
-                    //        Sensor_CraneUp : BOOL := FALSE;
-                    //        Sensor_MagazinEmergencyStop : BOOL := FALSE;
-                    //        Sensor_MagazinSwitchManuellAutomatic : BOOL := FALSE;
-                    //        Sensor_SliderMovedOut : BOOL := FALSE;
-                    //        Sensor_SliderNotMovedOut : BOOL := FALSE;
-                    //        Sensor_StartButtonMagazin : BOOL := FALSE;
-                    //        Sensor_WorkpieceReady : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //
-                    //    Mag.SliderNotMovedOut := Sensor_SliderNotMovedOut;
-                    //    Mag.SliderMovedOut := Sensor_SliderMovedOut;
-                    //    Mag.CraneOnMagazin := Sensor_CraneOnMagazin;
-                    //    Mag.CraneDown := Sensor_CraneDown;
-                    //    Mag.CraneUp := Sensor_CraneUp;
-                    //    Mag.CraneOnConveyor := Sensor_CraneOnConveyor;
-                    //    Mag.WorkpieceReady := Sensor_WorkpieceReady;
-                    //    Mag.StartButtonMagazin := Sensor_StartButtonMagazin;
-                    //    Actuator_MagazinSlider := Mag.MagazinSlider;
-                    //    Actuator_MagazinGreenLamp := Mag.MagazinGreenLamp;
-                    //    Crane.WorkpieceReady := Sensor_WorkpieceReady;
-                    //    Crane.CraneUp := Sensor_CraneUp;
-                    //    Crane.CraneOnConveyor := Sensor_CraneOnConveyor;
-                    //    Crane.CraneDown := Sensor_CraneDown;
-                    //    Crane.CraneSucked := Sensor_CraneSucked;
-                    //    Crane.CraneOnMagazin := Sensor_CraneOnMagazin;
-                    //    Crane.SliderMovedOut := Sensor_SliderMovedOut;
-                    //    Crane.StartButtonMagazin := Sensor_StartButtonMagazin;
-                    //    Actuator_CraneTurnCounterclockwise := Crane.CraneTurnCounterclockwise;
-                    //    Actuator_CraneTurnClockwise := Crane.CraneTurnClockwise;
-                    //    Actuator_CraneLower := Crane.CraneLower;
-                    //    Actuator_MagazinVacuumOff := Crane.MagazinVacuumOff;
-                    //    Actuator_MagazinVacuumOn := Crane.MagazinVacuumOn;
-                    //    IF Sensor_MagazinEmergencyStop THEN
-                    //        Mag();
-                    //        Crane();
-                    //        IF Actuator_MagazinGreenLamp THEN
-                    //            IF (Crane.StartCommandCrane AND Mag.StartCommandMagazin) THEN
-                    //                Crane.StartVar := TRUE;
-                    //                Mag.StartVar := TRUE;
-                    //            END_IF
-                    //        END_IF
-                    //        Crane.SFCReset := FALSE;
-                    //        Mag.SFCReset := FALSE;
-                    //    ELSIF NOT Sensor_MagazinEmergencyStop THEN
-                    //        Actuator_MagazinSlider := FALSE;
-                    //        Actuator_CraneLower := FALSE;
-                    //        Actuator_MagazinVacuumOn := FALSE;
-                    //        Actuator_MagazinVacuumOff := TRUE;
-                    //        Actuator_MagazinGreenLamp := FALSE;
-                    //        Actuator_CraneTurnCounterclockwise := FALSE;
-                    //        Actuator_CraneTurnClockwise := FALSE;
-                    //        Crane.SFCReset := TRUE;
-                    //        Mag.SFCReset := TRUE;
-                    //        Crane.StartVar := FALSE;
-                    //        Mag.StartVar := FALSE;
-                    //    END_IF
-                    //END_PROGRAM
-                    //FUNCTION_BLOCK CTD
-                    //
-                    //    VAR_INPUT
-                    //        CD : BOOL := FALSE;
-                    //        LD : BOOL := FALSE;
-                    //        PV : INT := INT#0;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        CV : INT := INT#0;
-                    //        Q : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //
-                    //    IF LD THEN
-                    //        CV := PV;
-                    //    ELSIF (CU AND (CV > INT#0)) THEN
-                    //        CV := (CV - INT#1);
-                    //    END_IF
-                    //    Q := (CV <= INT#0);
-                    //END_FUNCTION_BLOCK
-                    //
-                    //FUNCTION_BLOCK CTU
-                    //
-                    //    VAR_INPUT
-                    //        CU : BOOL := FALSE;
-                    //        PV : INT := INT#0;
-                    //        R : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        CV : INT := INT#0;
-                    //        Q : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //
-                    //    IF R THEN
-                    //        CV := INT#0;
-                    //    ELSIF (CU AND (CV < PV)) THEN
-                    //        CV := (CV + INT#1);
-                    //    END_IF
-                    //    Q := (CV >= PV);
-                    //END_FUNCTION_BLOCK
-                    //
-                    //FUNCTION_BLOCK R_TRIG
-                    //
-                    //    VAR_INPUT
-                    //        CLK : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        M : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        Q : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //
-                    //    Q := (CLK AND NOT M);
-                    //    M := CLK;
-                    //END_FUNCTION_BLOCK
-                    //
-                    //FUNCTION_BLOCK F_TRIG
-                    //
-                    //    VAR_INPUT
-                    //        CLK : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        M : BOOL := TRUE;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        Q : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //
-                    //    Q := (NOT CLK AND NOT M);
-                    //    M := NOT CLK;
-                    //END_FUNCTION_BLOCK
-                    //
-                    //FUNCTION SEL : ANY
-                    //
-                    //    VAR_INPUT
-                    //        G : BOOL := FALSE;
-                    //        a : ANY;
-                    //        b : ANY;
-                    //    END_VAR
-                    //
-                    //    VAR_OUTPUT
-                    //        SEL : ANY;
-                    //    END_VAR
-                    //
-                    //    IF G THEN
-                    //        SEL := a;
-                    //    ELSE
-                    //        SEL := b;
-                    //    END_IF
-                    //END_FUNCTION
-                    //
-                    //FUNCTION MAX : ANY_INT
-                    //
-                    //    VAR_OUTPUT
-                    //        MAX : ANY_INT;
-                    //    END_VAR
-                    //
-                    //    VAR_INPUT
-                    //        in0 : ANY_INT;
-                    //        in1 : ANY_INT;
-                    //    END_VAR
-                    //
-                    //    MAX := sel((in0 >= in1), in0, in1);
-                    //END_FUNCTION
-                    //
-                    //FUNCTION MIN : ANY_INT
-                    //
-                    //    VAR_OUTPUT
-                    //        MIN : ANY_INT;
-                    //    END_VAR
-                    //
-                    //    VAR_INPUT
-                    //        in0 : ANY_INT;
-                    //        in1 : ANY_INT;
-                    //    END_VAR
-                    //
-                    //    MIN := sel((in0 <= in1), in0, in1);
-                    //END_FUNCTION
-                    //
-                    //FUNCTION LIMIT : INT
-                    //
-                    //    VAR_OUTPUT
-                    //        LIMIT : INT := INT#0;
-                    //    END_VAR
-                    //
-                    //    VAR_INPUT
-                    //        in : ANY_INT;
-                    //        max : ANY_INT;
-                    //        min : ANY_INT;
-                    //    END_VAR
-                    //
-                    //    LIMIT := MAX(min, MIN(in, max));
-                    //END_FUNCTION
-                    //
-                    //FUNCTION ERROR : ANY
-                    //
-                    //    VAR_OUTPUT
-                    //        ERROR : ANY;
-                    //    END_VAR
-                    //
-                    //    VAR
-                    //        msg : STRING := WSTRING#"";
-                    //    END_VAR
-                    //
-                    //END_FUNCTION
-                    //
-                    //FUNCTION SMV : ANY
-                    //
-                    //    VAR_OUTPUT
-                    //        SMV : ANY;
-                    //    END_VAR
-                    //
-                    //    VAR_INPUT
-                    //        code : STRING := WSTRING#"";
-                    //    END_VAR
-                    //
-                    //END_FUNCTION
-                    //
-                    //FUNCTION_BLOCK TON
-                    //
-                    //    VAR_OUTPUT
-                    //        ET : USINT := USINT#0;
-                    //        Q : BOOL := FALSE;
-                    //    END_VAR
-                    //
-                    //    VAR_INPUT
-                    //        IN : BOOL := FALSE;
-                    //        PT : USINT := USINT#0;
-                    //    END_VAR
-                    //
-                    //
-                    //    IF IN THEN
-                    //        Q := (ET = USINT#0);
-                    //        IF (ET > USINT#0) THEN
-                    //            ET := (ET - USINT#1);
-                    //        ELSE
-                    //            ET := USINT#0;
-                    //        END_IF
-                    //    ELSE
-                    //        Q := FALSE;
-                    //        ET := PT;
-                    //    END_IF
-                    //END_FUNCTION_BLOCK
-                    //
-                    //TYPE SFC_STEPS: STRUCT
-                    //
-                    //        T :TIME
-                    //        X :BOOL
-                    //        _T :TIME
-                    //        _X :BOOLEND_STRUCT;
-                    //
-                    //END_TYPE
-                    //
-                    //TYPE
-                    //    STATES_CRANE : (Init, Start_Crane, Crane_Init, Crane_Init_2, Interstep, Interstep_2, TimeDelay, Turn_Right, Interstep_Check_Workpiece, Magazin_Stop, Crane_Lift_Magazine, Crane_Turn_Left, Crane_On_Conveyor, release, Crane_Lift_Conveyor, Crane_Stop);
-                    //    STATES_MAGAZIN : (Init, Start_Magazin, Green_Lamp, Magazin_Init, Magazin_Init_2, Interstep, convey, Step0, Slider_Move_Back, Step1);
-                    //END_TYPE
-
-                    sb.increaseIndent()
-                    for (vd in vars) {
-                        print(vd)
-                    }
-                    sb.decreaseIndent().nl().printf("END_VAR")
-                    sb.nl()
                 }
+                sb.space()
+                if (VariableDeclaration.CONSTANT and type != 0)
+                    sb.keyword("CONSTANT ")
+                if (VariableDeclaration.RETAIN and type != 0)
+                    sb.keyword("RETAIN ")
+                sb.space()
+                sb.increaseIndent()
+                for (vd in vars) {
+                    print(vd)
+                }
+                sb.decreaseIndent().nl().keyword("END_VAR")
+                sb.nl()
+            }
     }
 
     open fun print(vd: VariableDeclaration) {
@@ -1427,6 +679,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
                 val (dt, v) = vd.initValue as Value<*, *>
                 sb.printf(dt.repr(v))
             }
+
             vd.init != null -> {
                 sb.printf(" := ")
                 vd.init!!.accept(this)
@@ -1466,8 +719,8 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         seq.sortWith(compareBy(SFCStep::isInitial).thenBy(SFCStep::name))
         seq.forEach { a -> a.accept(this) }
         sfcNetwork.steps.stream()
-                .flatMap { s -> s.incoming.stream() }
-                .forEachOrdered { t -> t.accept(this) }
+            .flatMap { s -> s.incoming.stream() }
+            .forEachOrdered { t -> t.accept(this) }
 
     }
 
@@ -1480,14 +733,14 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         val f = transition.from.map { it.name }.reduce { a, b -> "$a, $b" }
         val t = transition.to.map { it.name }.reduce { a, b -> "$a, $b" }
 
-        sb.nl().printf("TRANSITION FROM ")
+        sb.nl().keyword("TRANSITION").space().keyword("FROM").space()
 
         if (transition.from.size > 1) {
             sb.append('(').append(f).append(')')
         } else {
             sb.printf(f)
         }
-        sb.printf(" TO ")
+        sb.space().keyword("TO").space()
         if (transition.to.size > 1) {
             sb.append('(').append(t).append(')')
         } else {
@@ -1496,7 +749,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         sb.printf(" := ")
 
         transition.guard.accept(this)
-        sb.printf(";").printf(" END_TRANSITION")
+        sb.printf(";").space().keyword("END_TRANSITION")
 
     }
 
@@ -1599,18 +852,20 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
                 special.name?.let { sb.write(": $it") }
                 special.exprs.joinInto(sb, separator = ", ") { it.accept(this) }
             }
+
             is SpecialStatement.Assume -> {
                 sb.nl().write("//# assume ")
                 special.name?.let { sb.write(": $it") }
                 special.exprs.joinInto(sb, separator = ", ") { it.accept(this) }
             }
+
             is SpecialStatement.Havoc -> {
                 sb.nl().write("//# havoc ")
                 special.name?.let { sb.write(": $it") }
                 special.variables.joinInto(sb, separator = ", ") { it.accept(this) }
             }
+
             else -> sb.nl().write("// special statement of type $special not supported")
         }
     }
 }
-

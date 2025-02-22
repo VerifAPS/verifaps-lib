@@ -3,6 +3,7 @@ package edu.kit.iti.formal.util
 import java.io.StringWriter
 import java.io.Writer
 import java.util.*
+import kotlin.math.max
 
 /**
  * CodeWriter class.
@@ -10,8 +11,7 @@ import java.util.*
  * @author weigla (15.06.2014)
  * @version 2
  */
-open class CodeWriter(var stream: Writer = StringWriter())
-    : Appendable by stream {
+open class CodeWriter(val stream: Writer = StringWriter()) : Appendable by stream {
 
     var uppercaseKeywords = true
     var ident = "    "
@@ -21,6 +21,8 @@ open class CodeWriter(var stream: Writer = StringWriter())
         stream.write(x)
         return this
     }
+
+    fun space() = write(" ")
 
     fun appendIdent(): CodeWriter {
         for (i in 0 until identDepth) {
@@ -35,7 +37,7 @@ open class CodeWriter(var stream: Writer = StringWriter())
     }
 
     fun decreaseIndent(): CodeWriter {
-        identDepth = Math.max(identDepth - 1, 0)
+        identDepth = max(identDepth - 1, 0)
         return this
     }
 
@@ -93,8 +95,12 @@ open class CodeWriter(var stream: Writer = StringWriter())
         return this@unaryPlus
     }
 
-    companion object{
-        fun with(fn : CodeWriter.() -> Unit) : String {
+    open fun comment(format: String, vararg args: Any) {
+        printf(format, args)
+    }
+
+    companion object {
+        fun with(fn: CodeWriter.() -> Unit): String {
             val cw = CodeWriter()
             fn(cw)
             return cw.stream.toString()

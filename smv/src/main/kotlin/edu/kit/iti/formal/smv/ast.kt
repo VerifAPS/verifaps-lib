@@ -578,7 +578,7 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
     /**
      *
      */
-    EQUAL("=", 12),
+    EQUAL("=", 11),
 
     /**
      *
@@ -593,7 +593,7 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
     /**
      *
      */
-    NOT_EQUAL("!=", 12),
+    NOT_EQUAL("!=", 13),
 
     /**
      *
