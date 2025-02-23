@@ -47,11 +47,9 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
                 "New Session",
                 ikof = MaterialDesignB.BOOK_OPEN_BLANK_VARIANT
             ).action { createNewCode(); createNewSpec() }
-        }
+        }.action { createNewSpec() }
 
-
-        splitmenubutton("Open") {
-            itemf("Open", ikof = MaterialDesignS.STORE).action { openFile() }
+        splitmenubutton("Open", FontIcon(MaterialDesignS.STORE)) {
             itemf("Open Specification", ikof = MaterialDesignS.STORE).action { openSpec() }
             itemf("Open Code", ikof = MaterialDesignS.STORE).action { openCode() }
             itemf("Open Session", ikof = MaterialDesignS.STORE).action { openSession() }
@@ -64,25 +62,24 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
                     }.action { openExample(ex) }
                 }
             }
+
             menu("Recent files") {
                 val map: ObservableList<MenuItem> = MappingList(rootModel.get().history.filenamesProperty) {
                     MenuItem(it).also { item -> item.action { doOpenFile(File(it)) } }
                 }
                 map.addListener(ListChangeListener<MenuItem> { _ -> items.setAll(map) })
             }
-        }
-
+        }.action { openFile() }
 
         splitmenubutton("Save") {
             itemf("Save Code").action { saveCode() }
             itemf("Save Spec").action { saveSpec() }
             itemf("Save All").action { saveAll() }
             itemf("Save Session As").action { saveSessionAs() }
-        }
+        }.action { saveAll() }
 
         button("About").action { openAboutDialog() }
         button("Preferences", graphic = FontIcon(MaterialDesignW.WRENCH_OUTLINE)).action { openConfigDialog() }
-        button("Rerun configuration wizard", graphic = FontIcon(MaterialDesignW.WIZARD_HAT)).action { openWizard() }
     }
 
     fun openExample(ex: Example) {
@@ -110,13 +107,10 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
         }
     }
 
-
-    private fun openWizard() {
-    }
-
     private fun doOpenFile(file: File) {
         try {
-            ImporterFacade.importFile(file, rootModel.get().globalConfig,
+            ImporterFacade.importFile(
+                file, rootModel.get().globalConfig,
                 rootModel.get().history, { hybridSpecification: HybridSpecification? ->
                     // handle hybridspecification
                     rootModel.get().hybridSpecifications

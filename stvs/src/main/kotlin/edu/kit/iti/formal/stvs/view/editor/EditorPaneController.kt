@@ -5,12 +5,8 @@ import edu.kit.iti.formal.stvs.model.code.*
 import edu.kit.iti.formal.stvs.model.code.ParsedCode.Companion.parseCode
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.view.*
-import edu.kit.iti.formal.stvs.view.editor.EditorPane
 import javafx.application.Platform
-import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableValue
 import javafx.concurrent.Task
-import javafx.event.ActionEvent
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.scene.control.*
@@ -22,9 +18,7 @@ import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 import java.time.Duration
 import java.util.*
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import java.util.function.Consumer
 
 /**
  * Created by csicar on 09.01.17. Some parts are inspired by examples of the used library:
@@ -182,7 +176,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
             // different character count than this CodeArea.
             spansBuilder.add(
                 getStyleClassesFor(token, syntaxErrors),
-                token!!.text.replace("\\r".toRegex(), "").length
+                token.text.replace("\\r".toRegex(), "").length
             )
         }
         return spansBuilder.create()
@@ -227,14 +221,5 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
 
     private fun handleTextChange(highlighting: StyleSpans<Collection<String>>) {
         view.setStyleSpans(highlighting)
-    }
-
-    private inner class ShowLineNumbersListener : ChangeListener<Boolean> {
-        override fun changed(
-            observableValue: ObservableValue<out Boolean>,
-            oldValue: Boolean, newValue: Boolean
-        ) {
-            view.setShowLineNumbers(newValue)
-        }
     }
 }

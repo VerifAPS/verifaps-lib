@@ -5,7 +5,6 @@ import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
-import edu.kit.iti.formal.stvs.view.menu.StvsRibbonController
 import edu.kit.iti.formal.stvs.view.menu.StvsToolbarController
 import javafx.application.Platform
 import javafx.beans.property.BooleanProperty

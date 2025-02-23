@@ -10,7 +10,6 @@ import javafx.beans.property.IntegerProperty
 import javafx.beans.property.LongProperty
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.StringProperty
-import javafx.collections.FXCollections
 import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
 import javafx.util.Callback

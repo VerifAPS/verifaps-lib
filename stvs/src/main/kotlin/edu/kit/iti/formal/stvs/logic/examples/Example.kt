@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.logic.examples
 import java.net.URL
 
 /**
- * This class represents an loadoable example.
+ * This class represents a loadoable example.
  *
  *
  * You should derive this to add a new example to the system.
@@ -30,9 +30,9 @@ data class Example(
     var description: String,
 
     /**
-     * The name of the html page to loaded.
+     * The name of the HTML page to load.
      *
-     * @return a String if there is one html page or null.
+     * @return a String if there is one HTML page or null.
      */
     var htmlHelp: String?,
 
