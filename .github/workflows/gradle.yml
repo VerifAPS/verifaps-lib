@@ -1,11 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Tests
 
 on:
   push:
@@ -18,17 +11,65 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1
-      with:
-        arguments: assemble
+      - uses: actions/checkout@v4
+
+      - name: Setup nuXmv
+        uses: verifaps/setup-nuxmv@v0.1.2
+
+      - name: Test nuXmv
+        run: echo "quit" | nuXmv -int | head -n 1
+
+      - name: setup-smt
+        uses: keyproject/setup-smt@v0
+
+      - name: Test z3
+        run: z3 -version
+
+      - name: Set up JDK 23
+        uses: actions/setup-java@v4
+        with:
+          java-version: '23'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew assemble :exec:assembleDist
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [ "build" ]
+    steps:
+      - run: ./gradlew test
+
+  integration-tests:
+    needs: [ "build" ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Integraton Tests"
+        run: share/integration-tests.sh
+
+  ttsynth-test:
+    runs-on: ubuntu-latest
+    needs: [ "build" ]
+    steps:
+      - name: "Python version"
+        run: python --version
+      - name: "g++ version"
+        run: g++ --version
+      - name: "javac version"
+        run: javac -version
+      - run: z3 -version
+
+      - name: Synthesis Tests
+        run: |
+          cd geteta/examples/synthesis_test_cases
+          ../../../exec/build/install/exec/bin/ttsynth --python=/usr/bin/python3 files/* -o generated/
+          ./gradlew test --info
+
+
+
+
