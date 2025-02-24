@@ -23,7 +23,7 @@ jobs:
         run: echo "quit" | nuXmv -int | head -n 1
 
       - name: setup-smt
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v0.1.2
 
       - name: Test z3
         run: z3 -version
