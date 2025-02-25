@@ -27,22 +27,6 @@ jobs:
 
       - run: ./gradlew assemble :exec:assembleDist
 
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: "**/build/**"
-
-
-  test:
-    runs-on: ubuntu-latest
-    needs: [ "build" ]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-
       - name: Setup nuXmv
         uses: verifaps/setup-nuxmv@v0.1.2
 
@@ -56,27 +40,6 @@ jobs:
         run: z3 -version            
 
       - run: ./gradlew test
-
-  integration-tests:
-    needs: [ "build" ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-
-      - name: Setup nuXmv
-        uses: verifaps/setup-nuxmv@v0.1.2
-
-      - name: Test nuXmv
-        run: echo "quit" | nuXmv -int | head -n 1
-
-      - name: setup-smt
-        uses: keyproject/setup-smt@v0.1.3
-
-      - name: Test z3
-        run: z3 -version            
 
       - name: Run integration tests
         run: share/integration-tests.sh
@@ -113,4 +76,3 @@ jobs:
           cd geteta/examples/synthesis_test_cases
           ../../../exec/build/install/exec/bin/ttsynth --python=/usr/bin/python3 files/* -o generated/
           ./gradlew test --info
-          
