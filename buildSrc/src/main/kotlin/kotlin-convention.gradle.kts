@@ -44,14 +44,14 @@ tasks.withType<Test>().configureEach {
     testLogging {
         events(
             TestLogEvent.FAILED,
-            TestLogEvent.PASSED,
-            TestLogEvent.SKIPPED
+            //TestLogEvent.PASSED,
+            //TestLogEvent.SKIPPED
         )
     }
 }
 
 jacoco {
-    toolVersion = "0.8.21"
+    toolVersion = "0.8.12"
 }
 
 tasks.jacocoTestReport {
