@@ -2,6 +2,7 @@ package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.multiple
 import com.github.ajalt.clikt.parameters.options.default
@@ -31,9 +32,9 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
-import kotlin.collections.HashMap
+import kotlin.io.path.readLines
+import kotlin.io.path.readText
 import kotlin.math.max
-import com.github.ajalt.clikt.core.main
 
 /**
  * @author Moritz Baumann
@@ -763,10 +764,10 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         val arguments = listOf(pythonExecutable, "-") +
                 resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
                 formula + variableDefinitions
-        val outputFile = createTempFile()
+        val outputFile = kotlin.io.path.createTempFile()
         val process = ProcessBuilder(arguments)
                 .redirectInput(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(outputFile)
+                .redirectOutput(outputFile.toFile())
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
 

@@ -1,5 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SExprFacade
+import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smt.SSymbol
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import edu.kit.iti.formal.stvs.model.expressions.*
@@ -55,9 +59,10 @@ class SmtEncoder(
         freeVariablesContext = validFreeVariables.associate { it.name to it.type }
         ioVariableTypes = ioVariables.map { it.name }
 
-        constraint = SmtModel()
-            .addHeaderDefinitions(createFreeVariables())
-            .addHeaderDefinitions(setFreeVariablesDefaultValues())
+        constraint = SmtModel().apply {
+            variableDefinitions.addAll(createFreeVariables())
+            variableDefinitions.addAll(setFreeVariablesDefaultValues())
+        }
 
         // Step (2): upper und lower Bound von Durations festlegen
         defineDurationBounds()
@@ -81,49 +86,43 @@ class SmtEncoder(
             for (z in column.cells.indices) {
                 val expression = column.cells[z]
                 // Add n_x to const declaration
-                constraint.addHeaderDefinitions(
-                    SList.sexpr("declare-const", "n_$z", "(_ BitVec 16)")
+                constraint.addHeaderDefinition(
+                    SList("declare-const", sym("n_$z"), TYPE_BV_16)
                 )
                 // Iterate over potential backward steps
                 for (i in 1..getMaxDurationSum(z - 1)) {
                     // Iterate over possible cycles in last row
                     for (k in 0..getMaxDuration(z - 1)) {
                         // n_(z-1) = k => A_z_i = A_(z-1)_(k-i)
-                        constraint.addGlobalConstrains(
-                            SList.sexpr(
+                        constraint.addGlobalConstraint(
+                            SList(
                                 "implies",
-                                SList.sexpr(
-                                    "=", "n_" + (z - 1),
+                                SList(
+                                    "=", sym("n_${z - 1}"),
                                     BitvectorUtils.hexFromInt(k, 4)
                                 ),
-                                SList.sexpr(
-                                    "=", "|" + variableName + "_" + z + "_"
-                                            + (-i) + "|",
-                                    "|" + variableName + "_" + (z - 1) + "_"
-                                            + (k - i) + "|"
+                                SList(
+                                    "=",
+                                    sym("|${variableName}_${z}_${-i}|"),
+                                    sym("|${variableName}_${z - 1}_${k - i}|")
                                 )
                             )
                         )
                         // Add backward reference to const declaration
-                        constraint.addHeaderDefinitions(
-                            SList.sexpr(
+                        constraint.addHeaderDefinition(
+                            SList(
                                 "declare-const",
-                                "|" + variableName + "_" + (z - 1) + "_"
-                                        + (k - i) + "|",
-                                getSmtLibVariableTypeName(
-                                    ioVariable.validType
-                                )
+                                sym("|${variableName}_${z - 1}_${k - i}|"),
+                                getSmtLibVariableTypeName(ioVariable.validType)
                             )
                         )
                     }
                     // Add backward reference to const declaration
-                    constraint.addHeaderDefinitions(
-                        SList.sexpr(
+                    constraint.addHeaderDefinition(
+                        SList(
                             "declare-const",
-                            "|" + variableName + "_" + z + "_" + (-i) + "|",
-                            getSmtLibVariableTypeName(
-                                ioVariable.validType
-                            )
+                            sym("|${variableName}_${z}_${-i}|"),
+                            getSmtLibVariableTypeName(ioVariable.validType)
                         )
                     )
                 }
@@ -152,13 +151,10 @@ class SmtEncoder(
                         visitor.constraint.variableDefinitions
                     )
                         .combine(this.constraint)
-                    constraint.addGlobalConstrains(
-                        SList.sexpr(
+                    constraint.addGlobalConstraint(
+                        SList(
                             "implies",
-                            SList.sexpr(
-                                "bvuge", "n_$z",
-                                BitvectorUtils.hexFromInt(i, 4)
-                            ),
+                            SList("bvuge", sym("n_$z"), BitvectorUtils.hexFromInt(i, 4)),
                             expressionConstraint
                         )
                     )
@@ -177,18 +173,17 @@ class SmtEncoder(
         for (z in specification.durations.indices) {
             val interval = specification.durations.get(z)!!
             // n_z >= lowerBound_z
-            constraint.addGlobalConstrains(
-                SList.sexpr(
-                    "bvuge", "n_$z",
+            constraint.addGlobalConstraint(
+                SList(
+                    "bvuge", sym("n_$z"),
                     BitvectorUtils.hexFromInt(interval.lowerBound, 4)
-                            + ""
                 )
             )
             // n_z <= upperBound_z
             if (interval.upperBound != null) {
-                constraint.addGlobalConstrains(
-                    SList.sexpr(
-                        "bvule", "n_$z",
+                constraint.addGlobalConstraint(
+                    SList(
+                        "bvule", sym("n_$z"),
                         BitvectorUtils.hexFromInt(
                             min(
                                 interval.upperBound.toDouble(),
@@ -198,9 +193,9 @@ class SmtEncoder(
                     )
                 )
             } else {
-                constraint.addGlobalConstrains(
-                    SList.sexpr(
-                        "bvule", "n_$z",
+                constraint.addGlobalConstraint(
+                    SList(
+                        "bvule", sym("n_$z"),
                         BitvectorUtils.hexFromInt(getMaxDuration(z), 4)
                     )
                 )
@@ -215,7 +210,7 @@ class SmtEncoder(
      * @param variable variable for which the assertion should be generated
      * @return asserts that the variable is equal to its default value
      */
-    private fun getDefaultValueEquality(variable: ValidFreeVariable): SExpression {
+    private fun getDefaultValueEquality(variable: ValidFreeVariable): SExpr {
         val constraint = variable.constraint
 
         val scev = SmtConvertExpressionVisitor(
@@ -239,11 +234,11 @@ class SmtEncoder(
         return ioVariableTypes.contains(name)
     }
 
-    private fun setFreeVariablesDefaultValues(): List<SExpression> {
+    private fun setFreeVariablesDefaultValues(): List<SExpr> {
         return validFreeVariables
             .filter { variable: ValidFreeVariable -> variable.constraint != null }
             .map { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
-            .map { SList.sexpr("assert", it) }
+            .map { SList("assert", it) }
     }
 
     fun getTypeForVariable(variableName: String?): Type? {
@@ -251,14 +246,14 @@ class SmtEncoder(
         if (type == null) {
             type = try {
                 specification.getColumnHeaderByName(variableName).validType
-            } catch (exception: NoSuchElementException) {
+            } catch (_: NoSuchElementException) {
                 null
             }
         }
         return type
     }
 
-    private fun createFreeVariables(): List<SExpression> {
+    private fun createFreeVariables(): List<SExpr> {
         return freeVariablesContext.entries.stream()
             .filter { item: Map.Entry<String?, Type> -> !isIoVariable(item.key) }
             .map { item: Map.Entry<String?, Type> ->
@@ -305,12 +300,17 @@ class SmtEncoder(
         }
 
         private fun getDeclarationForVariable(type: Type, variableName: String) =
-            SList.sexpr("declare-const", "|$variableName|", getSmtLibVariableTypeName(type))
+            SList("declare-const", SSymbol(variableName), getSmtLibVariableTypeName(type))
 
         fun getSmtLibVariableTypeName(type: Type) = when (type) {
-            is TypeInt -> "(_ BitVec 16)"
-            is TypeBool -> "Bool"
-            is TypeEnum -> "(_ BitVec 16)"
+            is TypeBool -> TYPE_BOOL
+            is TypeInt -> TYPE_BV_16
+            is TypeEnum -> TYPE_BV_16
         }
     }
 }
+
+val TYPE_BV_16 = SExprFacade.parseExpr("(_ BitVec 16)")
+val TYPE_BOOL = SSymbol("Bool")
+
+fun sym(s: String) = SSymbol(s)

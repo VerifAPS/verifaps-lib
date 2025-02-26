@@ -10,6 +10,7 @@ import edu.kit.iti.formal.util.center
 import edu.kit.iti.formal.util.times
 import java.io.StringWriter
 import javax.swing.SwingConstants
+import kotlin.math.max
 
 /**
  *  ```
@@ -250,7 +251,7 @@ class GridPrinter(
             val width = cells.asSequence()
                     .map { options.spacePadding * 2 + if (it.width < 0) it.content.length else it.width }
                     .maxOrNull() ?: options.columnMinWidth
-            cells.forEach { it.width = Math.max(options.columnMinWidth, width) }
+            cells.forEach { it.width = max(options.columnMinWidth, width) }
         }
     }
 
@@ -264,13 +265,13 @@ class GridPrinter(
                 var cell = seq[idx]
                 if (cell.spanColumns > 1) {
                     val consumed = seq.slice(idx + 1 until idx + cell.spanColumns)
-                    val w = consumed.sumBy { it.width + options.spacePadding }
+                    val w = consumed.sumOf { it.width + options.spacePadding }
                     cell.width += w
                     consumed.forEach { it.width = 0 }
-                    idx += cell.spanColumns;
+                    idx += cell.spanColumns
                     continue
                 }
-                idx++;
+                idx++
                 continue
             }
             grid[rowIdx] = seq.filter { it.width > 0 }.toTypedArray()
