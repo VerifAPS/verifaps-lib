@@ -74,7 +74,7 @@ class SmtConcretizerTest {
     @Test
     fun simpleTest() {
         val spec = importSpec("testSpec.xml")
-        val maxDurations: Map<Int, Int> = mapOf(0 to 7, 1 to 1, 2 to 2)
+        val maxDurations = mapOf(0 to 7, 1 to 1, 2 to 2)
         val concretizer = SmtConcretizer(autoloadConfig())
         concretizer.calculateConcreteSpecification(spec, freeVariables!!)
     }

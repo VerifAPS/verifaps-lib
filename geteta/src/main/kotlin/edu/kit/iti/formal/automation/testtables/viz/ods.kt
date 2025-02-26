@@ -25,7 +25,6 @@ import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.*
 import java.util.*
 import java.util.logging.Logger
-import kotlin.collections.ArrayList
 
 abstract class ODSWriter {
     protected val odsFactory = OdsFactory.create(Logger.getLogger(""), Locale.US)
@@ -38,10 +37,10 @@ abstract class ODSTestTableWriter(protected val gtt: GeneralizedTestTable) : ODS
     protected val output = gtt.programVariables.filter { it.isAssertion }
 }
 
-class ODSCounterExampleWriter constructor(
-        private val counterExample: CounterExample,
-        var tableStyle: TableStyle = DefaultTableStyle)
-    : Runnable, ODSWriter() {
+class ODSCounterExampleWriter(
+    private val counterExample: CounterExample,
+    var tableStyle: TableStyle = DefaultTableStyle
+) : Runnable, ODSWriter() {
     lateinit var currentTable: Table
     private val mappings = ArrayList<Pair<GeneralizedTestTable, Mapping>>()
 
@@ -168,7 +167,7 @@ class ODSCounterExampleWriter constructor(
             }
             output.forEach {
                 val v = counterExample[index,
-                        (it.externalVariable(gtt.programRuns, "_${gtt.name}") as SVariable).name]
+                    it.externalVariable(gtt.programRuns, "_${gtt.name}").name]
                 cell.setStyle(tableStyle.styleOutputValue)
                 cell.setTooltip(tableRow?.rawFields?.get(it)?.text)
                 cell.setStringValue(v)
@@ -179,8 +178,10 @@ class ODSCounterExampleWriter constructor(
 
 }
 
-open class TableUnwinder(private val gtt: GeneralizedTestTable,
-                         private val unwinding: Map<TableNode, Int>) {
+open class TableUnwinder(
+    private val gtt: GeneralizedTestTable,
+    private val unwinding: Map<TableNode, Int>
+) {
     private val ret = ArrayList<TableRow>()
     operator fun invoke(): List<TableRow> {
         ret.clear()
@@ -189,10 +190,10 @@ open class TableUnwinder(private val gtt: GeneralizedTestTable,
     }
 
     private fun unwind(tn: TableNode) =
-            when (tn) {
-                is Region -> unwind(tn)
-                is TableRow -> unwind(tn)
-            }
+        when (tn) {
+            is Region -> unwind(tn)
+            is TableRow -> unwind(tn)
+        }
 
     private fun unwind(tr: TableRow) {
         val num = unwindingsOf(tr)
@@ -209,7 +210,7 @@ open class TableUnwinder(private val gtt: GeneralizedTestTable,
     }
 
     protected fun unwindingsOf(tn: TableNode): Int =
-            unwinding.getOrDefault(tn, tn.duration.defaultUnwindings)
+        unwinding.getOrDefault(tn, tn.duration.defaultUnwindings)
 
     private val Duration.defaultUnwindings: Int
         get() = when (this@defaultUnwindings) {
@@ -219,7 +220,11 @@ open class TableUnwinder(private val gtt: GeneralizedTestTable,
         }
 }
 
-fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle, unwindedRows: List<TableRow>): ODSDebugTable {
+fun createTableWithoutProgram(
+    gtt: GeneralizedTestTable,
+    tableStyle: TableStyle,
+    unwindedRows: List<TableRow>
+): ODSDebugTable {
     val cat = arrayListOf<ValueColumn<ODSDebugTable>>()
     val styleMap = HashMap<String, TableCellStyle>()
 
@@ -238,32 +243,34 @@ fun createTableWithoutProgram(gtt: GeneralizedTestTable, tableStyle: TableStyle,
     styleMap["INPUT"] = tableStyle.styleCategoryHeader
 
     gtt.programVariables.filter { it.isAssumption }
-            .filterIsInstance<ProgramVariable>()
-            .forEach {
-                val group = arrayOf(inputCategory, "${it.name} : ${it.dataType.name}")
-                cat += ValueDebugColumn(group, it, RandomValueOracle)
-                cat += ConstraintDebugColumn(group, it)
-            }
+        .filterIsInstance<ProgramVariable>()
+        .forEach {
+            val group = arrayOf(inputCategory, "${it.name} : ${it.dataType.name}")
+            cat += ValueDebugColumn(group, it, RandomValueOracle)
+            cat += ConstraintDebugColumn(group, it)
+        }
 
 
     val outputCategory = "OUTPUT"
     styleMap[outputCategory] = tableStyle.styleCategoryHeader
     gtt.programVariables.filter { it.isAssertion }
-            .filterIsInstance<ProgramVariable>()
-            .forEach {
-                val group = arrayOf(outputCategory, "${it.name} : ${it.dataType.name}")
-                cat += ValueDebugColumn(group, it, RandomValueOracle)
-                cat += ConstraintDebugColumn(group, it)
-            }
+        .filterIsInstance<ProgramVariable>()
+        .forEach {
+            val group = arrayOf(outputCategory, "${it.name} : ${it.dataType.name}")
+            cat += ValueDebugColumn(group, it, RandomValueOracle)
+            cat += ConstraintDebugColumn(group, it)
+        }
 
     return ODSDebugTable(gtt, cat, unwindedRows)
 }
 
 
-fun createTableWithProgram(program: SMVModule,
-                           gtt: GeneralizedTestTable,
-                           tableStyle: TableStyle,
-                           unwindedRows: List<TableRow>): ODSDebugTable {
+fun createTableWithProgram(
+    program: SMVModule,
+    gtt: GeneralizedTestTable,
+    tableStyle: TableStyle,
+    unwindedRows: List<TableRow>
+): ODSDebugTable {
     val cat = arrayListOf<ValueColumn<ODSDebugTable>>()
     val styleMap = HashMap<String, TableCellStyle>()
 
@@ -280,40 +287,40 @@ fun createTableWithProgram(program: SMVModule,
 
     val inputCategory = "INPUT"
     styleMap["INPUT"] = tableStyle.styleCategoryHeader
-    val allInputVars = program.inputVars.map { it.name to false }.toMap().toMutableMap()
+    val allInputVars = program.inputVars.associate { it.name to false }.toMutableMap()
 
     gtt.programVariables.filter { it.isAssumption }
-            .filterIsInstance<ProgramVariable>()
-            .forEach {
-                allInputVars[it.name] = true
-                val group = arrayOf(inputCategory, it.name)
-                cat += ValueDebugColumn(group, it, RandomValueOracle)
-                cat += ConstraintDebugColumn(group, it)
-            }
+        .filterIsInstance<ProgramVariable>()
+        .forEach {
+            allInputVars[it.name] = true
+            val group = arrayOf(inputCategory, it.name)
+            cat += ValueDebugColumn(group, it, RandomValueOracle)
+            cat += ConstraintDebugColumn(group, it)
+        }
 
-    allInputVars.filter { (a, b) -> !b }
-            .forEach { (a, b) ->
-                val group = arrayOf(inputCategory, a)
-                cat += EmptyDebugColumn(group)
-            }
+    allInputVars.filter { (_, b) -> !b }
+        .forEach { (a, _) ->
+            val group = arrayOf(inputCategory, a)
+            cat += EmptyDebugColumn(group)
+        }
 
     val outputCategory = "OUTPUT"
     styleMap[outputCategory] = tableStyle.styleCategoryHeader
     gtt.programVariables.filter { it.isAssertion }
-            .filterIsInstance<ProgramVariable>()
-            .forEach {
-                val group = arrayOf(outputCategory, it.name)
-                cat += ConstraintDebugColumn(group, it)
-            }
+        .filterIsInstance<ProgramVariable>()
+        .forEach {
+            val group = arrayOf(outputCategory, it.name)
+            cat += ConstraintDebugColumn(group, it)
+        }
 
     val programCategory = "INTERNAL"
     styleMap[programCategory] = tableStyle.styleCategoryHeader
 
     program.stateVars.forEach { variable ->
         val init = program.initAssignments.find { it.target == variable }
-                ?: throw IllegalStateException()
+            ?: throw IllegalStateException()
         val next = program.nextAssignments.find { it.target == variable }
-                ?: throw IllegalStateException()
+            ?: throw IllegalStateException()
         val group = arrayOf(programCategory, variable.name)
         cat += ProgramOutputDebugColumn(group, variable, init, next)
     }
@@ -341,7 +348,7 @@ class ColumnGroup<T>(
     val style: TableCellStyle? = null
 
     override val rowSpan: Int
-        get() = children.sumBy { it.rowSpan }
+        get() = children.sumOf { it.rowSpan }
 
     override fun writeCell(cell: TableCellWalker, cindex: Int, odsDebugTable: T) {
         cell.setStringValue(text)
@@ -366,8 +373,10 @@ class VariableMulti<T>(
 }
 */
 
-abstract class ValueColumn<T>(val group: Array<String>,
-                              val variableName: String = "") {
+abstract class ValueColumn<T>(
+    val group: Array<String>,
+    val variableName: String = ""
+) {
     fun getGroup(x: Int) = if (group.size <= x) "" else group[x]
     abstract fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: T)
 }
@@ -383,20 +392,22 @@ class RowIdDebugColumn(group: Array<String>) : ValueColumn<ODSDebugTable>(group)
     }
 }
 
-class ValueDebugColumn(group: Array<String>,
-                       private val programVar: ProgramVariable,
-                       private val oracle: ValueOracle) : ValueColumn<ODSDebugTable>(group, programVar.name) {
+class ValueDebugColumn(
+    group: Array<String>,
+    private val programVar: ProgramVariable,
+    private val oracle: ValueOracle
+) : ValueColumn<ODSDebugTable>(group, programVar.name) {
     override fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: ODSDebugTable) {
         val constraint = row.rawFields[programVar]!!
-        val first = constraint.chunk(0)
+        val first: TestTableLanguageParser.ChunkContext = constraint.chunk(0)
         when (first) { // try to find a constant in the first chunk
-            is TestTableLanguageParser.ConstantFalseContext ->
-                cell.setBooleanValue(false)
-            is TestTableLanguageParser.ConstantTrueContext ->
-                cell.setBooleanValue(true)
-            is TestTableLanguageParser.ConstantIntContext -> {
-                cell.setStringValue((first as TestTableLanguageParser.CconstantContext).text)
-            }
+            is TestTableLanguageParser.CconstantContext ->
+                when (first.constant()) {
+                    is TestTableLanguageParser.ConstantFalseContext -> cell.setBooleanValue(false)
+                    is TestTableLanguageParser.ConstantTrueContext -> cell.setBooleanValue(true)
+                    else -> cell.setStringValue((first.text))
+                }
+
             else -> {
                 val dt = programVar.dataType
                 when (dt) {
@@ -410,8 +421,10 @@ class ValueDebugColumn(group: Array<String>,
     }
 }
 
-class ConstraintDebugColumn(group: Array<String>,
-                            private val programVar: ProgramVariable) : ValueColumn<ODSDebugTable>(group) {
+class ConstraintDebugColumn(
+    group: Array<String>,
+    private val programVar: ProgramVariable
+) : ValueColumn<ODSDebugTable>(group) {
     override fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: ODSDebugTable) {
         val constraint = row.rawFields[programVar]!!
         val fml = constraint.accept(table.formulaTblPrinter(programVar.name))
@@ -419,18 +432,19 @@ class ConstraintDebugColumn(group: Array<String>,
     }
 }
 
-class ProgramOutputDebugColumn(group: Array<String>,
-                               val variable: SVariable,
-                               val init: SAssignment,
-                               val next: SAssignment)
-    : ValueColumn<ODSDebugTable>(group, variable.name) {
+class ProgramOutputDebugColumn(
+    group: Array<String>,
+    val variable: SVariable,
+    val init: SAssignment,
+    val next: SAssignment
+) : ValueColumn<ODSDebugTable>(group, variable.name) {
     var firstRow = true
     override fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: ODSDebugTable) {
         val formula =
-                if (firstRow)
-                    init.expr.accept(table.formulaSmvPrinter())
-                else
-                    next.expr.accept(table.formulaSmvPrinter())
+            if (firstRow)
+                init.expr.accept(table.formulaSmvPrinter())
+            else
+                next.expr.accept(table.formulaSmvPrinter())
         cell.setFormula(formula)
         firstRow = false
     }
@@ -446,27 +460,30 @@ object RandomValueOracle : ValueOracle {
     val random = Random(2432632525234)
     override fun getInteger(dt: AnyInt): Int = random.nextInt(dt.upperBound.toInt())
     override fun getEnumValue(dt: EnumerateType) =
-            if (dt.allowedValues.isEmpty()) ""
-            else {
-                val values = dt.allowedValues.keys.toList()
-                val pos = random.nextInt(
-                        Math.max(dt.allowedValues.size - 1, 1))
-                values[pos]
-            }
+        if (dt.allowedValues.isEmpty()) ""
+        else {
+            val values = dt.allowedValues.keys.toList()
+            val pos = random.nextInt(
+                Math.max(dt.allowedValues.size - 1, 1)
+            )
+            values[pos]
+        }
 
     override fun getBoolean() = random.nextBoolean()
 }
 
 class ODSDebugTable(
-        gtt: GeneralizedTestTable,
-        private val categories: List<ValueColumn<ODSDebugTable>>,
-        internal val unwinding: List<TableRow>,
-        var tableStyle: TableStyle = DefaultTableStyle
+    gtt: GeneralizedTestTable,
+    private val categories: List<ValueColumn<ODSDebugTable>>,
+    internal val unwinding: List<TableRow>,
+    var tableStyle: TableStyle = DefaultTableStyle
 ) : Runnable, ODSTestTableWriter(gtt) {
     var programInputVariables = mutableSetOf<String>()
 
-    var currentTable: Table = document.addTable(getUniqueName(),
-            unwinding.size * 2, categories.size * 2)
+    var currentTable: Table = document.addTable(
+        getUniqueName(),
+        unwinding.size * 2, categories.size * 2
+    )
     var currentRow = 1
     val headerRows: Int
         get() = (categories.minByOrNull { it.group.size })?.group?.size ?: 0
@@ -499,7 +516,7 @@ class ODSDebugTable(
 
     protected fun writeRow(trow: TableRow) {
         val row = currentTable.nextRow()
-        val cell = row.walker
+        row.walker
         categories.forEachIndexed { cindex, it ->
             val cell = row.getOrCreateCell(cindex)
             it.writeCell(cell, cindex, trow, this)
@@ -538,7 +555,7 @@ private fun <T> Iterable<T>.runLengthEncoding(): List<Pair<T, Int>> {
             ++len
         } else {
             ret += cur to len
-            cur = elem; len = 1;
+            cur = elem; len = 1
         }
     }
     if (cur != null)
@@ -547,10 +564,11 @@ private fun <T> Iterable<T>.runLengthEncoding(): List<Pair<T, Int>> {
 }
 
 
-class Smv2OdsFml(val var2column: Map<String, Int>,
-                 val inputVariables: Set<String>,
-                 val currentRow: Int)
-    : SMVAstDefaultVisitorNN<String>() {
+class Smv2OdsFml(
+    val var2column: Map<String, Int>,
+    val inputVariables: Set<String>,
+    val currentRow: Int
+) : SMVAstDefaultVisitorNN<String>() {
     override fun defaultVisit(top: SMVAst): String = ""
     override fun visit(v: SVariable): String {
         val free = v.name !in var2column
@@ -599,14 +617,15 @@ class Smv2OdsFml(val var2column: Map<String, Int>,
     }
 
     override fun visit(l: SLiteral): String =
-            when (l.dataType) {
-                is EnumType -> '"' + l.value.toString() + '"'
-                is SMVTypes.BOOLEAN -> {
-                    if (l.value.toString().equals("TRUE", true))
-                        "TRUE()" else "FALSE()"
-                }
-                else -> l.value.toString()
+        when (l.dataType) {
+            is EnumType -> '"' + l.value.toString() + '"'
+            is SMVTypes.BOOLEAN -> {
+                if (l.value.toString().equals("TRUE", true))
+                    "TRUE()" else "FALSE()"
             }
+
+            else -> l.value.toString()
+        }
 
     override fun visit(ce: SCaseExpression): String {
         val ret = StringBuffer()
@@ -624,13 +643,13 @@ class Smv2OdsFml(val var2column: Map<String, Int>,
 }
 
 class ODSFormulaPrinter(
-        val gtt: GeneralizedTestTable,
-        val variable: String,
-        val currentRow: Int,
-        val var2column: Map<String, Int>)
-    : TestTableLanguageParserBaseVisitor<String>() {
+    val gtt: GeneralizedTestTable,
+    val variable: String,
+    val currentRow: Int,
+    val var2column: Map<String, Int>
+) : TestTableLanguageParserBaseVisitor<String>() {
     override fun visitCell(ctx: TestTableLanguageParser.CellContext): String =
-            ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
+        ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
 
 
     override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): String {
@@ -656,16 +675,17 @@ class ODSFormulaPrinter(
     }
 
     private fun columnOf(variable: String, i: Int): String =
-            when {
-                gtt.isProgramVariable(variable) ->
-                    ('A' + var2column[variable]!!) + "" + (currentRow - i)
-                gtt.isConstraintVariable(variable) -> variable
-                else -> "\"$variable\"" //ENUM CONSTANT
-            }
+        when {
+            gtt.isProgramVariable(variable) ->
+                ('A' + var2column[variable]!!) + "" + (currentRow - i)
+
+            gtt.isConstraintVariable(variable) -> variable
+            else -> "\"$variable\"" //ENUM CONSTANT
+        }
 
     override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String =
-            "AND(" + ctx.lower.accept(this) + "<=" + columnOf(variable, 0) + "; " +
-                    columnOf(variable, 0) + "<=" + ctx.upper.accept(this) + ")"
+        "AND(" + ctx.lower.accept(this) + "<=" + columnOf(variable, 0) + "; " +
+                columnOf(variable, 0) + "<=" + ctx.upper.accept(this) + ")"
 
     override fun visitMinus(ctx: TestTableLanguageParser.MinusContext) = "-" + ctx.expr().accept(this)
 
@@ -674,35 +694,46 @@ class ODSFormulaPrinter(
 
     override fun visitParens(ctx: TestTableLanguageParser.ParensContext) = "(" + ctx.expr().accept(this) + ")"
 
-    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) = ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) =
+        ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
 
-    override fun visitMod(ctx: TestTableLanguageParser.ModContext) = "MOD(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext) =
+        "MOD(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
 
-    override fun visitMult(ctx: TestTableLanguageParser.MultContext) = ctx.left.accept(this) + "*" + ctx.right.accept(this)
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext) =
+        ctx.left.accept(this) + "*" + ctx.right.accept(this)
 
     override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext) = ctx.IDENTIFIER().text +
             ctx.expr().joinToString("; ", "(", ")")
             { it.accept(this) }
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = ctx.left.accept(this) + "AND" + ctx.right.accept(this)
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) =
+        ctx.left.accept(this) + "AND" + ctx.right.accept(this)
 
-    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) = ctx.left.accept(this) + "+" + ctx.right.accept(this)
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) =
+        ctx.left.accept(this) + "+" + ctx.right.accept(this)
 
-    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) = " DIV(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) =
+        " DIV(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) = ctx.left.accept(this) + "<>" + ctx.right.accept(this)
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) =
+        ctx.left.accept(this) + "<>" + ctx.right.accept(this)
 
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) = "XOR(" + ctx.left.accept(this) + ";" + ctx.right.accept(this) + ")"
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) =
+        "XOR(" + ctx.left.accept(this) + ";" + ctx.right.accept(this) + ")"
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) = "OR( " + ctx.left.accept(this) + "; " + ctx.right.accept(this) + ")"
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) =
+        "OR( " + ctx.left.accept(this) + "; " + ctx.right.accept(this) + ")"
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) = ctx.left.accept(this) + "=" + ctx.right.accept(this)
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) =
+        ctx.left.accept(this) + "=" + ctx.right.accept(this)
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) = ctx.left.accept(this) + "-" + ctx.right.accept(this)
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) =
+        ctx.left.accept(this) + "-" + ctx.right.accept(this)
 
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) =
-            columnOf(ctx.IDENTIFIER().text, 0)//TODO for relational
+        columnOf(ctx.IDENTIFIER().text, 0)//TODO for relational
 
     override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String {
         val ret = StringBuffer()
@@ -711,8 +742,8 @@ class ODSFormulaPrinter(
             val g = ctx.expr(i).accept(this)
             val t = ctx.expr(i + 1).accept(this)
             ret.append("IF(")
-                    .append(g).append(";")
-                    .append(t).append(";")
+                .append(g).append(";")
+                .append(t).append(";")
             i += 2
         }
         ret.append("FALSE").append(")".repeat(i / 2))
@@ -737,43 +768,43 @@ object DefaultTableStyle : TableStyle {
     override var stylePauseVariableHeader: TableCellStyle = EMPTY
 
     val intStyle: DataStyle = createFloatStyleBuilder("custom-int-datastyle", Locale.getDefault())
-            .decimalPlaces(8).groupThousands(true).build()
+        .decimalPlaces(8).groupThousands(true).build()
 
 
     var styleValues = TableCellStyle.builder("values")
-            .build()
+        .build()
     override var styleOutputValue = TableCellStyle.builder("values_output")
-            .parentCellStyle(styleValues).build()
+        .parentCellStyle(styleValues).build()
     override val styleInputValue = TableCellStyle.builder("values_input")
-            .parentCellStyle(styleValues).build()
+        .parentCellStyle(styleValues).build()
 
     override var styleCategoryHeader = TableCellStyle.builder("category_header")
-            .backgroundColor { "ff00ff" }
-            .fontWeightBold()
-            .textAlign(CellAlign.CENTER)
-            .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
-            .build()
+        .backgroundColor { "ff00ff" }
+        .fontWeightBold()
+        .textAlign(CellAlign.CENTER)
+        .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
+        .build()
 
     var styleVariableHeader = TableCellStyle.builder("variable_header")
-            .backgroundColor(SimpleColor.GRAY48)
-            .fontWeightBold()
-            .textAlign(CellAlign.CENTER)
-            .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
-            .build()
+        .backgroundColor(SimpleColor.GRAY48)
+        .fontWeightBold()
+        .textAlign(CellAlign.CENTER)
+        .borderBottom(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
+        .build()
 
     override val styleInputVariableHeader: TableCellStyle = TableCellStyle.builder("variable_input_header")
-            .parentCellStyle(styleVariableHeader)
-            .build()
+        .parentCellStyle(styleVariableHeader)
+        .build()
 
     override val styleOutputVariableHeader = TableCellStyle.builder("variable_output_header")
-            .parentCellStyle(styleVariableHeader)
-            .build()
+        .parentCellStyle(styleVariableHeader)
+        .build()
 
     override val styleRowIdHeader: TableCellStyle = TableCellStyle.builder("variable_rowid_header")
-            .parentCellStyle(styleVariableHeader)
-            .build()
+        .parentCellStyle(styleVariableHeader)
+        .build()
 
     val styleRowTimeHeader: TableCellStyle = TableCellStyle.builder("variable_time_header")
-            .parentCellStyle(styleVariableHeader)
-            .build()
+        .parentCellStyle(styleVariableHeader)
+        .build()
 }

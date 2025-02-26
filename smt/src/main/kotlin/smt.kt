@@ -63,10 +63,10 @@ object SmtFacade {
      */
     suspend fun checkSmtSat(problem: String): SmtAnswer = coroutineScope {
         val process = ProcessBuilder("z3", "-in", "-smt2")
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .redirectInput(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .start()
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .redirectInput(ProcessBuilder.Redirect.PIPE)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .start()
 
         process.outputStream.writer().use { it.write(problem) }
         val error = process.waitFor()
@@ -103,6 +103,10 @@ abstract class SAtom : SExpr() {
         get() = true
 }
 
+data class SString(var value: String) : SAtom() {
+    override fun toString() = "\"$value\"";
+}
+
 data class SInteger(var num: BigInteger) : SAtom() {
     constructor(numnum: Int) : this(numnum.toBigInteger())
 
@@ -132,10 +136,10 @@ data class SList(val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> 
         args.forEach { add(it) }
     }
 
-    constructor(symbol: String, args: List<SExpr>) : this() {
+    /*constructor(symbol: String, args: List<SExpr>) : this() {
         list += SSymbol(symbol)
         list.addAll(args)
-    }
+    }*/
 
     constructor(expr: Collection<SExpr>) : this() {
         list.addAll(expr)
@@ -145,7 +149,7 @@ data class SList(val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> 
         get() = false
 
     override fun toString() = list
-            .joinToString(" ", "(", ")") { it.toString() }
+        .joinToString(" ", "(", ")") { it.toString() }
 
     companion object {
         fun singleton(s: SExpr): SList = SList(listOf(s))
@@ -157,6 +161,8 @@ class SexprParseTreeTransformer : SexprBaseVisitor<SExpr>() {
         val expressions = ctx.sexpr().map { it.accept(this) }
         return SList(expressions)
     }
+
+    override fun visitStr(ctx: SexprParser.StrContext) = SString(ctx.text.trim('"'))
 
     override fun visitN(ctx: SexprParser.NContext) = SInteger(BigInteger(ctx.NUMBER().text))
 

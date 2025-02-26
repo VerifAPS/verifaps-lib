@@ -29,28 +29,32 @@ import java.util.*
  * @version 1 (13.12.16)
  */
 class SpecificationInterfaceMisMatchException : GetetaException {
-    constructor() : super() {}
+    constructor() : super()
 
-    constructor(message: String) : super(message) {}
+    constructor(message: String) : super(message)
 
-    constructor(message: String, cause: Throwable) : super(message, cause) {}
+    constructor(message: String, cause: Throwable) : super(message, cause)
 
-    constructor(cause: Throwable) : super(cause) {}
+    constructor(cause: Throwable) : super(cause)
 
-    protected constructor(message: String, cause: Throwable,
-                          enableSuppression: Boolean,
-                          writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace) {
-    }
+    protected constructor(
+        message: String, cause: Throwable,
+        enableSuppression: Boolean,
+        writableStackTrace: Boolean
+    ) : super(message, cause, enableSuppression, writableStackTrace)
 
     constructor(code: SMVModule, v: SVariable) :
-            super(String.format("Could not find variable '%s' in module: %s. Candidates would be: %s",
-                    v.name, code.name, SpecificationInterfaceMisMatchException.candidates(v.name, code)
-            ))
+            super(
+                String.format(
+                    "Could not find variable '%s' in module: %s. Candidates would be: %s",
+                    v.name, code.name, candidates(v.name, code)
+                )
+            )
 
     companion object {
 
         private fun candidates(name: String, code: SMVModule): String {
-            val vars = code.stateVars + code.inputVars + code.frozenVars;
+            val vars = code.stateVars + code.inputVars + code.frozenVars
             val candidates = vars.map { it.name }
             val best = candidates(name, candidates)
             return best.take(3).reduce { a, b -> "$a, $b" }
@@ -58,7 +62,8 @@ class SpecificationInterfaceMisMatchException : GetetaException {
 
         private fun candidates(name: String, code: List<String>): Collection<String> {
             val heap = PriorityQueue(
-                    LevensteinCaseInsensitiveComparator(name))
+                LevensteinCaseInsensitiveComparator(name)
+            )
             heap.addAll(code)
             return heap
         }
@@ -80,7 +85,7 @@ class SpecificationInterfaceMisMatchException : GetetaException {
 
             private fun getLevenstheinToRef(o1: String): Int {
                 val k = o1.lowercase(Locale.getDefault())
-                return (computed as java.util.Map<String, Int>).computeIfAbsent(k) { s ->
+                return computed.computeIfAbsent(k) { s ->
                     levenshteinDistance(
                         reference,
                         s

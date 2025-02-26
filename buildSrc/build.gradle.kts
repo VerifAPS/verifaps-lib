@@ -10,10 +10,11 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
 }
 
 dependencies {
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0")
     implementation(libs.kotlinGradlePlugin)
 }
+

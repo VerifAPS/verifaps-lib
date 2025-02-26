@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.stvs.*
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest
-import edu.kit.iti.formal.stvs.logic.specification.smtlib.SExpression.Companion.fromText
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Tag
@@ -38,7 +38,7 @@ class SmtEncoderTest {
         val smtEncoder = SmtEncoder(3000, validSpec, freeVariables)
         val model = smtEncoder.constraint
 
-        val header: Collection<SExpression?> = model.variableDefinitions
+        val header = model.variableDefinitions
         println(model.toString())
         println(model.toText().length)
         println(header)
@@ -58,8 +58,8 @@ class SmtEncoderTest {
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
-        val definitions: Collection<SExpression?> = output.distinctVariableDefinitions
-        val nonDuplicate: Set<SExpression?> = LinkedHashSet(definitions)
+        val definitions = output.distinctVariableDefinitions
+        val nonDuplicate = LinkedHashSet(definitions)
         Assertions.assertEquals(nonDuplicate, definitions)
     }
 
@@ -402,9 +402,9 @@ class SmtEncoderTest {
         )
     }
 
-    private fun testWithStatements(constraints: Collection<SExpression>, vararg s: String) {
+    private fun testWithStatements(constraints: Collection<SExpr>, vararg s: String) {
         val statements = s.map { fromText(it) }
         val missingStatements = statements.filter { !constraints.contains(it) }
-        Assertions.assertEquals(ArrayList<SExpression>(), missingStatements, "no statements should be missing")
+        Assertions.assertEquals(ArrayList<SExpr>(), missingStatements, "no statements should be missing")
     }
 }

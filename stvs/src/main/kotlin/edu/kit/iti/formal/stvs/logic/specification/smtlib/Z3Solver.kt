@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import de.tudresden.inf.lat.jsexp.Sexp
-import de.tudresden.inf.lat.jsexp.SexpFactory
-import de.tudresden.inf.lat.jsexp.SexpParserException
+import edu.kit.iti.formal.smt.SAtom
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SExprFacade
+import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smt.SSymbol
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
@@ -13,7 +15,8 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteCell
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow
-import java.io.*
+import org.antlr.v4.runtime.CharStreams
+import java.io.IOException
 import java.util.function.Consumer
 import java.util.regex.Pattern
 
@@ -69,9 +72,6 @@ class Z3Solver(config: GlobalConfig) {
         } catch (e: IOException) {
             e.printStackTrace()
             throw ConcretizationException(e)
-        } catch (e: SexpParserException) {
-            e.printStackTrace()
-            throw ConcretizationException(e)
         }
     }
 
@@ -101,14 +101,21 @@ class Z3Solver(config: GlobalConfig) {
         return concretize(z3Input, validIoVariables)
     }
 
-    @Throws(ConcretizationException::class, SexpParserException::class)
-    private fun solverStringToSexp(z3String: String): Sexp {
-        var z3 = z3String
-        if (!z3.startsWith("sat")) {
+    @Throws(ConcretizationException::class)
+    private fun solverStringToSexp(z3String: String): List<SList> {
+        var output = SExprFacade.parse(CharStreams.fromString(z3String))
+
+        val first = output.firstOrNull()
+            ?: throw ConcretizationException("Z3 parsing failed. Given input '$z3String' is empty.")
+
+        val firstAtom = first as? SSymbol
+            ?: throw ConcretizationException("Z3 parsing failed. First Sexpr must be an atom. $first")
+
+        if (firstAtom.toString() != "sat") {
             throw ConcretizationException("Solver returned status: Unsatisfiable")
         }
-        z3 = z3.substring(z3.indexOf('\n') + 1)
-        return SexpFactory.parse(z3)
+
+        return output.subList(1, output.size).filterIsInstance<SList>()
     }
 
     companion object {
@@ -116,7 +123,7 @@ class Z3Solver(config: GlobalConfig) {
         private val DURATION_PATTERN: Pattern = Pattern.compile("n_(?<cycleCount>\\d+)")
 
         /**
-         * Converts a [Sexp] (already parsed output of the solver) to a
+         * Converts a [SExpr] (already parsed output of the solver) to a
          * [ConcreteSpecification].
          *
          * @param sexpr expression that should be converted
@@ -124,7 +131,7 @@ class Z3Solver(config: GlobalConfig) {
          * the solver output
          * @return converted specification
          */
-        private fun buildConcreteSpecFromSExp(sexpr: Sexp, validIoVariables: List<ValidIoVariable>)
+        private fun buildConcreteSpecFromSExp(sexpr: List<SList>, validIoVariables: List<ValidIoVariable>)
                 : ConcreteSpecification {
             val rawDurations = extractRawDurations(sexpr)
             // convert raw durations into duration list
@@ -219,12 +226,10 @@ class Z3Solver(config: GlobalConfig) {
          * @param durations concrete durations for each row
          * @return mapping
          */
-        private fun extractRawRows(
-            sexpr: Sexp,
-            durations: List<ConcreteDuration?>
-        ): Map<Int, MutableMap<String?, String>> {
-            val rawRows: MutableMap<Int, MutableMap<String?, String>> = HashMap()
-            sexpr.forEach(Consumer { varAssign: Sexp -> addRowToMap(durations, rawRows, varAssign) })
+        private fun extractRawRows(sexpr: List<SList>, durations: List<ConcreteDuration>)
+                : Map<Int, MutableMap<String?, String>> {
+            val rawRows = HashMap<Int, MutableMap<String?, String>>()
+            sexpr.forEach { addRowToMap(durations, rawRows, it) }
             return rawRows
         }
 
@@ -239,12 +244,12 @@ class Z3Solver(config: GlobalConfig) {
          */
         private fun addRowToMap(
             durations: List<ConcreteDuration?>,
-            rawRows: MutableMap<Int, MutableMap<String?, String>>, varAssign: Sexp
+            rawRows: MutableMap<Int, MutableMap<String?, String>>, varAssign: SList
         ) {
-            if (varAssign.length == 0 || varAssign[0].toIndentedString() != "define-fun") {
+            if (varAssign.size == 0 || varAssign[0].toString() != "define-fun") {
                 return
             }
-            val identifierMatcher = VAR_PATTERN.matcher(varAssign[1].toIndentedString())
+            val identifierMatcher = VAR_PATTERN.matcher(varAssign[1].toString())
             if (identifierMatcher.matches()) {
                 val varName = identifierMatcher.group("name")
                 val row = identifierMatcher.group("row")
@@ -259,7 +264,7 @@ class Z3Solver(config: GlobalConfig) {
                 }
                 val absoluteIndex = concreteDuration.beginCycle + cycleCount
                 rawRows.putIfAbsent(absoluteIndex, HashMap())
-                rawRows[absoluteIndex]!![varName] = varAssign[4].toIndentedString()
+                rawRows[absoluteIndex]!![varName] = varAssign[4].toString()
             }
         }
 
@@ -271,11 +276,12 @@ class Z3Solver(config: GlobalConfig) {
          * @param sexpr parsed solver output
          * @return Map from row to duration
          */
-        private fun extractRawDurations(sexpr: Sexp): Map<Int, Int> {
-            return sexpr.filter { isDurationLength(it) }
+        private fun extractRawDurations(sexpr: List<SList>): Map<Int, Int> {
+            return sexpr
+                .filter { isDurationLength(it) }
                 .associate {
                     val cycleCount = it[1].toString().substring(2).toInt()
-                    cycleCount to BitvectorUtils.intFromHex(it[4].toIndentedString(), false)
+                    cycleCount to BitvectorUtils.intFromHex(it[4].toString(), false)
                 }
         }
 
@@ -286,11 +292,11 @@ class Z3Solver(config: GlobalConfig) {
          * @param rawDurations raw durations (mapping from ro to duration)
          * @param varAssign solver assignment
          */
-        private fun isDurationLength(varAssign: Sexp): Boolean {
-            if (varAssign.length == 0 || varAssign[0].toIndentedString() != "define-fun") {
+        private fun isDurationLength(varAssign: SList): Boolean {
+            if (varAssign.size == 0 || varAssign[0].toString() != "define-fun") {
                 return false
             }
-            val durationMatcher = DURATION_PATTERN.matcher(varAssign[1].toIndentedString())
+            val durationMatcher = DURATION_PATTERN.matcher(varAssign[1].toString())
             return durationMatcher.matches()
         }
     }

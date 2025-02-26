@@ -8,6 +8,7 @@ import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
 import edu.kit.iti.formal.smt.*
+import edu.kit.iti.formal.smt.SExprFacade.fnapply
 import edu.kit.iti.formal.smt.SExprFacade.sexpr
 import edu.kit.iti.formal.smv.EnumType
 import kotlin.math.log
@@ -104,7 +105,7 @@ class SmtEncoder(
         val eq = smvModel.automaton.initialStates.map {
             sexpr("=", sexpr(symCycleRow, 0), it.name)
         }
-        model.assert(SList("or", eq))
+        model.assert(fnapply("or", eq))
 
         (0 until traceLength).forEach { i ->
             model.assert(sexpr("rconstraint", sexpr(symCycleRow, i)))
@@ -154,7 +155,7 @@ class SmtEncoder(
         model.file.add(
                 sexpr("define-fun", "constraints_row_${it.id}",
                         SList.singleton(sexpr("i", SmtIntType.type)), SmtBoolType.type,
-                        SList("and", body)))
+                        fnapply("and", body)))
     }
 
 
@@ -248,7 +249,7 @@ class TblExprToSExpr(columnVar: String,
             when {
                 ctx.chunk().size == 1 -> ctx.chunk(0).accept(this)
                 ctx.chunk().size == 0 -> SSymbol("true")
-                else -> SList("and", ctx.chunk().map { it.accept(this) })
+                else -> fnapply("and", ctx.chunk().map { it.accept(this) })
             }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext) = SSymbol("true")
@@ -288,7 +289,7 @@ class TblExprToSExpr(columnVar: String,
     override fun visitMult(ctx: TestTableLanguageParser.MultContext) = binop("bvmult", ctx.left, ctx.right)
 
     override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SExpr =
-            SList(ctx.IDENTIFIER().text, ctx.expr().map { it.accept(this) })
+            fnapply(ctx.IDENTIFIER().text, ctx.expr().map { it.accept(this) })
 
     override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = binop("and", ctx.left, ctx.right)
 

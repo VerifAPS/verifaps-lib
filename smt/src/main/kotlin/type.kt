@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.smt
 
-import edu.kit.iti.formal.smt.SExprFacade.sexpr
+import edu.kit.iti.formal.smt.SExprFacade.fnapply
 
 /**
  *
@@ -15,8 +15,12 @@ class SmtEnumType(val name: String, val values: Collection<String>) : SmtType() 
     override val type: SExpr by lazy { SSymbol(name) }
     val declaration by lazy {
         val s = values.map { SSymbol(it) }
-        sexpr("declare-datatypes",
-                SList(), SList.singleton(SList(name, s)))
+        fnapply(
+            "declare-datatypes", listOf(
+                SList(),
+                SList.singleton(fnapply(name, s))
+            )
+        )
     }
 }
 

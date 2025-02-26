@@ -6,10 +6,11 @@ import org.jdom2.xpath.XPathExpression
 import org.jdom2.xpath.XPathFactory
 
 data class Trans(
-        val from: Set<String> = setOf(),
-        val to: Set<String> = setOf(),
-        val condition: Set<String> = setOf(),
-        val usedNodes: Set<String> = setOf())
+    val from: Set<String> = setOf(),
+    val to: Set<String> = setOf(),
+    val condition: Set<String> = setOf(),
+    val usedNodes: Set<String> = setOf()
+)
 
 
 class SfcElementAccess(val sfcElement: Element) {
@@ -23,7 +24,8 @@ class SfcElementAccess(val sfcElement: Element) {
     private val xpathTransitions = xpf.compile("./transition", Filters.element())
     private val xpathGetLocalId = createXPathWithId("./*[@localId=\$id]")
     private val xpathGetVendorData = createXPathWithId(".//attribute[@guid=\$id]")
-    private val xpathFindActionsInActionBlock = createXPathWithId("./actionBlock[connectionPointIn/connection/@refLocalId=\$id]/action")
+    private val xpathFindActionsInActionBlock =
+        createXPathWithId("./actionBlock[connectionPointIn/connection/@refLocalId=\$id]/action")
 
 
     val initialStep: Element by lazy { xpathFindRootStep.evaluateFirst(sfcElement) }
@@ -38,7 +40,8 @@ class SfcElementAccess(val sfcElement: Element) {
     val pjoin: List<ParallelJoin> by lazy { getElements("simultaneousConvergence") { ParallelJoin(it) } }
     val sjoin: List<SelectiveJoin> by lazy { getElements("selectionConvergence") { SelectiveJoin(it) } }
 
-    private fun <T> getElements(vararg names: String, func: (Element) -> T): List<T> = nodes.values.filter { it.name in names }.map(func)
+    private fun <T> getElements(vararg names: String, func: (Element) -> T): List<T> =
+        nodes.values.filter { it.name in names }.map(func)
 
     private fun createXPathWithId(expr: String): XPathExpression<Element> {
         val map = hashMapOf("id" to 0)
@@ -86,15 +89,15 @@ class SfcElementAccess(val sfcElement: Element) {
 
         val onExit: String? by lazy { getVendorSpecificAttribute(e, CODESYS_ON_EXIT) }
         val onEntry: String? by lazy { getVendorSpecificAttribute(e, CODESYS_ON_ENTRY) }
-        val onWhile: String?  by lazy { getVendorSpecificAttribute(e, CODESYS_ON_STEP) }
+        val onWhile: String? by lazy { getVendorSpecificAttribute(e, CODESYS_ON_STEP) }
         val actionBlock: ActionBlock? by lazy { null }
 
 
         override fun transitionIncoming() =
-                listOf(Trans(from = setOf(name), usedNodes = setOf(localId)))
+            listOf(Trans(from = setOf(name), usedNodes = setOf(localId)))
 
         override fun transitionOutgoing() =
-                listOf(Trans(to = setOf(name), usedNodes = setOf(localId)))
+            listOf(Trans(to = setOf(name), usedNodes = setOf(localId)))
     }
 
     inner class ActionBlock(entry: Element) : NodeAccess(entry) {
@@ -163,21 +166,23 @@ class SfcElementAccess(val sfcElement: Element) {
             get() = times(transitionIncoming(), transitionOutgoing())
 
         override fun transitionOutgoing() =
-                pointOut(localId)
-                        .flatMap { it.transitionOutgoing() }
-                        .map { it.copy(usedNodes = it.usedNodes + localId) }
+            pointOut(localId)
+                .flatMap { it.transitionOutgoing() }
+                .map { it.copy(usedNodes = it.usedNodes + localId) }
 
         override fun transitionIncoming(): List<Trans> =
-                pointIn(entry)
-                        .flatMap { it.transitionIncoming() }
-                        .map { it.copy(usedNodes = it.usedNodes + localId) }
+            pointIn(entry)
+                .flatMap { it.transitionIncoming() }
+                .map { it.copy(usedNodes = it.usedNodes + localId) }
     }
 
     private fun times(from: Collection<Trans>, to: Collection<Trans>): Collection<Trans> {
         return from.flatMap { f ->
             to.map { t ->
-                Trans(f.from + t.from, f.to + t.to, f.condition + t.condition,
-                        t.usedNodes + f.usedNodes)
+                Trans(
+                    f.from + t.from, f.to + t.to, f.condition + t.condition,
+                    t.usedNodes + f.usedNodes
+                )
             }
         }
     }
@@ -185,9 +190,13 @@ class SfcElementAccess(val sfcElement: Element) {
     private fun merge(a: Collection<Trans>, b: Collection<Trans>): Collection<Trans> {
         val x = a.first()
         val y = b.first()
-        return listOf(Trans(x.from + y.from,
+        return listOf(
+            Trans(
+                x.from + y.from,
                 x.to + y.to, x.condition + y.condition,
-                x.usedNodes + y.usedNodes))
+                x.usedNodes + y.usedNodes
+            )
+        )
     }
 
     inner class SelectiveFork(entry: Element) : NodeAccess(entry, "selectionDivergence") {
@@ -195,26 +204,27 @@ class SfcElementAccess(val sfcElement: Element) {
             get() = times(transitionIncoming(), transitionOutgoing())
 
         override fun transitionOutgoing() =
-                pointOut(localId)
-                        .flatMap { it.transitionOutgoing() }
-                        .map { it.copy(usedNodes = it.usedNodes + localId) }
+            pointOut(localId)
+                .flatMap { it.transitionOutgoing() }
+                .map { it.copy(usedNodes = it.usedNodes + localId) }
 
         override fun transitionIncoming(): List<Trans> =
-                pointIn(entry)
-                        .flatMap { it.transitionIncoming() }
-                        .map { it.copy(usedNodes = it.usedNodes + localId) }
+            pointIn(entry)
+                .flatMap { it.transitionIncoming() }
+                .map { it.copy(usedNodes = it.usedNodes + localId) }
     }
 
     /**
      * Transition connects only two elements! No chaining allowed
      */
     inner class Transition(t: Element) : NodeAccess(t, "transition") {
-        private val conditionRefId = xpf.compile("./condition/connectionPointIn/connection/@refLocalId", Filters.attribute())
+        private val conditionRefId =
+            xpf.compile("./condition/connectionPointIn/connection/@refLocalId", Filters.attribute())
         private val qExpression = ".//inVariable[@localId=\$id]/expression/text()"
 
         val conditionId by lazy {
             conditionRefId.evaluateFirst(t).value
-                    ?: throw IllegalStateException("Following block does not have a transition guard:$t")
+                ?: throw IllegalStateException("Following block does not have a transition guard:$t")
         }
 
         val condition: String by lazy {
@@ -227,37 +237,45 @@ class SfcElementAccess(val sfcElement: Element) {
             get() = times(transitionIncoming(), transitionOutgoing())
 
         override fun transitionIncoming(): Collection<Trans> =
-                pointIn(entry).flatMap { it.transitionIncoming() }
-                        .map {
-                            it.copy(condition = it.condition + condition,
-                                    usedNodes = it.usedNodes + localId + conditionId)
-                        }
+            pointIn(entry).flatMap { it.transitionIncoming() }
+                .map {
+                    it.copy(
+                        condition = it.condition + condition,
+                        usedNodes = it.usedNodes + localId + conditionId
+                    )
+                }
 
         override fun transitionOutgoing() =
-                pointOut(localId).flatMap { it.transitionOutgoing() }
-                        .map {
-                            it.copy(condition = it.condition + condition,
-                                    usedNodes = it.usedNodes + localId + conditionId)
-                        }
+            pointOut(localId).flatMap { it.transitionOutgoing() }
+                .map {
+                    it.copy(
+                        condition = it.condition + condition,
+                        usedNodes = it.usedNodes + localId + conditionId
+                    )
+                }
 
     }
 
     public fun pointOut(localId: String): List<NodeAccess> {
         val xpathGetNext =
-                createXPathWithId("./*[connectionPointIn/connection[@refLocalId=\$id]]")
+            createXPathWithId("./*[connectionPointIn/connection[@refLocalId=\$id]]")
         xpathGetNext.setVariable("id", localId)
         return xpathGetNext.evaluate(sfcElement).map { get<NodeAccess>(it) }
     }
 
     public fun pointIn(element: Element): List<NodeAccess> {
         val xpath = xpf.compile(
-                "./connectionPointIn/connection/@refLocalId", Filters.attribute())
+            "./connectionPointIn/connection/@refLocalId", Filters.attribute()
+        )
         return xpath.evaluate(element).map { nodes[it.value]!! }.map { get<NodeAccess>(it) }
     }
 
 
-    private fun <T : NodeAccess> get(e: Element): T = access.computeIfAbsent(e.getAttributeValue("localId")) { factory(e) as T } as T
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : NodeAccess> get(e: Element): T =
+        access.computeIfAbsent(e.getAttributeValue("localId")) { factory(e) as T } as T
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T : NodeAccess> get(e: String): T = access.computeIfAbsent(e) { factory(nodes[it]!!) as T } as T
 
     private fun <T : NodeAccess> factory(e: Element): T {

@@ -1,6 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     `maven-publish`
@@ -69,7 +67,6 @@ tasks.register<Jar>("testJar") {
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release = 21
 }
 
 
@@ -77,9 +74,8 @@ tasks.getByName<Jar>("jar") {
     manifest {
         attributes(
             "Implementation-Title" to project.name,
-            "Implementation-Version" to (version ?: "0"),
+            "Implementation-Version" to version,
             "Description" to description,
-            "Created-By" to "Gradle ${gradle.gradleVersion}",
         )
     }
 }

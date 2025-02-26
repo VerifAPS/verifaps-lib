@@ -12,7 +12,7 @@ description = """
 version = "0.10"
 
 val antlrOutputDir =
-    file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/testtables/grammar")
+    layout.buildDirectory.dir("generated-src/antlr/main/")
 
 
 repositories {
@@ -35,14 +35,14 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs("src/main/java", file("${project.buildDir}/generated-src/antlr/main"))
+            srcDirs("src/main/java", antlrOutputDir.get().asFile)
         }
     }
 }
 
 
 val generateGrammarSource = tasks.named<AntlrTask>("generateGrammarSource") {
-    outputDirectory = antlrOutputDir
+    outputDirectory = antlrOutputDir.get().dir("edu/kit/iti/formal/automation/testtables/grammar").asFile
     arguments.addAll(listOf("-package", "edu.kit.iti.formal.automation.testtables.grammar", "-visitor"))
 }
 

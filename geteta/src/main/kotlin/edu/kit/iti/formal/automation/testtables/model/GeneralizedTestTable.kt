@@ -438,7 +438,7 @@ data class Region(override var id: String,
                   var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
     constructor(id: Int) : this("$id")
 
-    override fun count(): Int = this.children.sumBy { it.count() }
+    override fun count(): Int = this.children.sumOf { it.count() }
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
     override fun depth() = 1 + (this.children.maxByOrNull { it.depth() }?.depth() ?: 0)
     override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }

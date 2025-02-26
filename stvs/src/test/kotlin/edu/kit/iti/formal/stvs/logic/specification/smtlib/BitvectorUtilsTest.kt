@@ -13,10 +13,10 @@ class BitvectorUtilsTest {
     @Test
     fun testEquality() {
         for (i in -32768..32767) {
-            Assertions.assertEquals(i.toLong(), intFromHex(hexFromInt(i, 4), true).toLong())
+            Assertions.assertEquals(i.toLong(), intFromHex(hexFromInt(i, 4).toString(), true).toLong())
         }
         for (i in 0..65535) {
-            Assertions.assertEquals(i.toLong(), intFromHex(hexFromInt(i, 4), false).toLong())
+            Assertions.assertEquals(i.toLong(), intFromHex(hexFromInt(i, 4).toString(), false).toLong())
         }
     }
 
@@ -36,12 +36,5 @@ class BitvectorUtilsTest {
     @Test
     fun testWrongFormat() {
         assertFailsWith<IllegalArgumentException> { intFromHex("notvalid", true) }
-    }
-
-    @Test
-    fun testNull() {
-        assertFailsWith<IllegalArgumentException> {
-            intFromHex(null, false)
-        }
     }
 }

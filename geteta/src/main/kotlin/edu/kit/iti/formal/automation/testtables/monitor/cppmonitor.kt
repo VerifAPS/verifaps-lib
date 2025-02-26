@@ -59,7 +59,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
 
     val structNameIo = "${gtt.name}_io_t"
     val structNameGv = "${gtt.name}_gv_t"
-    val enumStates = "${gtt.name.capitalize()}States"
+    val enumStates = "${gtt.name.replaceFirstChar { it.uppercase() }}States"
     val cppRewriter =
             SmvToCTranslator().also {
                 //val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
@@ -119,7 +119,7 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         monitor.types += defineStateEnum()
 
         cw.println("template <typename io_t>")
-                .cblock("class ${gtt.name.capitalize()}Monitor " +
+                .cblock("class ${gtt.name.replaceFirstChar { it.uppercase() }}Monitor " +
                         ": public IMonitor<io_t> {", "};") {
                     +("struct Token {int state; $structNameGv globalVars;};")
                     +("vector<Token> tokens;")
