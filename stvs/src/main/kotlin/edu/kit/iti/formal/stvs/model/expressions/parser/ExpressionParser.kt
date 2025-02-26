@@ -97,7 +97,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
         return BinaryFunctionExpr(op, columnAsVariable, ctx.singlesided().expr().accept(this))
     }
 
-    override fun visitCellEOF(ctx: TestTableLanguageParser.CellEOFContext) = ctx.cell().accept(this)
+    override fun visitCellEOF(ctx: TestTableLanguageParser.CellEOFContext): Expression = ctx.cell().accept(this)
 
     override fun visitCdontcare(ctx: TestTableLanguageParser.CdontcareContext) = LiteralExpr(ValueBool.TRUE)
 
@@ -110,7 +110,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     }
 
 
-    override fun visitCexpr(ctx: TestTableLanguageParser.CexprContext) = ctx.expr().accept(this)
+    override fun visitCexpr(ctx: TestTableLanguageParser.CexprContext): Expression = ctx.expr().accept(this)
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): Expression {
         return LiteralExpr(ValueBool.TRUE)
@@ -130,7 +130,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     }
 
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): Expression {
-        // If we come here, its a top-level variable.
+        // If we come here, it's a top-level variable.
         // In this case there's an implicit equality with the column variable.
         return parseOccuringString(ctx)
     }
@@ -142,7 +142,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
     // A seemingly arbitrary string in a CellExpression can either be an Enum value or a variable...
     private fun parseOccuringString(ctx: TestTableLanguageParser.VariableContext): Expression {
         return parseArrayIndex(ctx)?.let { index: Int ->
-            // If it has an index to it, like A[-2], its a variable for sure
+            // If it has an index to it, like A[-2], it's a variable for sure
             // (indices don't make sense for enums!)
             VariableExpr(parseIdentifier(ctx), index)
         } ?: maybeParseEnum(ctx)
@@ -203,7 +203,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
             else -> throw ParseRuntimeException(
                 ParseException(
                     token.line, token.charPositionInLine,
-                    "Unsupported singlesided operation: \"" + token.type + "\""
+                    "Unsupported singlesided operation: \"${token.type}\""
                 )
             )
         }

@@ -1,53 +1,37 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import de.tudresden.inf.lat.jsexp.Sexp
-import java.util.*
-import java.util.function.Consumer
-import java.util.stream.Collectors
+import edu.kit.iti.formal.automation.analysis.toHuman
+import edu.kit.iti.formal.smt.SExpr
+import edu.kit.iti.formal.smt.SList
 
 /**
  * Represents sets of constraints and definitions.
  *
  * @author Carsten Csiky
  */
-class SmtModel : SExpression {
-    val globalConstraints: MutableList<SExpression> = arrayListOf()
-    val variableDefinitions: MutableList<SExpression> = arrayListOf()
-
-    /**
-     * Creates an instance with preset definitions/constraints. both lists should be modifiable
-     *
-     * @param globalConstraints list of global constraints
-     * @param variableDefinitions list of variable definitions
-     */
-    constructor(globalConstraints: List<SExpression> =listOf(), variableDefinitions: List<SExpression> =listOf()) {
-        this.globalConstraints.addAll(globalConstraints)
-        this.variableDefinitions.addAll(variableDefinitions)
-    }
-
+data class SmtModel(
+    val globalConstraints: MutableList<SExpr> = arrayListOf(),
+    val variableDefinitions: MutableList<SExpr> = arrayListOf()
+) {
     /**
      * Adds all constraints and definitions of `other` to this object.
      *
      * @param other object from which the constraints/definitions should be taken
      * @return this (now with added constraints/definitions)
      */
-    fun combine(other: SmtModel?): SmtModel {
-        addGlobalConstrains(other!!.globalConstraints)
-        addHeaderDefinitions(other.variableDefinitions)
+    fun combine(other: SmtModel): SmtModel {
+        globalConstraints.addAll(other.globalConstraints)
+        variableDefinitions.addAll(other.variableDefinitions)
         return this
     }
 
-    override val isAtom: Boolean
-        get() = false
+    fun toSexpr(): List<SExpr> {
+        val seq = ArrayList(variableDefinitions)
 
-    override fun toSexpr(): Sexp? {
-        val equivalentSList = SList().addAll(
-            variableDefinitions
-        )
-        globalConstraints.forEach(Consumer { constraint: SExpression ->
-            equivalentSList.addAll(SList("assert", constraint))
-        })
-        return equivalentSList.toSexpr()
+        globalConstraints.forEach {
+            seq.add(SList("assert", it))
+        }
+        return seq
     }
 
     /**
@@ -56,8 +40,9 @@ class SmtModel : SExpression {
      * @return definitions as string
      */
     fun headerToText(): String {
-        return distinctVariableDefinitions.stream().map { obj: SExpression? -> obj!!.toText() }
-            .collect(Collectors.joining(" \n "))
+        return distinctVariableDefinitions.joinToString("\n") {
+            it.toHuman()
+        }
     }
 
     /**
@@ -66,66 +51,24 @@ class SmtModel : SExpression {
      * @return constraints as string
      */
     fun globalConstraintsToText(): String {
-        return globalConstraints.stream().map { constr: SExpression -> SList("assert", constr) }
-            .map { obj: SList -> obj.toText() }.collect(Collectors.joining(" \n "))
+        return globalConstraints
+            .joinToString(" \n ") { SList("assert", it).toString() }
     }
 
-    override fun toText(): String {
-        return """${headerToText()} 
- ${globalConstraintsToText()}"""
+    fun toText(): String {
+        return "${headerToText()}\n${globalConstraintsToText()}"
     }
 
-    fun addGlobalConstrains(vararg globalConstraint: SExpression): SmtModel {
-        return addGlobalConstrains(listOf(*globalConstraint))
-    }
-
-    fun addGlobalConstrains(globalConstraints: Collection<SExpression>): SmtModel {
-        this.globalConstraints.addAll(globalConstraints)
+    fun addGlobalConstraint(c: SExpr): SmtModel {
+        this.globalConstraints.add(c)
         return this
     }
 
-    fun addHeaderDefinitions(vararg variableDefinition: SExpression): SmtModel {
-        return addHeaderDefinitions(Arrays.asList(*variableDefinition))
-    }
-
-    fun addHeaderDefinitions(variableDefinitions: Collection<SExpression>): SmtModel {
-        this.variableDefinitions.addAll(variableDefinitions)
+    fun addHeaderDefinition(c: SExpr): SmtModel {
+        this.variableDefinitions.add(c)
         return this
     }
 
-    val distinctVariableDefinitions: Set<SExpression?>
+    val distinctVariableDefinitions: Set<SExpr>
         get() = LinkedHashSet(variableDefinitions)
-
-    override fun toString(): String {
-        return ("SmtModel{\n" + "\tglobalConstraints=\n\t\t"
-                + globalConstraints.stream().map { obj: SExpression? -> obj.toString() }
-            .collect(Collectors.joining("\n\t\t"))
-                + ",\n\n\tvariableDefinitions=\n\t\t" + variableDefinitions.stream()
-            .map { obj: SExpression? -> obj.toString() }.collect(Collectors.joining("\n\t\t"))
-                + "\n}")
-    }
-
-    override fun equals(o: Any?): Boolean {
-        if (this === o) {
-            return true
-        }
-        if (o == null || javaClass != o.javaClass) {
-            return false
-        }
-
-        val that = o as SmtModel
-
-        if (if (globalConstraints != null) globalConstraints != that.globalConstraints
-            else that.globalConstraints != null
-        ) {
-            return false
-        }
-        return if (variableDefinitions != null) variableDefinitions == that.variableDefinitions else that.variableDefinitions == null
-    }
-
-    override fun hashCode(): Int {
-        var result = globalConstraints.hashCode()
-        result = 31 * result + variableDefinitions.hashCode()
-        return result
-    }
 }
