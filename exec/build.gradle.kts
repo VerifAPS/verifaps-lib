@@ -69,3 +69,7 @@ entrypoint("xml2st", "edu.kit.iti.formal.automation.Xml2TxtApp")
 application {
     applicationDistribution.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// Integration test requires the presence of the shell scripts
+val test by tasks.getting
+test.dependsOn(tasks.installDist)
