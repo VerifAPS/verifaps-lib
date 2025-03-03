@@ -1,12 +1,9 @@
 package edu.kit.iti.formal.automation
 
 import LoadHelp
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer
-import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import org.antlr.v4.runtime.CharStreams
-import org.antlr.v4.runtime.CommonTokenStream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.params.ParameterizedTest
@@ -17,7 +14,7 @@ object ProgramTest {
     @ParameterizedTest
     @MethodSource("getPrograms")
     fun testParser(testFile: Path) {
-        val lexer = IEC61131Lexer(CharStreams.fromPath(testFile))
+        //val lexer = IEC61131Lexer(CharStreams.fromPath(testFile))
         /*
         Vocabulary v = lexer.getVocabulary();
         for (Token t : lexer.getAllTokens()) {
@@ -26,10 +23,10 @@ object ProgramTest {
                     t.getCharPositionInLine());
         }
 */
-        val parser = IEC61131Parser(CommonTokenStream(lexer))
+        val parser = IEC61131Facade.getParser(CharStreams.fromPath(testFile))
         parser.addErrorListener(NiceErrorListener(testFile.toString()))
         val ctx = parser.start()
-        Assertions.assertEquals(0, parser.numberOfSyntaxErrors.toLong())
+        parser.errorReporter.throwException()
         val sl = ctx.accept(IECParseTreeToAST()) as PouElements
         Assertions.assertEquals(sl, sl.clone())
     }

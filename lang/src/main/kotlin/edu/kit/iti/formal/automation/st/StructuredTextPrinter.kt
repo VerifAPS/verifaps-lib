@@ -66,7 +66,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
                 sb.printf(", ")
         }
         sb.printf("] OF ")
-        sb.printf(arrayTypeDeclaration.baseType.identifier ?: "<missing>")
+        sb.printf(arrayTypeDeclaration.type.name)
     }
 
     override fun visit(stringTypeDeclaration: StringTypeDeclaration) {
@@ -349,9 +349,11 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         sb.keyword("INTERFACE ").printf(interfaceDeclaration.name)
 
-        val extendsInterfaces = interfaceDeclaration.interfaces.map { it.identifier }
-        if (!extendsInterfaces.isEmpty())
-            sb.keyword(" EXTENDS ").print(extendsInterfaces)
+        if (!interfaceDeclaration.interfaces.isEmpty()) {
+            sb.keyword(" EXTENDS ")
+            sb.print(
+                interfaceDeclaration.interfaces.joinToString(", ") { it.identifier!! })
+        }
 
         sb.increaseIndent().nl()
 
@@ -395,14 +397,14 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
     override fun visit(method: MethodDeclaration) {
         sb.keyword("METHOD ")
 
+        sb.printf(method.accessSpecifier.toString() + " ")
+
         if (method.isFinal)
             sb.keyword("FINAL ")
         if (method.isAbstract)
             sb.keyword("ABSTRACT ")
         if (method.isOverride)
             sb.keyword("OVERRIDE ")
-
-        sb.printf(method.accessSpecifier.toString() + " ")
 
         sb.printf(method.name)
 
@@ -574,7 +576,7 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         if (isPrintComments) {
             sb.nl()
             if ('\n' in commentStatement.comment) {
-                sb.comment(literals.comment_open()+ commentStatement.comment + literals.comment_close())
+                sb.comment(literals.comment_open() + commentStatement.comment + literals.comment_close())
             } else {
                 sb.comment("//%s\n", commentStatement.comment)
             }
