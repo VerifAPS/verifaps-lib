@@ -1,8 +1,10 @@
 package edu.kit.iti.formal.util
 
-public fun <K, V, A : Appendable> Map<K, V>.joinInto(buffer: A,
-                                                     separator: String = ",", prefix: String = "", postfix: String = "",
-                                                     transform: (K, V) -> Unit) {
+fun <K, V, A : Appendable> Map<K, V>.joinInto(
+    buffer: A,
+    separator: String = ",", prefix: String = "", postfix: String = "",
+    transform: (K, V) -> Unit
+) {
     val kv = entries.toList()
     buffer.append(prefix)
     if (isNotEmpty()) {
@@ -15,11 +17,13 @@ public fun <K, V, A : Appendable> Map<K, V>.joinInto(buffer: A,
     buffer.append(postfix)
 }
 
-public fun <T, A : Appendable> List<T>.joinInto(buffer: A,
-                                                separator: String = ",",
-                                                prefix: String = "",
-                                                postfix: String = "",
-                                                transform: (T) -> Unit) {
+fun <T, A : Appendable> List<T>.joinInto(
+    buffer: A,
+    separator: String = ",",
+    prefix: String = "",
+    postfix: String = "",
+    transform: (T) -> Unit
+) {
     buffer.append(prefix)
     if (isNotEmpty()) {
         for (i in 0 until size - 1) {
@@ -37,7 +41,7 @@ public fun <T, A : Appendable> List<T>.joinInto(buffer: A,
  * @author Alexander Weigl
  * @version 1 (14.07.18)
  */
-public operator fun CharSequence.times(i: Int): String {
+operator fun CharSequence.times(i: Int): String {
     if (i < 0) return ""
     val sb = StringBuilder()
     for (x in 1..i) {
@@ -49,7 +53,7 @@ public operator fun CharSequence.times(i: Int): String {
 /**
  * Centerizes a
  */
-public fun String.center(width: Int, c: Char = ' '): String {
+fun String.center(width: Int, c: Char = ' '): String {
     // width = 10, length = 7
     // ..1234567.
     val rem = width - length
@@ -64,5 +68,5 @@ public fun String.center(width: Int, c: Char = ' '): String {
 }
 
 operator fun Char.times(width: Int): String =
-        if (width <= 0) ""
-        else String(CharArray(width) { this })
+    if (width <= 0) ""
+    else String(CharArray(width) { this })
