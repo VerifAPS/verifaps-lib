@@ -15,8 +15,8 @@ kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ver
 kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
 kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-slf4jApi = { module = "org.slf4j:slf4j-api", version = "2.0.16" }
-slf4jSimple = { module = "org.slf4j:slf4j-simple", version = "2.0.16" }
+slf4jApi = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
+slf4jSimple = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }
 junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junitParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
