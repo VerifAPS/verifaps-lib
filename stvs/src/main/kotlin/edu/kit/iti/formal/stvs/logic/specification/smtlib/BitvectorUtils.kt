@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import edu.kit.iti.formal.smt.SAtom
+import edu.kit.iti.formal.smt.SSymbol
 import kotlin.math.pow
 
 /**
@@ -21,7 +23,7 @@ object BitvectorUtils {
      * @return hex representation with following format: #xABCD...
      */
     @JvmStatic
-    fun hexFromInt(integer: Int, length: Int): String {
+    fun hexFromInt(integer: Int, length: Int): SAtom {
         var integer = integer
         if (integer < 0) {
             integer += 16.0.pow(length.toDouble()).toInt()
@@ -31,7 +33,7 @@ object BitvectorUtils {
             result = HEX_CHARS[integer % 16].toString() + result
             integer /= 16
         }
-        return "#x$result"
+        return SSymbol("#x$result")
     }
 
     /**
@@ -42,16 +44,16 @@ object BitvectorUtils {
      * @return converted number
      */
     @JvmStatic
-    fun intFromHex(hex: String?, signed: Boolean): Int {
-        var hex = hex
-        require(!(hex == null || !hex.matches("\\#x[a-fA-F0-9]+".toRegex()))) { "hex does not match expected format" }
-        hex = hex.substring(2)
+    fun intFromHex(hex: String, signed: Boolean): Int {
+        require(hex.matches("#x[a-fA-F0-9]+".toRegex())) { "hex does not match expected format" }
+
+        var hexInt = hex.substring(2)
         var result = 0
-        for (i in 0 until hex.length) {
+        for (i in 0 until hexInt.length) {
             result *= 16
-            result += (hex[i].toString() + "").toInt(16)
+            result += (hexInt[i].toString() + "").toInt(16)
         }
-        val full = 16.0.pow(hex.length.toDouble()).toInt()
+        val full = 16.0.pow(hexInt.length.toDouble()).toInt()
         if (result >= full / 2 && signed) {
             result = -(full - result)
         }

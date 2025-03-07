@@ -12,5 +12,5 @@ fun interface ValueEnumHandler<R> {
      * @param value The value that the matched value represents
      * @return Object of type `R`
      */
-    fun handle(value: ValueEnum?): R
+    fun handle(value: ValueEnum): R
 }

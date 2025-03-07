@@ -119,9 +119,8 @@ class ResolveDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
                 }
                 is StringLit -> literal.dataType.resolve(scope::resolveDataType0)
                 is BitLit -> literal.dataType.resolve(scope::resolveDataType0)
-                is NullLit -> TODO()
                 is UnindentifiedLit -> TODO()
-                else -> {} // nohting todo, e.g., boolean literals
+                else -> {} // noting to-do, e.g., boolean literals, null literal
             }
         } catch (_: ClassCastException) {
         }

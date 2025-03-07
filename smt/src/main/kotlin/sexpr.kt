@@ -19,7 +19,10 @@ object SExprFacade {
 
     fun createParser(stream: String) = createParser(CharStreams.fromString(stream))
 
-    fun parse(stream: CharStream): ArrayList<SExpr> {
+    /**
+     * Parse the given input as a list of sexpr.
+     */
+    fun parse(stream: CharStream): List<SExpr> {
         val p = createParser(stream)
         val ctx = p.file()
         val t = SexprParseTreeTransformer()
@@ -55,4 +58,8 @@ object SExprFacade {
         return s
     }
 
+    fun fnapply(name: String, args: List<SExpr>) = SList(name).also { it.addAll(args) }
+
+    fun notEquals(left: SExpr, right: SExpr): SExpr =
+        SList("not", SList("=", left, right))
 }

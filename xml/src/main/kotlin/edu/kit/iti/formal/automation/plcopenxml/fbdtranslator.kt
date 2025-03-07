@@ -166,7 +166,7 @@ sealed class FbdNode(val block: Element, val network: FBDTranslator) {
         if (id.length > 5) {
             //This is a codesys assumption!
             if (id[1] != '0') throw IllegalStateException("I am not tested for more than 9 FBD networks!")
-            id[0].toInt() - 49
+            id[0].code - 49
         } else 0
     }
 
