@@ -23,6 +23,7 @@ package edu.kit.iti.formal.automation
  */
 
 import org.antlr.v4.runtime.*
+import kotlin.math.max
 
 /**
  * Created by weigl on 10/07/14.
@@ -33,12 +34,11 @@ class NiceErrorListener(private val content: String) : BaseErrorListener() {
                              offendingSymbol: Any?, line: Int, charPositionInLine: Int,
                              msg: String?, e: RecognitionException?) {
 
-        val lines = content.split("\n".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-        System.err.println(line.toString() + "@" + charPositionInLine)
+        val lines = content.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toList()
+        System.err.println("$line@$charPositionInLine")
         System.err.println((recognizer as Parser).ruleInvocationStack)
 
         var cur: RuleContext? = e!!.ctx
-        val p = recognizer as Parser?
         while (cur != null) {
             System.err.println(
                     cur.depth().toString() + " >> " + recognizer.ruleNames[cur
@@ -53,7 +53,7 @@ class NiceErrorListener(private val content: String) : BaseErrorListener() {
 
             if (i + 1 == line) {
                 System.err.print(">")
-                for (j in 0 until Math.max(0, charPositionInLine - 1)) {
+                for (j in 0 until max(0, charPositionInLine - 1)) {
                     print(' ')
                 }
                 println("^ " + msg!!)

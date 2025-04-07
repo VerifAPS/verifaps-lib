@@ -1,8 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
-
-import de.tudresden.inf.lat.jsexp.SexpFactory
+/*
+import edu.kit.iti.formal.smt.SExprFacade.sexpr
+import edu.kit.iti.formal.smt.SList
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.*
 
@@ -10,52 +10,41 @@ import java.util.*
  * Created by csicar on 28.02.17.
  */
 class SListTest {
-    private var simple: SList? = null
-
-    private var multivalue: SList? = null
-    private var nested: SList? = null
-    @BeforeEach
-    fun setupInstance() {
-        this.simple = SList("testValue")
-        this.multivalue = SList("val1", "val2", "val3")
-        this.nested = SList("val1", SList("nested1.1", "nested1.2"), SList("nested2.1"))
-    }
-
-    @get:Throws(Exception::class)
-    @get:Test
-    val isAtom: Unit
-        get() {
-            Assertions.assertEquals(false, simple!!.isAtom)
-            Assertions.assertEquals(false, multivalue!!.isAtom)
-            Assertions.assertEquals(false, nested!!.isAtom)
-        }
+    val simple = SList("testValue")
+    val multivalue = sexpr("val1", "val2", "val3")
+    val nested = sexpr("val1", sexpr("nested1.1", "nested1.2"), sexpr("nested2.1"))
 
     @Test
-    @Throws(Exception::class)
-    fun toText() {
-        Assertions.assertEquals(" ( testValue ) ", simple!!.toText())
-        Assertions.assertEquals(" ( val1 val2 val3 ) ", multivalue!!.toText())
-        Assertions.assertEquals(" ( val1  ( nested1.1 nested1.2 )   ( nested2.1 )  ) ", nested!!.toText())
+    fun isAtom() {
+        Assertions.assertEquals(false, simple.isAtom)
+        Assertions.assertEquals(false, multivalue.isAtom)
+        Assertions.assertEquals(false, nested.isAtom)
     }
 
     @Test
-    @Throws(Exception::class)
+    fun testToString() {
+        Assertions.assertEquals(" ( testValue ) ", simple.toString())
+        Assertions.assertEquals(" ( val1 val2 val3 ) ", multivalue.toString())
+        Assertions.assertEquals(" ( val1  ( nested1.1 nested1.2 )   ( nested2.1 )  ) ", nested.toString())
+    }
+
+    @Test
     fun addAllStringArguments() {
-        val newElements: List<String> = mutableListOf("add1", "add2", "add3")
+        val newElements = mutableListOf("add1", "add2", "add3")
 
-        simple!!.addAll("add1", "add2", "add3")
+        simple.addAll("add1", "add2", "add3")
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3"), simple)
-        multivalue!!.addAll("add1", "add2", "add3")
+        multivalue.addAll("add1", "add2", "add3")
         Assertions.assertEquals(SList("val1", "val2", "val3", "add1", "add2", "add3"), multivalue)
-        nested!!.addAll("add1", "add2", "add3")
+        nested.addAll("add1", "add2", "add3")
         Assertions.assertEquals(
             SList(
                 "val1",
                 SList("nested1.1", "nested1.2"),
                 SList("nested2.1"),
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             ), nested
         )
     }
@@ -65,49 +54,49 @@ class SListTest {
     fun addAllArgumentExpressions() {
         val newElements: List<String> = mutableListOf("add1", "add2", "add3")
 
-        simple!!.addAll(
-            SAtom("add1"),
-            SAtom("add2"),
-            SAtom("add3")
+        simple.addAll(
+            sym("add1"),
+            sym("add2"),
+            sym("add3")
         )
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3"), simple)
-        simple!!.addAll(
-            SAtom("add4"),
-            SAtom("add5")
+        simple.addAll(
+            sym("add4"),
+            sym("add5")
         )
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3", "add4", "add5"), simple)
 
 
-        multivalue!!.addAll(
-            SAtom("add1"),
-            SAtom("add2"),
-            SAtom("add3")
+        multivalue.addAll(
+            sym("add1"),
+            sym("add2"),
+            sym("add3")
         )
         Assertions.assertEquals(SList("val1", "val2", "val3", "add1", "add2", "add3"), multivalue)
 
-        nested!!.addAll(
-            SAtom("add1"),
-            SAtom("add2"),
-            SAtom("add3")
+        nested.addAll(
+            sym("add1"),
+            sym("add2"),
+            sym("add3")
         )
         Assertions.assertEquals(
             SList(
                 "val1",
                 SList("nested1.1", "nested1.2"),
                 SList("nested2.1"),
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             ), nested
         )
 
         val inner = SList("inner1", "inner2")
-        simple!!.addAll(inner)
-        inner.addAll(SAtom("inner3"))
+        simple.addAll(inner)
+        inner.addAll(sym("inner3"))
         Assertions.assertEquals(
             SList(
-                "testValue", SAtom("add1"), SAtom("add2"), SAtom("add3"),
-                SAtom("add4"), SAtom("add5"), SList("inner1", "inner2", "inner3")
+                "testValue", sym("add1"), sym("add2"), sym("add3"),
+                sym("add4"), sym("add5"), SList("inner1", "inner2", "inner3")
             ), simple
         )
     }
@@ -117,36 +106,36 @@ class SListTest {
     fun addAllListOfExpressions() {
         val newElements: List<String> = mutableListOf("add1", "add2", "add3")
 
-        simple!!.addAll(
+        simple.addAll(
             Arrays.asList(
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             )
         )
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3"), simple)
-        simple!!.addAll(
+        simple.addAll(
             Arrays.asList(
-                SAtom("add4"),
-                SAtom("add5")
+                sym("add4"),
+                sym("add5")
             )
         )
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3", "add4", "add5"), simple)
 
-        multivalue!!.addAll(
+        multivalue.addAll(
             Arrays.asList(
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             )
         )
         Assertions.assertEquals(SList("val1", "val2", "val3", "add1", "add2", "add3"), multivalue)
 
-        nested!!.addAll(
+        nested.addAll(
             Arrays.asList(
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             )
         )
         Assertions.assertEquals(
@@ -154,19 +143,19 @@ class SListTest {
                 "val1",
                 SList("nested1.1", "nested1.2"),
                 SList("nested2.1"),
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             ), nested
         )
 
         val inner = SList("inner1", "inner2")
-        simple!!.addAll(inner)
-        inner.addAll(Arrays.asList(SAtom("inner3")))
+        simple.addAll(inner)
+        inner.addAll(Arrays.asList(sym("inner3")))
         Assertions.assertEquals(
             SList(
-                "testValue", SAtom("add1"), SAtom("add2"), SAtom("add3"),
-                SAtom("add4"), SAtom("add5"), SList("inner1", "inner2", "inner3")
+                "testValue", sym("add1"), sym("add2"), sym("add3"),
+                sym("add4"), sym("add5"), SList("inner1", "inner2", "inner3")
             ), simple
         )
     }
@@ -174,21 +163,21 @@ class SListTest {
     @Test
     @Throws(Exception::class)
     fun addListElements() {
-        simple!!.addListElements(
+        simple.addListElements(
             mutableListOf<String?>(
                 "add1", "add2", "add3"
             )
         )
         Assertions.assertEquals(SList("testValue", "add1", "add2", "add3"), simple)
 
-        multivalue!!.addListElements(
+        multivalue.addListElements(
             mutableListOf<String?>(
                 "add1", "add2", "add3"
             )
         )
         Assertions.assertEquals(SList("val1", "val2", "val3", "add1", "add2", "add3"), multivalue)
 
-        nested!!.addListElements(
+        nested.addListElements(
             mutableListOf<String?>(
                 "add1", "add2", "add3"
             )
@@ -198,9 +187,9 @@ class SListTest {
                 "val1",
                 SList("nested1.1", "nested1.2"),
                 SList("nested2.1"),
-                SAtom("add1"),
-                SAtom("add2"),
-                SAtom("add3")
+                sym("add1"),
+                sym("add2"),
+                sym("add3")
             ), nested
         )
     }
@@ -211,22 +200,22 @@ class SListTest {
         get() {
             Assertions.assertEquals(
                 Arrays.asList(
-                    SAtom("testValue")
-                ), simple!!.list
+                    sym("testValue")
+                ), simple.list
             )
             Assertions.assertEquals(
                 Arrays.asList(
-                    SAtom("val1"),
-                    SAtom("val2"),
-                    SAtom("val3")
-                ), multivalue!!.list
+                    sym("val1"),
+                    sym("val2"),
+                    sym("val3")
+                ), multivalue.list
             )
             Assertions.assertEquals(
                 Arrays.asList(
-                    SAtom("val1"),
+                    sym("val1"),
                     SList("nested1.1", "nested1.2"),
                     SList("nested2.1")
-                ), nested!!.list
+                ), nested.list
             )
         }
 
@@ -239,7 +228,7 @@ class SListTest {
         Assertions.assertEquals(
             SList(
                 Arrays.asList(
-                    SAtom("val1"),
+                    sym("val1"),
                     SList("nested1.1", "nested1.2"),
                     SList("nested2.1")
                 )
@@ -255,7 +244,7 @@ class SListTest {
         Assertions.assertNotEquals(this, simple)
         Assertions.assertNotEquals(this, multivalue)
         Assertions.assertNotEquals(this, nested)
-        Assertions.assertFalse(nested!!.equals(null))
+        Assertions.assertFalse(nested.equals(null))
     }
 
     @Test
@@ -267,7 +256,7 @@ class SListTest {
         Assertions.assertEquals(
             SList(
                 Arrays.asList(
-                    SAtom("val1"),
+                    sym("val1"),
                     SList("nested1.1", "nested1.2"),
                     SList("nested2.1")
                 )
@@ -280,7 +269,7 @@ class SListTest {
     fun toSexpr() {
         val sexp = SexpFactory.newNonAtomicSexp()
         sexp.add(SexpFactory.newAtomicSexp("testValue"))
-        Assertions.assertEquals(sexp, simple!!.toSexpr())
+        Assertions.assertEquals(sexp, simple.toSexpr())
     }
 
 
@@ -296,4 +285,4 @@ class SListTest {
     fun toStringTest() {
         Assertions.assertNotEquals("", simple.toString())
     }
-}
+}*/

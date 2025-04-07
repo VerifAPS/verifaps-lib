@@ -53,7 +53,6 @@ dependencies {
     implementation("jaxen:jaxen:2.0.0")
 
     implementation("com.google.code.gson:gson:2.12.1")
-    implementation("de.tu-dresden.inf.lat.jsexp:jsexp:0.2.2")
 
     implementation("org.fxmisc.cssfx:cssfx:11.2.2")
     implementation(project(":fxutils"))

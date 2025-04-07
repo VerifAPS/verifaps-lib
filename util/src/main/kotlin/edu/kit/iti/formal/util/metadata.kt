@@ -38,6 +38,7 @@ class Metadata {
     private var metadata: HashMap<String, Any>? = null
 
     fun <T> get(clazz: Class<T>): T? = get(clazz.name)
+    @Suppress("UNCHECKED_CAST")
     fun <T> get(key: String): T? = metadata?.get(key) as T?
     fun <T : Any?> set(clazz: Class<T>, obj: T) = set(clazz.name, obj)
     fun <T : Any?> set(key: String, obj: T) {

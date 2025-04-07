@@ -165,8 +165,10 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
         return quantified
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <E : SMVAst> List<E>.visitAll(): MutableList<E> =
-            map { it.accept(this@SMVAstMutableVisitor) as E }.toMutableList()
+            map { it.accept(this@SMVAstMutableVisitor) as E }
+                .toMutableList()
 }
 
 class VariableReplacer(val map: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {

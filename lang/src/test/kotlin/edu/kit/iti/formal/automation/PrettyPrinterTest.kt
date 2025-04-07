@@ -71,6 +71,7 @@ object PrettyPrinterTest {
             System.err.println(
                     e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n")
             )
+            Assertions.fail("Re-parsing the printed output results into an error\n-----\n$printed")
         } finally {
            //System.err.println(printed)
         }
