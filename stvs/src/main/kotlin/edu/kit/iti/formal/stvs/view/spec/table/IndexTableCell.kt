@@ -1,14 +1,16 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.table.HybridRow
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.beans.value.ChangeListener
 import javafx.beans.value.ObservableValue
-import javafx.scene.control.*
+import javafx.scene.control.TableCell
+import javafx.scene.control.TableView
+import javafx.scene.control.Tooltip
 import javafx.scene.text.Text
 import javafx.scene.text.TextAlignment
 import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 
 /**
@@ -17,7 +19,6 @@ import org.kordamp.ikonli.javafx.FontIcon
  */
 class IndexTableCell(private val tableView: TableView<*>?) : TableCell<HybridRow?, String?>() {
     private val icon: Text = FontIcon(FontAwesomeRegular.FILE_CODE)
-    private val tooltip = Tooltip()
 
     /**
      * IndexTableCell
@@ -25,13 +26,15 @@ class IndexTableCell(private val tableView: TableView<*>?) : TableCell<HybridRow
      * displaying the comment icon.
      */
     init {
+        tooltip = Tooltip("")
+
         val indexChangeListener =
             ChangeListener { observableValue: ObservableValue<out Number>?, oldIndex: Number?, newIndexNumber: Number ->
                 val newIndex = newIndexNumber.toInt()
                 if (newIndex < 0) {
                     return@ChangeListener
                 }
-                icon.visibleProperty().bind(getCommentPropertyByIndex(newIndex)!!.isEmpty().not())
+                icon.visibleProperty().bind(getCommentPropertyByIndex(newIndex).isEmpty().not())
                 tooltip.textProperty().bind(getCommentPropertyByIndex(newIndex))
             }
         indexChangeListener.changed(null, 0, this.index)
@@ -39,8 +42,8 @@ class IndexTableCell(private val tableView: TableView<*>?) : TableCell<HybridRow
 
         this.graphic = icon
         this.textAlignment = TextAlignment.RIGHT
-        this.setTooltip(tooltip)
     }
+
 
     private fun getCommentPropertyByIndex(index: Int): StringProperty {
         if (tableView == null || index < 0 || index >= tableView.items.size) {

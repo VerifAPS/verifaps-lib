@@ -29,7 +29,7 @@ class GeTeTaImporterTest {
     @Test
     @Throws(Exception::class)
     fun testDoImportCounterexample() {
-        val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = Arrays.asList(TypeInt, TypeBool)
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
             File(
                 StvsApplication::class.java.getResource(
@@ -61,7 +61,7 @@ class GeTeTaImporterTest {
     @Throws(ImportException::class)
     fun testDoImportVerified() {
         val typeContext = Arrays.asList(
-            TypeInt.INT, TypeBool.BOOL, enumOfName(
+            TypeInt, TypeBool, enumOfName(
                 "enumD", "literalOne", "literalTwo"
             )
         )
@@ -82,7 +82,7 @@ class GeTeTaImporterTest {
     @Test
     @Throws(ImportException::class)
     fun testDoImportUnknownStatus() {
-        val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = Arrays.asList(TypeInt, TypeBool)
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
             StvsApplication::class.java.getResourceAsStream(
                 "testSets/problematic_1/constraint_spec_unknown_error_1.xml"
@@ -104,7 +104,7 @@ class GeTeTaImporterTest {
     @Test(expected = ImportException::class)
     @Throws(ImportException::class)
     fun testDoImportInvalidXML() {
-        val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = Arrays.asList(TypeInt, TypeBool)
         val result = importVerificationResult(
             this.javaClass
                 .getResourceAsStream("report_illegal_xml_1.xml"), ImporterFacade.ImportFormat.GETETA,

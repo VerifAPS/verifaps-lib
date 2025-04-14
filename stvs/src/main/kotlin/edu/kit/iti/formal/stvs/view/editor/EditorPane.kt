@@ -1,13 +1,15 @@
 package edu.kit.iti.formal.stvs.view.editor
 
-import edu.kit.iti.formal.stvs.model.code.*
+import edu.kit.iti.formal.stvs.model.code.SyntaxError
 import edu.kit.iti.formal.stvs.view.ViewUtils
-import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.geometry.Orientation
 import javafx.scene.Node
-import javafx.scene.control.*
+import javafx.scene.control.Label
+import javafx.scene.control.ListView
+import javafx.scene.control.SplitPane
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.HBox
 import org.fxmisc.richtext.CodeArea
 import org.fxmisc.richtext.LineNumberFactory

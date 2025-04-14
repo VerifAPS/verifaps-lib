@@ -67,7 +67,8 @@ class Code {
             return
         }
 
-        ParsedCode.parseCode(sourcecode,
+        ParsedCode.parseCode(
+            sourcecode,
             { col -> tokens.setAll(col) },
             { col -> syntaxErrors.setAll(col) },
             { newValue -> parsedCode = newValue })

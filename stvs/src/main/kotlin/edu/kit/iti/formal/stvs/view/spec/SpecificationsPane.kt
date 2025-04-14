@@ -4,7 +4,9 @@ import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.Tab
+import javafx.scene.control.TabPane
 import javafx.scene.layout.AnchorPane
 
 /**

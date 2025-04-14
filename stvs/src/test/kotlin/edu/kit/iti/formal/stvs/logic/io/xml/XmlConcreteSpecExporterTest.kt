@@ -23,7 +23,7 @@ class XmlConcreteSpecExporterTest {
         val json: JsonElement =
             JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest::class.java)
         val typeContext =
-            listOf(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
+            listOf(TypeInt, TypeBool, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec =
             ImporterFacade.importConcreteSpec(loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"), typeContext)
         val result = TestUtils.stringOutputStream { exporter.export(concreteSpec, it) }

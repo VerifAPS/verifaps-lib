@@ -231,7 +231,7 @@ class TimingDiagramController : Controller {
                 globalXAxis,
                 yaxis, concreteSpec, specIoVar, selection, activated
             )
-            return timingDiagramController to  yaxis
+            return timingDiagramController to yaxis
         }
 
         /**
@@ -259,7 +259,7 @@ class TimingDiagramController : Controller {
                 globalXAxis,
                 boolCategoryAxis, concreteSpec, specIoVar, selection, activated
             )
-            return timingDiagramController to  boolCategoryAxis
+            return timingDiagramController to boolCategoryAxis
         }
 
         /**

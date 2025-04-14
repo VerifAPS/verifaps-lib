@@ -1,7 +1,10 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
 import edu.kit.iti.formal.stvs.model.common.Selection
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Expression
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool
+import edu.kit.iti.formal.stvs.model.expressions.TypeCheckException
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell
 
 /**
@@ -41,7 +44,7 @@ data class CellTypeProblem(val exception: TypeCheckException, override val colum
         ): Expression {
             try {
                 val type = typeChecker.typeCheck(expr)
-                if (type!!.checksAgainst(TypeBool.Companion.BOOL)) {
+                if (type!!.checksAgainst(TypeBool)) {
                     return expr
                 } else {
                     throw CellTypeProblem(

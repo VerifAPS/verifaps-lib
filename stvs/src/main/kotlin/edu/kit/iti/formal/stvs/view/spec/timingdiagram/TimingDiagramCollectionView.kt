@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram
 
 import edu.kit.iti.formal.stvs.view.ViewUtils
-import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionView
 import javafx.beans.Observable
 import javafx.beans.value.ObservableValue
 import javafx.event.ActionEvent
@@ -12,8 +11,10 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.text.TextAlignment
-import javafx.stage.*
-import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
+import javafx.stage.Modality
+import javafx.stage.Stage
+import javafx.stage.StageStyle
+import javafx.stage.WindowEvent
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 

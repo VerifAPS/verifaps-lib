@@ -1,22 +1,24 @@
 package edu.kit.iti.formal.stvs.view
 
-import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.model.StvsRootModel
-import edu.kit.iti.formal.stvs.model.code.*
+import edu.kit.iti.formal.stvs.model.code.Code
+import edu.kit.iti.formal.stvs.model.code.ParsedCode
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
-import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
 import edu.kit.iti.formal.stvs.util.ProcessCreationException
-import edu.kit.iti.formal.stvs.view.StvsRootView
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
 import edu.kit.iti.formal.stvs.view.editor.EditorPaneController
-import edu.kit.iti.formal.stvs.view.spec.*
-import javafx.beans.property.*
+import edu.kit.iti.formal.stvs.view.spec.SpecificationsPaneController
+import edu.kit.iti.formal.stvs.view.spec.VerificationEvent
+import javafx.beans.property.ListProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.scene.control.Alert.AlertType
 import java.io.IOException
-import java.util.*
 
 /**
  * The root controller. Manages the largest-scale view of the application (see
@@ -121,7 +123,7 @@ class StvsRootController(
 
     private fun typesFromCode(parsedCode: ParsedCode?): List<Type> {
         if (parsedCode == null) {
-            return Arrays.asList(TypeInt.INT, TypeBool.BOOL)
+            return listOf(TypeInt, TypeBool)
         }
         return parsedCode.definedTypes
     }

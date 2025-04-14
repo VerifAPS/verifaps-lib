@@ -56,8 +56,8 @@ object JsonTableParser {
         val concreteSpec = ConcreteSpecification(isCounterExample)
 
         val typeContext: MutableList<Type> = ArrayList()
-        typeContext.add(TypeInt.INT)
-        typeContext.add(TypeBool.BOOL)
+        typeContext.add(TypeInt)
+        typeContext.add(TypeBool)
         typeContext.addAll(types!!)
         val typesByName = typeContext.stream()
             .collect(Collectors.toMap(Type::typeName, Function.identity()))
@@ -165,8 +165,8 @@ object JsonTableParser {
 
     private fun typeFromString(input: String): Type {
         return when (input) {
-            "INT" -> TypeInt.INT
-            "BOOL" -> TypeBool.BOOL
+            "INT" -> TypeInt
+            "BOOL" -> TypeBool
             else -> TypeEnum(input, emptyList())
         }
     }

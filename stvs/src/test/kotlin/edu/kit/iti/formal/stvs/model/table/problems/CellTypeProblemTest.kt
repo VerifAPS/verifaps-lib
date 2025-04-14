@@ -1,10 +1,7 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
 import edu.kit.iti.formal.stvs.model.expressions.*
-
 import edu.kit.iti.formal.stvs.model.table.problems.CellTypeProblem.Companion.tryTypeCheckCellExpression
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,7 +26,7 @@ class CellTypeProblemTest {
     @Test
     @Throws(Exception::class)
     fun tryTypeCheckCellExpression() {
-        val typeMap = mapOf("A" to TypeInt.INT, "B" to TypeBool.BOOL)
+        val typeMap = mapOf("A" to TypeInt, "B" to TypeBool)
         val typeChecker = TypeChecker(typeMap)
         val problematicCell = SimpleExpressions.and(SimpleExpressions.literal(2), SimpleExpressions.literal(true))
         try {

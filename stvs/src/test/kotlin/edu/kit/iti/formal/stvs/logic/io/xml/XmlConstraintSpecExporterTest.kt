@@ -31,7 +31,7 @@ class XmlConstraintSpecExporterTest {
             CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "Active")
         )
 
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = listOf(TypeInt, TypeBool)
         val testSpec = JsonTableParser.constraintTableFromJson(testjson)
         val resultString = TestUtils.stringOutputStream { exporter.export(testSpec, it) }
         val expectedString = this.javaClass.getResourceAsStream("spec_constraint_valid_1.xml")!!.reader().readText()

@@ -30,7 +30,6 @@ import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 import edu.kit.iti.formal.automation.visitors.Visitable
 import edu.kit.iti.formal.automation.visitors.Visitor
 import java.util.*
-import kotlin.collections.ArrayList
 
 interface ITraversal<T> {
     val visitor: Visitor<T>
@@ -954,7 +953,7 @@ abstract class AstVisitor<T> : DefaultVisitorNN<T>() {
     }
 }
 
-open abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
+abstract class AstVisitorWithScope<T> : AstVisitor<T>() {
     protected lateinit var scope: Scope
     override fun visit(localScope: Scope): T {
         scope = localScope

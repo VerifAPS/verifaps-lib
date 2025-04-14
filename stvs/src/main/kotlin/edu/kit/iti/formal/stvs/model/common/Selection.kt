@@ -8,16 +8,11 @@ import java.util.*
  * This class is used to represent a selected area in a specification table (a col,row-Tuple for a
  * cell, a column, or a row). It is generated (and used) when the user hovers over an area in the
  * timing diagram and represents the corresponding area in the table.
- *
- * @author Leon Kaucher
- */
-class Selection
-/**
- * Create a new Selection for a given column and row.
  * @param column The selected column
  * @param row The selected row
+ * @author Leon Kaucher
  */
-    (column: String? = null, row: Int? = null) {
+class Selection(column: String? = null, row: Int? = null) {
 
     val columnProperty = NullableProperty<String?>(column)
     var column: String? by columnProperty

@@ -63,7 +63,7 @@ class ElementBuilder(val e: Element, val ns: Namespace? = null) {
     }
 
     operator fun Any.unaryPlus(): String {
-        e.setText(this.toString())
+        e.text = this.toString()
         return this.toString()
     }
 

@@ -7,10 +7,8 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeFactory.enumOfName
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import org.junit.jupiter.api.Assertions
-
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 
 /**
  * Created by bal on 25.02.17.
@@ -36,7 +34,7 @@ class HybridRowTest {
             Assertions.assertEquals(0, cell.counterExamplesProperty.size)
         }
         Assertions.assertEquals(0, hybridRow!!.duration.counterExamplesProperty.size)
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
+        val typeContext = listOf(TypeInt, TypeBool, enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             loadFromTestSets("/valid_1/concrete_spec_valid_1.xml")!!, typeContext
         )

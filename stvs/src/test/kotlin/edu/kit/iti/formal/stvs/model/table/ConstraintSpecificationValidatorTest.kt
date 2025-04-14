@@ -6,7 +6,6 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
 import javafx.beans.property.SimpleListProperty
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import tornadofx.asObservable
@@ -32,7 +31,7 @@ class ConstraintSpecificationValidatorTest {
     fun testProblems(testfile: String) {
         val testJson = JsonTableParser.jsonFromResource(testfile, ConstraintSpecificationValidatorTest::class.java)
         val codeIoVariables = JsonTableParser.codeIoVariablesFromJson(testJson).asObservable()
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL).asObservable()
+        val typeContext = listOf(TypeInt, TypeBool).asObservable()
         val freeVars = JsonTableParser.freeVariableSetFromJson(testJson)
 
         val testSpec = JsonTableParser.constraintTableFromJson(testJson)

@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.view.JavaFxTest
 import javafx.application.Application
 import javafx.scene.Scene
@@ -9,6 +8,7 @@ import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 

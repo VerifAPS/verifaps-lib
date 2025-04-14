@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
-import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.logic.io.ImportException
+import edu.kit.iti.formal.stvs.logic.io.Importer
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.input.JDOMParseException
@@ -11,7 +12,10 @@ import org.jdom2.input.sax.XMLReaderJDOMFactory
 import org.jdom2.input.sax.XMLReaderXSDFactory
 import org.xml.sax.Attributes
 import org.xml.sax.SAXException
-import java.io.*
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.Reader
 import java.net.URL
 import javax.xml.XMLConstants
 import javax.xml.parsers.ParserConfigurationException
@@ -101,14 +105,14 @@ abstract class XmlImporter<T> : Importer<T> {
                     override fun startPrefixMapping(prefix: String, uri: String) {
                     }
                 }
-            };
+            }
 
 
             val readerFactory: XMLReaderJDOMFactory = XMLReaderXSDFactory(xsdResource)
             val sax = SAXBuilder(readerFactory)
             assert(readerFactory.isValidating)
 
-            sax.setSAXHandlerFactory(factory);
+            sax.saxHandlerFactory = factory
             sax.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "")
             sax.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "")
             return sax.build(source)

@@ -3,7 +3,6 @@ package edu.kit.iti.formal.stvs.model.table
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import javafx.beans.Observable
 import javafx.util.Callback
-import java.util.*
 
 /**
  *
@@ -52,7 +51,13 @@ class ConcreteSpecification(
         ioVariables: List<ValidIoVariable>,
         rows: List<SpecificationRow<ConcreteCell>>, durations: List<ConcreteDuration>,
         isCounterExample: Boolean
-    ) : this(DEFAULT_NAME, ioVariables.toMutableList(), rows.toMutableList(), durations.toMutableList(), isCounterExample)
+    ) : this(
+        DEFAULT_NAME,
+        ioVariables.toMutableList(),
+        rows.toMutableList(),
+        durations.toMutableList(),
+        isCounterExample
+    )
 
     /**
      * Construct a new ConcreteSpecification with given name, column headers, rows and durations.
@@ -150,7 +155,6 @@ class ConcreteSpecification(
         result = 31 * result + durations.hashCode()
         return result
     }
-
 
 
     companion object {

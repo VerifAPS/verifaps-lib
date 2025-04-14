@@ -9,6 +9,7 @@ package edu.kit.iti.formal.stvs.model.table
 class ConcreteDuration(beginCycle: Int, duration: Int) {
     @JvmField
     val duration: Int
+
     @JvmField
     val beginCycle: Int
 

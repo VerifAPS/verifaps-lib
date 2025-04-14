@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io
 
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 
 /**
  * Interface for all classes concerned with exporting model objects to some output format.

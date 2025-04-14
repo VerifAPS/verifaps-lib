@@ -84,7 +84,7 @@ class SmtEncoder(
             val variableName = ioVariable.name
             // Iterate over Rows
             for (z in column.cells.indices) {
-                val expression = column.cells[z]
+                column.cells[z]
                 // Add n_x to const declaration
                 constraint.addHeaderDefinition(
                     SList("declare-const", sym("n_$z"), TYPE_BV_16)

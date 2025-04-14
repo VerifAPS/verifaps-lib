@@ -2,7 +2,8 @@ package edu.kit.iti.formal.stvs.model.table.problems
 
 import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval
-import edu.kit.iti.formal.stvs.model.expressions.parser.*
+import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser
+import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException
 import edu.kit.iti.formal.stvs.model.table.ConstraintDuration
 
 /**

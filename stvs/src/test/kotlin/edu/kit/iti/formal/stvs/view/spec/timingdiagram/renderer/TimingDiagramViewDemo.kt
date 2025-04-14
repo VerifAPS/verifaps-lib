@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.view.JavaFxTest
 import javafx.scene.Scene
 import org.junit.Ignore
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.util.function.Supplier
 

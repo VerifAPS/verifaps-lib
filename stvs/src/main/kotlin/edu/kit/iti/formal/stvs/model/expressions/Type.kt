@@ -18,7 +18,11 @@ sealed interface Type {
     fun <R> match(
         matchIntType: TypeIntegerHandler<R>, matchBoolType: TypeBooleanHandler<R>,
         matchEnumType: TypeEnumHandler<R>
-    ): R?
+    ): R = when (this) {
+        is TypeBool -> matchBoolType.handle()
+        is TypeInt -> matchIntType.handle()
+        is TypeEnum -> matchEnumType.handle(this)
+    }
 
     /**
      * Finds out whether this type checks against another type, which means any value of this type can

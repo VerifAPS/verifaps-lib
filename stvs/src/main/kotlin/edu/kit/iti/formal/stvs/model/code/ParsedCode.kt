@@ -1,21 +1,16 @@
 package edu.kit.iti.formal.stvs.model.code
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.IEC61131Facade.file
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
-import edu.kit.iti.formal.automation.datatypes.DataTypeVisitor
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
-import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.expressions.TypeBool
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
 import edu.kit.iti.formal.stvs.model.expressions.TypeInt
-import org.antlr.v4.runtime.ANTLRInputStream
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 
@@ -42,8 +37,8 @@ data class ParsedCode
         val definedTypes = arrayListOf<Type>()
 
         init {
-            definedTypes.add(TypeBool.BOOL)
-            definedTypes.add(TypeInt.INT)
+            definedTypes.add(TypeBool)
+            definedTypes.add(TypeInt)
         }
 
         override fun visit(typeDeclarations: TypeDeclarations) {
@@ -71,7 +66,7 @@ data class ParsedCode
         val definedVariables = arrayListOf<CodeIoVariable>()
 
         override fun visit(programDeclaration: ProgramDeclaration) {
-            programDeclaration.scope.variables.forEach{
+            programDeclaration.scope.variables.forEach {
                 // String varName = variableEntry.getKey();
                 val category = getCategoryFromDeclaration(it)
                 val dataTypeName = it.dataType?.name
@@ -178,7 +173,7 @@ data class ParsedCode
          * @return The AST constructed from the token stream
          */
         private fun parse(tokenStream: CharStream, syntaxErrorListener: SyntaxErrorListener): PouElements {
-            val (pous, errors) =  fileResolve(tokenStream, true)
+            val (pous, _) = fileResolve(tokenStream, true)
             return pous
         }
 
@@ -193,7 +188,7 @@ data class ParsedCode
             input: String, parsedTokenHandler: ParsedTokenHandler,
             syntaxErrorListener: SyntaxErrorListener
         ): IEC61131Lexer {
-            val lexer = IEC61131Lexer(ANTLRInputStream(input))
+            val lexer = IEC61131Lexer(CharStreams.fromString(input))
             lexer.removeErrorListeners()
             lexer.addErrorListener(syntaxErrorListener)
             parsedTokenHandler.accept(lexer.allTokens)

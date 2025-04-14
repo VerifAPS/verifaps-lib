@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 
-<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<session xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
          xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../session.xsd">
     <code>
         <plaintaASext>TYPE

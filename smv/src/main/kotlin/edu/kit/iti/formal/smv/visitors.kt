@@ -160,8 +160,8 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
 
     override fun visit(quantified: SQuantified): SMVExpr {
         quantified.quantified = quantified.quantified
-                .map({ it.accept(this) as SMVExpr })
-                .toMutableList()
+                .map { it.accept(this) as SMVExpr }
+            .toMutableList()
         return quantified
     }
 
@@ -184,7 +184,7 @@ open class ExpressionReplacer(protected val assignments: Map<out SMVExpr, SMVExp
         return if (a == null)
             super.visit(x) as SMVExpr
         else {
-            changed = true;
+            changed = true
             a
         }
     }
@@ -274,9 +274,9 @@ open class ExpressionReplacerRecur(val assignments: Map<out SMVExpr, SMVExpr>) :
     }
 
     override fun visit(v: SVariable): SMVExpr = replace(v)
-    override fun visit(v: SBinaryExpression): SMVExpr = replace(v) as SMVExpr
-    override fun visit(v: SUnaryExpression): SMVExpr = (replace(v)) as SMVExpr
-    override fun visit(v: SLiteral): SMVExpr = (replace(v)) as SMVExpr
-    override fun visit(v: SFunction): SMVExpr = (replace(v)) as SMVExpr
-    override fun visit(v: SQuantified): SMVExpr = (replace(v)) as SMVExpr
+    override fun visit(v: SBinaryExpression): SMVExpr = replace(v)
+    override fun visit(v: SUnaryExpression): SMVExpr = replace(v)
+    override fun visit(v: SLiteral): SMVExpr = replace(v)
+    override fun visit(v: SFunction): SMVExpr = replace(v)
+    override fun visit(v: SQuantified): SMVExpr = replace(v)
 }

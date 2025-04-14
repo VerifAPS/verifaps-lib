@@ -25,7 +25,7 @@ class PositiveIntegerInputField : TextField() {
         valid.addListener { _, _, value: Boolean ->
             this.onValidStateChange(value)
         }
-        alignmentProperty().setValue(Pos.CENTER_RIGHT)
+        alignmentProperty().value = Pos.CENTER_RIGHT
         ViewUtils.setupClass(this)
     }
 

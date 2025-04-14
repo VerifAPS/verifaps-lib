@@ -1,11 +1,12 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
 import javafx.application.Platform
-import javafx.beans.property.*
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
 import javafx.event.EventHandler
 import javafx.scene.Node
-import javafx.scene.input.*
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.AnchorPane
 
 /**

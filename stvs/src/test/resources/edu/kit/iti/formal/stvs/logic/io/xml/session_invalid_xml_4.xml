@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 
-<session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<session xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://formal.iti.kit.edu/stvs/io/1.0/"
          xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../session.xsd">
     <code>
         <plaintext>TYPE
@@ -59,7 +59,7 @@
                 </enumTypes>
             </specification>
         </tab>
-        <tab  open="true" readOnly="true">
+        <tab open="true" readOnly="true">
             <specification isConcrete="false" comment="I am a table comment!">
                 <variables>
                     <ioVariable io="input" name="R" data-type="INT" colwidth="10"></ioVariable>

@@ -1,15 +1,19 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import javafx.application.Platform
-import javafx.beans.property.*
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.value.ObservableValue
 import javafx.event.EventHandler
-import javafx.scene.control.*
+import javafx.scene.control.TableCell
+import javafx.scene.control.TableColumn
+import javafx.scene.control.TableView
+import javafx.scene.control.TextField
 import javafx.scene.control.cell.TextFieldTableCell
-import javafx.scene.input.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 import javafx.util.Callback
 import javafx.util.StringConverter
-import javafx.util.converter.DefaultStringConverter
 
 /**
  * Created by Lukas on 13.07.2017.
@@ -17,19 +21,22 @@ import javafx.util.converter.DefaultStringConverter
 open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter: StringConverter<T>? = null) :
     TableCell<S, T>() {
 
-    var textField: TextField?=null
+    var textField: TextField? = null
 
     fun setUp() {
         textField?.onKeyPressed = EventHandler { t: KeyEvent ->
             when (t.code) {
                 KeyCode.ENTER ->
                     commitEdit(converter.get()!!.fromString(textField?.text))
+
                 KeyCode.ESCAPE ->
                     cancelEdit()
+
                 KeyCode.TAB -> {
                     commitEdit(converter.get()!!.fromString(textField?.text))
                     selectNextTableCell(!t.isShiftDown)
                 }
+
                 else -> {}
             }
         }
@@ -63,7 +70,7 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
         if (columns.size < 2) {
             return null
         }
-        val currentIndex = columns.indexOf(getTableColumn())
+        val currentIndex = columns.indexOf(tableColumn)
         var nextIndex = currentIndex
         if (forward) {
             nextIndex++

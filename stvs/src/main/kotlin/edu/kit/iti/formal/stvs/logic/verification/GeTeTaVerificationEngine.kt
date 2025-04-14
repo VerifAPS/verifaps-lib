@@ -2,7 +2,10 @@ package edu.kit.iti.formal.stvs.logic.verification
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
-import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.datatypes.AnyBit
+import edu.kit.iti.formal.automation.datatypes.AnyDt
+import edu.kit.iti.formal.automation.datatypes.EnumerateType
+import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.algorithms.MultiModelGluer
 import edu.kit.iti.formal.automation.testtables.model.*
@@ -10,7 +13,7 @@ import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import edu.kit.iti.formal.smv.CounterExample
 import edu.kit.iti.formal.smv.NuXMVOutput
 import edu.kit.iti.formal.smv.SMVTypes
-import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.model.code.ParsedCode
 import edu.kit.iti.formal.stvs.model.common.*
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
@@ -18,7 +21,10 @@ import edu.kit.iti.formal.stvs.model.expressions.*
 import edu.kit.iti.formal.stvs.model.expressions.parser.computeEnumValuesByName
 import edu.kit.iti.formal.stvs.model.table.*
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
-import edu.kit.iti.formal.stvs.model.verification.*
+import edu.kit.iti.formal.stvs.model.verification.Counterexample
+import edu.kit.iti.formal.stvs.model.verification.VerificationError
+import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
+import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess
 import edu.kit.iti.formal.stvs.util.ProcessCreationException
 import javafx.application.Platform
 import javafx.beans.property.SimpleListProperty
@@ -26,9 +32,9 @@ import org.antlr.v4.runtime.CharStreams
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import tornadofx.asObservable
-import java.io.*
+import java.io.File
 import java.io.FileNotFoundException
-import java.util.*
+import java.io.IOException
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -70,10 +76,10 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
      */
     @Throws(IOException::class, ExportException::class, ProcessCreationException::class)
     override fun startVerification(scenario: VerificationScenario, spec: ConstraintSpecification) {
-        val (pous, error) = IEC61131Facade.fileResolve(CharStreams.fromString(scenario.code.sourcecode), true)
+        val (pous, _) = IEC61131Facade.fileResolve(CharStreams.fromString(scenario.code.sourcecode), true)
 
         val code = pous.findFirstProgram() ?: error("No program found")
-        val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
+        val (_, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
 
 

@@ -1,7 +1,9 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
-import javafx.scene.control.*
+import javafx.scene.control.Button
+import javafx.scene.control.ButtonType
+import javafx.scene.control.Dialog
 import javafx.util.Callback
 
 /**

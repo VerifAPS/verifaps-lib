@@ -1,11 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException
-import edu.kit.iti.formal.stvs.model.*
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.common.VariableRole
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.model.expressions.Value
 import edu.kit.iti.formal.stvs.model.table.*
 import org.jdom2.Element
 import java.io.IOException
@@ -46,7 +46,7 @@ class XmlConcreteSpecImporter(private val typeContext: List<Type>) : XmlImporter
             val dt = variable.getAttributeValue("data-type")
             val type = typeContext.find { t: Type -> t.typeName == dt } ?: error("Unknown variable type: $dt")
             val name = variable.getAttributeValue("name")
-            val role = variable.getAttributeValue("role")
+            variable.getAttributeValue("role")
                 ?.let { v -> VariableRole.entries.firstOrNull { it.name == v } }
                 ?: category.defaultRole
             ValidIoVariable(category, name, type, category.defaultRole)

@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io
 
-import java.io.*
+import java.io.InputStream
 
 /**
  * An Interface for all classes concerned with importing model objects from some import format.

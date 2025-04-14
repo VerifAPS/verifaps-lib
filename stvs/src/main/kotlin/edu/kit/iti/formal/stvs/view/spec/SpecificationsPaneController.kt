@@ -4,11 +4,11 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.verification.VerificationScenario
 import edu.kit.iti.formal.stvs.model.verification.VerificationState
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
 import javafx.beans.binding.Bindings
 import javafx.beans.property.ListProperty
 import javafx.beans.property.ObjectProperty
@@ -17,7 +17,10 @@ import javafx.collections.ObservableList
 import javafx.event.ActionEvent
 import javafx.event.Event
 import javafx.event.EventHandler
-import javafx.scene.control.*
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.MenuItem
+import javafx.scene.control.Tab
+import javafx.scene.control.TextInputDialog
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 

@@ -31,8 +31,8 @@ class VariableCollectionDemo {
 
     private fun variableViewScene(): List<Node?> {
         val types = listOf(
-            TypeInt.INT,
-            TypeBool.BOOL,
+            TypeInt,
+            TypeBool,
             TypeEnum("COLORS", mutableListOf("red", "green", "blue"))
         )
         val vars = arrayListOf(FreeVariable("blah", "INT"), FreeVariable("xyz", "BOOL"))

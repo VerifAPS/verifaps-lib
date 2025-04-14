@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.roundTripTests
 
-import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
+import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.logic.io.xml.TestUtils
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import org.junit.jupiter.api.Assertions
@@ -8,8 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import java.io.IOException
-import java.net.URISyntaxException
 
 /**
  * @author Benjamin Alt

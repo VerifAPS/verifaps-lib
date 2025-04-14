@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.table.Commentable
-import javafx.event.ActionEvent
 import javafx.event.EventHandler
 import javafx.scene.Node
 

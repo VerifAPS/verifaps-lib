@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.editor
 
-import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.TestUtils.loadCodeFromFile
 import edu.kit.iti.formal.stvs.model.code.Code
 import edu.kit.iti.formal.stvs.model.code.SyntaxError
@@ -12,6 +11,7 @@ import javafx.scene.Node
 import javafx.scene.control.TextArea
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.util.function.Consumer
 

@@ -12,6 +12,7 @@ import tornadofx.setValue
  */
 class FreeVariableList {
     private val variablesProperty = SimpleListProperty<FreeVariable>(FXCollections.observableArrayList())
+
     /**
      * Get the [ObservableList] of free variables. This list is "deeply observable", meaning
      * that changes to the properties of the [FreeVariable]s it contains cause change events

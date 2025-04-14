@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import edu.kit.iti.formal.smt.SAtom
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smt.SExprFacade
 import edu.kit.iti.formal.smt.SList

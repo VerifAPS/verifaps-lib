@@ -28,7 +28,7 @@ class XmlSessionImporterTest {
             StvsApplication::class.java.getResourceAsStream("testSets/valid_1/constraint_spec_valid_1.xml")!!
         )
 
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
+        val typeContext = listOf(TypeInt, TypeBool, enumOfName("enumD", "literalOne", "literalTwo"))
         val concreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             StvsApplication::class.java.getResourceAsStream("testSets/valid_1/concrete_spec_valid_1.xml")!!,
             typeContext
@@ -36,8 +36,8 @@ class XmlSessionImporterTest {
         hybridSpec.concreteInstance = concreteSpec
         Assertions.assertEquals(hybridSpec, importedSession.hybridSpecifications[0])
         val code =
-                StvsApplication::class.java.getResourceAsStream("testSets/valid_1/code_valid_1.st")!!
-                    .reader().readText()
+            StvsApplication::class.java.getResourceAsStream("testSets/valid_1/code_valid_1.st")!!
+                .reader().readText()
 
         Assertions.assertEquals(
             code.replace("\\s+".toRegex(), " ").trim(),

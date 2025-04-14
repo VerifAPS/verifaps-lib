@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.model.expressions
 
 import edu.kit.iti.formal.stvs.model.common.IoVariable
 import edu.kit.iti.formal.stvs.model.table.StringReadable
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
 
 /**
  *

@@ -4,8 +4,6 @@ import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.builder.minimum
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval
-import org.antlr.v4.runtime.*
-import java.util.*
 
 /**
  * A class for parsing fixed interval expressions like <tt>[1,-]</tt> or <tt>[1,5]</tt>, defined by

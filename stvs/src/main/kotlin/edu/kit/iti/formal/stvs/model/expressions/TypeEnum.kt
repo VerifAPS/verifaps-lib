@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import java.util.*
 import java.util.function.Consumer
 
 /**
@@ -35,15 +34,9 @@ class TypeEnum(enumTypeName: String, values: List<String>) : Type {
         })
     }
 
-    override fun <R> match(
-        matchIntType: TypeIntegerHandler<R>, matchBoolType: TypeBooleanHandler<R>,
-        matchEnumType: TypeEnumHandler<R>
-    ): R? = matchEnumType.handle(this)
-
-    override fun checksAgainst(other: Type): Boolean {
-        return other.match({ false }, { false },
-            { otherEnum: TypeEnum? -> otherEnum!!.typeName == typeName })!!
-    }
+    override fun checksAgainst(other: Type): Boolean = other.match(
+        { false }, { false },
+        { otherEnum: TypeEnum? -> otherEnum!!.typeName == typeName })
 
     override fun parseLiteral(literal: String): Value? = valueMap[literal]
 

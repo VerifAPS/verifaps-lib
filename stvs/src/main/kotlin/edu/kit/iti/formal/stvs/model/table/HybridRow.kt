@@ -1,10 +1,8 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import javafx.beans.Observable
 import javafx.collections.MapChangeListener
 import javafx.util.Callback
-import java.util.*
 import java.util.stream.Collectors
 
 /**

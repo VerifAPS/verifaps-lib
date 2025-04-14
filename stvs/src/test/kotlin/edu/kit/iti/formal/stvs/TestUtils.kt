@@ -45,8 +45,8 @@ object TestUtils {
 
     fun importValidSpec(source: InputStream, vararg enumTypes: TypeEnum): ValidSpecification {
         val typeContext: MutableList<Type> = ArrayList()
-        typeContext.add(TypeInt.INT)
-        typeContext.add(TypeBool.BOOL)
+        typeContext.add(TypeInt)
+        typeContext.add(TypeBool)
         for (enumType in enumTypes) {
             typeContext.add(enumType)
         }
@@ -80,8 +80,8 @@ object TestUtils {
 
     fun importValidFreeVariables(source: InputStream, vararg enumTypes: TypeEnum): List<ValidFreeVariable> {
         val typeContext: MutableList<Type> = ArrayList()
-        typeContext.add(TypeInt.INT)
-        typeContext.add(TypeBool.BOOL)
+        typeContext.add(TypeInt)
+        typeContext.add(TypeBool)
         for (enumType in enumTypes) {
             typeContext.add(enumType)
         }

@@ -1,8 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
-import edu.kit.iti.formal.stvs.model.*
-import edu.kit.iti.formal.stvs.model.table.*
+import edu.kit.iti.formal.stvs.model.StvsRootModel
 import org.jdom2.CDATA
 import org.jdom2.Element
 

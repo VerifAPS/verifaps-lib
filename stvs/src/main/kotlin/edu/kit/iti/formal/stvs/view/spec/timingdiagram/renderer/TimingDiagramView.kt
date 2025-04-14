@@ -9,7 +9,8 @@ import javafx.collections.ObservableList
 import javafx.scene.chart.Axis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
-import javafx.scene.control.*
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.Pane
 import javafx.scene.shape.Line
 import javafx.scene.shape.Rectangle
@@ -47,7 +48,7 @@ class TimingDiagramView<A>(private val xaxis: NumberAxis, private val yaxis: Axi
         ViewUtils.setupView(this)
 
         val seriesObservableList = FXCollections.observableArrayList<Series<Number?, A>>()
-        setData(seriesObservableList)
+        data = seriesObservableList
         seriesObservableList.addListener { _: Observable? ->
             Platform.runLater { this@TimingDiagramView.requestRelayout() }
         }

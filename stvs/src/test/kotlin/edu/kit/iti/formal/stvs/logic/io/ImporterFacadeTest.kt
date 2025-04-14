@@ -8,7 +8,9 @@ import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.code.Code
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.TypeBool
+import edu.kit.iti.formal.stvs.model.expressions.TypeFactory
+import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.*
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
 import edu.kit.iti.formal.stvs.model.verification.VerificationSuccess
@@ -16,7 +18,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
 
 /**
  * @author Benjamin Alt
@@ -48,7 +49,7 @@ class ImporterFacadeTest {
     @Test
     fun importConcreteSpecFile() {
         val file = XmlConcreteSpecImporter::class.java.getResourceAsStream("spec_concrete_valid_1.xml")!!
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = listOf(TypeInt, TypeBool)
         val importedSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(file, typeContext)
         val json: JsonElement =
             JsonTableParser.jsonFromResource("concrete_spec.json", ConcreteSpecificationTest::class.java)
@@ -90,7 +91,7 @@ class ImporterFacadeTest {
     @Disabled
     fun importVerificationResult() {
         val typeContext =
-            listOf(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
+            listOf(TypeInt, TypeBool, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
             loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")
         )
@@ -104,7 +105,7 @@ class ImporterFacadeTest {
     @Disabled
     fun importVerificationResultBadFormat() {
         val typeContext =
-            listOf(TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
+            listOf(TypeInt, TypeBool, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val constraintSpec: ConstraintSpecification =
             ImporterFacade.importConstraintSpec(loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
         ImporterFacade.importVerificationResult(

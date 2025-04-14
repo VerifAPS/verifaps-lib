@@ -7,6 +7,6 @@ package edu.kit.iti.formal.stvs.model.expressions
  */
 data class GuardedExpression(
     val branches: List<Pair<Expression, Expression>>,
-) : Expression(){
+) : Expression() {
     override fun <R> accept(visitor: ExpressionVisitor<R>): R = visitor.visit(this)
 }

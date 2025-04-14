@@ -6,7 +6,8 @@ import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.beans.binding.Bindings
 import javafx.geometry.Pos
-import javafx.scene.control.*
+import javafx.scene.control.Label
+import javafx.scene.control.Tooltip
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import java.util.*

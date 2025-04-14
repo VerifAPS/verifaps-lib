@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import java.util.*
-
 /**
  * Helper class for quickly creating values of [TypeEnum].
  *

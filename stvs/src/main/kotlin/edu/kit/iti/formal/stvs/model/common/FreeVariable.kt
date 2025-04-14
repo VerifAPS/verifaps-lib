@@ -1,7 +1,8 @@
 package edu.kit.iti.formal.stvs.model.common
 
 import javafx.beans.Observable
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.util.Callback
 import tornadofx.getValue
 import tornadofx.setValue

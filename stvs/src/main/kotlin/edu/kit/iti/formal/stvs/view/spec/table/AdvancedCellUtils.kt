@@ -95,22 +95,22 @@ object AdvancedCellUtils {
         choiceBox: ChoiceBox<T>?
     ) {
         if (cell.isEmpty) {
-            cell.setText(null)
-            cell.setGraphic(null)
+            cell.text = null
+            cell.graphic = null
         } else {
             if (cell.isEditing) {
                 choiceBox?.selectionModel?.select(cell.item)
-                cell.setText(null)
+                cell.text = null
 
                 if (graphic != null) {
                     hbox!!.children.setAll(graphic, choiceBox)
-                    cell.setGraphic(hbox)
+                    cell.graphic = hbox
                 } else {
-                    cell.setGraphic(choiceBox)
+                    cell.graphic = choiceBox
                 }
             } else {
                 cell.text = getItemText(cell, converter)
-                cell.setGraphic(graphic)
+                cell.graphic = graphic
             }
         }
     }
@@ -154,8 +154,8 @@ object AdvancedCellUtils {
         textField: TextField?
     ) {
         if (cell.isEmpty) {
-            cell.setText(null)
-            cell.setGraphic(null)
+            cell.text = null
+            cell.graphic = null
         } else {
             if (cell.isEditing) {
                 if (textField != null) {
@@ -165,13 +165,13 @@ object AdvancedCellUtils {
 
                 if (graphic != null) {
                     hbox!!.children.setAll(graphic, textField)
-                    cell.setGraphic(hbox)
+                    cell.graphic = hbox
                 } else {
-                    cell.setGraphic(textField)
+                    cell.graphic = textField
                 }
             } else {
                 cell.text = getItemText<T>(cell, converter)
-                cell.setGraphic(graphic)
+                cell.graphic = graphic
             }
         }
     }
@@ -190,9 +190,9 @@ object AdvancedCellUtils {
 
         if (graphic != null) {
             hbox!!.children.setAll(graphic, textField)
-            cell.setGraphic(hbox)
+            cell.graphic = hbox
         } else {
-            cell.setGraphic(textField)
+            cell.graphic = textField
         }
 
         textField!!.selectAll()
@@ -248,22 +248,22 @@ object AdvancedCellUtils {
         comboBox: ComboBox<T>?
     ) {
         if (cell.isEmpty) {
-            cell.setText(null)
-            cell.setGraphic(null)
+            cell.text = null
+            cell.graphic = null
         } else {
             if (cell.isEditing) {
                 comboBox?.selectionModel?.select(cell.item)
-                cell.setText(null)
+                cell.text = null
 
                 if (graphic != null) {
                     hbox!!.children.setAll(graphic, comboBox)
-                    cell.setGraphic(hbox)
+                    cell.graphic = hbox
                 } else {
-                    cell.setGraphic(comboBox)
+                    cell.graphic = comboBox
                 }
             } else {
                 cell.text = getItemText<T>(cell, converter)
-                cell.setGraphic(graphic)
+                cell.graphic = graphic
             }
         }
     }

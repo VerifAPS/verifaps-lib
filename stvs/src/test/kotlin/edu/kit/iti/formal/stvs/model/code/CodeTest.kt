@@ -59,8 +59,8 @@ class CodeTest {
 
         val myEnum: Type = TypeEnum("MY_ENUM", mutableListOf("possible", "values", "enum"))
         val expectedDefinedTypes: MutableSet<Type> = HashSet()
-        expectedDefinedTypes.add(TypeBool.BOOL)
-        expectedDefinedTypes.add(TypeInt.INT)
+        expectedDefinedTypes.add(TypeBool)
+        expectedDefinedTypes.add(TypeInt)
         expectedDefinedTypes.add(myEnum)
         TestUtils.assertCollectionsEqual(expectedDefinedTypes, parsed.definedTypes)
     }
@@ -83,7 +83,8 @@ class CodeTest {
         Truth.assertThat(parsed.definedVariables.toSet()).isEqualTo(expectedVariables)
     }
 
-    @Test @Disabled //TODO later check
+    @Test
+    @Disabled //TODO later check
     fun testParsedCodeBlocks() {
         val expectedBlock = FoldableCodeBlock(5, 27)
         val pcode = enumDefinition.parsedCode!!

@@ -1,11 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io
 
-import edu.kit.iti.formal.stvs.*
+import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ExecutableLocator.findExecutableFile
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.*
 
 /**
  * Created by csicar on 20.07.17.

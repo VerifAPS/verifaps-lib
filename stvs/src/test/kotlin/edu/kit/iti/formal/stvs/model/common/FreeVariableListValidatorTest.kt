@@ -20,7 +20,7 @@ class FreeVariableListValidatorTest {
     @MethodSource("parameters")
     fun testRevalidate(expectedProblem: String, variables: List<FreeVariable>) {
         val typeContext = SimpleListProperty(
-            FXCollections.observableArrayList(TypeInt.INT, TypeBool.BOOL)
+            FXCollections.observableArrayList(TypeInt, TypeBool)
         )
         val validator = FreeVariableListValidator(typeContext, FreeVariableList(variables.toMutableList()))
         checkProblems(expectedProblem, variables, validator)

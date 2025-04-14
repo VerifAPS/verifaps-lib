@@ -1,22 +1,11 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification
 
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.logic.io.xml.XmlImporter
+import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
-import edu.kit.iti.formal.stvs.model.table.*
-import edu.kit.iti.formal.stvs.model.*
-import edu.kit.iti.formal.stvs.logic.*
-import edu.kit.iti.formal.stvs.logic.io.ImportException
-import edu.kit.iti.formal.stvs.logic.io.xml.*
-import edu.kit.iti.formal.stvs.model.verification.*
+import edu.kit.iti.formal.stvs.model.verification.VerificationResult
 import org.jdom2.Element
-import java.io.File
-import java.io.IOException
 import java.net.URL
-import java.util.regex.Pattern
-import javax.xml.transform.TransformerException
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 
 /**
  * Provides functionality to import the output of the GeTeTa verification engine.
@@ -332,11 +321,11 @@ class GeTeTaImporter(private val typeContext: List<Type>, constraintSpec: Constr
 //            }
 //            currentValues[varName] = ValueInt(intVal)
 //            if (!varTypes.containsKey(varName)) {
-//                varTypes[varName] = TypeInt.INT
+//                varTypes[varName] = TypeInt
 //            }
 //        } else if (BOOL_VALUE_PATTERN.matcher(varValue).matches()) {
 //            if (!varTypes.containsKey(varName)) {
-//                varTypes[varName] = TypeBool.BOOL
+//                varTypes[varName] = TypeBool
 //            }
 //            if (varValue == "TRUE") {
 //                currentValues[varName] = ValueBool.TRUE

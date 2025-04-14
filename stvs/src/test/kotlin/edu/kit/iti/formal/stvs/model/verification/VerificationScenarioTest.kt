@@ -1,6 +1,7 @@
 package edu.kit.iti.formal.stvs.model.verification
 
-import edu.kit.iti.formal.stvs.*
+import edu.kit.iti.formal.stvs.StvsApplication
+import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
@@ -23,7 +24,6 @@ import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
 import java.util.*
-import kotlin.concurrent.Volatile
 
 /**
  * Created by bal on 26.02.17.
@@ -44,7 +44,8 @@ class VerificationScenarioTest {
         scenario = VerificationScenario()
         code = importStCode(File(StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI()))
         constraintSpec = ImporterFacade.importConstraintSpec(
-            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")
+        )
         scenario.code = code
         config = autoloadConfig()
     }
@@ -101,7 +102,7 @@ class VerificationScenarioTest {
             observableValue: ObservableValue<out VerificationResult>,
             old: VerificationResult, newResult: VerificationResult
         ) {
-            val typeContext = Arrays.asList(TypeInt.INT, TypeBool.BOOL, enumOfName("enumD", "literalOne", "literalTwo"))
+            val typeContext = Arrays.asList(TypeInt, TypeBool, enumOfName("enumD", "literalOne", "literalTwo"))
             try {
                 val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
                     loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),

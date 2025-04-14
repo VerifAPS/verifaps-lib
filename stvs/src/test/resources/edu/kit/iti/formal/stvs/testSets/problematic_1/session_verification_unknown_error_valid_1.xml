@@ -28,10 +28,10 @@
         <tab id="0" open="false" readOnly="false">
             <specification isConcrete="false" name="TestSpec">
                 <variables>
-                    <ioVariable data-type="INT" io="output" name="I" colwidth="100.0" />
-                    <ioVariable data-type="INT" io="output" name="J" colwidth="100.0" />
-                    <ioVariable data-type="INT" io="output" name="SUM" colwidth="187.0" />
-                    <ioVariable data-type="BOOL" io="input" name="FLAG" colwidth="100.0" />
+                    <ioVariable data-type="INT" io="output" name="I" colwidth="100.0"/>
+                    <ioVariable data-type="INT" io="output" name="J" colwidth="100.0"/>
+                    <ioVariable data-type="INT" io="output" name="SUM" colwidth="187.0"/>
+                    <ioVariable data-type="BOOL" io="input" name="FLAG" colwidth="100.0"/>
                 </variables>
                 <rows>
                     <row comment="">

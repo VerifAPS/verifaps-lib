@@ -1,17 +1,14 @@
 package edu.kit.iti.formal.stvs.view.menu
 
-import edu.kit.iti.formal.stvs.logic.io.*
+import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.BooleanProperty
-import javafx.beans.property.IntegerProperty
-import javafx.beans.property.LongProperty
-import javafx.beans.property.ObjectProperty
-import javafx.beans.property.StringProperty
-import javafx.scene.control.*
+import javafx.beans.property.*
 import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.ButtonType
+import javafx.scene.control.Dialog
 import javafx.util.Callback
 import java.io.IOException
 

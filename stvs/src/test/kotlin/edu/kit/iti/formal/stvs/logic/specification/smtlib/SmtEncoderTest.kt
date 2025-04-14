@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
 import edu.kit.iti.formal.smt.SExpr
-import edu.kit.iti.formal.stvs.*
+import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ImportException
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlSessionImporterTest
 import edu.kit.iti.formal.stvs.model.expressions.TypeEnum
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.io.IOException
-import java.util.*
 import kotlin.test.assertFailsWith
 
 /**

@@ -119,7 +119,7 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
                     // handle rootModel
                     rootModel.workingdir = file.getParentFile()
                     rootModel.filename = file.getName()
-                    this.rootModel.setValue(rootModel)
+                    this.rootModel.value = rootModel
                 }, (ImportCodeHandler { code: Code ->
                     // handle code
                     rootModel.get().scenario.code = code

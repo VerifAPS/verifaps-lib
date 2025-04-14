@@ -288,10 +288,10 @@ class RandomTableGenerator {
     private fun randomType(): Type {
         val randomInt = random.nextInt(10)
         if (randomInt < 3) {
-            return TypeInt.INT
+            return TypeInt
         }
         if (randomInt < 6) {
-            return TypeBool.BOOL
+            return TypeBool
         }
         return randomEnumType()
     }

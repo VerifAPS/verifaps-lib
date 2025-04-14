@@ -1,16 +1,19 @@
 package edu.kit.iti.formal.stvs.view.editor
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
-import edu.kit.iti.formal.stvs.model.code.*
+import edu.kit.iti.formal.stvs.model.code.Code
 import edu.kit.iti.formal.stvs.model.code.ParsedCode.Companion.parseCode
+import edu.kit.iti.formal.stvs.model.code.SyntaxError
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
 import javafx.application.Platform
 import javafx.concurrent.Task
 import javafx.event.Event
 import javafx.event.EventHandler
-import javafx.scene.control.*
-import javafx.scene.input.*
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.MenuItem
+import javafx.scene.control.SeparatorMenuItem
+import javafx.scene.input.KeyEvent
 import org.antlr.v4.runtime.Token
 import org.fxmisc.richtext.model.StyleSpans
 import org.fxmisc.richtext.model.StyleSpansBuilder

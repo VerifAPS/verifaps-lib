@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="no"?>
 
-<session xmlns="http://formal.iti.kt.edu/stvs/logic/io/xml"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://formal.iti.kit.edu/stvs/io/1.0/ ../session.xsd">
+<session xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://formal.iti.kt.edu/stvs/logic/io/xml"
+         xsi:schemaLocation="">
     <code>
         <plaintext>TYPE
             enumD : (literalOne, literalTwo);

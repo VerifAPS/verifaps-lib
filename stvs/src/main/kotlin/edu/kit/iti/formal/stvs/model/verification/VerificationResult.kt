@@ -2,8 +2,6 @@ package edu.kit.iti.formal.stvs.model.verification
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
-import java.io.*
-import java.util.*
 
 /**
  * The result of a verification (created by a
@@ -76,7 +74,8 @@ data class VerificationError(
 class Counterexample(
     val specification: ConstraintSpecification,
     val counterexample: ConcreteSpecification,
-    override val log: String) : VerificationResult() {
+    override val log: String
+) : VerificationResult() {
     /**
      * Create a new Counterexample from a given [ConcreteSpecification] and a log file.
      * @param counterexample The concrete specification (counterexample)

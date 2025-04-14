@@ -4,7 +4,10 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.scene.Node
 import javafx.scene.control.*
-import javafx.scene.layout.*
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
+import javafx.scene.layout.Region
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 
@@ -20,7 +23,7 @@ class VariableCollection : TitledPane() {
     val typeTableColumn: TableColumn<FreeVariable, String> = TableColumn("Type")
     val constraintTableColumn: TableColumn<FreeVariable, String> = TableColumn("Constraint")
 
-    private val content = BorderPane()
+    private val root = BorderPane()
     private val toolBar = ToolBar()
     val btnRemoveRow: Button = Button(
         "Remove Rows",
@@ -61,9 +64,9 @@ class VariableCollection : TitledPane() {
         //this.overviewLabel.getStyleClass().addAll("freevar", "overview-label");
         freeVariableTableView.styleClass.addAll("freevar", "variable-table-view")
         freeVariableTableView.prefHeight = 100.0
-        setContent(content)
-        content.center = freeVariableTableView
-        content.top = toolBar
+        content = root
+        root.center = freeVariableTableView
+        root.top = toolBar
 
         btnAddRow.contentDisplay = ContentDisplay.GRAPHIC_ONLY
         btnRemoveRow.contentDisplay = ContentDisplay.GRAPHIC_ONLY

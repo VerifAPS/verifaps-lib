@@ -4,7 +4,6 @@ import com.google.gson.JsonElement
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecificationValidatorTest
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser
-import junit.framework.TestCase
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.io.File

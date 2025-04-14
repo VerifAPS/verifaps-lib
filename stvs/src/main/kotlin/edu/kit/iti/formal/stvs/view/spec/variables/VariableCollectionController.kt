@@ -4,8 +4,8 @@ import edu.kit.iti.formal.stvs.model.common.FreeVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.FreeVariableListValidator
 import edu.kit.iti.formal.stvs.model.common.FreeVariableProblem
-import edu.kit.iti.formal.stvs.model.expressions.*
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.view.Controller
 import edu.kit.iti.formal.stvs.view.spec.variables.clipboard.Json
 import javafx.beans.Observable
 import javafx.beans.property.ListProperty

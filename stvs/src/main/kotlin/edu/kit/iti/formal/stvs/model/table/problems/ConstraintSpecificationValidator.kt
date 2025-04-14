@@ -1,18 +1,20 @@
 package edu.kit.iti.formal.stvs.model.table.problems
 
-import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
-import edu.kit.iti.formal.stvs.model.common.FreeVariableList
-import edu.kit.iti.formal.stvs.model.common.NullableProperty
-import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
-import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.model.expressions.Expression
+import edu.kit.iti.formal.stvs.model.expressions.LowerBoundedInterval
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.model.expressions.TypeChecker
 import edu.kit.iti.formal.stvs.model.table.ConstraintCell
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.SpecificationRow
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import javafx.beans.InvalidationListener
 import javafx.beans.Observable
-import javafx.beans.property.*
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ListProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.getValue

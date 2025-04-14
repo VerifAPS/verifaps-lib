@@ -9,8 +9,6 @@ import edu.kit.iti.formal.stvs.model.expressions.ValueInt
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
-import kotlin.NoSuchElementException
 import kotlin.test.assertFailsWith
 
 /**
@@ -25,7 +23,7 @@ class ConcreteSpecificationTest {
     fun setUp() {
         concreteSpec = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_valid_1.xml")!!,
-            listOf(TypeInt.INT, TypeBool.BOOL)
+            listOf(TypeInt, TypeBool)
         )
     }
 
@@ -88,12 +86,12 @@ class ConcreteSpecificationTest {
     fun testEquals() {
         val identicalSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_valid_1.xml")!!,
-            listOf(TypeInt.INT, TypeBool.BOOL)
+            listOf(TypeInt, TypeBool)
         )
         Assertions.assertEquals(identicalSpec, concreteSpec)
         val differentSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_empty.xml")!!,
-            listOf(TypeInt.INT, TypeBool.BOOL)
+            listOf(TypeInt, TypeBool)
         )
         Assertions.assertNotEquals(differentSpec, concreteSpec)
         Assertions.assertNotEquals(null, concreteSpec)

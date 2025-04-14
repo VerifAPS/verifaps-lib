@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.table
 
-import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
@@ -25,6 +24,7 @@ import javafx.scene.control.TextArea
 import javafx.scene.layout.Pane
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import tornadofx.asObservable
 import java.io.PrintWriter
@@ -41,7 +41,7 @@ class SpecificationTableDemo {
     }
 
     private fun simpleTableScene(): List<Node?> {
-        val types = listOf(TypeInt.INT, TypeBool.BOOL)
+        val types = listOf(TypeInt, TypeBool)
         val codevars = listOf(
             CodeIoVariable(VariableCategory.INPUT, "BOOL", "A"),
             CodeIoVariable(VariableCategory.INPUT, "INT", "B"),

@@ -1,11 +1,8 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.verification
 
-import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlExporter
-import edu.kit.iti.formal.stvs.model.common.Variable
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import org.jdom2.Element
-import org.w3c.dom.Node
 
 /**
  * Exporter for communication with the GeTeTa verification engine. Provides functionality for

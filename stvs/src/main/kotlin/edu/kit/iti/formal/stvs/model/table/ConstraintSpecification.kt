@@ -3,7 +3,7 @@ package edu.kit.iti.formal.stvs.model.table
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import javafx.beans.Observable
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
 import javafx.beans.value.ChangeListener
 import javafx.util.Callback
 
@@ -14,7 +14,8 @@ import javafx.util.Callback
  * @author Benjamin Alt
  */
 open class ConstraintSpecification(name: String, val freeVariableList: FreeVariableList) :
-    SpecificationTable<SpecIoVariable, ConstraintCell, ConstraintDuration>(name,
+    SpecificationTable<SpecIoVariable, ConstraintCell, ConstraintDuration>(
+        name,
         Callback<SpecIoVariable, Array<Observable>> { columnHeader: SpecIoVariable ->
             arrayOf(columnHeader.nameProperty, columnHeader.typeProperty, columnHeader.categoryProperty)
         },

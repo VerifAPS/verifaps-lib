@@ -1,23 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
-  <general>
-    <uiLanguage>bogusLanguage</uiLanguage>
-    <windowSize>
-      <width>1566</width>
-      <height>884</height>
-      <maximized>false</maximized>
-    </windowSize>
-    <verificationTimeout>10</verificationTimeout>
-    <simulationTimeout>60</simulationTimeout>
-    <maxLineRollout>36</maxLineRollout>
-  </general>
-  <editor>
-    <showLineNumbers>true</showLineNumbers>
-    <fontFamily>Courier</fontFamily>
-    <fontSize>12</fontSize>
-  </editor>
-  <dependencies>
-    <z3Path>/opt/z3-4.5.0-x64-ubuntu-14.04/bin/z3</z3Path>
-    <getetaCommand>java -jar /opt/geteta/geteta-0.4.1-exe.jar -c ${code} -t ${spec} -x</getetaCommand>
-    <nuxmvFilename>/opt/nuXmv-1.1.1-Linux/bin/nuXmv</nuxmvFilename>
-  </dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
+    <general>
+        <uiLanguage>bogusLanguage</uiLanguage>
+        <windowSize>
+            <width>1566</width>
+            <height>884</height>
+            <maximized>false</maximized>
+        </windowSize>
+        <verificationTimeout>10</verificationTimeout>
+        <simulationTimeout>60</simulationTimeout>
+        <maxLineRollout>36</maxLineRollout>
+    </general>
+    <editor>
+        <showLineNumbers>true</showLineNumbers>
+        <fontFamily>Courier</fontFamily>
+        <fontSize>12</fontSize>
+    </editor>
+    <dependencies>
+        <z3Path>/opt/z3-4.5.0-x64-ubuntu-14.04/bin/z3</z3Path>
+        <getetaCommand>java -jar /opt/geteta/geteta-0.4.1-exe.jar -c ${code} -t ${spec} -x</getetaCommand>
+        <nuxmvFilename>/opt/nuXmv-1.1.1-Linux/bin/nuXmv</nuxmvFilename>
+    </dependencies>
 </config>

@@ -2,7 +2,6 @@ package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
-import edu.kit.iti.formal.stvs.util.ListTypeConverter.makeObservableList
 import javafx.beans.property.ListProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.ObservableList
@@ -41,7 +40,7 @@ class IoVariableChooserDialog(
             )
         }
         val makeObservableList = codeIoVariables
-        ioVariables.setItems(makeObservableList)
+        ioVariables.items = makeObservableList
         ioVariables.prefHeight = 200.0
 
         resultConverter = Callback { buttonType: ButtonType -> this.convertResult(buttonType) }

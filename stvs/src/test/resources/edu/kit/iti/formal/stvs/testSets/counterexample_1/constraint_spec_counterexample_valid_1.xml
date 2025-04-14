@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false" name="Unnamed Specification">
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" comment="" isConcrete="false"
+               name="Unnamed Specification">
     <variables>
-        <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="171.0" />
-        <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="172.0" />
-        <ioVariable data-type="INT" io="input" name="neg_val" colwidth="172.0" />
-        <freeVariable name="freeVarA" data-type="INT" default="-" />
-        <freeVariable name="freeVarB" data-type="BOOL" default="TRUE" />
+        <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="171.0"/>
+        <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="172.0"/>
+        <ioVariable data-type="INT" io="input" name="neg_val" colwidth="172.0"/>
+        <freeVariable name="freeVarA" data-type="INT" default="-"/>
+        <freeVariable name="freeVarB" data-type="BOOL" default="TRUE"/>
     </variables>
     <rows>
         <row comment="">

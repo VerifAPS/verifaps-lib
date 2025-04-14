@@ -1,10 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.verification
 
-import javafx.beans.property.*
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
 import tornadofx.getValue
 import tornadofx.setValue
 import java.io.IOException
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**

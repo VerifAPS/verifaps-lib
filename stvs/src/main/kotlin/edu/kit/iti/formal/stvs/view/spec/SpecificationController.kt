@@ -2,9 +2,11 @@ package edu.kit.iti.formal.stvs.view.spec
 
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer
 import edu.kit.iti.formal.stvs.logic.specification.smtlib.SmtConcretizer
-import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
+import edu.kit.iti.formal.stvs.model.common.Selection
+import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
 import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
@@ -12,18 +14,22 @@ import edu.kit.iti.formal.stvs.model.verification.VerificationState
 import edu.kit.iti.formal.stvs.util.AsyncRunner
 import edu.kit.iti.formal.stvs.util.AsyncTaskCompletedHandler
 import edu.kit.iti.formal.stvs.util.JavaFxAsyncTask
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
 import edu.kit.iti.formal.stvs.view.common.AlertFactory
 import edu.kit.iti.formal.stvs.view.spec.table.SpecificationTableController
 import edu.kit.iti.formal.stvs.view.spec.timingdiagram.TimingDiagramCollectionController
 import edu.kit.iti.formal.stvs.view.spec.variables.VariableCollectionController
 import javafx.beans.binding.BooleanBinding
-import javafx.beans.property.*
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.ListProperty
+import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ObservableValue
 import javafx.collections.ListChangeListener
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.*
+import javafx.scene.control.Alert
+import javafx.scene.control.MenuItem
 
 /**
  * This is the controller for the [SpecificationView]. It handles most of the view logic that
@@ -193,7 +199,7 @@ class SpecificationController(
 
     private inner class ConcretizationTaskHandler : AsyncTaskCompletedHandler<ConcreteSpecification> {
         override fun onSuccess(concreteSpec: ConcreteSpecification) {
-            spec.concreteInstance= concreteSpec
+            spec.concreteInstance = concreteSpec
             timingDiagramCollectionController!!.activated = true
             onConcretizationInactive()
         }

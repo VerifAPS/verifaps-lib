@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.stvs.model.config
 
-import edu.kit.iti.formal.stvs.*
+import edu.kit.iti.formal.stvs.TestUtils
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

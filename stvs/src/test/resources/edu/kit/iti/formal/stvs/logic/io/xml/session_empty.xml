@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session xmlns="http://formal.iti.kit.edu/stvs/io/1.0/">
     <code>
-        <plaintext />
+        <plaintext/>
     </code>
-    <tabs />
+    <tabs/>
 </session>

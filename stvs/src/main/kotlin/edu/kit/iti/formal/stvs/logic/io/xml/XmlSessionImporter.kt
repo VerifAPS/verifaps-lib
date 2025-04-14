@@ -16,7 +16,6 @@ import tornadofx.asObservable
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import java.util.*
 
 /**
  * This class provides the functionality to import whole sessions ([StvsRootModel]s) from
@@ -60,7 +59,7 @@ class XmlSessionImporter(currentConfig: GlobalConfig, currentHistory: History) :
         val scenario = VerificationScenario()
         scenario.code = code
 
-        val typeContext = code.parsedCode?.let { it.definedTypes } ?: listOf(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = code.parsedCode?.let { it.definedTypes } ?: listOf(TypeInt, TypeBool)
 
         // Tabs
         val hybridSpecs: List<HybridSpecification> = importTabs(source, typeContext)

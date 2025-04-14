@@ -4,12 +4,12 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import edu.kit.iti.formal.stvs.model.common.ValidFreeVariable
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
 import edu.kit.iti.formal.stvs.model.table.*
-import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ColumnProblem
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
-import edu.kit.iti.formal.stvs.view.*
+import edu.kit.iti.formal.stvs.view.Controller
+import edu.kit.iti.formal.stvs.view.ViewUtils
 import javafx.beans.InvalidationListener
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
@@ -96,7 +96,7 @@ class SpecificationTableController(
                 this.onColumnSelectionChanged(obs, before, columnNow)
             }
 
-        tableView.setItems(hybridSpecification.hybridRowsProperty)
+        tableView.items = hybridSpecification.hybridRowsProperty
     }
 
     private fun onColumnSelectionChanged(
@@ -121,7 +121,8 @@ class SpecificationTableController(
     }
 
     private fun focusCell(columnId: String?, row: Int) {
-        tableView.edit(row,
+        tableView.edit(
+            row,
             tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> columnId == column.userData }
                 .findFirst().orElseThrow { IllegalArgumentException("Cannot focus unknown column: $columnId") })
     }
@@ -181,14 +182,13 @@ class SpecificationTableController(
             return
         }
         val tableColumn = tableView.columns[1]
-        val popOverManager =
-            CommentPopOverManager(
-                hybridSpecification!!.rows[index],
-                hybridSpecification.isEditable,
-                tableColumn.graphic,
-                0.0,
-                200.0
-            )
+        CommentPopOverManager(
+            hybridSpecification!!.rows[index],
+            hybridSpecification.isEditable,
+            tableColumn.graphic,
+            0.0,
+            200.0
+        )
     }
 
     fun resizeColumns() {
@@ -295,7 +295,7 @@ class SpecificationTableController(
 
         column.userData = specIoVariable.name
         specIoVariable.nameProperty
-            .addListener(InvalidationListener { o: Observable? -> column.setUserData(specIoVariable.name) })
+            .addListener(InvalidationListener { o: Observable? -> column.userData = specIoVariable.name })
         column.text = ""
         column.graphic = ColumnHeader(specIoVariable)
         column.prefWidth = specIoVariable.columnConfig.width

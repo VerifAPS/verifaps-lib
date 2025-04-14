@@ -2,10 +2,8 @@ package edu.kit.iti.formal.stvs.model.expressions
 
 import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.stvs.model.expressions.parser.IntervalParser.Companion.parse
-import edu.kit.iti.formal.stvs.model.expressions.parser.ParseException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
 import kotlin.test.assertFailsWith
 
 /**
@@ -49,7 +47,7 @@ class TestIntervalParser {
     @Test//(expected = ParseException::class)
     fun testNoNegativeNumbersAllowedInConstant() {
         //assertFailsWith<IllegalArgumentException> {
-            parse("-1")
+        parse("-1")
         //}
     }
 

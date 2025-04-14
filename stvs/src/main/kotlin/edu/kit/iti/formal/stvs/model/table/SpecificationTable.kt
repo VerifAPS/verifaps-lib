@@ -1,8 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.model.common.Named
 import javafx.beans.Observable
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.StringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
@@ -207,7 +208,7 @@ open class SpecificationTable<H : Named?, C, D>(
             require(addedRow!!.cells.size == columnHeaders.size) {
                 "Illegal width for row $addedRow, expected width: ${columnHeaders.size}"
             }
-            require(addedRow.cells.keys.all { getOptionalColumnHeaderByName(it) != null}) {
+            require(addedRow.cells.keys.all { getOptionalColumnHeaderByName(it) != null }) {
                 "Added row contains unknown IoVariable: $addedRow"
             }
         }

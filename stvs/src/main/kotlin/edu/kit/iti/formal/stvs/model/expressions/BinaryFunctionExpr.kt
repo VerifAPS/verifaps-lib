@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.expressions
 
-import edu.kit.iti.formal.stvs.model.expressions.BinaryFunctionExpr.Op
-
 /**
  * The runtime-representation for parsed, binary function expressions. Examples are: +, -, =, AND,
  * OR, etc. Anything that has two arguments.

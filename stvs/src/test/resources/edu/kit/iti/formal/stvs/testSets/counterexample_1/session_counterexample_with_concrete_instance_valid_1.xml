@@ -26,10 +26,10 @@
         <tab id="0" open="false" readOnly="false">
             <specification isConcrete="false" name="Unnamed Specification">
                 <variables>
-                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="171.0" />
-                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="172.0" />
-                    <freeVariable name="freeVarA" data-type="INT" default="-" />
-                    <freeVariable name="freeVarB" data-type="BOOL" default="TRUE" />
+                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="171.0"/>
+                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="172.0"/>
+                    <freeVariable name="freeVarA" data-type="INT" default="-"/>
+                    <freeVariable name="freeVarB" data-type="BOOL" default="TRUE"/>
                 </variables>
                 <rows>
                     <row comment="">
@@ -48,10 +48,10 @@
         <tab id="1" open="false" readOnly="true">
             <specification isConcrete="false" name="Unnamed Specification">
                 <variables>
-                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="100.0" />
-                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="100.0" />
-                    <freeVariable name="freeVarA" data-type="INT" default="-" />
-                    <freeVariable name="freeVarB" data-type="BOOL" default="TRUE" />
+                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" colwidth="100.0"/>
+                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" colwidth="100.0"/>
+                    <freeVariable name="freeVarA" data-type="INT" default="-"/>
+                    <freeVariable name="freeVarB" data-type="BOOL" default="TRUE"/>
                 </variables>
                 <rows>
                     <row comment="">
@@ -68,8 +68,8 @@
             </specification>
             <specification isConcrete="true" isCounterExample="true" name="Unnamed Specification">
                 <variables>
-                    <ioVariable data-type="BOOL" io="input" name="Start_Stop" />
-                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig" />
+                    <ioVariable data-type="BOOL" io="input" name="Start_Stop"/>
+                    <ioVariable data-type="BOOL" io="output" name="ONS_Trig"/>
                 </variables>
                 <rows>
                     <row>

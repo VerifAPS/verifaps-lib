@@ -45,7 +45,7 @@ sealed class Value {
  */
 data class ValueBool(val value: Boolean) : Value() {
     override val type: Type
-        get() = TypeBool.Companion.BOOL
+        get() = TypeBool
 
     override val valueString: String
         get() = if (value) {
@@ -101,7 +101,7 @@ data class ValueInt(val value: Int) : Value() {
     }
 
     override val type: Type
-        get() = TypeInt.Companion.INT
+        get() = TypeInt
 
     override val valueString: String
         get() = value.toString()
@@ -111,9 +111,9 @@ data class ValueInt(val value: Int) : Value() {
 /**
  * Runtime-representation for enum values of [Expression]s.
  * In contrast to [ValueBool] this is not a singleton, since many different instances can be
- * created at runtime. [ValueEnum.getType] of this value always returns a [TypeEnum].
- * @param enumValue enum constructor (for example <tt>red</tt>)
- *  @param enumType enum type (for example <tt>TypeEnum(COLORS, [red, green, blue])</tt>)
+ * created at runtime. [ValueEnum.type] of this value always returns a [TypeEnum].
+ * @param valueString enum constructor (for example `red`)
+ * @param type enum type (for example `TypeEnum(COLORS, [red, green, blue])`)
  * @author Philipp
  */
 data class ValueEnum(override val valueString: String, override val type: TypeEnum) : Value() {

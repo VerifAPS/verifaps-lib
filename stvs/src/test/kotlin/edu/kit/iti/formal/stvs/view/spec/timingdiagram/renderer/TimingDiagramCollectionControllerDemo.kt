@@ -1,6 +1,5 @@
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
-import org.junit.jupiter.api.Tag
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConcreteSpecImporter
 import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.common.SelectionClickListener
@@ -16,6 +15,7 @@ import javafx.scene.Scene
 import javafx.scene.control.TextArea
 import javafx.scene.layout.VBox
 import org.junit.Test
+import org.junit.jupiter.api.Tag
 import java.io.File
 import java.io.FileInputStream
 import java.util.function.Supplier
@@ -33,7 +33,7 @@ class TimingDiagramCollectionControllerDemo {
 
     private fun simpleScene(): Scene? {
         try {
-            val importer = XmlConcreteSpecImporter(listOf(TypeInt.INT, TypeBool.BOOL))
+            val importer = XmlConcreteSpecImporter(listOf(TypeInt, TypeBool))
             val inputStream = FileInputStream(
                 File(
                     TimingDiagramCollectionControllerDemo::class.java.getResource("spec_concrete_valid_1.xml")!!.toURI()

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" isConcrete="true" isCounterExample="false" name="Unnamed Specification">
+<specification xmlns="http://formal.iti.kit.edu/stvs/io/1.0/" isConcrete="true" isCounterExample="false"
+               name="Unnamed Specification">
     <variables>
-        <ioVariable data-type="INT" io="input" name="A" />
-        <ioVariable data-type="BOOL" io="input" name="B" />
-        <ioVariable data-type="INT" io="output" name="C" />
-        <ioVariable data-type="enumD" io="output" name="D" />
+        <ioVariable data-type="INT" io="input" name="A"/>
+        <ioVariable data-type="BOOL" io="input" name="B"/>
+        <ioVariable data-type="INT" io="output" name="C"/>
+        <ioVariable data-type="enumD" io="output" name="D"/>
     </variables>
     <rows>
         <row>

@@ -2,7 +2,7 @@ package edu.kit.iti.formal.stvs.model.table
 
 import javafx.beans.InvalidationListener
 import javafx.beans.Observable
-import javafx.beans.property.*
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
@@ -113,7 +113,6 @@ open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C,
         result = 31 * result + commentProperty.hashCode()
         return result
     }
-
 
 
     companion object {

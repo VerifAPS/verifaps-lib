@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import edu.kit.iti.formal.stvs.*
-import edu.kit.iti.formal.stvs.logic.io.ImportException
+import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.logic.specification.ConcretizationException
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
@@ -14,10 +13,12 @@ import edu.kit.iti.formal.stvs.model.expressions.TypeInt
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import edu.kit.iti.formal.stvs.model.table.ValidSpecification
 import edu.kit.iti.formal.stvs.model.table.problems.ConstraintSpecificationValidator
-import javafx.beans.property.*
-import org.junit.jupiter.api.*
+import javafx.beans.property.SimpleListProperty
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
 import tornadofx.asObservable
-import java.io.IOException
 import java.util.*
 
 /**
@@ -31,7 +32,7 @@ class Z3SolverTest {
 
     private fun importSpec(name: String): ValidSpecification {
         val typeContext = listOf(
-            TypeInt.INT, TypeBool.BOOL, TypeEnum(
+            TypeInt, TypeBool, TypeEnum(
                 "colors",
                 mutableListOf("red", "green", "blue")
             )

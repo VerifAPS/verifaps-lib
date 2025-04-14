@@ -1,6 +1,9 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList
+import edu.kit.iti.formal.stvs.model.common.NullableProperty
+import edu.kit.iti.formal.stvs.model.common.Selection
+import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
 import javafx.beans.Observable
 import javafx.beans.property.SimpleListProperty
 import javafx.collections.FXCollections
@@ -8,7 +11,6 @@ import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import tornadofx.getValue
 import tornadofx.setValue
-import java.util.*
 
 /**
  * A [ConstraintSpecification] which also has an associated counterexample (a

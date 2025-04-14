@@ -1,7 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.examples
 
 import com.google.gson.GsonBuilder
-import java.util.*
 
 /**
  * @author Alexander Weigl

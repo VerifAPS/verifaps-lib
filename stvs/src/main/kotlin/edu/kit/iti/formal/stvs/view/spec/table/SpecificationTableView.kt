@@ -11,7 +11,6 @@ import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.stage.StageStyle
 import javafx.util.Callback
-import org.kordamp.ikonli.fontawesome5.FontAwesomeRegular
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
 
@@ -22,12 +21,10 @@ import org.kordamp.ikonli.javafx.FontIcon
  * @author Carsten Csiky
  * @author Alexander Weigl
  */
-class SpecificationTableView(/*public Label getHeader() {
-     return header;
-   }*/val tableView: TableView<HybridRow>
-) : TitledPane() {
+class SpecificationTableView(val tableView: TableView<HybridRow>) : TitledPane() {
     private val toolbar = ToolBar()
-    private val content = VBox()
+    private val root = VBox()
+
     val btnRemoveRows: Button = Button(
         "Remove Rows",
         FontIcon(FontAwesomeSolid.MINUS_SQUARE)
@@ -53,9 +50,9 @@ class SpecificationTableView(/*public Label getHeader() {
      * @param tableView The underlying [TableView] of [HybridRow]s
      */
     init {
-        setContent(content)
+        content = root
         text = "Specification Table"
-        content.children.addAll(toolbar, tableView)
+        root.children.addAll(toolbar, tableView)
         VBox.setVgrow(tableView, Priority.ALWAYS)
         tableView.columns.add(0, createIndexColumn())
         ViewUtils.setupView(this)
@@ -89,7 +86,7 @@ class SpecificationTableView(/*public Label getHeader() {
         s.isFullScreen = true
         //s.setMaximized(true);
         //TableView<HybridRow> newView = new TableView<>(tableView.getItems());
-        setContent(Label("opened externally"))
+        content = Label("opened externally")
         val root = BorderPane(tableView)
         val bb = ButtonBar()
         root.top = bb
@@ -99,7 +96,7 @@ class SpecificationTableView(/*public Label getHeader() {
         bb.buttons.addAll(yesButton)
         yesButton.onAction = EventHandler { e: ActionEvent? -> s.hide() }
         s.showAndWait()
-        setContent(tableView)
+        content = tableView
     }
 
     /**

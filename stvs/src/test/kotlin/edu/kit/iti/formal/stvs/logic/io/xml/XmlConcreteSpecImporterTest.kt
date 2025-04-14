@@ -8,14 +8,13 @@ import edu.kit.iti.formal.stvs.model.table.ConcreteSpecificationTest
 import edu.kit.iti.formal.stvs.model.table.JsonTableParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import java.util.*
 import kotlin.test.assertFailsWith
 
 /**
  * @author Benjamin Alt
  */
 class XmlConcreteSpecImporterTest {
-    private var importer = XmlConcreteSpecImporter(listOf(TypeInt.INT, TypeBool.BOOL))
+    private var importer = XmlConcreteSpecImporter(listOf(TypeInt, TypeBool))
 
     @Test
     @Throws(Exception::class)

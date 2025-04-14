@@ -2,12 +2,14 @@ package edu.kit.iti.formal.stvs.logic.io
 
 import edu.kit.iti.formal.stvs.logic.io.xml.*
 import edu.kit.iti.formal.stvs.logic.io.xml.verification.GeTeTaImporter
-import edu.kit.iti.formal.stvs.model.*
-import edu.kit.iti.formal.stvs.model.code.*
+import edu.kit.iti.formal.stvs.model.StvsRootModel
+import edu.kit.iti.formal.stvs.model.code.Code
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
 import edu.kit.iti.formal.stvs.model.expressions.Type
-import edu.kit.iti.formal.stvs.model.table.*
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
+import edu.kit.iti.formal.stvs.model.table.HybridSpecification
 import edu.kit.iti.formal.stvs.model.verification.VerificationResult
 import org.xml.sax.InputSource
 import org.xml.sax.SAXException
@@ -199,10 +201,10 @@ object ImporterFacade {
     @Throws(IOException::class)
     fun importStCode(chosenFile: File): Code {
         val plaintext = String(
-            Files.readAllBytes(Paths.get(chosenFile.getAbsolutePath())),
+            Files.readAllBytes(Paths.get(chosenFile.absolutePath)),
             charset("utf-8")
         )
-        return Code(chosenFile.getAbsolutePath(), plaintext)
+        return Code(chosenFile.absolutePath, plaintext)
     }
 
     /**

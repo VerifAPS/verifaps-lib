@@ -84,7 +84,7 @@ class SfcElementAccess(val sfcElement: Element) {
     inner class Step(e: Element) : NodeAccess(e, "step") {
         val name: String by lazy { entry.getAttributeValue("name") }
         val initial: Boolean by lazy {
-            e.getAttributeValue("initialStep")?.toBoolean() ?: false
+            e.getAttributeValue("initialStep")?.toBoolean() == true
         }
 
         val onExit: String? by lazy { getVendorSpecificAttribute(e, CODESYS_ON_EXIT) }
@@ -139,7 +139,7 @@ class SfcElementAccess(val sfcElement: Element) {
     }
 
 
-    inner class ParallelJoin(entry: Element) : SfcElementAccess.NodeAccess(entry, "simultaneousConvergence") {
+    inner class ParallelJoin(entry: Element) : NodeAccess(entry, "simultaneousConvergence") {
         override val transitions: Collection<Trans>
             get() = merge(transitionIncoming(), transitionOutgoing())
 
@@ -256,14 +256,14 @@ class SfcElementAccess(val sfcElement: Element) {
 
     }
 
-    public fun pointOut(localId: String): List<NodeAccess> {
+    fun pointOut(localId: String): List<NodeAccess> {
         val xpathGetNext =
             createXPathWithId("./*[connectionPointIn/connection[@refLocalId=\$id]]")
         xpathGetNext.setVariable("id", localId)
         return xpathGetNext.evaluate(sfcElement).map { get<NodeAccess>(it) }
     }
 
-    public fun pointIn(element: Element): List<NodeAccess> {
+    fun pointIn(element: Element): List<NodeAccess> {
         val xpath = xpf.compile(
             "./connectionPointIn/connection/@refLocalId", Filters.attribute()
         )
@@ -278,6 +278,7 @@ class SfcElementAccess(val sfcElement: Element) {
     @Suppress("UNCHECKED_CAST")
     private fun <T : NodeAccess> get(e: String): T = access.computeIfAbsent(e) { factory(nodes[it]!!) as T } as T
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T : NodeAccess> factory(e: Element): T {
         return when (e.name) {
             "step" -> Step(e)

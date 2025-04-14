@@ -1,7 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
-import edu.kit.iti.formal.stvs.logic.io.*
-import edu.kit.iti.formal.stvs.model.common.*
+import edu.kit.iti.formal.stvs.logic.io.ImportException
+import edu.kit.iti.formal.stvs.model.common.FreeVariable
+import edu.kit.iti.formal.stvs.model.common.FreeVariableList
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
+import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.table.*
 import org.jdom2.Element
 import org.w3c.dom.Node
@@ -80,7 +83,7 @@ class XmlConstraintSpecImporter : XmlImporter<ConstraintSpecification>() {
         val cellsMap = hashMapOf<String, ConstraintCell>()
 
         row.getChildren("cell").forEachIndexed { j, cell ->
-            val constraintCell = ConstraintCell(cell.getValue())
+            val constraintCell = ConstraintCell(cell.value)
             constraintCell.comment = cell.getAttributeValue("comment")
             cellsMap[ioVariables[j].name] = constraintCell
         }

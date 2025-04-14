@@ -1,7 +1,5 @@
 package edu.kit.iti.formal.stvs.model.table
 
-import org.junit.Assert
-import org.junit.Before
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

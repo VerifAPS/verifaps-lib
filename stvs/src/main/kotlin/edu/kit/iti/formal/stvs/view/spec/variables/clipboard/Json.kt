@@ -26,7 +26,7 @@ object Json {
      */
     fun stringToRealFreeVariables(input: String?): List<FreeVariable> {
         //if (input == null)
-            return listOf()
+        return listOf()
         //return toRealFreeVariables(json.decodeFromString<FreeVarSelection>(input))
     }
 

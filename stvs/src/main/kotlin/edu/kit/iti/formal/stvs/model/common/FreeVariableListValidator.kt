@@ -1,13 +1,12 @@
 package edu.kit.iti.formal.stvs.model.common
 
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
 import javafx.beans.Observable
 import javafx.beans.property.*
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import tornadofx.getValue
 import tornadofx.setValue
-import java.util.*
 
 /**
  * The validator for the effective model [FreeVariableList]. This class provides

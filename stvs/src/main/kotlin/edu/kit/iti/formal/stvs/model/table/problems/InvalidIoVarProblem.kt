@@ -4,7 +4,8 @@ import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.Selection
 import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
-import edu.kit.iti.formal.stvs.model.expressions.*
+import edu.kit.iti.formal.stvs.model.expressions.Type
+import edu.kit.iti.formal.stvs.model.expressions.VariableExpr
 
 /**
  *
@@ -63,7 +64,10 @@ data class InvalidIoVarProblem(
             specIoVariable: SpecIoVariable, typesByName: Map<String, Type>,
             codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler
         ): Type {
-            val type = typesByName[specIoVariable.type] ?: throw InvalidIoVarProblem(specIoVariable, ErrorType.TYPE_UNKNOWN).asException()
+            val type = typesByName[specIoVariable.type] ?: throw InvalidIoVarProblem(
+                specIoVariable,
+                ErrorType.TYPE_UNKNOWN
+            ).asException()
             codeIoVariables.stream()
                 .filter { codeIoVariable: CodeIoVariable -> codeIoVariable.name == specIoVariable.name }
                 .findAny().ifPresent { codeIoVariable: CodeIoVariable ->
@@ -76,7 +80,11 @@ data class InvalidIoVarProblem(
         }
 
         @Throws(SpecProblemException::class)
-        private fun tryGetValidName(ioVar: SpecIoVariable, codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler): String {
+        private fun tryGetValidName(
+            ioVar: SpecIoVariable,
+            codeIoVariables: Collection<CodeIoVariable>,
+            minorProblemsHandler: MinorProblemsHandler
+        ): String {
             if (!VariableExpr.IDENTIFIER_PATTERN.matcher(ioVar.name).matches()) {
                 throw InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID).asException()
             }

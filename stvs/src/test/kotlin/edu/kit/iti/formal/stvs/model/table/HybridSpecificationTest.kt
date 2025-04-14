@@ -27,12 +27,12 @@ class HybridSpecificationTest {
     private val concreteInstance = ImporterFacade.importConcreteSpec(
         loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"),
         listOf(
-            TypeInt.INT, TypeBool.BOOL, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo")
+            TypeInt, TypeBool, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo")
         )
     )
 
     @Test
-    fun counterExample(){
+    fun counterExample() {
         Assertions.assertEquals(null, hybridSpec.counterExample)
     }
 
@@ -53,8 +53,8 @@ class HybridSpecificationTest {
     @Test
     fun getSetSelection() {
         Assertions.assertEquals(Selection(), hybridSpec.getSelection())
-        hybridSpec.getSelection().row=(3)
-        hybridSpec.getSelection().column=("A")
+        hybridSpec.getSelection().row = (3)
+        hybridSpec.getSelection().column = ("A")
         Assertions.assertEquals(Selection("A", 3), hybridSpec.getSelection())
     }
 
@@ -64,7 +64,7 @@ class HybridSpecificationTest {
         assertFailsWith<IllegalArgumentException> {
             val badConcreteSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
                 xmlFile,
-                listOf(TypeInt.INT, TypeBool.BOOL)
+                listOf(TypeInt, TypeBool)
             )
             hybridSpec.concreteInstance = badConcreteSpec
         }
@@ -91,7 +91,7 @@ class HybridSpecificationTest {
         val identicalConcrete: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"),
             listOf(
-                TypeInt.INT, TypeBool.BOOL,
+                TypeInt, TypeBool,
                 TypeFactory.enumOfName("enumD", "literalOne", "literalTwo")
             )
         )

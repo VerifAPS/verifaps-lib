@@ -1,14 +1,11 @@
 package edu.kit.iti.formal.stvs.view.menu
 
-import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.view.ViewUtils
 import edu.kit.iti.formal.stvs.view.common.FileSelectionField
 import edu.kit.iti.formal.stvs.view.common.PositiveIntegerInputField
-import edu.kit.iti.formal.stvs.view.menu.ConfigDialogManager
 import javafx.geometry.Insets
 import javafx.scene.control.*
 import javafx.scene.layout.GridPane
-import javafx.scene.text.Text
 
 /**
  * The view for a config dialog. Includes numerous text fields, checkboxes and number text fields

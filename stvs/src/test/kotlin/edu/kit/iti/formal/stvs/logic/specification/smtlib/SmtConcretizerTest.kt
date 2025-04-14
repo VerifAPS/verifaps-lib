@@ -27,7 +27,7 @@ class SmtConcretizerTest {
 
     private fun importSpec(name: String): ValidSpecification {
         val typeContext = listOf(
-            TypeInt.INT, TypeBool.BOOL, TypeEnum(
+            TypeInt, TypeBool, TypeEnum(
                 "colors",
                 mutableListOf("red", "green", "blue")
             )

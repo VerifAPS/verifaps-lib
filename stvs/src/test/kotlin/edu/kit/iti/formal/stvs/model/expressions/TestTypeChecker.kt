@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
 class TestTypeChecker {
-    private val varTypeCtx = mapOf("X" to TypeInt.INT)
+    private val varTypeCtx = mapOf("X" to TypeInt)
     private val checker = TypeChecker(varTypeCtx)
 
 
@@ -46,7 +46,7 @@ class TestTypeChecker {
             )
 
         val type = checker.typeCheck(validExpression)
-        Assertions.assertEquals(type, TypeBool.BOOL)
+        Assertions.assertEquals(type, TypeBool)
     }
 
     @Test//(expected = TypeCheckException::class)

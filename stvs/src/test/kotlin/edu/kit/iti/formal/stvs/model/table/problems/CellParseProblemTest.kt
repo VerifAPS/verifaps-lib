@@ -21,10 +21,10 @@ class CellParseProblemTest {
 
     @Test
     fun expressionOrProblemForCell() {
-        val typeContext = listOf(TypeInt.INT, TypeBool.BOOL)
+        val typeContext = listOf(TypeInt, TypeBool)
         val typeMap: MutableMap<String, Type> = HashMap()
-        typeMap["A"] = TypeInt.INT
-        typeMap["B"] = TypeBool.BOOL
+        typeMap["A"] = TypeInt
+        typeMap["B"] = TypeBool
         val typeChecker = TypeChecker(typeMap)
         val problematicCell = ConstraintCell("3<<>4")
         assertFailsWith<SpecProblemException> {

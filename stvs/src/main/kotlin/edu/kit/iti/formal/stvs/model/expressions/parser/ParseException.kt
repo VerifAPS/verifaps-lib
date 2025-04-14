@@ -14,5 +14,4 @@ data class ParseException
  * @param parseErrorMessage an error message to provide further information to the user.
  */
     (val line: Int, val characterInLine: Int, val parseErrorMessage: String) :
-    Exception("(line $line character $characterInLine): $parseErrorMessage") {
-}
+    Exception("(line $line character $characterInLine): $parseErrorMessage")

@@ -307,7 +307,7 @@ class ExpressionParser : TestTableLanguageParserBaseVisitor<Expression> {
 
     override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): Expression {
         return GuardedExpression(
-            ctx.c.zip(ctx.t).map { (c,t) -> c.accept(this) to t.accept(this)  }
+            ctx.c.zip(ctx.t).map { (c, t) -> c.accept(this) to t.accept(this) }
         )
     }
 

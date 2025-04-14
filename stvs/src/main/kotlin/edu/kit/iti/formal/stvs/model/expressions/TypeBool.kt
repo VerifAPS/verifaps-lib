@@ -6,14 +6,7 @@ package edu.kit.iti.formal.stvs.model.expressions
  *
  * @author Philipp
  */
-class TypeBool private constructor() : Type {
-    override fun <R> match(
-        matchIntType: TypeIntegerHandler<R>, matchBoolType: TypeBooleanHandler<R>,
-        matchEnumType: TypeEnumHandler<R>
-    ): R? {
-        return matchBoolType.handle()
-    }
-
+object TypeBool : Type {
     override fun checksAgainst(other: Type): Boolean {
         return other.match({ false }, { true }, { otherEnum: TypeEnum? -> false })!!
     }
@@ -37,14 +30,5 @@ class TypeBool private constructor() : Type {
 
     override fun toString(): String {
         return "TypeBool"
-    }
-
-    override fun equals(obj: Any?): Boolean {
-        return obj is TypeBool
-    }
-
-    companion object {
-        @JvmField
-        val BOOL: TypeBool = TypeBool()
     }
 }

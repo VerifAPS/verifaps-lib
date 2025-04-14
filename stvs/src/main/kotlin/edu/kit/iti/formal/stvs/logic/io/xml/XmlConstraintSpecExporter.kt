@@ -1,9 +1,10 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
-import edu.kit.iti.formal.stvs.model.*
-import edu.kit.iti.formal.stvs.model.common.*
-import edu.kit.iti.formal.stvs.model.table.*
+import edu.kit.iti.formal.stvs.model.common.IoVariable
+import edu.kit.iti.formal.stvs.model.common.SpecIoVariable
+import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
+import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
 import org.jdom2.Element
 
 /**

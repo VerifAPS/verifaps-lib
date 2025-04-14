@@ -17,7 +17,8 @@ import edu.kit.iti.formal.stvs.model.table.ConstraintCell
  *
  * @author Benjamin Alt
  */
-data class CellParseProblem(val exception: ParseException, override val column: String, override val row: Int) : CellProblem {
+data class CellParseProblem(val exception: ParseException, override val column: String, override val row: Int) :
+    CellProblem {
     override val errorMessage: String = createErrorMessage(exception)
     override val location: Selection = Selection(column, row)
     val parseException: ParseException = exception

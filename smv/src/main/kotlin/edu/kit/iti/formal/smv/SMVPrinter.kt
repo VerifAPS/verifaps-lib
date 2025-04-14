@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import java.util.regex.Pattern
 
 class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     val sort = true
@@ -87,7 +86,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         stream.print("MODULE ")
         stream.print(m.name)
         if (!m.moduleParameters.isEmpty()) {
-            stream.print("(");
+            stream.print("(")
             m.moduleParameters.forEachIndexed { index, sVariable ->
                 sVariable.accept(this)
                 if (index + 1 < m.moduleParameters.size) stream.print(", ")
@@ -109,7 +108,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         printSectionSingle("INIT", m.initExpr)
         printSectionSingle("TRANS", m.transExpr)
 
-        if (m.initAssignments.size > 0 || m.nextAssignments.size > 0) {
+        if (m.initAssignments.isNotEmpty() || m.nextAssignments.isNotEmpty()) {
             stream.print("ASSIGN").increaseIndent()
             printAssignments("init", m.initAssignments)
             printAssignments("next", m.nextAssignments)
@@ -159,8 +158,7 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
     override fun visit(func: SFunction) {
         when (func.name) {
-            SMVFacade.FUNCTION_ID_BIT_ACCESS ->
-                visitBitAccess(func)
+            SMVFacade.FUNCTION_ID_BIT_ACCESS -> TODO()
         }
 
         stream.print(func.name)
@@ -171,10 +169,6 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
                 stream.print(", ")
         }
         stream.print(')')
-    }
-
-    private fun visitBitAccess(func: SFunction) {
-        TODO("not implemented")
     }
 
     override fun visit(quantified: SQuantified) {
