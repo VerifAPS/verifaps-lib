@@ -6,8 +6,8 @@
 kotlin = "2.1.20"
 kotlinxDatetime = "0.6.2"
 kotlinxSerializationJSON = "1.8.1"
-kotlinxCoroutines = "1.10.1"
-junit = "5.12.1"
+kotlinxCoroutines = "1.10.2"
+junit = "5.12.2"
 antlr = "4.13.2"
 
 [libraries]
