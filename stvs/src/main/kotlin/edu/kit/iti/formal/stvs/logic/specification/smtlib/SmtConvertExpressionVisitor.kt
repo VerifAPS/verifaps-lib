@@ -74,7 +74,7 @@ class SmtConvertExpressionVisitor(
         val argument = unary.argument.accept(this)
         val name = smtlibUnaryOperationNames[unary.operation]
             ?: if (unary.operation == UnaryFunctionExpr.Op.UNARY_MINUS) {
-                return SList("-", SInteger(0), argument)
+                return SList("-", SNumber(0), argument)
             } else {
                 throw IllegalArgumentException(
                     "Operation " + unary.operation + "is " + "not supported"

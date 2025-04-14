@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml
 
+import com.google.common.truth.Truth
 import com.google.gson.JsonElement
 import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
@@ -28,7 +29,9 @@ class XmlConcreteSpecExporterTest {
             ImporterFacade.importConcreteSpec(loadFromTestSets("/valid_1/concrete_spec_valid_1.xml"), typeContext)
         val result = TestUtils.stringOutputStream { exporter.export(concreteSpec, it) }
         val expectedString = loadFromTestSets("/valid_1/concrete_spec_valid_1.xml").reader().readText()
-        Assertions.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(result))
+        Truth.assertThat(TestUtils.removeWhitespace(result)).isEqualTo(
+            TestUtils.removeWhitespace(expectedString)
+        )
     }
 
     @Test
@@ -36,6 +39,8 @@ class XmlConcreteSpecExporterTest {
         val concreteSpec = ConcreteSpecification(false)
         val result = TestUtils.stringOutputStream { exporter.export(concreteSpec, it) }
         val expectedString = this.javaClass.getResourceAsStream("spec_concrete_empty.xml")!!.reader().readText()
-        Assertions.assertEquals(TestUtils.removeWhitespace(expectedString), TestUtils.removeWhitespace(result))
+        Truth.assertThat(TestUtils.removeWhitespace(result)).isEqualTo(
+            TestUtils.removeWhitespace(expectedString)
+        )
     }
 }

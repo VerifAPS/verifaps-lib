@@ -16,5 +16,5 @@ STRING: '"' ~('"') '"';
 NUMBER : [0-9]+;
 
 fragment SYMLETTER : ~[ ()\n\r\t\f];
-SYMBOL : '|' (SYMLETTER|[() \n\r\t\f])+ '|' | SYMLETTER+;
+SYMBOL : '|' (SYMLETTER|[() \n\r\t\f])+? '|' | SYMLETTER+;
 WS : [ \n\r\t] -> skip;

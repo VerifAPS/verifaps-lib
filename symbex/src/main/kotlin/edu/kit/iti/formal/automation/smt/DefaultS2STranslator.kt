@@ -75,7 +75,7 @@ class DefaultS2STranslator : S2SDataTypeTranslator {
                 return SSymbol("#b" + twoComplement(BigInteger.valueOf(i.toLong()), 16))
             }
             SMVTypes.INT -> {
-                return SInteger(l.value as BigInteger)
+                return SNumber(l.value as BigInteger)
             }
             else ->
                 throw IllegalArgumentException("Unsupported data type: ${l.dataType}")

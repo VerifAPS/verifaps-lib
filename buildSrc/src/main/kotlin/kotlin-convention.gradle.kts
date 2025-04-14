@@ -26,6 +26,8 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.0")
     testImplementation(project(":utils-test"))
+
+    testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
 }
 
 

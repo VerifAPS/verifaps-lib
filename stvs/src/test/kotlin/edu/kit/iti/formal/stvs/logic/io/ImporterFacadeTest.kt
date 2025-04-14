@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.stvs.logic.io
 
+import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonElement
 import edu.kit.iti.formal.stvs.StvsApplication
 import edu.kit.iti.formal.stvs.TestUtils.loadFromTestSets
@@ -144,9 +146,8 @@ class ImporterFacadeTest {
     fun importHistory() {
         val file = File(XmlSessionImporter::class.java.getResource("history_valid_1.xml")!!.toURI())
         val history = ImporterFacade.importHistory(file)
-        assertEquals(
-            "/home/bal/Projects/kit/pse/stverificationstudio/doc/FA-Testsession-Ressourcen/testsession_valid.xml",
-            history.filenames[0]
+        assertThat(history.filenames[0]).isEqualTo(
+            "/home/bal/Projects/kit/pse/stverificationstudio/doc/FA-Testsession-Ressourcen/testsession_valid.xml"
         )
     }
 

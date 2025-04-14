@@ -9,7 +9,7 @@ import edu.kit.iti.formal.automation.smt.S2SDataTypeTranslator
 import edu.kit.iti.formal.automation.smt.S2SFunctionTranslator
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smt.SExprFacade.sexpr
-import edu.kit.iti.formal.smt.SInteger
+import edu.kit.iti.formal.smt.SNumber
 import edu.kit.iti.formal.smt.SList
 import edu.kit.iti.formal.smt.SSymbol
 
@@ -36,7 +36,7 @@ class SmtModel {
     }
 
     fun bvOf(lower: Int, bitLength: Int) =
-            SList(SList(SSymbol("_"), SSymbol("int2bv"), SInteger(bitLength)), SInteger(lower))
+            SList(SList(SSymbol("_"), SSymbol("int2bv"), SNumber(bitLength)), SNumber(lower))
 
 
     val sexp: MutableCollection<SmtStatement> = arrayListOf()

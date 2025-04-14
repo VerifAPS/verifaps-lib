@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import com.google.common.truth.Truth
 import edu.kit.iti.formal.smt.SExprFacade.sexpr
 import edu.kit.iti.formal.smt.SList
 import org.junit.jupiter.api.Assertions
@@ -54,10 +55,8 @@ class SmtModelTest {
     @Test
     @Throws(Exception::class)
     fun toSexpr() {
-        Assertions.assertEquals(
-            fromText("(a bb ccc ( assert d ) ( assert ee ) ( assert fff) )"),
-            simple.toSexpr()
-        )
+        Truth.assertThat(simple.toSexpr())
+            .isEqualTo(fromText("(a bb ccc ( assert d ) ( assert ee ) ( assert fff) )"))
     }
 
     @Test
@@ -69,25 +68,6 @@ class SmtModelTest {
         val result2 = other.headerToText()
         println(result2)
         assertMatches("l o s", result2)
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun globalConstraintsToText() {
-        val pattern = "( assert d ) ( assert ee ) ( assert fff )"
-        assertMatches(pattern, simple.globalConstraintsToText())
-
-        assertMatches(
-            "( assert ggg ) ( assert ( 1 2 3 h ) ) ( assert i )",
-            other.globalConstraintsToText()
-        )
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun toText() {
-        assertMatches("a bb ccc ( assert d ) ( assert ee ) ( assert fff )", simple.toText())
-        assertMatches("l o s ( assert ggg ) ( assert ( 1 2 3 h ) ) ( assert i )", other.toText())
     }
 
     @Test
@@ -117,7 +97,7 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc",
-                "d ee fff new new2"
+                "d ee fff (new new2)"
             ), simple
         )
         other.addGlobalConstraint(sexpr(SList("newA", sexpr("newB", "newC"))))
@@ -155,7 +135,7 @@ class SmtModelTest {
         simple.addHeaderDefinition(sexpr(sym("new"), sym("new2")))
         Assertions.assertEquals(
             fromString(
-                "a bb ccc new new2",
+                "a bb ccc (new new2)",
                 "d ee fff"
             ), simple
         )

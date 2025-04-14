@@ -1,9 +1,12 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smt.SExprFacade.parseExpr
 import edu.kit.iti.formal.smt.SExprFacade.sexpr
 import edu.kit.iti.formal.smt.SList
+import edu.kit.iti.formal.smt.SNumber
 import edu.kit.iti.formal.smt.SSymbol
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -20,13 +23,24 @@ internal fun fromText(s: String) = parseExpr(s)
 class SExpressionTest {
     @Test
     fun fromString() {
-        assertEquals(
+        assertThat(SSymbol("a")).isEqualTo(SSymbol("a"))
+        assertThat(SList(SSymbol("a"))).isEqualTo(SList(SSymbol("a")))
+        assertThat(fromText("a")).isEqualTo(SSymbol("a"))
+        assertThat(fromText("()")).isEqualTo(SList())
+        assertThat(fromText("(a)")).isEqualTo(SList(SSymbol("a")))
+
+        assertThat(fromText("(nested1 2 3)"))
+            .isEqualTo(sexpr("nested1", 2, 3))
+
+
+        assertThat(
+            fromText("(a b c (nested1 2 3 ) (4))")
+        ).isEqualTo(
             SList(
                 "a", SSymbol("b"), SSymbol("c"),
-                sexpr("nested1", "2", "3"),
-                SList("4")
-            ),
-            fromText("(a b c (nested1 2 3 ) (4))")
+                sexpr("nested1", 2, 3),
+                SList(SNumber(4))
+            )
         )
     }
 
@@ -41,7 +55,7 @@ class SExpressionTest {
     @ParameterizedTest
     @MethodSource("instancesToTest")
     fun toText(expression: SExpr) {
-        assertEquals(expression, fromText(expression.toString()))
+        assertThat(fromText(expression.toString())).isEqualTo(expression)
     }
 
     @ParameterizedTest
@@ -59,7 +73,7 @@ class SExpressionTest {
             return listOf(
                 Arguments.of(list),
                 Arguments.of(SSymbol("asdasd")),
-                Arguments.of(SSymbol("1"))
+                Arguments.of(SNumber(1))
             )
         }
     }

@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
+import com.google.common.truth.Truth
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ImportException
@@ -345,65 +346,57 @@ class SmtEncoderTest {
         val output = smtEncoder.constraint
         val constraints = output.globalConstraints
 
-        println(output)
+        val seq = setOf(
+            "(implies (bvuge n_2 #x0004) (= |A_2_4| |A_2_0|))",
+            "(implies (bvuge n_2 #x0003) (= |A_2_3| |A_2_-1|))",
+            "(implies (= n_1 #x0001) (= |A_2_-1| |A_1_0|))",
+            "(implies (bvuge n_2 #x0002) (= |A_2_2| |A_2_-2|))",
+            "(implies (= n_1 #x0001) (= |A_2_-2| |A_1_-1|))",
+            "(implies (= n_0 #x0003) (= |A_1_-1| |A_0_2|))",
+            "(implies (bvuge n_2 #x0001) (= |A_2_1| |A_2_-3|))",
+            "(implies (= n_1 #x0001) (= |A_2_-3| |A_1_-2|))",
+            "(implies (= n_0 #x0003) (= |A_1_-2| |A_0_1|))",
+            "(implies (bvuge n_2 #x0000) (= |A_2_0| |A_2_-4|))",
+            "(implies (= n_1 #x0001) (= |A_2_-4| |A_1_-3|))",
+            "(implies (= n_0 #x0003) (= |A_1_-3| |A_0_0|))",
+            "(implies (bvuge n_2 #x0004) (= |A_2_4| |A_2_0|))",
+            "(implies (bvuge n_2 #x0003) (= |A_2_3| |A_2_-1|))",
+            "(implies (= n_1 #x0002) (= |A_2_-1| |A_1_1|))",
 
+            "(implies (bvuge n_2 #x0002) (= |A_2_2| |A_2_-2|))",
+            "(implies (= n_1 #x0002) (= |A_2_-2| |A_1_0|))",
 
-        testWithStatements(
-            constraints,
-            "(implies (bvuge n_2  #x0004) (= |A_2_4| |A_2_0|))",
+            "(implies (bvuge n_2 #x0001) (= |A_2_1| |A_2_-3|))",
+            "(implies (= n_1 #x0002) (= |A_2_-3| |A_1_-1|))",
+            "(implies (= n_0 #x0003) (= |A_1_-1| |A_0_2|))",
 
-            "(implies (bvuge n_2  #x0003) (= |A_2_3| |A_2_-1|))",
-            "(implies (= n_1  #x0001) (= |A_2_-1| |A_1_0|))",
+            "(implies (bvuge n_2 #x0000) (= |A_2_0| |A_2_-4|))",
+            "(implies (= n_1 #x0002) (= |A_2_-4| |A_1_-2|))",
+            "(implies (= n_0 #x0003) (= |A_1_-2| |A_0_1|))",
+            "(bvuge n_0 #x0003)",
+            "(bvule n_0 #x0003)",
+            "(bvuge n_1 #x0001)",
+            "(bvule n_1 #x0005)",
+            "(bvuge n_2 #x0001)",
+            "(bvule n_2 #x0005)"
+        ).map { fromText(it) }
 
-            "(implies (bvuge n_2  #x0002) (= |A_2_2| |A_2_-2|))",
-            "(implies (= n_1  #x0001) (= |A_2_-2| |A_1_-1|))",
-            "(implies (= n_0  #x0003) (= |A_1_-1| |A_0_2|))",
+        for (expr in seq) {
+            println(expr.toString() + " " + expr.hashCode().toString())
+        }
 
-            "(implies (bvuge n_2  #x0001) (= |A_2_1| |A_2_-3|))",
-            "(implies (= n_1  #x0001) (= |A_2_-3| |A_1_-2|))",
-            "(implies (= n_0  #x0003) (= |A_1_-2| |A_0_1|))",
+        println()
 
-            "(implies (bvuge n_2  #x0000) (= |A_2_0| |A_2_-4|))",
-            "(implies (= n_1  #x0001) (= |A_2_-4| |A_1_-3|))",
-            "(implies (= n_0  #x0003) (= |A_1_-3| |A_0_0|))"
-        )
+        for(expr in constraints) {
+            println(expr.toString() + " " + expr.hashCode().toString())
+        }
 
-        testWithStatements(
-            constraints,
-            "(implies (bvuge n_2  #x0004) (= |A_2_4| |A_2_0|))",
-
-            "(implies (bvuge n_2  #x0003) (= |A_2_3| |A_2_-1|))",
-            "(implies (= n_1  #x0002) (= |A_2_-1| |A_1_1|))",
-
-            "(implies (bvuge n_2  #x0002) (= |A_2_2| |A_2_-2|))",
-            "(implies (= n_1  #x0002) (= |A_2_-2| |A_1_0|))",
-
-            "(implies (bvuge n_2  #x0001) (= |A_2_1| |A_2_-3|))",
-            "(implies (= n_1  #x0002) (= |A_2_-3| |A_1_-1|))",
-            "(implies (= n_0  #x0003) (= |A_1_-1| |A_0_2|))",
-
-
-            "(implies (bvuge n_2  #x0000) (= |A_2_0| |A_2_-4|))",
-            "(implies (= n_1  #x0002) (= |A_2_-4| |A_1_-2|))",
-            "(implies (= n_0  #x0003) (= |A_1_-2| |A_0_1|))"
-        )
-
-        testWithStatements(
-            constraints,
-            "(bvuge n_0  #x0003)",
-            "(bvule n_0  #x0003)",
-
-            "(bvuge n_1  #x0001)",
-            "(bvule n_1  #x0005)",
-
-            "(bvuge n_2  #x0001)",
-            "(bvule n_2  #x0005)"
-        )
+        Truth.assertThat(constraints).containsAtLeastElementsIn(seq)
     }
 
     private fun testWithStatements(constraints: Collection<SExpr>, vararg s: String) {
         val statements = s.map { fromText(it) }
         val missingStatements = statements.filter { !constraints.contains(it) }
-        Assertions.assertEquals(ArrayList<SExpr>(), missingStatements, "no statements should be missing")
+        Truth.assertThat(missingStatements).isEmpty()
     }
 }

@@ -107,7 +107,7 @@ data class SString(var value: String) : SAtom() {
     override fun toString() = "\"$value\"";
 }
 
-data class SInteger(var num: BigInteger) : SAtom() {
+data class SNumber(var num: BigInteger) : SAtom() {
     constructor(numnum: Int) : this(numnum.toBigInteger())
 
     override fun toString() = num.toString()
@@ -136,11 +136,6 @@ data class SList(val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> 
         args.forEach { add(it) }
     }
 
-    /*constructor(symbol: String, args: List<SExpr>) : this() {
-        list += SSymbol(symbol)
-        list.addAll(args)
-    }*/
-
     constructor(expr: Collection<SExpr>) : this() {
         list.addAll(expr)
     }
@@ -164,9 +159,9 @@ class SexprParseTreeTransformer : SexprBaseVisitor<SExpr>() {
 
     override fun visitStr(ctx: SexprParser.StrContext) = SString(ctx.text.trim('"'))
 
-    override fun visitN(ctx: SexprParser.NContext) = SInteger(BigInteger(ctx.NUMBER().text))
+    override fun visitN(ctx: SexprParser.NContext) = SNumber(BigInteger(ctx.NUMBER().text))
 
     override fun visitS(ctx: SexprParser.SContext) = SSymbol(ctx.SYMBOL().text)
 
-    override fun visitList(ctx: SexprParser.ListContext?) = SList(ctx?.sexpr()?.map { it.accept(this) } ?: listOf())
+    override fun visitList(ctx: SexprParser.ListContext) = SList(ctx.sexpr()?.map { it.accept(this) } ?: listOf())
 }

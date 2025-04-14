@@ -3,6 +3,9 @@ package edu.kit.iti.formal.smt
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.ConsoleErrorListener
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
 import java.math.BigInteger
 
 /**
@@ -32,6 +35,20 @@ object SExprFacade {
 
     fun parseExpr(stream: CharStream): SExpr {
         val p = createParser(stream)
+        p.removeErrorListeners()
+        p.addErrorListener(object : ConsoleErrorListener() {
+            override fun syntaxError(
+                recognizer: Recognizer<*, *>?,
+                offendingSymbol: Any?,
+                line: Int,
+                charPositionInLine: Int,
+                msg: String?,
+                e: RecognitionException?
+            ) {
+                super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
+                throw IllegalArgumentException("Syntax error at line $line:$charPositionInLine $msg")
+            }
+        })
         val ctx = p.sexpr()
         val t = SexprParseTreeTransformer()
         return ctx.accept(t)
@@ -47,7 +64,7 @@ object SExprFacade {
             s.list += when (it) {
                 is SExpr -> it
                 is String -> SSymbol(it)
-                is Int -> SInteger(BigInteger.valueOf(it.toLong()))
+                is Int -> SNumber(BigInteger.valueOf(it.toLong()))
                 is Collection<*> -> sexpr(it)
                 //is Float -> SNumber(it)
                 else -> {

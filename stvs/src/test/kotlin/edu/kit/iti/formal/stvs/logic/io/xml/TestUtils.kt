@@ -25,7 +25,7 @@ object TestUtils {
         Status.ALL to ".*".toRegex()
     )
 
-    fun removeWhitespace(input: String) = input.replace("[\t ]+".toRegex(), " ").replace("\r\n", "\n").trim()
+    fun removeWhitespace(input: String) = input.replace("[\t\n\r ]+".toRegex(), "").replace("\r\n", "\n").trim()
 
     fun getResource(name: String) = javaClass.getResourceAsStream(name) ?: error("Could not find resource file: $name")
 

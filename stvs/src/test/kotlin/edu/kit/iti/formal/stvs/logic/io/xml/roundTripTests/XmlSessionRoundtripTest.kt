@@ -1,5 +1,6 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.roundTripTests
 
+import com.google.common.truth.Truth
 import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImportException
@@ -8,7 +9,6 @@ import edu.kit.iti.formal.stvs.logic.io.xml.TestUtils
 import edu.kit.iti.formal.stvs.model.StvsRootModel
 import edu.kit.iti.formal.stvs.model.config.GlobalConfig
 import edu.kit.iti.formal.stvs.model.config.History
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -29,11 +29,8 @@ class XmlSessionRoundtripTest() {
         val tempFile = File.createTempFile("test", "")
         ExporterFacade.exportSession(importedSession, tempFile)
         val fileContentsAfter = TestUtils.readFromFile(tempFile.absolutePath)
-        Assertions.assertEquals(
-            TestUtils.removeWhitespace(fileContentsBefore),
-            TestUtils.removeWhitespace(fileContentsAfter),
-            "ComparisonFailure at file: " + file.path
-        )
+        Truth.assertThat(TestUtils.removeWhitespace(fileContentsAfter))
+            .isEqualTo(TestUtils.removeWhitespace(fileContentsBefore))
     }
 
     companion object {

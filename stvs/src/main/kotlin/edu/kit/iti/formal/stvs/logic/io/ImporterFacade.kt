@@ -219,7 +219,7 @@ object ImporterFacade {
     fun importHistory(chosenFile: File): History {
         try {
             val root = chosenFile.inputStream().use { XmlImporter.readXml(it).rootElement }
-            val filenames = root.getChildren("filename").map { it.text }
+            val filenames = root.getChildren("filename").map { it.text.trim() }
             return History(filenames)
         } catch (e: IOException) {
             throw ImportException(e)

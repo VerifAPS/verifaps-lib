@@ -1,9 +1,9 @@
 package edu.kit.iti.formal.stvs.logic.io.xml.roundTripTests
 
+import com.google.common.truth.Truth
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
 import edu.kit.iti.formal.stvs.logic.io.xml.TestUtils
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -22,10 +22,8 @@ class XmlConfigRoundtripTest {
             ExporterFacade.exportConfig(importedConfig, it)
         }
 
-        Assertions.assertEquals(
-            TestUtils.removeWhitespace(fileContentsBefore),
-            TestUtils.removeWhitespace(fileContentsAfter)
-        )
+        Truth.assertThat(TestUtils.removeWhitespace(fileContentsAfter))
+            .isEqualTo(TestUtils.removeWhitespace(fileContentsBefore))
     }
 
     companion object {

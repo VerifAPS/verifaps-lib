@@ -254,7 +254,7 @@ class TblExprToSExpr(columnVar: String,
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext) = SSymbol("true")
 
-    override fun visitI(ctx: TestTableLanguageParser.IContext) = SInteger(ctx.INTEGER().text.toBigInteger())
+    override fun visitI(ctx: TestTableLanguageParser.IContext) = SNumber(ctx.INTEGER().text.toBigInteger())
 
     override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext) = SSymbol("true")
 

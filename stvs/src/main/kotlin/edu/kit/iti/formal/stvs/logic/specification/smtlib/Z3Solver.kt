@@ -114,7 +114,7 @@ class Z3Solver(config: GlobalConfig) {
             throw ConcretizationException("Solver returned status: Unsatisfiable")
         }
 
-        return output.subList(1, output.size).filterIsInstance<SList>()
+        return (output[1] as SList).filterIsInstance<SList>()
     }
 
     companion object {
