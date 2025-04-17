@@ -190,11 +190,11 @@ open class ExpressionReplacer(protected val assignments: Map<out SMVExpr, SMVExp
     }
 
     override fun visit(v: SVariable): SMVExpr = replace(v)
-    override fun visit(v: SBinaryExpression) = replace(v)
-    override fun visit(v: SUnaryExpression) = replace(v)
-    override fun visit(v: SLiteral) = replace(v)
-    override fun visit(v: SFunction) = replace(v)
-    override fun visit(v: SQuantified) = replace(v)
+    override fun visit(be: SBinaryExpression) = replace(be)
+    override fun visit(ue: SUnaryExpression) = replace(ue)
+    override fun visit(l: SLiteral) = replace(l)
+    override fun visit(func: SFunction) = replace(func)
+    override fun visit(quantified: SQuantified) = replace(quantified)
 }
 
 class SMVAstMutableTraversal(val visitor: SMVAstMutableVisitor) : SMVAstMutableVisitor() {
@@ -274,9 +274,9 @@ open class ExpressionReplacerRecur(val assignments: Map<out SMVExpr, SMVExpr>) :
     }
 
     override fun visit(v: SVariable): SMVExpr = replace(v)
-    override fun visit(v: SBinaryExpression): SMVExpr = replace(v)
-    override fun visit(v: SUnaryExpression): SMVExpr = replace(v)
-    override fun visit(v: SLiteral): SMVExpr = replace(v)
-    override fun visit(v: SFunction): SMVExpr = replace(v)
-    override fun visit(v: SQuantified): SMVExpr = replace(v)
+    override fun visit(be: SBinaryExpression): SMVExpr = replace(be)
+    override fun visit(ue: SUnaryExpression): SMVExpr = replace(ue)
+    override fun visit(l: SLiteral): SMVExpr = replace(l)
+    override fun visit(func: SFunction): SMVExpr = replace(func)
+    override fun visit(quantified: SQuantified): SMVExpr = replace(quantified)
 }

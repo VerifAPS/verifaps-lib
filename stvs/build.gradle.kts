@@ -58,15 +58,6 @@ dependencies {
     implementation(project(":fxutils"))
 }
 
-fun getVersionName(): String {
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine = listOf("git", "rev-parse", "--short", "HEAD")
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
 application { mainClass = "edu.kit.iti.formal.stvs.StvsApplication" }
 
 /*ext.sharedManifest = manifest {

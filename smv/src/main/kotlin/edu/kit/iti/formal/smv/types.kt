@@ -137,11 +137,11 @@ data class EnumType(var values: List<String>) : SMVType {
 
     override fun allowedValue(obj: Any): Boolean = obj is String
 
-    override fun valueOf(value: String): SLiteral {
-        if (!values.contains(value)) {
+    override fun valueOf(str: String): SLiteral {
+        if (!values.contains(str)) {
             throw IllegalArgumentException()
         }
-        return SEnumLiteral(value, this)
+        return SEnumLiteral(str, this)
     }
 
     override fun toString(): String {

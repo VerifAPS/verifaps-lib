@@ -9,6 +9,8 @@ import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.opentest4j.AssertionFailedError
 import kotlin.test.assertFailsWith
 
 /**
@@ -128,7 +130,7 @@ class SpecificationTableTest {
 
     @Test//(expected = IndexOutOfBoundsException::class)
     fun testGetRowNoSuchRow() {
-        assertFailsWith<NoSuchElementException> {
+        assertFailsWith<IndexOutOfBoundsException> {
             table.rows[4]
         }
     }
@@ -145,42 +147,46 @@ class SpecificationTableTest {
         assertEquals(newRow, table.rows[4])
     }
 
-    @Test//(expected = IllegalArgumentException::class)
-    @Throws(Throwable::class)
+    @Test
     fun testAddInvalidRow() {
-        TestUtils.rethrowThreadUncheckedExceptions {
-            val newCells = mapOf(
-                "VariableA" to "A4",
-                "VariableB" to "B4",
-                "VariableC" to "C4",
-                "VariableX" to "D4"
-            )
-            val newRow = SpecificationRow.createUnobservableRow(newCells)
-            table.rows.add(newRow)
+        assertThrows<IllegalArgumentException> {
+            TestUtils.rethrowThreadUncheckedExceptions {
+                val newCells = mapOf(
+                    "VariableA" to "A4",
+                    "VariableB" to "B4",
+                    "VariableC" to "C4",
+                    "VariableX" to "D4"
+                )
+                val newRow = SpecificationRow.createUnobservableRow(newCells)
+                table.rows.add(newRow)
+            }
         }
     }
 
-    @Test//(expected = IllegalArgumentException::class)
-    @Throws(Throwable::class)
+    @Test
     fun testAddInvalidlySizedRow() {
-        TestUtils.rethrowThreadUncheckedExceptions {
-            val newCells = mapOf(
-                "VariableA" to "A4",
-                "VariableB" to "B4",
-                "VariableC" to "C4",
-                "VariableD" to "D4",
-                "VariableE" to "E5"
-            )
-            val newRow = SpecificationRow.createUnobservableRow(newCells)
-            table.rows.add(newRow)
+        assertThrows<IllegalArgumentException> {
+            TestUtils.rethrowThreadUncheckedExceptions {
+                val newCells = mapOf(
+                    "VariableA" to "A4",
+                    "VariableB" to "B4",
+                    "VariableC" to "C4",
+                    "VariableD" to "D4",
+                    "VariableE" to "E5"
+                )
+                val newRow = SpecificationRow.createUnobservableRow(newCells)
+                table.rows.add(newRow)
+            }
         }
     }
 
-    @Test//(expected = IllegalStateException::class)
+    @Test
     fun testAddColumnToEmptyTable() {
         val emptyTable = ConstraintSpecification(FreeVariableList())
         val column = SpecificationColumn(arrayListOf<ConstraintCell?>())
-        emptyTable.addColumn(SpecIoVariable(VariableCategory.INPUT, "INT", "A"), column)
+        assertFailsWith<IllegalStateException> {
+            emptyTable.addColumn(SpecIoVariable(VariableCategory.INPUT, "INT", "A"), column)
+        }
     }
 
     @Test

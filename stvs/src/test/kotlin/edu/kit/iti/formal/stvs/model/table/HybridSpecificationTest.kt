@@ -47,7 +47,7 @@ class HybridSpecificationTest {
     fun getCounterExample() {
         Assertions.assertEquals(null, hybridSpec.counterExample)
         hybridSpec.counterExample = (concreteInstance)
-        Assertions.assertEquals(Optional.of(concreteInstance), hybridSpec.counterExample)
+        Assertions.assertEquals(concreteInstance, hybridSpec.counterExample)
     }
 
     @Test
@@ -80,7 +80,7 @@ class HybridSpecificationTest {
         hybridSpec.concreteInstance = (concreteInstance)
         Assertions.assertNotNull(hybridSpec.concreteInstance)
         hybridSpec.removeConcreteInstance()
-        Assertions.assertNotNull(hybridSpec.concreteInstance)
+        Assertions.assertNull(hybridSpec.concreteInstance)
     }
 
     @Test

@@ -7,6 +7,7 @@ import javafx.collections.FXCollections
 import javafx.collections.MapChangeListener
 import javafx.collections.ObservableMap
 import javafx.util.Callback
+import java.util.Objects
 import java.util.function.Consumer
 import java.util.stream.Collectors
 
@@ -108,12 +109,7 @@ open class SpecificationRow<C>(cells: Map<String, C>, val extractor: Callback<C,
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = cells.hashCode()
-        result = 31 * result + commentProperty.hashCode()
-        return result
-    }
-
+    override fun hashCode(): Int = Objects.hash(cells, comment)
 
     companion object {
         /**

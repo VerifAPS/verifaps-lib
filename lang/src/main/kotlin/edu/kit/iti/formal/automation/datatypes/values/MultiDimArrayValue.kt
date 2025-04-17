@@ -31,6 +31,7 @@ class NDArray<T : Any>(val dimensions: Array<IntRange>, defaultValue: T) {
         data[p] = value
     }
 
+    @Suppress("UNCHECKED_CAST")
     operator fun get(it: List<Int>): T = data[pos(it)] as T
     operator fun get(vararg idx: Int): T = this[idx.toList()]
     operator fun set(vararg idx: Int, value: T) {

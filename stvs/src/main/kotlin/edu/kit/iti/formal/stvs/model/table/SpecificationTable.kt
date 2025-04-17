@@ -246,11 +246,11 @@ open class SpecificationTable<H : Named?, C, D>(
         append("\nColumns: ")
         columnHeaders.joinTo(this, ", ") { it.toString() }
         append("\nRows:\n")
-        rows.joinTo(this, "\n") { row ->
+        /*rows.joinTo(this, "\n") { row ->
             columnHeaders.joinTo(this, ",") { header ->
                 row!!.cells[header!!.name].toString()
             }
-        }
+        }*/
     }
 
     override fun equals(other: Any?): Boolean {

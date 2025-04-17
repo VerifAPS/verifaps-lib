@@ -11,7 +11,6 @@ import java.util.*
  * @version 1
  */
 object DataTypes {
-    val DEFAULT = BigInteger.ZERO
     internal var map = HashMap<String, AnyDt>()
 
     val dataTypeNames: Set<String>
@@ -80,7 +79,6 @@ object DataTypes {
     private operator fun <T : AnyDt> get(anyClazz: Class<T>) =
             map.values.filter { anyClazz.isAssignableFrom(it.javaClass) }
 
-    @JvmOverloads
     fun findSuitableInteger(s: BigInteger, signed: Boolean): AnyInt {
         return findSuitableInteger(s,
                 if (signed)
@@ -90,7 +88,6 @@ object DataTypes {
         )
     }
 
-    @JvmOverloads
     fun findSuitableInteger(s: BigInteger, integerTypes: Array<AnyInt> = integers): AnyInt {
         if (s == BigInteger.ZERO) return INT
 

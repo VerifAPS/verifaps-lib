@@ -88,11 +88,20 @@ class SpecificationRowTest {
 
     @Test
     fun testHashCode() {
+        val toBeChanged: StringProperty = SimpleStringProperty("")
+
+        val specRow = SpecificationRow(HashMap(), identityExtractor())
+        specRow.cells["abc"] = toBeChanged
+
         val otherRow = SpecificationRow(HashMap(), identityExtractor())
         otherRow.cells["abc"] = toBeChanged
-        Assertions.assertEquals(otherRow.hashCode().toLong(), specRow.hashCode().toLong())
+
+        Assertions.assertEquals(otherRow.hashCode(), specRow.hashCode())
+        Assertions.assertEquals(otherRow, specRow)
+
+
         otherRow.cells["abd"] = SimpleStringProperty("something else")
-        Assertions.assertNotEquals(otherRow.hashCode().toLong(), specRow.hashCode().toLong())
+        Assertions.assertNotEquals(otherRow.hashCode(), specRow.hashCode())
     }
 
     companion object {
