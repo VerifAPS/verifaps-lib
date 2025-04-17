@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -42,11 +43,16 @@ tasks.withType<Test>().configureEach {
 
     // Log information about all test results, not only the failed ones.
     testLogging {
+        showStandardStreams = false
+        exceptionFormat = TestExceptionFormat.SHORT
+
         events(
             TestLogEvent.FAILED,
             //TestLogEvent.PASSED,
             //TestLogEvent.SKIPPED
         )
+
+        error.showStandardStreams = true
     }
 }
 

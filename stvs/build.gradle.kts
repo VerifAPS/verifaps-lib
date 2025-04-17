@@ -82,10 +82,6 @@ tasks.named<Test>("test") {
     useJUnitPlatform() {
         excludeTags("performance", "demo", "random")
     }
-
-    testLogging {
-        showStandardStreams = true
-    }
 }
 
 tasks.register<Test>("guiTest") {
