@@ -44,6 +44,10 @@ jobs:
       - name: Run integration tests
         run: ./gradlew :exec:test
 
+      - name: Summarize tests results
+        uses: jeantessier/test-summary-action@v1
+        if: ${{ always() }}
+
 
 #  ttsynth-test:
 #    runs-on: ubuntu-latest

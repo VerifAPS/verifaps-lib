@@ -63,8 +63,6 @@ tasks.jacocoTestReport {
 
 tasks.register<Jar>("testJar") {
     archiveClassifier.set("tests")
-    //from sourceSets . test . output
-    //        from sourceSets . test . resources
 }
 
 tasks.withType<JavaCompile>().configureEach {
