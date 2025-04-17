@@ -13,7 +13,6 @@ object TypeFactory {
      * @param values the possible values that this enum type has
      * @return an instance of [TypeEnum]
      */
-    @JvmStatic
     fun enumOfName(name: String, vararg values: String): TypeEnum {
         return TypeEnum(name, listOf(*values))
     }

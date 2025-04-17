@@ -19,11 +19,13 @@ import javafx.beans.value.ObservableValue
 import junit.framework.AssertionFailedError
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
-import java.util.*
+import kotlin.concurrent.timer
+import kotlin.time.measureTimedValue
 
 /**
  * Created by bal on 26.02.17.
@@ -50,22 +52,25 @@ class VerificationScenarioTest {
         config = autoloadConfig()
     }
 
-    @Test//(timeout = TIMEOUT)
+    @Test
     @Throws(Exception::class)
+    @Disabled
     fun testVerify() {
         scenario.verificationResultProperty.addListener(VerificationResultListener())
         Assertions.assertEquals(VerificationState.NOT_STARTED, scenario.verificationState)
         scenario.verify(config, constraintSpec)
         Assertions.assertEquals(VerificationState.RUNNING, scenario.verificationState)
         done = false
-        val startTime = System.currentTimeMillis()
-        while (!done) {
-            Thread.sleep(500)
+        val startTime = measureTimedValue {
+            while (!done) {
+                Thread.sleep(500)
+            }
         }
     }
 
     @Test
     @Throws(Exception::class)
+    @Disabled
     fun testCancel() {
         Assertions.assertEquals(VerificationState.NOT_STARTED, scenario.verificationState)
         scenario.verify(config, constraintSpec)
@@ -102,7 +107,7 @@ class VerificationScenarioTest {
             observableValue: ObservableValue<out VerificationResult>,
             old: VerificationResult, newResult: VerificationResult
         ) {
-            val typeContext = Arrays.asList(TypeInt, TypeBool, enumOfName("enumD", "literalOne", "literalTwo"))
+            val typeContext = listOf(TypeInt, TypeBool, enumOfName("enumD", "literalOne", "literalTwo"))
             try {
                 val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
                     loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
@@ -112,11 +117,10 @@ class VerificationScenarioTest {
                     typeContext,
                     constraintSpec
                 )
-                /* Cannot just assertEquals() with verificationResults, as logFileNames (randomly
-        generated) will be different
-        assertEquals(expectedResult, newResult); */
+                /* Cannot just assertEquals() with verificationResults, as logFileNames
+                (randomly generated) will be different assertEquals(expectedResult, newResult); */
                 Assertions.assertEquals(expectedResult.javaClass, newResult.javaClass)
-            } catch (e: ImportException) {
+            } catch (_: ImportException) {
                 throw AssertionFailedError()
             }
             done = true

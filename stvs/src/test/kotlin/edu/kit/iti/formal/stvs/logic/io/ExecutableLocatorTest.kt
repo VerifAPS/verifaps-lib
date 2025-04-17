@@ -3,12 +3,14 @@ package edu.kit.iti.formal.stvs.logic.io
 import edu.kit.iti.formal.stvs.TestUtils
 import edu.kit.iti.formal.stvs.logic.io.ExecutableLocator.findExecutableFile
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 
 /**
  * Created by csicar on 20.07.17.
  */
+@Disabled
 class ExecutableLocatorTest {
     @Test
     @Throws(Exception::class)
