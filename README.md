@@ -1,4 +1,4 @@
-# verifaps-lib  [![CircleCI](https://circleci.com/gh/VerifAPS/verifaps-lib/tree/master.svg?style=svg)](https://circleci.com/gh/VerifAPS/verifaps-lib/tree/master) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=VerifAPS_verifaps-lib&metric=alert_status)](https://sonarcloud.io/dashboard?id=VerifAPS_verifaps-lib)
+# verifaps-lib  [![Tests](https://github.com/VerifAPS/verifaps-lib/actions/workflows/gradle.yml/badge.svg)](https://github.com/VerifAPS/verifaps-lib/actions/workflows/gradle.yml)
  
 Library and programs for the verification of software for automated production systems.
 

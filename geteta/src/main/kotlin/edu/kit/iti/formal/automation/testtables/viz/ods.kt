@@ -1,5 +1,7 @@
 package edu.kit.iti.formal.automation.testtables.viz
 
+import com.github.jferard.fastods.AnonymousOdsFileWriter
+import com.github.jferard.fastods.OdsDocument
 import com.github.jferard.fastods.OdsFactory
 import com.github.jferard.fastods.Table
 import com.github.jferard.fastods.TableCell
@@ -27,9 +29,9 @@ import java.util.*
 import java.util.logging.Logger
 
 abstract class ODSWriter {
-    protected val odsFactory = OdsFactory.create(Logger.getLogger(""), Locale.US)
-    val writer = odsFactory.createWriter()
-    protected val document = writer.document()
+    protected val odsFactory: OdsFactory = OdsFactory.create(Logger.getLogger(""), Locale.US)
+    val writer: AnonymousOdsFileWriter = odsFactory.createWriter()
+    protected val document: OdsDocument = writer.document()
 }
 
 abstract class ODSTestTableWriter(protected val gtt: GeneralizedTestTable) : ODSWriter() {
@@ -664,7 +666,7 @@ class ODSFormulaPrinter(
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext) = "TRUE()"
 
-    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext) = ctx.text
+    override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): String? = ctx.text
 
     override fun visitConstantTrue(ctx: TestTableLanguageParser.ConstantTrueContext?) = "TRUE()"
 
@@ -763,7 +765,7 @@ interface TableStyle {
 }
 
 object DefaultTableStyle : TableStyle {
-    val EMPTY = TableCellStyle.DEFAULT_CELL_STYLE
+    val EMPTY: TableCellStyle = TableCellStyle.DEFAULT_CELL_STYLE
     override var styleRowId: TableCellStyle = EMPTY
     override var stylePauseVariableHeader: TableCellStyle = EMPTY
 
@@ -771,21 +773,21 @@ object DefaultTableStyle : TableStyle {
         .decimalPlaces(8).groupThousands(true).build()
 
 
-    var styleValues = TableCellStyle.builder("values")
+    var styleValues: TableCellStyle? = TableCellStyle.builder("values")
         .build()
-    override var styleOutputValue = TableCellStyle.builder("values_output")
+    override var styleOutputValue: TableCellStyle = TableCellStyle.builder("values_output")
         .parentCellStyle(styleValues).build()
-    override val styleInputValue = TableCellStyle.builder("values_input")
+    override val styleInputValue: TableCellStyle = TableCellStyle.builder("values_input")
         .parentCellStyle(styleValues).build()
 
-    override var styleCategoryHeader = TableCellStyle.builder("category_header")
+    override var styleCategoryHeader: TableCellStyle = TableCellStyle.builder("category_header")
         .backgroundColor { "ff00ff" }
         .fontWeightBold()
         .textAlign(CellAlign.CENTER)
         .borderAll(SimpleLength.pt(1.0), SimpleColor.BLACK, BorderStyle.SOLID)
         .build()
 
-    var styleVariableHeader = TableCellStyle.builder("variable_header")
+    var styleVariableHeader: TableCellStyle? = TableCellStyle.builder("variable_header")
         .backgroundColor(SimpleColor.GRAY48)
         .fontWeightBold()
         .textAlign(CellAlign.CENTER)
@@ -796,7 +798,7 @@ object DefaultTableStyle : TableStyle {
         .parentCellStyle(styleVariableHeader)
         .build()
 
-    override val styleOutputVariableHeader = TableCellStyle.builder("variable_output_header")
+    override val styleOutputVariableHeader: TableCellStyle = TableCellStyle.builder("variable_output_header")
         .parentCellStyle(styleVariableHeader)
         .build()
 

@@ -15,6 +15,7 @@ kotlin {
 
 dependencies {
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0")
+    implementation("org.jetbrains.dokka:dokka-base:2.0.0")
     implementation(libs.kotlinGradlePlugin)
 }
 

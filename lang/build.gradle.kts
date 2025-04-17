@@ -25,3 +25,5 @@ tasks.named<AntlrTask>("generateGrammarSource") {
 tasks.withType<Test>().configureEach {
     exclude("**/SFCLangParserTest.class")
 }
+
+tasks["dokkaHtmlPartial"].dependsOn(tasks["generateGrammarSource"])
