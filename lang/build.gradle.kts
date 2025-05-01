@@ -10,7 +10,7 @@ dependencies {
     api(project(":util"))
     api(project(":xml"))
 
-    api("com.github.ajalt.clikt:clikt:5.0.2")
+    api("com.github.ajalt.clikt:clikt:5.0.3")
 
     testImplementation("org.mdkt.compiler:InMemoryJavaCompiler:1.3.0")
     implementation("com.squareup:javapoet:1.13.0")
