@@ -40,8 +40,8 @@ dependencies {
     implementation(project(":lang"))
     implementation(project(":geteta"))
 
-    implementation("org.sosy-lab:java-smt:5.0.1")
-    val z3Version = "4.13.4"
+    implementation("org.sosy-lab:java-smt:5.0.1-523-g9001c0ea4")
+    val z3Version = "4.14.0"
     //javasmt-solver-z3-4.13.4-libz3-x64.dll
     runtimeOnly("org.sosy-lab:javasmt-solver-z3:$z3Version:libz3-x64@dll")
     runtimeOnly("org.sosy-lab:javasmt-solver-z3:$z3Version:libz3java-x64@dll")
@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.jdom)
     implementation("jaxen:jaxen:2.0.0")
 
-    implementation("com.google.code.gson:gson:2.12.1")
+    implementation("com.google.code.gson:gson:2.13.1")
 
     implementation("org.fxmisc.cssfx:cssfx:11.2.2")
     implementation(project(":fxutils"))
