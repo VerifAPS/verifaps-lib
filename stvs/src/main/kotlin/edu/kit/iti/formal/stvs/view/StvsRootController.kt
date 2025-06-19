@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
@@ -30,7 +48,7 @@ class StvsRootController(
      * Get the current [StvsRootModel] managed by this controller.
      * @return The root model
      */
-    val rootModel: StvsRootModel
+    val rootModel: StvsRootModel,
 ) : Controller {
     override val view: StvsRootView
 
@@ -48,7 +66,7 @@ class StvsRootController(
     init {
         this.editorPaneController = EditorPaneController(
             rootModel.scenario.code,
-            rootModel.globalConfig
+            rootModel.globalConfig,
         )
 
         this.types =
@@ -58,8 +76,12 @@ class StvsRootController(
             SimpleListProperty(FXCollections.observableArrayList(ioVarsFromCode(rootModel.scenario.code.parsedCode)))
 
         this.specificationsPaneController = SpecificationsPaneController(
-            rootModel.hybridSpecifications, rootModel.scenario.verificationStateProperty,
-            types, ioVars, rootModel.globalConfig, rootModel.scenario
+            rootModel.hybridSpecifications,
+            rootModel.scenario.verificationStateProperty,
+            types,
+            ioVars,
+            rootModel.globalConfig,
+            rootModel.scenario,
         )
 
         rootModel.scenario.codeProperty
@@ -73,7 +95,7 @@ class StvsRootController(
         this.verificationResultHandler = VerificationResultHandler(this)
         view.addEventHandler(VerificationEvent.Companion.EVENT_TYPE) { event: VerificationEvent ->
             this.onVerificationEvent(
-                event
+                event,
             )
         }
     }
@@ -105,8 +127,10 @@ class StvsRootController(
             VerificationEvent.Type.STOP -> {
                 rootModel.scenario.cancel()
                 AlertFactory.createAlert(
-                    AlertType.INFORMATION, "Verification cancelled",
-                    "Verification cancelled.", ""
+                    AlertType.INFORMATION,
+                    "Verification cancelled",
+                    "Verification cancelled.",
+                    "",
                 ).showAndWait()
             }
 
@@ -161,8 +185,10 @@ class StvsRootController(
     private fun onVerificationResultChange(res: VerificationResult?) {
         res?.accept(verificationResultHandler)
             ?: AlertFactory.createAlert(
-                AlertType.ERROR, "Verification Error",
-                "The verification result is null.", ""
+                AlertType.ERROR,
+                "Verification Error",
+                "The verification result is null.",
+                "",
             ).showAndWait()
     }
 }

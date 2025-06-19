@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
 import com.google.common.truth.Truth
@@ -16,7 +34,7 @@ import kotlin.test.assertFailsWith
  * Created by csicar on 09.02.17.
  */
 class SmtEncoderTest {
-    @Test //! Should take about 19min!
+    @Test // ! Should take about 19min!
     @Tag("performance")
     fun performanceTest() {
         val sourceFileGetter = loaderFor("spec_long_example.xml")
@@ -27,7 +45,7 @@ class SmtEncoderTest {
         println(model.toString())
     }
 
-    @Test //! Takes about 3min!
+    @Test // ! Takes about 3min!
     @Tag("performance")
     fun performanceSingleVariableTest() {
         val sourceFileGetter =
@@ -50,7 +68,8 @@ class SmtEncoderTest {
             { XmlSessionImporterTest::class.java.getResourceAsStream("spec_constraint_valid_enum_1.xml")!! }
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum("colors", mutableListOf("red", "green", "blue"))
+            sourceFile(),
+            TypeEnum("colors", mutableListOf("red", "green", "blue")),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
@@ -70,10 +89,11 @@ class SmtEncoderTest {
         }
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "colors",
-                mutableListOf("red", "green", "blue")
-            )
+                mutableListOf("red", "green", "blue"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
@@ -100,7 +120,7 @@ class SmtEncoderTest {
             "( bvsge |lala_0_1| #x0000 )",
             "( bvslt |lala_0_1| #x0003 )",
             "( bvsge |lala_0_0| #x0000 )",
-            "( bvslt |lala_0_0| #x0003 )"
+            "( bvslt |lala_0_0| #x0003 )",
         )
     }
 
@@ -111,10 +131,11 @@ class SmtEncoderTest {
         }
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "colors",
-                mutableListOf("red", "green", "blue", "orange", "black")
-            )
+                mutableListOf("red", "green", "blue", "orange", "black"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
@@ -141,7 +162,7 @@ class SmtEncoderTest {
             "( bvsge |lala_0_1| #x0000 )",
             "( bvslt |lala_0_1| #x0005 )",
             "( bvsge |lala_0_0| #x0000 )",
-            "( bvslt |lala_0_0| #x0005 )"
+            "( bvslt |lala_0_0| #x0005 )",
         )
     }
 
@@ -150,10 +171,11 @@ class SmtEncoderTest {
         val sourceFile = loaderFor("spec_all.xml")
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "colors",
-                mutableListOf("red", "green", "blue", "orange", "black")
-            )
+                mutableListOf("red", "green", "blue", "orange", "black"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
@@ -165,10 +187,9 @@ class SmtEncoderTest {
 
         println(output.toString())
 
-
         testWithStatements(
             constraints,
-            "( implies ( bvuge n_1 #x0000 ) ( not ( = |C_1_0| #x0032 ) ) )"
+            "( implies ( bvuge n_1 #x0000 ) ( not ( = |C_1_0| #x0032 ) ) )",
         )
     }
 
@@ -178,10 +199,11 @@ class SmtEncoderTest {
         val sourceFile = loaderFor("spec_all.xml")
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "colors",
-                mutableListOf("red", "green", "blue", "orange", "black")
-            )
+                mutableListOf("red", "green", "blue", "orange", "black"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
@@ -203,17 +225,18 @@ class SmtEncoderTest {
         val sourceFile = loaderFor("spec_freevariable.xml")
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "Color",
-                mutableListOf("red", "green", "blue")
-            )
+                mutableListOf("red", "green", "blue"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(
             sourceFile(),
             TypeEnum(
                 "Color",
-                mutableListOf("red", "green", "blue")
-            )
+                mutableListOf("red", "green", "blue"),
+            ),
         )
 
         val maxDuration = 5
@@ -227,10 +250,11 @@ class SmtEncoderTest {
         val sourceFile = loaderFor("spec_all.xml")
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "colors",
-                mutableListOf("red", "green", "blue", "orange", "black")
-            )
+                mutableListOf("red", "green", "blue", "orange", "black"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
         assertFailsWith<IllegalArgumentException> {
@@ -251,14 +275,13 @@ class SmtEncoderTest {
         val output = smtEncoder.constraint
         val constraints = output.globalConstraints
 
-
         testWithStatements(
             constraints,
             "( bvuge n_0 #x0005 )",
             " ( bvule n_0 #x0003 )  ",
             "( implies  ( bvuge n_0 #x0000 )   ( = |C_0_0| #x002A )  )",
             " ( implies  ( bvuge n_0 #x0001 )   ( = |C_0_1| #x002A )  )",
-            "( implies  ( bvuge n_0 #x0002 )   ( = |C_0_2| #x002A )  )"
+            "( implies  ( bvuge n_0 #x0002 )   ( = |C_0_2| #x002A )  )",
         )
     }
 
@@ -269,21 +292,21 @@ class SmtEncoderTest {
         val sourceFile = loaderFor("spec_freevariable.xml")
 
         val spec = TestUtils.importValidSpec(
-            sourceFile(), TypeEnum(
+            sourceFile(),
+            TypeEnum(
                 "Color",
-                mutableListOf("red", "green", "blue")
-            )
+                mutableListOf("red", "green", "blue"),
+            ),
         )
         val freeVariables = TestUtils.importValidFreeVariables(
             sourceFile(),
             TypeEnum(
                 "Color",
-                mutableListOf("red", "green", "blue")
-            )
+                mutableListOf("red", "green", "blue"),
+            ),
         )
 
         val maxDuration = 50
-
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
@@ -305,7 +328,6 @@ class SmtEncoderTest {
         val freeVariables = TestUtils.importValidFreeVariables(sourceFile())
 
         val maxDuration = 50
-
 
         val smtEncoder = SmtEncoder(maxDuration, spec, freeVariables)
         val output = smtEncoder.constraint
@@ -330,7 +352,6 @@ class SmtEncoderTest {
         val preprocessor = SmtEncoder(maxDurations, spec, freeVariables)
         println(preprocessor.constraint)
     }
-
 
     @Test
     @Throws(ImportException::class, IOException::class)
@@ -378,7 +399,7 @@ class SmtEncoderTest {
             "(bvuge n_1 #x0001)",
             "(bvule n_1 #x0005)",
             "(bvuge n_2 #x0001)",
-            "(bvule n_2 #x0005)"
+            "(bvule n_2 #x0005)",
         ).map { fromText(it) }
 
         for (expr in seq) {
@@ -387,7 +408,7 @@ class SmtEncoderTest {
 
         println()
 
-        for(expr in constraints) {
+        for (expr in constraints) {
             println(expr.toString() + " " + expr.hashCode().toString())
         }
 

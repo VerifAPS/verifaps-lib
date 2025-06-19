@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -58,10 +58,7 @@ class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap())
  * 2020-02-11 weigl: add branch conditions to line map
  * 2020-03-10 weigl: add branch conditions for cases
  */
-open class SymbolicExecutioner(
-    var scope: Scope = Scope.defaultScope(),
-    val useDefinitions: Boolean = true,
-) : DefaultVisitor<SMVExpr>() {
+open class SymbolicExecutioner(var scope: Scope = Scope.defaultScope(), val useDefinitions: Boolean = true) : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
     private val varCache = HashMap<String, SVariable>()
@@ -148,7 +145,8 @@ open class SymbolicExecutioner(
     //region visitors
     override fun visit(literal: Literal): SLiteral = this.valueTranslator.translate(literal)
 
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable)
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) =
+        visit(functionBlockDeclaration as PouExecutable)
     override fun visit(programDeclaration: ProgramDeclaration) = visit(programDeclaration as PouExecutable)
     fun visit(exec: PouExecutable): SMVExpr? {
         exec.findAttributePragma("smv_body")?.let {

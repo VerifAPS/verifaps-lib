@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -197,7 +197,8 @@ class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageP
         ctx.op.accept(this) + ctx.expr().accept(this),
     )
 
-    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext) = span("interval", "[${ctx.lower.accept(this)}, ${ctx.upper.accept(this)}]")
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext) =
+        span("interval", "[${ctx.lower.accept(this)}, ${ctx.upper.accept(this)}]")
 
     override fun visitRelational_operator(ctx: TestTableLanguageParser.Relational_operatorContext) = when {
         ctx.EQUALS() != null -> options.mathEquals
@@ -210,39 +211,55 @@ class HtmlExprPrinter(val options: HtmlTablePrinterOptions) : TestTableLanguageP
 
     override fun visitMinus(ctx: TestTableLanguageParser.MinusContext) = span("minus", "-" + ctx.sub.accept(this))
 
-    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext) = span("negate", "${options.mathNot} " + ctx.sub.accept(this))
+    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext) = span(
+        "negate",
+        "${options.mathNot} " + ctx.sub.accept(this),
+    )
 
     override fun visitParens(ctx: TestTableLanguageParser.ParensContext) = "(${ctx.expr().accept(this)})"
 
-    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) = ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) =
+        ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
 
-    override fun visitMod(ctx: TestTableLanguageParser.ModContext) = ctx.left.accept(this) + " mod " + ctx.right.accept(this)
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext) =
+        ctx.left.accept(this) + " mod " + ctx.right.accept(this)
 
-    override fun visitMult(ctx: TestTableLanguageParser.MultContext) = ctx.left.accept(this) + " ${options.mathMult} " + ctx.right.accept(this)
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext) =
+        ctx.left.accept(this) + " ${options.mathMult} " + ctx.right.accept(this)
 
-    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext) = ctx.guardedcommand().accept(this)
+    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext) =
+        ctx.guardedcommand().accept(this)
 
-    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String = ctx.n.text + "(" + ctx.expr().joinToString(", ") { it.accept(this) } + ")"
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String =
+        ctx.n.text + "(" + ctx.expr().joinToString(", ") { it.accept(this) } + ")"
 
     override fun visitBvariable(ctx: TestTableLanguageParser.BvariableContext) = ctx.variable().accept(this)
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = ctx.left.accept(this) + " ${options.mathAnd} " + ctx.right.accept(this)
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) =
+        ctx.left.accept(this) + " ${options.mathAnd} " + ctx.right.accept(this)
 
-    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) = ctx.left.accept(this) + " ${options.mathPlus} " + ctx.right.accept(this)
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) =
+        ctx.left.accept(this) + " ${options.mathPlus} " + ctx.right.accept(this)
 
-    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) = ctx.left.accept(this) + " ${options.mathDiv} " + ctx.right.accept(this)
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) =
+        ctx.left.accept(this) + " ${options.mathDiv} " + ctx.right.accept(this)
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) = ctx.left.accept(this) + " ${options.mathUnequal}" + ctx.right.accept(this)
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) =
+        ctx.left.accept(this) + " ${options.mathUnequal}" + ctx.right.accept(this)
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) = ctx.left.accept(this) + " ${options.mathXor} " + ctx.right.accept(this)
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) =
+        ctx.left.accept(this) + " ${options.mathXor} " + ctx.right.accept(this)
 
     override fun visitBconstant(ctx: TestTableLanguageParser.BconstantContext) = ctx.constant().accept(this)
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) = ctx.left.accept(this) + " ${options.mathOr} " + ctx.right.accept(this)
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) =
+        ctx.left.accept(this) + " ${options.mathOr} " + ctx.right.accept(this)
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) = ctx.left.accept(this) + " ${options.mathEquals} " + ctx.right.accept(this)
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) =
+        ctx.left.accept(this) + " ${options.mathEquals} " + ctx.right.accept(this)
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) = ctx.left.accept(this) + " ${options.mathMinus} " + ctx.right.accept(this)
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) =
+        ctx.left.accept(this) + " ${options.mathMinus} " + ctx.right.accept(this)
 
     override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) = span("variable", ctx.text)
 

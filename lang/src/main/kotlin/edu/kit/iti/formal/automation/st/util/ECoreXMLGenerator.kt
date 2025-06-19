@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -62,14 +62,16 @@ constructor(
 
                 if (type == String::class.java) {
                     System.out.format(
-                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString\" />%n",
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " +
+                            "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString\" />%n",
                         f.name,
                     )
                 }
 
                 if (type == Boolean::class.java) {
                     System.out.format(
-                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean\" />%n",
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " +
+                            "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean\" />%n",
                         f.name,
                     )
                 }
@@ -82,9 +84,10 @@ constructor(
                     System.err.println("ERROR")
                 }
 
-                if (Top::class.java!!.isAssignableFrom(type)) {
+                if (Top::class.java.isAssignableFrom(type)) {
                     System.out.format(
-                        "\t<eStructuralFeatures xsi:type=\"ecore:EReference\" name=\"%s\" upperBound=\"-1\" eType=\"#//%s\" />%n",
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EReference\" name=\"%s\" " +
+                            "upperBound=\"-1\" eType=\"#//%s\" />%n",
                         f.name,
                         type.simpleName,
                     )

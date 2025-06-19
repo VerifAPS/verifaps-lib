@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -50,7 +50,8 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
     override fun visit(timeOfDay: AnyDate.TIME_OF_DAY): Boolean = expected == timeOfDay
     override fun visit(date: AnyDate.DATE): Boolean = expected == date
 
-    override fun visit(arrayType: ArrayType): Boolean = TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+    override fun visit(arrayType: ArrayType): Boolean =
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
 
     override fun visit(anyInt: AnyInt): Boolean = when (expected) {
         // TODO There should be a conformance check somewhere else!

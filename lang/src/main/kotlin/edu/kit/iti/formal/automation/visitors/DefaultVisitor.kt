@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -47,7 +47,8 @@ abstract class DefaultVisitorNN<T> : Visitor<T> {
     override fun visit(enumeration: CaseCondition.Enumeration): T = defaultVisit(enumeration)
     override fun visit(binaryExpression: BinaryExpression): T = defaultVisit(binaryExpression)
     override fun visit(configurationDeclaration: ConfigurationDeclaration): T = defaultVisit(configurationDeclaration)
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): T = defaultVisit(enumerationTypeDeclaration)
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): T =
+        defaultVisit(enumerationTypeDeclaration)
     override fun visit(repeatStatement: RepeatStatement): T = defaultVisit(repeatStatement)
     override fun visit(whileStatement: WhileStatement): T = defaultVisit(whileStatement)
     override fun visit(unaryExpression: UnaryExpression): T = defaultVisit(unaryExpression)

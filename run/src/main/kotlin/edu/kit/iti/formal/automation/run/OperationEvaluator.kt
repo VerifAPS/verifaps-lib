@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -84,7 +84,8 @@ object OperationEvaluator {
         else -> TODO("implement other data type")
     }
 
-    fun multiply(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt = normalizeInt(VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value)))
+    fun multiply(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt =
+        normalizeInt(VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value)))
 
     fun not(eValue: EValue): EValue {
         if (eValue is VBool) {
@@ -121,9 +122,15 @@ object OperationEvaluator {
         }
     }
 
-    private fun greaterThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
+    private fun greaterThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(
+        AnyBit.BOOL,
+        leftValue.value > rightValue.value,
+    )
 
-    private fun greaterThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
+    private fun greaterThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(
+        AnyBit.BOOL,
+        leftValue.value > rightValue.value,
+    )
 
     fun greaterThan(leftValue: EValue, rightValue: EValue): VBool = when {
         leftValue is VAnyReal || rightValue is VAnyReal -> greaterThan(toReal(leftValue), toReal(rightValue))
@@ -131,9 +138,15 @@ object OperationEvaluator {
         else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun greaterThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+    private fun greaterThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(
+        AnyBit.BOOL,
+        leftValue.value >= rightValue.value,
+    )
 
-    private fun greaterThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+    private fun greaterThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(
+        AnyBit.BOOL,
+        leftValue.value >= rightValue.value,
+    )
 
     fun greaterThanOrEquals(leftValue: EValue, rightValue: EValue): VBool = when {
         leftValue is VAnyReal || rightValue is VAnyReal -> greaterThanOrEquals(toReal(leftValue), toReal(rightValue))
@@ -141,9 +154,15 @@ object OperationEvaluator {
         else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun lessThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+    private fun lessThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(
+        AnyBit.BOOL,
+        leftValue.value <= rightValue.value,
+    )
 
-    private fun lessThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+    private fun lessThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(
+        AnyBit.BOOL,
+        leftValue.value <= rightValue.value,
+    )
 
     fun lessThanOrEquals(leftValue: EValue, rightValue: EValue): VBool = when {
         leftValue is VAnyReal || rightValue is VAnyReal -> lessThanOrEquals(toReal(leftValue), toReal(rightValue))
@@ -151,9 +170,15 @@ object OperationEvaluator {
         else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun lessThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+    private fun lessThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(
+        AnyBit.BOOL,
+        leftValue.value < rightValue.value,
+    )
 
-    private fun lessThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+    private fun lessThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(
+        AnyBit.BOOL,
+        leftValue.value < rightValue.value,
+    )
 
     fun lessThan(leftValue: EValue, rightValue: EValue): VBool = when {
         leftValue is VAnyReal || rightValue is VAnyReal -> lessThan(toReal(leftValue), toReal(rightValue))
@@ -175,7 +200,8 @@ object OperationEvaluator {
 
     fun subtract(leftValue: EValue, rightValue: EValue): EValue = add(leftValue, negate(rightValue))
 
-    fun modulo(leftValue: VAnyInt, rightValue: VAnyInt) = VAnyInt(leftValue.dataType, leftValue.value.mod(rightValue.value))
+    fun modulo(leftValue: VAnyInt, rightValue: VAnyInt) =
+        VAnyInt(leftValue.dataType, leftValue.value.mod(rightValue.value))
 
     fun modulo(leftValue: EValue, rightValue: EValue): EValue = when {
         leftValue is VAnyInt && rightValue is VAnyInt -> modulo(leftValue, rightValue)

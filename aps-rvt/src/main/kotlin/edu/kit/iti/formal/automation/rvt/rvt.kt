@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -57,10 +57,7 @@ val nameEqual: SVarEquals = { a, b -> a.name == b.name }
  * @author Alexander Weigl
  * @version 1 (12.06.17)
  */
-open class RegressionVerification(
-    var newVersion: SMVModule,
-    var oldVersion: SMVModule,
-) {
+open class RegressionVerification(var newVersion: SMVModule, var oldVersion: SMVModule) {
 
     val glueModule = SMVModule("main")
 
@@ -70,9 +67,11 @@ open class RegressionVerification(
     val oldInstanceName = "__old__"
     val newInstanceName = "__new__"
 
-    protected open fun commonInputVariables(): Set<Pair<SVariable, SVariable>> = commonVariables(oldVersion.moduleParameters, newVersion.moduleParameters, nameEqual)
+    protected open fun commonInputVariables(): Set<Pair<SVariable, SVariable>> =
+        commonVariables(oldVersion.moduleParameters, newVersion.moduleParameters, nameEqual)
 
-    protected open fun commonOutputVariables(): Set<Pair<SVariable, SVariable>> = commonOutputVariables(oldVersion, newVersion, nameEqual)
+    protected open fun commonOutputVariables(): Set<Pair<SVariable, SVariable>> =
+        commonOutputVariables(oldVersion, newVersion, nameEqual)
 
     protected open fun staticInitModule() {
         glueModule.name = "main"
@@ -170,7 +169,11 @@ open class RegressionVerification(
     }
 }
 
-private fun commonOutputVariables(oldVersion: SMVModule, newVersion: SMVModule, pred: SVarEquals): Set<Pair<SVariable, SVariable>> = commonVariables(oldVersion.outputVars, newVersion.outputVars, pred)
+private fun commonOutputVariables(
+    oldVersion: SMVModule,
+    newVersion: SMVModule,
+    pred: SVarEquals,
+): Set<Pair<SVariable, SVariable>> = commonVariables(oldVersion.outputVars, newVersion.outputVars, pred)
 
 val filterOutput = { k: SVariable -> k.isOutput }
 private val SMVModule.outputVars: Collection<SVariable>
@@ -267,12 +270,7 @@ open class GloballyMiter(oldVersion: SMVModule, newVersion: SMVModule) : Miter(o
 
 private fun SVariable.prefix(prefix: String): SVariable = SVariable(prefix + this.name, this.dataType!!)
 
-open class UntilMiter(
-    val endCondtion: SMVExpr,
-    oldVersion: SMVModule,
-    newVersion: SMVModule,
-    val inner: Miter,
-) : Miter(oldVersion, newVersion) {
+open class UntilMiter(val endCondtion: SMVExpr, oldVersion: SMVModule, newVersion: SMVModule, val inner: Miter) : Miter(oldVersion, newVersion) {
     var triggerCondition = SVariable.bool("END_TRIGGER_POINT")
 
     open fun event() {

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -20,10 +20,7 @@ package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.sfclang.split
 
-data class DateAndTimeData(
-    var date: DateData = DateData(),
-    var tod: TimeofDayData = TimeofDayData(),
-) {
+data class DateAndTimeData(var date: DateData = DateData(), var tod: TimeofDayData = TimeofDayData()) {
     var hours: Int
         get() = tod.hours
         set(hours) {

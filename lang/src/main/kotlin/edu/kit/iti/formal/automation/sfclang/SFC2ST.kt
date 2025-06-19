@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -145,7 +145,10 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
             sl.add(AssignmentStatement(SymbolicReference(transitVariable), BooleanLit.LFALSE))
 
             // S+N, R
-            step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.SET || aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
+            step.events.stream().filter { aa ->
+                aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.SET ||
+                    aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED
+            }
                 .forEach { aa ->
                     if (scope.hasVariable(aa.actionName)) {
                         sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LTRUE))
@@ -153,7 +156,10 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
                         sl.add(InvocationStatement(aa.actionName))
                     }
                 }
-            step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.OVERRIDING_RESET }
+            step.events.stream().filter { aa ->
+                aa.qualifier!!.qualifier ==
+                    SFCActionQualifier.Qualifier.OVERRIDING_RESET
+            }
                 .forEach { aa ->
                     if (scope.hasVariable(aa.actionName)) {
                         sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LFALSE))

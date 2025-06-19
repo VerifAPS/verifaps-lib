@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -20,11 +20,7 @@ package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.sfclang.split
 
-data class DateData(
-    var year: Int = 0,
-    var month: Int = 0,
-    var day: Int = 0,
-) {
+data class DateData(var year: Int = 0, var month: Int = 0, var day: Int = 0) {
     companion object {
         fun parse(str: String): DateData {
             val pattern = Regex("(?<year>\\d\\d\\d\\d)-(?<month>\\d?\\d)-(?<day>\\d?\\d)")

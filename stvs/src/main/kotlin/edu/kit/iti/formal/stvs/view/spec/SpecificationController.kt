@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec
 
 import edu.kit.iti.formal.stvs.logic.specification.SpecificationConcretizer
@@ -39,9 +57,11 @@ import javafx.scene.control.MenuItem
  */
 class SpecificationController(
     typeContext: ListProperty<Type>,
-    codeIoVariables: ListProperty<CodeIoVariable>, val spec: HybridSpecification,
-    stateProperty: ObjectProperty<VerificationState?>, codeInvalid: BooleanBinding?,
-    globalConfig: GlobalConfig
+    codeIoVariables: ListProperty<CodeIoVariable>,
+    val spec: HybridSpecification,
+    stateProperty: ObjectProperty<VerificationState?>,
+    codeInvalid: BooleanBinding?,
+    globalConfig: GlobalConfig,
 ) : Controller {
     private val globalConfig: GlobalConfig
     private val concretizationHandler: ConcretizationTaskHandler
@@ -75,14 +95,16 @@ class SpecificationController(
         this.globalConfig = globalConfig
         this.variableCollectionController = VariableCollectionController(typeContext, spec.freeVariableList)
         this.tableController = SpecificationTableController(
-            globalConfig, typeContext,
-            codeIoVariables, variableCollectionController.validator.validFreeVariablesProperty,
-            spec
+            globalConfig,
+            typeContext,
+            codeIoVariables,
+            variableCollectionController.validator.validFreeVariablesProperty,
+            spec,
         )
         this.specificationInvalid = SimpleBooleanProperty(true)
         specificationInvalid.bind(
             variableCollectionController.validator.validProperty.not()
-                .or(tableController.validator.validProperty.not()).or(codeInvalid)
+                .or(tableController.validator.validProperty.not()).or(codeInvalid),
         )
         this.specificationConcretizable = SimpleBooleanProperty(true)
         specificationConcretizable
@@ -108,17 +130,22 @@ class SpecificationController(
             EventHandler { actionEvent: ActionEvent -> this.startConcretizer(actionEvent) }
 
         spec.concreteInstanceProperty
-            .addListener { observable: ObservableValue<out ConcreteSpecification?>?, old: ConcreteSpecification?, newVal: ConcreteSpecification? ->
+            .addListener {
+                    observable: ObservableValue<out ConcreteSpecification?>?,
+                    old: ConcreteSpecification?,
+                    newVal: ConcreteSpecification?,
+                ->
                 this.onConcreteInstanceChanged(
-                    newVal
+                    newVal,
                 )
             }
         registerTimingDiagramDeactivationHandler()
     }
 
     private fun onVerificationStateChanged(
-        observableValue: ObservableValue<out VerificationState?>, oldState: VerificationState?,
-        newState: VerificationState?
+        observableValue: ObservableValue<out VerificationState?>,
+        oldState: VerificationState?,
+        newState: VerificationState?,
     ) {
         when (newState) {
             VerificationState.RUNNING -> view.setVerificationButtonStop()
@@ -166,11 +193,12 @@ class SpecificationController(
     private fun startConcretizer(actionEvent: ActionEvent) {
         val runner = ConcretizationRunner(
             tableController.validator.validSpecification!!,
-            variableCollectionController.validator.validFreeVariables
+            variableCollectionController.validator.validFreeVariables,
         )
         val task = JavaFxAsyncTask(
             globalConfig.simulationTimeout,
-            runner, this.concretizationHandler
+            runner,
+            this.concretizationHandler,
         )
 
         this.concretizingTask = task
@@ -213,14 +241,13 @@ class SpecificationController(
 
     private inner class ConcretizationRunner(
         val specToConcretize: ValidSpecification,
-        val freeVariables: List<ValidFreeVariable>
+        val freeVariables: List<ValidFreeVariable>,
     ) : AsyncRunner<ConcreteSpecification> {
         val concretizer: SpecificationConcretizer = SmtConcretizer(globalConfig)
 
         @Throws(Exception::class)
-        override fun run(): ConcreteSpecification {
-            return concretizer.calculateConcreteSpecification(specToConcretize, freeVariables)!!
-        }
+        override fun run(): ConcreteSpecification =
+            concretizer.calculateConcreteSpecification(specToConcretize, freeVariables)!!
 
         override fun terminate() {
             concretizer.terminate()

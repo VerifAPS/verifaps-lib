@@ -1,6 +1,23 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smt.SExprFacade.parseExpr
@@ -32,18 +49,18 @@ class SExpressionTest {
         assertThat(fromText("(nested1 2 3)"))
             .isEqualTo(sexpr("nested1", 2, 3))
 
-
         assertThat(
-            fromText("(a b c (nested1 2 3 ) (4))")
+            fromText("(a b c (nested1 2 3 ) (4))"),
         ).isEqualTo(
             SList(
-                "a", SSymbol("b"), SSymbol("c"),
+                "a",
+                SSymbol("b"),
+                SSymbol("c"),
                 sexpr("nested1", 2, 3),
-                SList(SNumber(4))
-            )
+                SList(SNumber(4)),
+            ),
         )
     }
-
 
     @Test
     fun fromStringWrongInput() {
@@ -73,7 +90,7 @@ class SExpressionTest {
             return listOf(
                 Arguments.of(list),
                 Arguments.of(SSymbol("asdasd")),
-                Arguments.of(SNumber(1))
+                Arguments.of(SNumber(1)),
             )
         }
     }

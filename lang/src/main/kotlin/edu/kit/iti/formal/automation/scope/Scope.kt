@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -189,15 +189,18 @@ data class Scope(val variables: VariableScope = VariableScope()) :
 
     fun filterByFlags(flags: Int): List<VariableDeclaration> = variables.filter { it.isType(flags) }
 
-    fun hasVariable(variable: String): Boolean = variable in variables || this.parent != null && this.parent!!.hasVariable(variable)
+    fun hasVariable(variable: String): Boolean =
+        variable in variables || this.parent != null && this.parent!!.hasVariable(variable)
 
     fun resolveProgram(key: String) = programs.lookup(key)
     fun resolveFunctionBlock(key: String) = functionBlocks.lookup(key)
     fun resolveFunction(key: String) = functions.lookup(key)
 
-    fun registerProgram(programDeclaration: ProgramDeclaration) = programs.register(programDeclaration.name!!, programDeclaration)
+    fun registerProgram(programDeclaration: ProgramDeclaration) =
+        programs.register(programDeclaration.name!!, programDeclaration)
 
-    fun registerFunction(functionDeclaration: FunctionDeclaration) = functions.register(functionDeclaration.name, functionDeclaration)
+    fun registerFunction(functionDeclaration: FunctionDeclaration) =
+        functions.register(functionDeclaration.name, functionDeclaration)
 
     fun registerFunctionBlock(fblock: FunctionBlockDeclaration) = functionBlocks.register(fblock.name, fblock)
 
@@ -282,7 +285,8 @@ data class Scope(val variables: VariableScope = VariableScope()) :
     fun registerClass(clazz: ClassDeclaration) = classes.register(clazz.name, clazz)
 
     fun resolveClass(key: String) = classes.lookup(key)
-    fun registerInterface(interfaceDeclaration: InterfaceDeclaration) = interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
+    fun registerInterface(interfaceDeclaration: InterfaceDeclaration) =
+        interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
 
     fun registerMethod(md: MethodDeclaration) = methods.register(md.name, md)
     fun resolveInterface(key: String) = interfaces.lookup(key)
@@ -298,7 +302,8 @@ data class Scope(val variables: VariableScope = VariableScope()) :
         }
     }
 
-    fun isGlobalVariable(variable: SymbolicReference): Boolean = resolveVariable(variable) != null && topLevel.resolveVariable(variable) === resolveVariable(variable)
+    fun isGlobalVariable(variable: SymbolicReference): Boolean =
+        resolveVariable(variable) != null && topLevel.resolveVariable(variable) === resolveVariable(variable)
 
     override fun clone(): Scope {
         val gs = Scope(parent)

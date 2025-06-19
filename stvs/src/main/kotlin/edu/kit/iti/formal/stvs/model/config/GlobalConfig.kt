@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.config
 
 import edu.kit.iti.formal.stvs.logic.io.ExecutableLocator
@@ -13,7 +31,6 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.div
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
-
 
 /**
  * Contains global configuration specified by the user.
@@ -52,12 +69,12 @@ class GlobalConfig {
     var editorFontFamily: String by editorFontFamilyProperty
 
     val nuxmvFilenameProperty: StringProperty = SimpleStringProperty(
-        ExecutableLocator.findExecutableFileAsString("nuXmv") ?: "[Path to nuXmv Executable]"
+        ExecutableLocator.findExecutableFileAsString("nuXmv") ?: "[Path to nuXmv Executable]",
     )
     var nuxmvFilename: String by nuxmvFilenameProperty
 
     val z3PathProperty: StringProperty = SimpleStringProperty(
-        ExecutableLocator.findExecutableFileAsString("z3") ?: "[Path to Z3 Executable]"
+        ExecutableLocator.findExecutableFileAsString("z3") ?: "[Path to Z3 Executable]",
     )
     var z3Path: String by z3PathProperty
 
@@ -128,7 +145,6 @@ class GlobalConfig {
         result = 31 * result + z3Path.hashCode()
         return result.toInt()
     }
-
 
     companion object {
         const val AUTOLOAD_CONFIG_FILENAME: String = "stvs-config.xml"

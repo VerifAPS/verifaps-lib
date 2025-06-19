@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.variables
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariable
@@ -25,10 +43,7 @@ import kotlin.math.min
  *
  * @author Philipp
  */
-class VariableCollectionController(
-    codeTypes: ListProperty<Type>,
-    val freeVariableList: FreeVariableList
-) : Controller {
+class VariableCollectionController(codeTypes: ListProperty<Type>, val freeVariableList: FreeVariableList) : Controller {
     val validator: FreeVariableListValidator = FreeVariableListValidator(codeTypes, freeVariableList)
     override val view: VariableCollection = VariableCollection()
 
@@ -72,7 +87,6 @@ class VariableCollectionController(
 
         view.freeVariableTableView.items = freeVariableList.variables
 
-
         view.btnAddRow.onAction = EventHandler { actionEvent: ActionEvent -> this.onAddVariableClicked() }
         view.btnRemoveRow.onAction =
             EventHandler { actionEvent: ActionEvent -> this.onDeleteVariableClicked(actionEvent) }
@@ -90,7 +104,7 @@ class VariableCollectionController(
         tableView.items.setAll(newList)
 
         // naive implementation does not work, if two rows are equals (in name, type and constraint)
-        //tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems());
+        // tableView.getItems().removeAll(tableView.getSelectionModel().getSelectedItems());
         tableView.selectionModel.clearSelection()
     }
 
@@ -98,8 +112,8 @@ class VariableCollectionController(
         freeVariableList.variables.add(FreeVariable("variable", "BOOL"))
     }
 
-    private fun cellFactory(tableColumn: TableColumn<FreeVariable?, String?>): TableCell<FreeVariable?, String?> {
-        return object : TextFieldTableCell<FreeVariable?, String>(DefaultStringConverter()) {
+    private fun cellFactory(tableColumn: TableColumn<FreeVariable?, String?>): TableCell<FreeVariable?, String?> =
+        object : TextFieldTableCell<FreeVariable?, String>(DefaultStringConverter()) {
             init {
                 validator.problemsProperty.addListener { _: Observable? -> onProblemsChanged() }
                 styleClass.add("freevar")
@@ -131,15 +145,15 @@ class VariableCollectionController(
                     } else {
                         configureProblematic(
                             java.lang.String.join(
-                                "\n\n", problems.stream()
-                                    .map(FreeVariableProblem::guiMessage).collect(Collectors.toList())
-                            )
+                                "\n\n",
+                                problems.stream()
+                                    .map(FreeVariableProblem::guiMessage).collect(Collectors.toList()),
+                            ),
                         )
                     }
                 }
             }
         }
-    }
 
     private fun rowFactory(tableView: TableView<FreeVariable?>): TableRow<FreeVariable?> {
         val row = TableRow<FreeVariable?>()
@@ -179,7 +193,7 @@ class VariableCollectionController(
                 val dropIndex = row.index
                 tableView.items.addAll(
                     min(dropIndex, tableView.items.size),
-                    droppedVariables
+                    droppedVariables,
                 )
 
                 tableView.selectionModel.clearSelection()

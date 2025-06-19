@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -26,12 +26,7 @@ import edu.kit.iti.formal.smv.ast.SMVExpr
  * @author Alexander Weigl
  * @version 1 (07.03.18)
  */
-data class Transition(
-    val name: String,
-    val from: AutomatonState,
-    val to: AutomatonState,
-    var type: TransitionType,
-)
+data class Transition(val name: String, val from: AutomatonState, val to: AutomatonState, var type: TransitionType)
 
 enum class TransitionType {
     ACCEPT,
@@ -127,7 +122,10 @@ data class TestTableAutomaton(
         transitions.add(Transition(name, from, to, guard))
     }
 
-    fun getTransition(from: AutomatonState, to: AutomatonState): Transition? = transitions.find { it.from == from && it.to == to }
+    fun getTransition(from: AutomatonState, to: AutomatonState): Transition? = transitions.find {
+        it.from == from &&
+            it.to == to
+    }
 
     fun clear() {
         transitions.clear()

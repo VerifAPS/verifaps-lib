@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -45,7 +45,8 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String): SVariable = internalVariable(programRunNames).inModule(tableName) as SVariable
+    open fun externalVariable(programRunNames: List<String>, tableName: String): SVariable =
+        internalVariable(programRunNames).inModule(tableName) as SVariable
 
     open fun internalVariable(programRunNames: List<String>): SVariable = SVariable(name, logicType)
 }
@@ -98,12 +99,14 @@ data class ProgramVariable(
     /**
      *
      */
-    override fun externalVariable(programRunNames: List<String>, tableName: String) = SVariable("${programRunNames[programRun]}.$realName", logicType)
+    override fun externalVariable(programRunNames: List<String>, tableName: String) =
+        SVariable("${programRunNames[programRun]}.$realName", logicType)
 
     /**
      *
      */
-    override fun internalVariable(programRunNames: List<String>): SVariable = SVariable("${programRunNames[programRun]}$realName", logicType)
+    override fun internalVariable(programRunNames: List<String>): SVariable =
+        SVariable("${programRunNames[programRun]}$realName", logicType)
 }
 
 data class ConstraintVariable(
@@ -133,7 +136,8 @@ data class ProjectionVariable(
     /**
      *
      */
-    override fun externalVariable(programRunNames: List<String>, tableName: String) = SVariable("$tableName.$name", logicType)
+    override fun externalVariable(programRunNames: List<String>, tableName: String) =
+        SVariable("$tableName.$name", logicType)
 
     /**
      *
@@ -371,7 +375,11 @@ sealed class Duration {
             get() = true
     }
 
-    data class ClosedInterval(val lower: Int, val upper: Int, override var modifier: DurationModifier = DurationModifier.NONE) : Duration() {
+    data class ClosedInterval(
+        val lower: Int,
+        val upper: Int,
+        override var modifier: DurationModifier = DurationModifier.NONE,
+    ) : Duration() {
         override fun contains(cycles: Int): Boolean = cycles in lower..upper
 
         override val isUnbounded: Boolean
@@ -442,10 +450,7 @@ sealed class TableNode(open var id: String, var duration: Duration = Duration.Cl
     abstract fun visit(visitor: (TableNode) -> Unit)
 }
 
-data class Region(
-    override var id: String,
-    var children: MutableList<TableNode> = arrayListOf(),
-) : TableNode(id) {
+data class Region(override var id: String, var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
     constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumOf { it.count() }
@@ -461,11 +466,7 @@ data class Region(
     }
 }
 
-data class GotoTransition(
-    var tableName: String,
-    var rowId: String,
-    var kind: Kind = Kind.PASS,
-) {
+data class GotoTransition(var tableName: String, var rowId: String, var kind: Kind = Kind.PASS) {
     enum class Kind { PASS, MISS, FAIL }
 }
 

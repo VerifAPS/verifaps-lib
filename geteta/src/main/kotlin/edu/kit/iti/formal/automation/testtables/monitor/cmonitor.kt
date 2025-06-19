@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -40,7 +40,11 @@ import java.util.concurrent.Callable
 
 object CMonitorGenerator : MonitorGeneration {
     override val key = "c"
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton, options: MonitorGenerationOptions): Monitor {
+    override fun generate(
+        gtt: GeneralizedTestTable,
+        automaton: TestTableAutomaton,
+        options: MonitorGenerationOptions,
+    ): Monitor {
         val impl = CMonitorGeneratorImpl(gtt, automaton)
         return impl.call()
     }
@@ -419,7 +423,8 @@ class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
 
     override fun visit(ue: SUnaryExpression) = "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
 
-    override fun visit(be: SBinaryExpression) = "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
+    override fun visit(be: SBinaryExpression) =
+        "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
 
     private fun opToC(operator: SBinaryOperator) = when (operator) {
         SBinaryOperator.PLUS -> "+"

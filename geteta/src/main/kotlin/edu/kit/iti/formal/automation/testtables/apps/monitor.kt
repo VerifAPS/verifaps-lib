@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -125,22 +125,23 @@ class MonitorApp : CliktCommand(name = "ttmonitor") {
     }
 }
 
-fun bindsConstraintVariable(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable): Boolean = ctx?.chunk()?.filter { chunk ->
-    val ss = chunk.getChild(0)
-    when (ss) {
-        is TestTableLanguageParser.SinglesidedContext -> {
-            val expr = ss.expr()
-            val e = expr as? TestTableLanguageParser.BvariableContext
-            val v = e?.variable()?.IDENTIFIER()
-            if (v == null || ss.relational_operator().text == "=") {
-                false
-            } else {
-                v.equals(fvar.name)
+fun bindsConstraintVariable(ctx: TestTableLanguageParser.CellContext?, fvar: ConstraintVariable): Boolean =
+    ctx?.chunk()?.filter { chunk ->
+        val ss = chunk.getChild(0)
+        when (ss) {
+            is TestTableLanguageParser.SinglesidedContext -> {
+                val expr = ss.expr()
+                val e = expr as? TestTableLanguageParser.BvariableContext
+                val v = e?.variable()?.IDENTIFIER()
+                if (v == null || ss.relational_operator().text == "=") {
+                    false
+                } else {
+                    v.equals(fvar.name)
+                }
             }
+            is TestTableLanguageParser.CvariableContext -> {
+                ss.variable().IDENTIFIER().text == fvar.name
+            }
+            else -> false
         }
-        is TestTableLanguageParser.CvariableContext -> {
-            ss.variable().IDENTIFIER().text == fvar.name
-        }
-        else -> false
-    }
-}?.isNotEmpty() ?: false
+    }?.isNotEmpty() ?: false

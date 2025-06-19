@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -489,25 +489,30 @@ class ProgramSynthesizer(
         "state_$it.any() ? table_status::ACTIVE : table_status::INACTIVE"
     }
 
-    private fun generateStateChecks(): Iterable<String> = states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
-        lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-            val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
-            require(!inputCheckExpr.contains("output.")) {
-                "Referring to output variables in assumptions is unsupported"
+    private fun generateStateChecks(): Iterable<String> =
+        states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
+            lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
+                val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
+                require(!inputCheckExpr.contains("output.")) {
+                    "Referring to output variables in assumptions is unsupported"
+                }
+                acc + "if (state_$tableIndex[$rowIndex] and not ($inputCheckExpr)) {" +
+                    "    state_$tableIndex[$rowIndex] = false;" +
+                    "}"
             }
-            acc + "if (state_$tableIndex[$rowIndex] and not ($inputCheckExpr)) {" +
-                "    state_$tableIndex[$rowIndex] = false;" +
-                "}"
+        } + (0 until automata.size).flatMap { index ->
+            listOf(
+                "if (state_$index.none() && status[$index] == table_status::ACTIVE) {",
+                "    status[$index] = table_status::INACTIVE;",
+                "}",
+            )
         }
-    } + (0 until automata.size).flatMap { index ->
-        listOf(
-            "if (state_$index.none() && status[$index] == table_status::ACTIVE) {",
-            "    status[$index] = table_status::INACTIVE;",
-            "}",
-        )
-    }
 
-    private fun generateOutputFunctions(): Iterable<String> = states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
+    private fun generateOutputFunctions(): Iterable<String> = states.foldIndexed(listOf()) {
+            tableIndex,
+            lines,
+            rowStates,
+        ->
         val memoizedOutputFunctions = mutableMapOf<TableRow, List<String>>()
 
         lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
@@ -630,9 +635,17 @@ class ProgramSynthesizer(
         )
     }
 
-    private fun generateHistoryValues(): Iterable<String> = referenceVariables.keys.map { "${translator.variableReplacement.getValue(it)}," }
+    private fun generateHistoryValues(): Iterable<String> = referenceVariables.keys.map {
+        "${translator.variableReplacement.getValue(it)},"
+    }
 
-    private fun generateCheckExpression(expressions: Map<String, SMVExpr>) = if (expressions.isEmpty()) "true" else expressions.values.joinToString(" and ") { it.accept(translator) }
+    private fun generateCheckExpression(expressions: Map<String, SMVExpr>) = if (expressions.isEmpty()) {
+        "true"
+    } else {
+        expressions.values.joinToString(" and ") {
+            it.accept(translator)
+        }
+    }
 
     private fun generateCppDataType(type: SMVType): CppType = when (type) {
         is SMVTypes.BOOLEAN -> CppType.BOOL
@@ -646,7 +659,10 @@ class ProgramSynthesizer(
         else -> throw IllegalArgumentException("Data types other than bool and int are currently unsupported")
     }
 
-    private fun indentLines(iter: Iterable<String>, indent: Int): String = iter.joinToString(separator = "\n" + " ".repeat(indent))
+    private fun indentLines(iter: Iterable<String>, indent: Int): String = iter.joinToString(
+        separator =
+        "\n" + " ".repeat(indent),
+    )
 
     /**
      * Accumulates values from all SVariables in the expression
@@ -671,14 +687,24 @@ class ProgramSynthesizer(
      * Extracts SVariables matching the given pattern from an expression
      */
     private class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
-        override fun visit(v: SVariable): Set<Pair<String, MatchResult>> = pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
+        override fun visit(v: SVariable): Set<Pair<String, MatchResult>> =
+            pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
     }
 
     /**
      * Extracts the dependencies to output variables (other than self) and other variables from an expression
      */
-    private class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String) : SVariableVisitor<Pair<String, Boolean>>() {
-        override fun visit(v: SVariable): Set<Pair<String, Boolean>> = if (v.name == self) setOf() else setOf(Pair(v.name, outputVariables.contains(v.name)))
+    private class OutputExpressionDependencyVisitor(
+        private val outputVariables: Set<String>,
+        private val self: String,
+    ) : SVariableVisitor<Pair<String, Boolean>>() {
+        override fun visit(v: SVariable): Set<Pair<String, Boolean>> = if (v.name ==
+            self
+        ) {
+            setOf()
+        } else {
+            setOf(Pair(v.name, outputVariables.contains(v.name)))
+        }
     }
 
     /**
@@ -789,7 +815,11 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
     }
 
-    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>): Iterable<String>? {
+    private fun callOmega(
+        formula: String,
+        resultVariables: List<String>,
+        variableDefinitions: List<String>,
+    ): Iterable<String>? {
         val arguments = listOf(pythonExecutable, "-") +
             resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
             formula + variableDefinitions
@@ -841,7 +871,8 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
         override fun visit(v: SVariable): String = variableNameMap.getValue(v.name)
 
-        override fun visit(be: SBinaryExpression): String = "(${be.left.accept(this)} ${opToOmega(be.operator, be.left.dataType)} ${be.right.accept(this)})"
+        override fun visit(be: SBinaryExpression): String =
+            "(${be.left.accept(this)} ${opToOmega(be.operator, be.left.dataType)} ${be.right.accept(this)})"
 
         private fun opToOmega(op: SBinaryOperator, type: SMVType?): String = when (type) {
             SMVTypes.BOOLEAN -> when (op) {
@@ -869,7 +900,8 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
             else -> throw IllegalArgumentException("unsupported expression type $type")
         }
 
-        override fun visit(ue: SUnaryExpression): String = "(${opToOmega(ue.operator, ue.expr.dataType)} ${ue.expr.accept(this)})"
+        override fun visit(ue: SUnaryExpression): String =
+            "(${opToOmega(ue.operator, ue.expr.dataType)} ${ue.expr.accept(this)})"
 
         private fun opToOmega(op: SUnaryOperator, type: SMVType?): String = when (type) {
             SMVTypes.BOOLEAN -> when (op) {
@@ -909,7 +941,8 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
         fun getVariableDeclarations(): List<String> = iteExprCache.map { (expr, varName) -> "bool $varName = $expr;" }
 
-        override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String = "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
+        override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String =
+            "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
 
         override fun visitExpr(ctx: IteLanguageParser.ExprContext): String = ctx.iteExpr()?.accept(this)
             ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
@@ -922,11 +955,14 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
             { "${cacheVarPrefix}_${initialCacheVarSuffix + iteExprCache.size}" },
         )
 
-        override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String = if (variableContext.containsKey(ctx.text) && variableContext[ctx.text] == CppType.BOOL) {
-            "${ctx.text}[0]"
-        } else { // identifier must refer to a specific bit
-            "${ctx.text.substringBeforeLast('_')}[${ctx.text.substringAfterLast('_')}]"
-        }
+        override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String =
+            if (variableContext.containsKey(ctx.text) &&
+                variableContext[ctx.text] == CppType.BOOL
+            ) {
+                "${ctx.text}[0]"
+            } else { // identifier must refer to a specific bit
+                "${ctx.text.substringBeforeLast('_')}[${ctx.text.substringAfterLast('_')}]"
+            }
     }
 }
 
@@ -951,7 +987,10 @@ enum class CppType(private val cppName: String) {
 /**
  * Checks if a SMVExpr is a value assignment to a SVariable and returns the corresponding expression.
  */
-private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? = (this as? SBinaryExpression)?.takeIf { operator == SBinaryOperator.EQUAL }?.run {
+private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? = (this as? SBinaryExpression)?.takeIf {
+    operator ==
+        SBinaryOperator.EQUAL
+}?.run {
     right.takeIf { left is SVariable } ?: left.takeIf { right is SVariable }
 }
 

@@ -48,7 +48,7 @@ interface FunctionRegistry {
     }
 }
 
-class DefaultFunctionRegistry() : FunctionRegistry {
+class DefaultFunctionRegistry : FunctionRegistry {
     private val map = HashMap<String, FunctionEvaluator>()
 
     override fun register(name: String, func: FunctionEvaluator) {
@@ -61,7 +61,7 @@ class DefaultFunctionRegistry() : FunctionRegistry {
 /*****************************************************************************/
 
 object FunctionDefinitions {
-    fun __shl_int(num: EValue, bits: EValue): EValue {
+    fun shiftLeftInt(num: EValue, bits: EValue): EValue {
         if (num is VAnyInt && bits is VAnyInt) {
             val (dt, v) = num
             val (_, b) = bits
@@ -73,7 +73,7 @@ object FunctionDefinitions {
 
 fun getDefaultRegistry(): FunctionRegistry {
     val dfr = DefaultFunctionRegistry()
-    dfr.register(FunctionDefinitions::__shl_int)
+    dfr.register(FunctionDefinitions::shiftLeftInt)
     return dfr
 }
 

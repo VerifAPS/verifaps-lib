@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -113,7 +113,9 @@ class SMTProgram(
             sb.append("(define-fun <> ((a Bool) (b Bool)) Bool\n" + "  (not (= a b)))\n")
 
             for (i in 1..64) {
-                sb.append(String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i))
+                sb.append(
+                    String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i),
+                )
             }
 
             val init = initFunction
@@ -135,7 +137,8 @@ class SMTProgram(
     }
      */
 
-    fun getDefineSteps(prefix: String, suffix: String) = getDefineInputTypes(prefix, suffix) + getDefineStateTypes(prefix, suffix)
+    fun getDefineSteps(prefix: String, suffix: String) =
+        getDefineInputTypes(prefix, suffix) + getDefineStateTypes(prefix, suffix)
 
     fun getDefineStateTypes(prefix: String, suffix: String) = this.stateDataTypes.entries
         .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -77,9 +77,11 @@ interface ReveContext {
     fun completeOutRel(old: BlockStatement, new: BlockStatement) = completeRelation(old.output, new.output, outRelation)
 
     // fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
-    fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr = createRelation(old.input, new.input, oldModule, newModule, inRelation)
+    fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
+        createRelation(old.input, new.input, oldModule, newModule, inRelation)
 
-    fun createOutRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr = createRelation(old.output, new.output, oldModule, newModule, outRelation)
+    fun createOutRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
+        createRelation(old.output, new.output, oldModule, newModule, outRelation)
 
     fun createRelation(
         oldVars: MutableList<SymbolicReference>,
@@ -170,11 +172,7 @@ data class TopReveContext(
         get() = TODO("Not yet implemented")
 }*/
 
-data class RelatedVariables(
-    val oldVar: SMVExpr,
-    val operator: SBinaryOperator,
-    val newVar: SMVExpr,
-) {
+data class RelatedVariables(val oldVar: SMVExpr, val operator: SBinaryOperator, val newVar: SMVExpr) {
     val expr
         get() = SBinaryExpression(oldVar, operator, newVar)
 }
@@ -263,11 +261,7 @@ val Invoked?.name: String?
 typealias CallSiteMapping = List<Pair<BlockStatement, BlockStatement>>
 
 object ModFacade {
-    fun createModularProgram(
-        entry: PouExecutable,
-        outputFolder: File,
-        prefix: String = "",
-    ): ModularProgram {
+    fun createModularProgram(entry: PouExecutable, outputFolder: File, prefix: String = ""): ModularProgram {
         val complete = SymbExFacade.simplify(entry)
         val simplifiedFile = File(outputFolder, "${prefix}_${entry.name}_simplified.st")
         info("Write simplified version of '$prefix' to $simplifiedFile")
@@ -313,7 +307,11 @@ object ModFacade {
         return x to y
     }
 
-    fun createReveContextsBySpecification(seq: List<String>, oldProgram: ModularProgram, newProgram: ModularProgram): ReveContextManager {
+    fun createReveContextsBySpecification(
+        seq: List<String>,
+        oldProgram: ModularProgram,
+        newProgram: ModularProgram,
+    ): ReveContextManager {
         val cm = ReveContextManager()
         seq.forEach { createReveContextsBySpecification(it, oldProgram, newProgram, cm) }
         return cm
@@ -340,7 +338,8 @@ object ModFacade {
         val ctx = TopReveContext()
         ctx.condition = if (cond.isBlank()) SLiteral.TRUE else SMVFacade.expr(cond)
         ctx.inRelation = if (inrel.isBlank()) arrayListOf() else inrel.split(",").map(::parseRelation).toMutableList()
-        ctx.outRelation = if (outrel.isBlank()) arrayListOf() else outrel.split(",").map(::parseRelation).toMutableList()
+        ctx.outRelation =
+            if (outrel.isBlank()) arrayListOf() else outrel.split(",").map(::parseRelation).toMutableList()
         ctxManager.add(bA, bB, ctx)
     }
 
@@ -412,8 +411,9 @@ data class CallSiteSpec(val contextPath: List<String>, val number: Int = 0) {
     var specifiedContext: SMVExpr? = null
 
     fun repr(): String = contextPath.joinToString(".") + ".$number"
-    fun correspond(other: CallSiteSpec) = contextPath.subList(1, contextPath.lastIndex) == other.contextPath.subList(1, other.contextPath.lastIndex) &&
-        other.number == number
+    fun correspond(other: CallSiteSpec) =
+        contextPath.subList(1, contextPath.lastIndex) == other.contextPath.subList(1, other.contextPath.lastIndex) &&
+            other.number == number
 
     fun isPrefix(ids: List<String>) = ids.size <= contextPath.size && ids.zip(contextPath).all { (a, b) -> a == b }
 }
@@ -466,4 +466,9 @@ class MaintainBlocks(val entry: PouExecutable) {
     }
 }
 
-private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) = vars.map { reference -> this.getVariable(reference).clone().also { it.type = newType } }
+private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) = vars.map { reference ->
+    this.getVariable(reference).clone().also {
+        it.type =
+            newType
+    }
+}

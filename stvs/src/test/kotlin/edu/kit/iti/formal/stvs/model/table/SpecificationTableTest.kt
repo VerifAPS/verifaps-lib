@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import com.google.common.truth.Truth
@@ -10,7 +28,6 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opentest4j.AssertionFailedError
 import kotlin.test.assertFailsWith
 
 /**
@@ -28,14 +45,14 @@ class SpecificationTableTest {
         assertEquals("A2", table.getColumnByName("VariableA").cells[2])
     }
 
-    @Test//(expected = NoSuchElementException::class)
+    @Test // (expected = NoSuchElementException::class)
     fun testGetCellNoSuchColumn() {
         assertFailsWith<NoSuchElementException> {
             table.getColumnByName("VariableE").cells[2]
         }
     }
 
-    @Test//(expected = IndexOutOfBoundsException::class)
+    @Test // (expected = IndexOutOfBoundsException::class)
     fun testGetCellNoSuchRow() {
         assertFailsWith<IndexOutOfBoundsException> {
             table.getColumnByName("VariableB").cells[4]
@@ -46,11 +63,11 @@ class SpecificationTableTest {
     fun testGetColumnByName() {
         assertEquals(
             SpecificationColumn(mutableListOf("A0", "A1", "A2", "A3")),
-            table.getColumnByName("VariableA")
+            table.getColumnByName("VariableA"),
         )
     }
 
-    @Test//(expected = NoSuchElementException::class)
+    @Test // (expected = NoSuchElementException::class)
     fun testGetColumnNoSuchColumn() {
         assertFailsWith<NoSuchElementException> {
             table.getColumnByName("E")
@@ -73,7 +90,7 @@ class SpecificationTableTest {
         assertEquals(table.columnHeaders.size.toLong(), (widthBefore + 1).toLong())
     }
 
-    @Test//(expected = IllegalArgumentException::class)
+    @Test // (expected = IllegalArgumentException::class)
     @Throws(Throwable::class)
     fun testAddExistingColumn() {
         assertFailsWith<IllegalArgumentException> {
@@ -86,7 +103,7 @@ class SpecificationTableTest {
         }
     }
 
-    @Test//(expected = IllegalArgumentException::class)
+    @Test // (expected = IllegalArgumentException::class)
     @Throws(Throwable::class)
     fun testAddColumnInvalidSize() {
         assertFailsWith<IllegalArgumentException> {
@@ -109,7 +126,7 @@ class SpecificationTableTest {
         assertEquals(expectedColumn, removedColumn)
     }
 
-    @Test//(expected = NoSuchElementException::class)
+    @Test // (expected = NoSuchElementException::class)
     fun testRemoveColumnActuallyRemoved() {
         val colName = "VariableA"
         table.removeColumnByName(colName)
@@ -128,7 +145,7 @@ class SpecificationTableTest {
             .isEqualTo(SpecificationRow.createUnobservableRow(expectedCells))
     }
 
-    @Test//(expected = IndexOutOfBoundsException::class)
+    @Test // (expected = IndexOutOfBoundsException::class)
     fun testGetRowNoSuchRow() {
         assertFailsWith<IndexOutOfBoundsException> {
             table.rows[4]
@@ -155,7 +172,7 @@ class SpecificationTableTest {
                     "VariableA" to "A4",
                     "VariableB" to "B4",
                     "VariableC" to "C4",
-                    "VariableX" to "D4"
+                    "VariableX" to "D4",
                 )
                 val newRow = SpecificationRow.createUnobservableRow(newCells)
                 table.rows.add(newRow)
@@ -172,7 +189,7 @@ class SpecificationTableTest {
                     "VariableB" to "B4",
                     "VariableC" to "C4",
                     "VariableD" to "D4",
-                    "VariableE" to "E5"
+                    "VariableE" to "E5",
                 )
                 val newRow = SpecificationRow.createUnobservableRow(newCells)
                 table.rows.add(newRow)

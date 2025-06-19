@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -45,7 +45,8 @@ object DefaultInitValue : InitValueTranslator {
 
         override fun visit(word: AnyBit): Value<*, *> = VAnyBit(word, Bits(word.bitLength.toLong(), 0))
 
-        override fun visit(enumerateType: EnumerateType): Value<*, *> = VAnyEnum(enumerateType, enumerateType.defValue!!)
+        override fun visit(enumerateType: EnumerateType): Value<*, *> =
+            VAnyEnum(enumerateType, enumerateType.defValue!!)
 
         override fun visit(rangeType: RangeType): Value<*, *> = VAnyInt(rangeType.base, rangeType.default)
 
@@ -70,7 +71,8 @@ object DefaultInitValue : InitValueTranslator {
             return VNULL
         }*/
 
-        override fun visit(functionBlockDataType: FunctionBlockDataType): Value<*, *> = functionBlockDataType.asRecord().accept(this)
+        override fun visit(functionBlockDataType: FunctionBlockDataType): Value<*, *> =
+            functionBlockDataType.asRecord().accept(this)
 
         override fun visit(recordType: RecordType): Value<*, *> {
             val s = VStruct(recordType, RecordValue())
@@ -80,13 +82,14 @@ object DefaultInitValue : InitValueTranslator {
                         it.initValue != null -> it.initValue!!
                         it.init != null -> it.init?.getValue()!!
                         it.dataType != null -> it.dataType?.accept(this)!!
-                        else -> VVOID // throw IllegalStateException("Could not determine initial value for variable: $it")
+                        else -> VVOID
                     }
             }
             return s
         }
 
-        override fun visit(dateAndTime: AnyDate.DATE_AND_TIME): Value<*, *> = VDateAndTime(dateAndTime, DateAndTimeData())
+        override fun visit(dateAndTime: AnyDate.DATE_AND_TIME): Value<*, *> =
+            VDateAndTime(dateAndTime, DateAndTimeData())
 
         override fun visit(timeOfDay: AnyDate.TIME_OF_DAY): Value<*, *> = VTimeOfDay(timeOfDay, TimeofDayData())
 
@@ -95,7 +98,8 @@ object DefaultInitValue : InitValueTranslator {
 }
 
 object EvaluateInitialization : AstVisitor<Value<*, *>>() {
-    override fun defaultVisit(obj: Any): Value<*, *> = throw java.lang.IllegalArgumentException("${javaClass.name} not implemented for ${obj.javaClass.name}.")
+    override fun defaultVisit(obj: Any): Value<*, *> =
+        throw java.lang.IllegalArgumentException("${javaClass.name} not implemented for ${obj.javaClass.name}.")
 
     override fun visit(arrayinit: ArrayInitialization): Value<*, *> {
         val v = arrayinit.initValues.map { it.accept(this) }

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -28,12 +28,7 @@ import java.util.regex.Pattern
  * @author weigl
  * @version $Id: $Id
  */
-data class TimeofDayData(
-    var hours: Int = 0,
-    var minutes: Int = 0,
-    var seconds: Int = 0,
-    var millieseconds: Int = 0,
-) {
+data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0, var seconds: Int = 0, var millieseconds: Int = 0) {
     companion object {
         fun parse(tod: String): TimeofDayData {
             val pattern = Pattern.compile("(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?")

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -146,11 +146,7 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
  * * inserting information
  * * forgetting information in [historyLength] cycles.
  */
-class PrivacyModelBuilder(
-    private val code: SMVModule,
-    val isHigh: (String) -> Boolean,
-    val historyLength: Int = 10,
-) : Runnable {
+class PrivacyModelBuilder(private val code: SMVModule, val isHigh: (String) -> Boolean, val historyLength: Int = 10) : Runnable {
     val strongEqualInVar = SVariable("strongEqualIn", SMVTypes.BOOLEAN)
     val softEqualInVar = SVariable("softEqualIn", SMVTypes.BOOLEAN)
     val hmb = HistoryModuleBuilder(

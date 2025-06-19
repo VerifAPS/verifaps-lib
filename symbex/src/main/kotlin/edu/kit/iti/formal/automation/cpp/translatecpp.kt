@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -352,7 +352,8 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
         // out.nl().print("const struct $name ${name}_default = {${values.joinToString(", ")}};\n")
     }
 
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable, functionBlockDeclaration.actions)
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) =
+        visit(functionBlockDeclaration as PouExecutable, functionBlockDeclaration.actions)
 
     fun visit(outer: String, action: ActionDeclaration) {
         out.cblock("void ${outer}_${action.name}(${outer}_state this) {", "}") {

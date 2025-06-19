@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -21,9 +21,7 @@ package edu.kit.iti.formal.automation.testtables.monitor
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 
-data class MonitorGenerationOptions(
-    val includes: List<String> = listOf(),
-)
+data class MonitorGenerationOptions(val includes: List<String> = listOf())
 
 interface MonitorGeneration {
     val key: String
@@ -36,10 +34,7 @@ interface MonitorGeneration {
 
 interface CombinedMonitorGeneration {
     val key: String
-    fun generate(
-        name: String,
-        input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
-    ): Monitor
+    fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor
 }
 
 data class Monitor(

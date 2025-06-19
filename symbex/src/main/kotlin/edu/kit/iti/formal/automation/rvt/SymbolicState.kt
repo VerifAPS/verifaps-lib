@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -125,7 +125,8 @@ data class SymbolicState(
 
     override fun clear() = variables.clear()
 
-    override fun put(key: SVariable, value: SMVExpr): SMVExpr? = throw IllegalArgumentException("Use assign(...) instead")
+    override fun put(key: SVariable, value: SMVExpr): SMVExpr? =
+        throw IllegalArgumentException("Use assign(...) instead")
 
     fun assign(key: SVariable, assignCounter: Int, v: SMVExpr) {
         val s = ensureVariable(key)

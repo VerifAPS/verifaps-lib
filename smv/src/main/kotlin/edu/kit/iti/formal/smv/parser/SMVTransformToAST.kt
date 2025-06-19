@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -115,7 +115,8 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
         return null
     }
 
-    override fun visitConstantsDeclaration(ctx: SMVParser.ConstantsDeclarationContext): Any = throw IllegalStateException("not supported")
+    override fun visitConstantsDeclaration(ctx: SMVParser.ConstantsDeclarationContext): Any =
+        throw IllegalStateException("not supported")
 
     override fun visitVarBodyAssign(ctx: SMVParser.VarBodyAssignContext): Any = super.visitVarBodyAssign(ctx)
 
@@ -139,7 +140,8 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
         return null
     }
 
-    override fun visitFairnessConstraint(ctx: SMVParser.FairnessConstraintContext): Any = super.visitFairnessConstraint(ctx)
+    override fun visitFairnessConstraint(ctx: SMVParser.FairnessConstraintContext): Any =
+        super.visitFairnessConstraint(ctx)
 
     override fun visitPslSpecification(ctx: SMVParser.PslSpecificationContext): Any = super.visitPslSpecification(ctx)
 
@@ -262,7 +264,8 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitFalseExpr(ctx: SMVParser.FalseExprContext): SLiteral = SLiteral.FALSE
 
-    override fun visitModuleTypeProcess(ctx: SMVParser.ModuleTypeProcessContext): Any = throw IllegalStateException("not supported")
+    override fun visitModuleTypeProcess(ctx: SMVParser.ModuleTypeProcessContext): Any =
+        throw IllegalStateException("not supported")
 
     override fun visitTemporalBinExpr(ctx: SMVParser.TemporalBinExprContext): Any = SQuantified(
         STemporalOperator.valueOf(ctx.op),
@@ -282,19 +285,25 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
         return SFunction(ctx.func.text, exprs)
     }
 
-    private fun getSMVExprs(ctx: SMVParser.FunctionExprContext): List<SMVExpr> = ctx.stateExpr().map { it.accept(this) as SMVExpr }
+    private fun getSMVExprs(ctx: SMVParser.FunctionExprContext): List<SMVExpr> = ctx.stateExpr().map {
+        it.accept(this) as SMVExpr
+    }
 
     override fun visitCasesExprAtom(ctx: SMVParser.CasesExprAtomContext): Any = super.visitCasesExprAtom(ctx)
 
-    override fun visitVariableAccess(ctx: SMVParser.VariableAccessContext): Any = SVariable.create(ctx.getText()).with(null)
+    override fun visitVariableAccess(ctx: SMVParser.VariableAccessContext): Any =
+        SVariable.create(ctx.getText()).with(null)
 
     override fun visitArrayAccess(ctx: SMVParser.ArrayAccessContext): Any = throw IllegalStateException("not supported")
 
-    override fun visitVariableDotted(ctx: SMVParser.VariableDottedContext): Any = throw IllegalStateException("not supported")
+    override fun visitVariableDotted(ctx: SMVParser.VariableDottedContext): Any =
+        throw IllegalStateException("not supported")
 
-    override fun visitIntegerLiteral(ctx: SMVParser.IntegerLiteralContext): Any = SIntegerLiteral(BigInteger(ctx.value.getText()))
+    override fun visitIntegerLiteral(ctx: SMVParser.IntegerLiteralContext): Any =
+        SIntegerLiteral(BigInteger(ctx.value.getText()))
 
-    override fun visitFloatLiteral(ctx: SMVParser.FloatLiteralContext): Any = SFloatLiteral(BigDecimal(ctx.value.getText()))
+    override fun visitFloatLiteral(ctx: SMVParser.FloatLiteralContext): Any =
+        SFloatLiteral(BigDecimal(ctx.value.getText()))
 
     override fun visitCaseBranch(ctx: SMVParser.CaseBranchContext): Any = super.visitCaseBranch(ctx)
 }

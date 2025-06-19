@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -73,9 +73,13 @@ public object GetetaFacade {
 
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
-    fun parseCell(cell: String, enableRelational: Boolean = true) = createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
+    fun parseCell(cell: String, enableRelational: Boolean = true) = createParser(cell).also {
+        it.relational =
+            enableRelational
+    }.cellEOF()!!
 
-    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
+    fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr =
+        exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
 
     fun exprToSMV(
         cell: TestTableLanguageParser.CellContext,
@@ -89,11 +93,7 @@ public object GetetaFacade {
         return expr
     }
 
-    fun exprToSMV(
-        u: TestTableLanguageParser.CellContext,
-        pv: ProjectionVariable,
-        vc: ParseContext,
-    ): SMVExpr {
+    fun exprToSMV(u: TestTableLanguageParser.CellContext, pv: ProjectionVariable, vc: ParseContext): SMVExpr {
         require(pv.arity != 0) { "Arity of column function is zero. Column ${pv.name}" }
 
         if (pv.arity > 1) {
@@ -107,11 +107,15 @@ public object GetetaFacade {
                         }
                         fd.call(pv.argumentDefinitions)
                     } else {
-                        throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+                        throw IllegalStateException(
+                            "Multi-arity column header only supported with user-defined functions",
+                        )
                     }
                 }
                 is TestTableLanguageParser.CdontcareContext -> SLiteral.TRUE
-                else -> throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+                else -> throw IllegalStateException(
+                    "Multi-arity column header only supported with user-defined functions",
+                )
             }
         } else {
             return exprToSMV(u, pv.argumentDefinitions.first(), 0, vc)
@@ -154,16 +158,15 @@ public object GetetaFacade {
     val DEFAULT_PROGRAM_RUN_NAME = { it: Int -> "_$it$" }
 
     @JvmStatic
-    fun parseTableDSL(input: String, timeConstants: Map<String, Int> = hashMapOf()) = parseTableDSL(CharStreams.fromString(input), timeConstants)
+    fun parseTableDSL(input: String, timeConstants: Map<String, Int> = hashMapOf()) =
+        parseTableDSL(CharStreams.fromString(input), timeConstants)
 
     @JvmStatic
-    fun parseTableDSL(input: File, timeConstants: Map<String, Int> = hashMapOf()) = parseTableDSL(CharStreams.fromFileName(input.absolutePath), timeConstants)
+    fun parseTableDSL(input: File, timeConstants: Map<String, Int> = hashMapOf()) =
+        parseTableDSL(CharStreams.fromFileName(input.absolutePath), timeConstants)
 
     @JvmStatic
-    fun parseTableDSL(
-        input: CharStream,
-        timeConstants: Map<String, Int> = hashMapOf(),
-    ): List<GeneralizedTestTable> {
+    fun parseTableDSL(input: CharStream, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
         val parser = createParser(input)
         return parseTableDSL(parser.file(), timeConstants)
     }
@@ -198,12 +201,7 @@ public object GetetaFacade {
     fun getHistoryName(variable: SVariable): String = variable.name + "__history"
 
     @JvmStatic
-    fun runNuXMV(
-        nuXmvPath: String,
-        folder: String,
-        modules: List<SMVModule>,
-        vt: VerificationTechnique,
-    ): NuXMVOutput {
+    fun runNuXMV(nuXmvPath: String, folder: String, modules: List<SMVModule>, vt: VerificationTechnique): NuXMVOutput {
         val adapter = createNuXMVProcess(folder, modules, nuXmvPath, vt)
         return adapter.call()
     }
@@ -274,7 +272,8 @@ public object GetetaFacade {
     }
 
     @JvmStatic
-    fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> = parseTableDSL(file, timeConstants)
+    fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> =
+        parseTableDSL(file, timeConstants)
 
     @JvmStatic
     fun constructTable(table: GeneralizedTestTable) = AutomatonBuilderPipeline(table).transform()
@@ -283,10 +282,15 @@ public object GetetaFacade {
     fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) = constructSMV(constructTable(table), superEnum)
 
     @JvmStatic
-    fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) = SmvConstructionPipeline(automaton, superEnum).transform()
+    fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
+        SmvConstructionPipeline(automaton, superEnum).transform()
 
     @JvmStatic
-    fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
+    fun analyzeCounterExample(
+        automaton: TestTableAutomaton,
+        testTable: GeneralizedTestTable,
+        counterExample: CounterExample,
+    ): MutableList<Mapping> {
         val analyzer = CounterExampleAnalyzer(
             automaton,
             testTable,

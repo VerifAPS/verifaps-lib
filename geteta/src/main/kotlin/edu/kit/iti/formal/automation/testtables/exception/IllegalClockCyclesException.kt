@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -31,5 +31,6 @@ class IllegalClockCyclesException : GetetaException {
 
     constructor(cause: Throwable) : super(cause) {}
 
-    protected constructor(message: String, cause: Throwable, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace) {}
+    protected constructor(message: String, cause: Throwable, enableSuppression: Boolean, writableStackTrace: Boolean) :
+        super(message, cause, enableSuppression, writableStackTrace) {}
 }

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.editor
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
@@ -32,7 +50,7 @@ import java.util.concurrent.Executors
 class EditorPaneController(val code: Code, private val globalConfig: GlobalConfig) : Controller {
     override val view: EditorPane = EditorPane(
         code.sourcecode,
-        code.syntaxErrorsProperty
+        code.syntaxErrorsProperty,
     )
     private val executor = Executors.newSingleThreadExecutor()
 
@@ -47,7 +65,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         view.stylesheets
             .add(
                 EditorPane::class.java.getResource("st-keywords.css")
-                    .toExternalForm()
+                    .toExternalForm(),
             )
         configureTextArea()
         setupContextMenu()
@@ -69,8 +87,10 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
     }
 
     private fun updateFontFamily(fontFamily: String) {
-        view.codeArea.style = ("-fx-font-family: " + fontFamily + ";" + "-fx-font-size: "
-                + globalConfig.editorFontSizeProperty.get() + "pt;")
+        view.codeArea.style = (
+            "-fx-font-family: " + fontFamily + ";" + "-fx-font-size: " +
+                globalConfig.editorFontSizeProperty.get() + "pt;"
+            )
     }
 
     private fun updateFontSize(size: Int) {
@@ -78,10 +98,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
             .get() + ";" + "-fx-font-size: " + size + "pt;"
     }
 
-    private fun createMenuItem(
-        name: String, action: Runnable,
-        icon: FontAwesomeSolid
-    ): MenuItem {
+    private fun createMenuItem(name: String, action: Runnable, icon: FontAwesomeSolid): MenuItem {
         val item = createMenuItem(name, action)
         item.graphic = FontIcon(icon)
         return item
@@ -93,21 +110,23 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         return item
     }
 
-
     private fun setupContextMenu() {
         val codeArea = view.codeArea
 
         val menu = ContextMenu()
         menu.items.addAll(
             createMenuItem(
-                "Undo", { codeArea.undo() },
-                FontAwesomeSolid.UNDO
-            ), createMenuItem("Redo") { codeArea.redo() },
+                "Undo",
+                { codeArea.undo() },
+                FontAwesomeSolid.UNDO,
+            ),
+            createMenuItem("Redo") { codeArea.redo() },
             SeparatorMenuItem(),
             createMenuItem("Paste", { codeArea.paste() }, FontAwesomeSolid.PASTE),
             createMenuItem("Copy", { codeArea.copy() }, FontAwesomeSolid.COPY),
             createMenuItem("Cut", { codeArea.cut() }, FontAwesomeSolid.CUT),
-            createMenuItem("Select All") { codeArea.selectAll() })
+            createMenuItem("Select All") { codeArea.selectAll() },
+        )
         view.contextMenu = menu
     }
 
@@ -136,17 +155,13 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         val sourcecode = codeArea.text
         val task = object : Task<StyleSpans<Collection<String>>>() {
             @Throws(Exception::class)
-            override fun call(): StyleSpans<Collection<String>> {
-                return computeHighlighting(sourcecode)
-            }
+            override fun call(): StyleSpans<Collection<String>> = computeHighlighting(sourcecode)
         }
         executor.execute(task)
         return task
     }
 
-    private fun computeHighlighting(
-        sourcecode: String
-    ): StyleSpans<Collection<String>> {
+    private fun computeHighlighting(sourcecode: String): StyleSpans<Collection<String>> {
         val spansBuilder = StyleSpansBuilder<Collection<String>>()
 
         if (sourcecode.isEmpty()) {
@@ -163,11 +178,13 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
             {
                 tokens.addAll(it)
                 Platform.runLater { code.tokensProperty.setAll(it) }
-            }, {
+            },
+            {
                 syntaxErrors.addAll(it)
                 Platform.runLater { code.syntaxErrorsProperty.setAll(it) }
-            }, { Platform.runLater { code.parsedCodeProperty.set(it) } })
-
+            },
+            { Platform.runLater { code.parsedCodeProperty.set(it) } },
+        )
 
         if (tokens.isEmpty()) {
             spansBuilder.add(emptyList(), 0)
@@ -179,7 +196,7 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
             // different character count than this CodeArea.
             spansBuilder.add(
                 getStyleClassesFor(token, syntaxErrors),
-                token.text.replace("\\r".toRegex(), "").length
+                token.text.replace("\\r".toRegex(), "").length,
             )
         }
         return spansBuilder.create()
@@ -194,32 +211,34 @@ class EditorPaneController(val code: Code, private val globalConfig: GlobalConfi
         }
     }
 
-    private fun getHightlightingClass(token: Token?): List<String> {
-        return when (token!!.type) {
-            IEC61131Lexer.COMMENT, IEC61131Lexer.LINE_COMMENT -> listOf("comment")
-            IEC61131Lexer.RETURN, IEC61131Lexer.INTERFACE, IEC61131Lexer.END_INTERFACE, IEC61131Lexer.METHOD,
-            IEC61131Lexer.END_METHOD, IEC61131Lexer.EXTENDS, IEC61131Lexer.IMPLEMENTS, IEC61131Lexer.ELSEIF,
-            IEC61131Lexer.THEN, IEC61131Lexer.OF, IEC61131Lexer.PROGRAM, IEC61131Lexer.END_PROGRAM, IEC61131Lexer.TYPE,
-            IEC61131Lexer.END_TYPE, IEC61131Lexer.IF, IEC61131Lexer.END_IF, IEC61131Lexer.FUNCTION,
-            IEC61131Lexer.END_FUNCTION, IEC61131Lexer.FUNCTION_BLOCK, IEC61131Lexer.END_FUNCTION_BLOCK,
-            IEC61131Lexer.CASE, IEC61131Lexer.END_CASE, IEC61131Lexer.ELSE -> listOf("keyword")
+    private fun getHightlightingClass(token: Token?): List<String> = when (token!!.type) {
+        IEC61131Lexer.COMMENT, IEC61131Lexer.LINE_COMMENT -> listOf("comment")
+        IEC61131Lexer.RETURN, IEC61131Lexer.INTERFACE, IEC61131Lexer.END_INTERFACE, IEC61131Lexer.METHOD,
+        IEC61131Lexer.END_METHOD, IEC61131Lexer.EXTENDS, IEC61131Lexer.IMPLEMENTS, IEC61131Lexer.ELSEIF,
+        IEC61131Lexer.THEN, IEC61131Lexer.OF, IEC61131Lexer.PROGRAM, IEC61131Lexer.END_PROGRAM, IEC61131Lexer.TYPE,
+        IEC61131Lexer.END_TYPE, IEC61131Lexer.IF, IEC61131Lexer.END_IF, IEC61131Lexer.FUNCTION,
+        IEC61131Lexer.END_FUNCTION, IEC61131Lexer.FUNCTION_BLOCK, IEC61131Lexer.END_FUNCTION_BLOCK,
+        IEC61131Lexer.CASE, IEC61131Lexer.END_CASE, IEC61131Lexer.ELSE,
+        -> listOf("keyword")
 
-            IEC61131Lexer.INT, IEC61131Lexer.SINT, IEC61131Lexer.DINT, IEC61131Lexer.LINT, IEC61131Lexer.UINT,
-            IEC61131Lexer.ULINT, IEC61131Lexer.USINT, IEC61131Lexer.UDINT, IEC61131Lexer.BOOL, IEC61131Lexer.BYTE,
-            IEC61131Lexer.WORD, IEC61131Lexer.LWORD, IEC61131Lexer.DWORD -> listOf("type")
+        IEC61131Lexer.INT, IEC61131Lexer.SINT, IEC61131Lexer.DINT, IEC61131Lexer.LINT, IEC61131Lexer.UINT,
+        IEC61131Lexer.ULINT, IEC61131Lexer.USINT, IEC61131Lexer.UDINT, IEC61131Lexer.BOOL, IEC61131Lexer.BYTE,
+        IEC61131Lexer.WORD, IEC61131Lexer.LWORD, IEC61131Lexer.DWORD,
+        -> listOf("type")
 
-            IEC61131Lexer.INTEGER_LITERAL -> listOf("number")
+        IEC61131Lexer.INTEGER_LITERAL -> listOf("number")
 
-            IEC61131Lexer.STRING_LITERAL, IEC61131Lexer.REAL_LITERAL, IEC61131Lexer.RETAIN, IEC61131Lexer.F_EDGE,
-            IEC61131Lexer.R_EDGE, IEC61131Lexer.VAR_ACCESS, IEC61131Lexer.VAR_TEMP, IEC61131Lexer.VAR_EXTERNAL,
-            IEC61131Lexer.VAR_CONFIG, IEC61131Lexer.REAL, IEC61131Lexer.LREAL -> listOf("unsupported")
+        IEC61131Lexer.STRING_LITERAL, IEC61131Lexer.REAL_LITERAL, IEC61131Lexer.RETAIN, IEC61131Lexer.F_EDGE,
+        IEC61131Lexer.R_EDGE, IEC61131Lexer.VAR_ACCESS, IEC61131Lexer.VAR_TEMP, IEC61131Lexer.VAR_EXTERNAL,
+        IEC61131Lexer.VAR_CONFIG, IEC61131Lexer.REAL, IEC61131Lexer.LREAL,
+        -> listOf("unsupported")
 
-            IEC61131Lexer.VAR, IEC61131Lexer.VAR_INPUT, IEC61131Lexer.VAR_IN_OUT, IEC61131Lexer.VAR_OUTPUT,
-            IEC61131Lexer.CONSTANT, IEC61131Lexer.END_VAR -> listOf("vardef")
+        IEC61131Lexer.VAR, IEC61131Lexer.VAR_INPUT, IEC61131Lexer.VAR_IN_OUT, IEC61131Lexer.VAR_OUTPUT,
+        IEC61131Lexer.CONSTANT, IEC61131Lexer.END_VAR,
+        -> listOf("vardef")
 
-            IEC61131Lexer.AND, IEC61131Lexer.NOT, IEC61131Lexer.OR, IEC61131Lexer.MOD -> listOf("operation")
-            else -> listOf()
-        }
+        IEC61131Lexer.AND, IEC61131Lexer.NOT, IEC61131Lexer.OR, IEC61131Lexer.MOD -> listOf("operation")
+        else -> listOf()
     }
 
     private fun handleTextChange(highlighting: StyleSpans<Collection<String>>) {

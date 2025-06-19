@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -51,10 +51,7 @@ interface CliSmtSolver : SmtSolver {
     fun readAll(): List<SExpr>
 }
 
-class CliSmtSolverImpl(
-    val smtFile: File = File.createTempFile("verifaps_", ".smt2"),
-    val command: Array<String>,
-) : CliSmtSolver {
+class CliSmtSolverImpl(val smtFile: File = File.createTempFile("verifaps_", ".smt2"), val command: Array<String>) : CliSmtSolver {
     val out = smtFile.bufferedWriter()
     var smtOut: Reader? = null
 
@@ -114,10 +111,7 @@ class TeeSolverCLI(val writeTo: Writer, val solver: InteractiveSmtSolver) : Inte
 }
 
 // taken from stvs and modified
-class InteractiveSmtSolverImpl(
-    var timeout: Long = 10,
-    var command: Array<String> = arrayOf("z3", "-in", "-smt2"),
-) : InteractiveSmtSolver {
+class InteractiveSmtSolverImpl(var timeout: Long = 10, var command: Array<String> = arrayOf("z3", "-in", "-smt2")) : InteractiveSmtSolver {
 
     var process: Process? = null
     var smtIn: Writer? = null

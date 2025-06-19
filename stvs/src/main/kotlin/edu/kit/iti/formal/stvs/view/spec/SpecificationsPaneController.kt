@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
@@ -35,7 +53,7 @@ class SpecificationsPaneController(
     private val typeContext: ListProperty<Type>,
     private val ioVariables: ListProperty<CodeIoVariable>,
     private val globalConfig: GlobalConfig,
-    private val scenario: VerificationScenario
+    private val scenario: VerificationScenario,
 ) : Controller {
     override val view: SpecificationsPane = SpecificationsPane()
     private val controllers: MutableMap<Tab?, SpecificationController> = HashMap()
@@ -59,7 +77,8 @@ class SpecificationsPaneController(
             for (ioVariable in ioVariables.get()!!) {
                 val specIoVariable = SpecIoVariable(
                     category = ioVariable!!.category,
-                    typeIdentifier = ioVariable.type, name = ioVariable.name
+                    typeIdentifier = ioVariable.type,
+                    name = ioVariable.name,
                 )
                 hybridSpecification.columnHeaders.add(specIoVariable)
             }
@@ -106,8 +125,12 @@ class SpecificationsPaneController(
     private fun addTab(hybridSpecification: HybridSpecification, index: Int): SpecificationController {
         val controller =
             SpecificationController(
-                typeContext, ioVariables, hybridSpecification, this.state,
-                Bindings.isEmpty(scenario.code.syntaxErrorsProperty).not(), globalConfig
+                typeContext,
+                ioVariables,
+                hybridSpecification,
+                this.state,
+                Bindings.isEmpty(scenario.code.syntaxErrorsProperty).not(),
+                globalConfig,
             )
         val tab = Tab()
         tab.onCloseRequest = EventHandler { e: Event -> onTabCloseRequest(e, tab) }
@@ -128,9 +151,7 @@ class SpecificationsPaneController(
         return controller
     }
 
-    fun addTab(hybridSpecification: HybridSpecification): SpecificationController {
-        return addTab(hybridSpecification, 0)
-    }
+    fun addTab(hybridSpecification: HybridSpecification): SpecificationController = addTab(hybridSpecification, 0)
 
     private fun onTabSetName(actionEvent: ActionEvent) {
         val activeTab = view.tabPane.selectionModel.selectedItem
@@ -151,7 +172,6 @@ class SpecificationsPaneController(
         contextMenu.items.add(setNameItem)
         return contextMenu
     }
-
 
     private fun removeTab(index: Int) {
         val removeTab = view.tabs[index]

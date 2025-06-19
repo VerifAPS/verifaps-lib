@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -69,12 +69,7 @@ class AbstractIntEqSfcApp : CliktCommand() {
     }
 }
 
-class AbstractIntEqSfc(
-    val sfcName: String,
-    val leftFile: File,
-    val rightFile: File,
-    val outputFile: File,
-) : Runnable {
+class AbstractIntEqSfc(val sfcName: String, val leftFile: File, val rightFile: File, val outputFile: File) : Runnable {
     override fun run() {
         val leftSfc = getSfc(leftFile)
         val rightSfc = getSfc(rightFile)

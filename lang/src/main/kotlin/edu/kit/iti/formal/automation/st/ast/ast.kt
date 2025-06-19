@@ -737,8 +737,7 @@ abstract class Expression : Top() {
     fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
 }
 
-data class BinaryExpression(var leftExpr: Expression, var operator: BinaryOperator, var rightExpr: Expression) :
-    Expression() {
+data class BinaryExpression(var leftExpr: Expression, var operator: BinaryOperator, var rightExpr: Expression) : Expression() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -1619,8 +1618,7 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
     }
 }
 
-data class Position(val lineNumber: Int = -1, val charInLine: Int = -1, val offset: Int = -1, val file: String = "") :
-    Cloneable {
+data class Position(val lineNumber: Int = -1, val charInLine: Int = -1, val offset: Int = -1, val file: String = "") : Cloneable {
 
     companion object {
         fun start(token: Token?) = Position(
@@ -2110,8 +2108,7 @@ data class SFCStep(var name: String = ANONYM) : Top() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    data class AssociatedAction(var qualifier: SFCActionQualifier? = null, var actionName: String = ANONYM) :
-        Cloneable {
+    data class AssociatedAction(var qualifier: SFCActionQualifier? = null, var actionName: String = ANONYM) : Cloneable {
         override fun clone(): AssociatedAction {
             val aa = AssociatedAction()
             aa.actionName = this.actionName

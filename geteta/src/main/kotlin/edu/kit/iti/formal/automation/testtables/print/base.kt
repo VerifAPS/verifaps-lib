@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -82,10 +82,7 @@ typealias CellPrinter = (TestTableLanguageParser.CellContext) -> String
 /**
  * This class helps printer with serialization of the table cell contents.
  */
-class PrinterHelper(
-    gtt: GeneralizedTestTable,
-    val cellPrinter: CellPrinter,
-) {
+class PrinterHelper(gtt: GeneralizedTestTable, val cellPrinter: CellPrinter) {
     val states = gtt.region.flat()
     val columns = LinkedHashMap<String, List<PrintCellContent>>()
 
@@ -140,10 +137,7 @@ class Counter {
  *
  * This class provides visitor functions that get called during table visialization.
  */
-abstract class AbstractTablePrinter(
-    protected val gtt: GeneralizedTestTable,
-    protected val stream: CodeWriter,
-) : TablePrinter {
+abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable, protected val stream: CodeWriter) : TablePrinter {
 
     protected lateinit var helper: PrinterHelper
     protected var currentRow = 0

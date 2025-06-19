@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -63,7 +63,8 @@ object CppMonitorGenerator : MonitorGeneration {
 }
 
 object CppCombinedMonitorGeneration : CombinedMonitorGeneration {
-    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor = CppCombinedMonitorGenerationImpl(name, input).call()
+    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor =
+        CppCombinedMonitorGenerationImpl(name, input).call()
 
     override val key = "cpp"
 }
@@ -305,7 +306,15 @@ fun CodeWriter.assertVariableBound(gtt: GeneralizedTestTable, tableRow: TableRow
     }
 }
 
-private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SVariable> = filter { gv -> seq.any { expr -> expr.find { it == gv } != null } }
+private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SVariable> = filter { gv ->
+    seq.any { expr ->
+        expr.find {
+            it ==
+                gv
+        } !=
+            null
+    }
+}
 
 /** Searches for equality of gv with other terms. TODO look only for top level formulas */
 fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
@@ -483,30 +492,25 @@ private fun CodeWriter.historyValuesUpdate(gtt: GeneralizedTestTable) {
     }
 }
 
-private fun CodeWriter.constructor(name: String, inits: Iterable<String> = listOf(), fn: CodeWriter.() -> Unit): CodeWriter {
+private fun CodeWriter.constructor(
+    name: String,
+    inits: Iterable<String> = listOf(),
+    fn: CodeWriter.() -> Unit,
+): CodeWriter {
     val a = inits.joinToString(", ")
     val b = if (a.isBlank()) "" else ": $a"
     cblock("$name() $b {", "}", fn)
     return this
 }
 
-private fun CodeWriter.method(
-    ret: String = "",
-    name: String,
-    args: Iterable<String>,
-    fn: CodeWriter.() -> Unit,
-) {
+private fun CodeWriter.method(ret: String = "", name: String, args: Iterable<String>, fn: CodeWriter.() -> Unit) {
     val params = args.filter { ' ' in it }.joinToString(", ")
     val mods = args.filter { ' ' !in it }.joinToString(" ")
     cblock("$ret $name($params) $mods {", "}", fn)
 }
 
-private fun CodeWriter.method(
-    ret: String = "",
-    name: String,
-    vararg args: String,
-    fn: CodeWriter.() -> Unit,
-) = method(ret, name, args.toList(), fn)
+private fun CodeWriter.method(ret: String = "", name: String, vararg args: String, fn: CodeWriter.() -> Unit) =
+    method(ret, name, args.toList(), fn)
 
 private fun CodeWriter.ift(cond: String = "", fn: CodeWriter.() -> Unit): CodeWriter {
     cblock("if($cond) {", "}", fn)

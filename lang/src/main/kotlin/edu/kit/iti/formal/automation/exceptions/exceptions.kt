@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -18,13 +18,10 @@
  * *****************************************************************/
 package edu.kit.iti.formal.automation.exceptions
 
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.datatypes.AnyDt
-import edu.kit.iti.formal.automation.scope.Scope
-import edu.kit.iti.formal.automation.st.ast.Expression
-import edu.kit.iti.formal.automation.st.ast.Invocation
-import edu.kit.iti.formal.automation.st.ast.SymbolicReference
-import edu.kit.iti.formal.automation.st.ast.Top
+import edu.kit.iti.formal.automation.*
+import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.scope.*
+import edu.kit.iti.formal.automation.st.ast.*
 import java.util.*
 
 /**
@@ -39,7 +36,12 @@ abstract class IECException : RuntimeException {
     constructor(message: String?) : super(message)
     constructor(message: String?, cause: Throwable?) : super(message, cause)
     constructor(cause: Throwable?) : super(cause)
-    constructor(message: String?, cause: Throwable?, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace)
+    constructor(
+        message: String?,
+        cause: Throwable?,
+        enableSuppression: Boolean,
+        writableStackTrace: Boolean,
+    ) : super(message, cause, enableSuppression, writableStackTrace)
 }
 
 /**
@@ -51,7 +53,13 @@ class DataTypeNotDefinedException : RuntimeException {
     constructor(message: String) : super(message) {}
     constructor(message: String, cause: Throwable) : super(message, cause) {}
     constructor(cause: Throwable) : super(cause) {}
-    protected constructor(message: String, cause: Throwable, enableSuppression: Boolean, writableStackTrace: Boolean) : super(message, cause, enableSuppression, writableStackTrace) {}
+    protected constructor(
+        message: String,
+        cause: Throwable,
+        enableSuppression: Boolean,
+        writableStackTrace: Boolean,
+    ) : super(message, cause, enableSuppression, writableStackTrace) {
+    }
 }
 
 /**
@@ -90,11 +98,7 @@ class FunctionInvocationArgumentNumberException : IECException()
  */
 class FunctionUndefinedException(val invocation: Invocation) : IECException()
 
-class TypeConformityException(
-    val expression: Expression,
-    val expectedDataTypes: Array<AnyDt>,
-    vararg actual: AnyDt?,
-) : IECException() {
+class TypeConformityException(val expression: Expression, val expectedDataTypes: Array<AnyDt>, vararg actual: AnyDt?) : IECException() {
     val actualDatatypes: Array<out AnyDt?> = actual
 
     override val message: String?

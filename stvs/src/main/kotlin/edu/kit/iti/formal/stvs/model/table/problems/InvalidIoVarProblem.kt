@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table.problems
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
@@ -15,9 +33,7 @@ import edu.kit.iti.formal.stvs.model.expressions.VariableExpr
  * @author Benjamin Alt
  * @author Philipp
  */
-data class InvalidIoVarProblem(
-    val specIoVariable: SpecIoVariable, private val errorType: ErrorType
-) : ColumnProblem {
+data class InvalidIoVarProblem(val specIoVariable: SpecIoVariable, private val errorType: ErrorType) : ColumnProblem {
     override val column: String
         get() = specIoVariable.name
     override val errorMessage: String
@@ -26,9 +42,11 @@ data class InvalidIoVarProblem(
     override val location: Selection = Selection(specIoVariable.name)
 
     enum class ErrorType {
-        NAME_INVALID, TYPE_UNKNOWN,
-        NAME_MISMATCH, TYPE_MISMATCH,
-        CATEGORY_MISMATCH
+        NAME_INVALID,
+        TYPE_UNKNOWN,
+        NAME_MISMATCH,
+        TYPE_MISMATCH,
+        CATEGORY_MISMATCH,
     }
 
     companion object {
@@ -50,8 +68,9 @@ data class InvalidIoVarProblem(
         @Throws(SpecProblemException::class)
         fun tryGetValidIoVariable(
             specIoVariable: SpecIoVariable,
-            codeIoVariables: Collection<CodeIoVariable>, typesByName: Map<String, Type>,
-            minorProblemsHandler: MinorProblemsHandler
+            codeIoVariables: Collection<CodeIoVariable>,
+            typesByName: Map<String, Type>,
+            minorProblemsHandler: MinorProblemsHandler,
         ): ValidIoVariable {
             val name = tryGetValidName(specIoVariable, codeIoVariables, minorProblemsHandler)
             val type = tryGetValidType(specIoVariable, typesByName, codeIoVariables, minorProblemsHandler)
@@ -61,12 +80,14 @@ data class InvalidIoVarProblem(
 
         @Throws(SpecProblemException::class)
         private fun tryGetValidType(
-            specIoVariable: SpecIoVariable, typesByName: Map<String, Type>,
-            codeIoVariables: Collection<CodeIoVariable>, minorProblemsHandler: MinorProblemsHandler
+            specIoVariable: SpecIoVariable,
+            typesByName: Map<String, Type>,
+            codeIoVariables: Collection<CodeIoVariable>,
+            minorProblemsHandler: MinorProblemsHandler,
         ): Type {
             val type = typesByName[specIoVariable.type] ?: throw InvalidIoVarProblem(
                 specIoVariable,
-                ErrorType.TYPE_UNKNOWN
+                ErrorType.TYPE_UNKNOWN,
             ).asException()
             codeIoVariables.stream()
                 .filter { codeIoVariable: CodeIoVariable -> codeIoVariable.name == specIoVariable.name }
@@ -83,7 +104,7 @@ data class InvalidIoVarProblem(
         private fun tryGetValidName(
             ioVar: SpecIoVariable,
             codeIoVariables: Collection<CodeIoVariable>,
-            minorProblemsHandler: MinorProblemsHandler
+            minorProblemsHandler: MinorProblemsHandler,
         ): String {
             if (!VariableExpr.IDENTIFIER_PATTERN.matcher(ioVar.name).matches()) {
                 throw InvalidIoVarProblem(ioVar, ErrorType.NAME_INVALID).asException()

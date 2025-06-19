@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
 import edu.kit.iti.formal.stvs.model.common.Selection
@@ -29,19 +47,18 @@ class TimingDiagramController : Controller {
     private val activated: BooleanProperty
 
     /*
-   * private void updateAxisExternalPosition() { Transform transformation =
-   * ViewUtils.calculateTransformRelativeTo(view.getParent().getParent().getParent(),
-   * view.getyAxis()); double yAxisPosition =
-   * transformation.transform(view.getyAxis().getLayoutBounds()).getMinY();
-   * externalYAxis.layoutYProperty().set(yAxisPosition); }
-   */
+     * private void updateAxisExternalPosition() { Transform transformation =
+     * ViewUtils.calculateTransformRelativeTo(view.getParent().getParent().getParent(),
+     * view.getyAxis()); double yAxisPosition =
+     * transformation.transform(view.getyAxis().getLayoutBounds()).getMinY();
+     * externalYAxis.layoutYProperty().set(yAxisPosition); }
+     */
     override val view: TimingDiagramView<*>
     private val selection: Selection?
     private val ioVariable: ValidIoVariable
     private val concreteSpec: ConcreteSpecification?
     private val commonXAxis: NumberAxis?
     private var lastMouseEvent: MouseEvent? = null
-
 
     /**
      * Instantiates a new Timing diagram controller with a number xAxis.
@@ -54,9 +71,12 @@ class TimingDiagramController : Controller {
      * @param activated property that indicates if the selection should be updated
      */
     constructor(
-        commonXAxis: NumberAxis?, externalYAxis: NumberAxis,
-        spec: ConcreteSpecification?, ioVariable: ValidIoVariable, selection: Selection?,
-        activated: BooleanProperty
+        commonXAxis: NumberAxis?,
+        externalYAxis: NumberAxis,
+        spec: ConcreteSpecification?,
+        ioVariable: ValidIoVariable,
+        selection: Selection?,
+        activated: BooleanProperty,
     ) {
         this.activated = activated
         this.selection = selection
@@ -94,9 +114,12 @@ class TimingDiagramController : Controller {
      * @param activated property that indicates if the selection should be updated
      */
     constructor(
-        commonXAxis: NumberAxis?, externalYAxis: CategoryAxis,
-        spec: ConcreteSpecification?, ioVariable: ValidIoVariable, selection: Selection?,
-        activated: BooleanProperty
+        commonXAxis: NumberAxis?,
+        externalYAxis: CategoryAxis,
+        spec: ConcreteSpecification?,
+        ioVariable: ValidIoVariable,
+        selection: Selection?,
+        activated: BooleanProperty,
     ) {
         this.activated = activated
         this.ioVariable = ioVariable
@@ -121,7 +144,6 @@ class TimingDiagramController : Controller {
 
         initCommon()
     }
-
 
     /**
      * Create mouse events and context menu entries.
@@ -155,7 +177,7 @@ class TimingDiagramController : Controller {
                 if (event.button == MouseButton.PRIMARY) {
                     selection!!.fireClickEvent(
                         ioVariable.name,
-                        concreteSpec.cycleToRowNumber(i)
+                        concreteSpec.cycleToRowNumber(i),
                     )
                 }
             }
@@ -206,7 +228,7 @@ class TimingDiagramController : Controller {
     companion object {
         /*
   All Diagrams are constructed via factory-methods because the NumberAxis is a final class.
-   */
+         */
         /**
          * Generates an integer timing diagram.
          *
@@ -219,8 +241,11 @@ class TimingDiagramController : Controller {
          * @return A [Pair] which holds a [TimingDiagramController] and a [NumberAxis]
          */
         fun createIntegerTimingDiagram(
-            concreteSpec: ConcreteSpecification?, specIoVar: ValidIoVariable, globalXAxis: NumberAxis?,
-            selection: Selection?, activated: BooleanProperty
+            concreteSpec: ConcreteSpecification?,
+            specIoVar: ValidIoVariable,
+            globalXAxis: NumberAxis?,
+            selection: Selection?,
+            activated: BooleanProperty,
         ): Pair<TimingDiagramController, Axis<*>> {
             val yaxis = NumberAxis(0.0, 10.0, 1.0)
             yaxis.prefWidth = 30.0
@@ -229,7 +254,11 @@ class TimingDiagramController : Controller {
             yaxis.isMinorTickVisible = false
             val timingDiagramController = TimingDiagramController(
                 globalXAxis,
-                yaxis, concreteSpec, specIoVar, selection, activated
+                yaxis,
+                concreteSpec,
+                specIoVar,
+                selection,
+                activated,
             )
             return timingDiagramController to yaxis
         }
@@ -246,8 +275,11 @@ class TimingDiagramController : Controller {
          * @return A [Pair] which holds a [TimingDiagramController] and a [CategoryAxis]
          */
         fun createBoolTimingDiagram(
-            concreteSpec: ConcreteSpecification?, specIoVar: ValidIoVariable, globalXAxis: NumberAxis?,
-            selection: Selection?, activated: BooleanProperty
+            concreteSpec: ConcreteSpecification?,
+            specIoVar: ValidIoVariable,
+            globalXAxis: NumberAxis?,
+            selection: Selection?,
+            activated: BooleanProperty,
         ): Pair<TimingDiagramController, Axis<*>> {
             val categories = FXCollections.observableArrayList<String>()
             categories.addAll("FALSE", "TRUE")
@@ -257,7 +289,11 @@ class TimingDiagramController : Controller {
             boolCategoryAxis.isAutoRanging = true
             val timingDiagramController = TimingDiagramController(
                 globalXAxis,
-                boolCategoryAxis, concreteSpec, specIoVar, selection, activated
+                boolCategoryAxis,
+                concreteSpec,
+                specIoVar,
+                selection,
+                activated,
             )
             return timingDiagramController to boolCategoryAxis
         }
@@ -275,8 +311,12 @@ class TimingDiagramController : Controller {
          * @return A [Pair] which holds a [TimingDiagramController] and a [CategoryAxis]
          */
         fun createEnumTimingDiagram(
-            concreteSpec: ConcreteSpecification?, specIoVar: ValidIoVariable, typeEnum: TypeEnum?,
-            globalXAxis: NumberAxis?, selection: Selection?, activated: BooleanProperty
+            concreteSpec: ConcreteSpecification?,
+            specIoVar: ValidIoVariable,
+            typeEnum: TypeEnum?,
+            globalXAxis: NumberAxis?,
+            selection: Selection?,
+            activated: BooleanProperty,
         ): Pair<TimingDiagramController, Axis<*>> {
             val categories = FXCollections.observableArrayList<String>()
             typeEnum!!.values.stream().map(ValueEnum::valueString).forEach(categories::add)
@@ -286,7 +326,11 @@ class TimingDiagramController : Controller {
             categoryAxis.isAutoRanging = true
             val timingDiagramController = TimingDiagramController(
                 globalXAxis,
-                categoryAxis, concreteSpec, specIoVar, selection, activated
+                categoryAxis,
+                concreteSpec,
+                specIoVar,
+                selection,
+                activated,
             )
             return timingDiagramController to categoryAxis
         }

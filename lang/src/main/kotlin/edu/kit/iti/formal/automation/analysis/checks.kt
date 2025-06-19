@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -42,9 +42,14 @@ fun getCheckers(reporter: Reporter) = listOf(CheckForTypes(reporter), CheckForLi
  * Similarity is defined via degree of levensthein of the low-case strings.
  * Percentage of changed characters.
  */
-fun variableSimilarity(expected: String, defined: String): Double = dlevenshtein(expected.lowercase(Locale.getDefault()), defined.lowercase(Locale.getDefault())).toDouble() / expected.length
+fun variableSimilarity(expected: String, defined: String): Double =
+    dlevenshtein(expected.lowercase(Locale.getDefault()), defined.lowercase(Locale.getDefault())).toDouble() /
+        expected.length
 
-fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) = this.map { it to variableSimilarity(reference, it) }
+fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) = this.map {
+    it to
+        variableSimilarity(reference, it)
+}
     .sortedByDescending { it.second }
     .filter { it.second > threshold }
     .map { it.first }
@@ -457,7 +462,10 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
                     )
                     .filter { (_, m) -> m.name == method.name }
                     .joinToString { (w, m) -> "${w.name}.${m.name}" }
-            reporter.report(method, "Method is declared as override, but does not override any method. Candidates are: $candidates")
+            reporter.report(
+                method,
+                "Method is declared as override, but does not override any method. Candidates are: $candidates",
+            )
         }
 
         if (method.isAbstract && !method.stBody.isEmpty()) {

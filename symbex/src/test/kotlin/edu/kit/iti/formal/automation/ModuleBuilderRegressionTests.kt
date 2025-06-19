@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -28,7 +28,11 @@ object ModuleBuilderRegressionTests {
         val expected = javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/specialstatements.smv")
             ?.bufferedReader()?.readText() ?: ""
         val (stInput, _) =
-            IEC61131Facade.fileResolve(CharStreams.fromStream(javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/specialstatements.st")))
+            IEC61131Facade.fileResolve(
+                CharStreams.fromStream(
+                    javaClass.getResourceAsStream("/edu/kit/iti/formal/automation/st/specialstatements.st"),
+                ),
+            )
         Assertions.assertNotNull(expected)
         Assertions.assertNotNull(stInput)
         println(IEC61131Facade.print(stInput))

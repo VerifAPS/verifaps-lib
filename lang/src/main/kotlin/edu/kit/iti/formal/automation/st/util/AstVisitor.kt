@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -949,67 +949,84 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun defaultVisit(obj: Any): Any = obj
 
-    override fun visit(assignmentStatement: AssignmentStatement): Statement = super.visit(assignmentStatement) as AssignmentStatement
+    override fun visit(assignmentStatement: AssignmentStatement): Statement =
+        super.visit(assignmentStatement) as AssignmentStatement
 
     override fun visit(range: CaseCondition.Range): CaseCondition.Range = super.visit(range) as CaseCondition.Range
 
-    override fun visit(integerCondition: CaseCondition.IntegerCondition): CaseCondition.IntegerCondition = super.visit(integerCondition) as CaseCondition.IntegerCondition
+    override fun visit(integerCondition: CaseCondition.IntegerCondition): CaseCondition.IntegerCondition =
+        super.visit(integerCondition) as CaseCondition.IntegerCondition
 
-    override fun visit(enumeration: CaseCondition.Enumeration): CaseCondition.Enumeration = super.visit(enumeration) as CaseCondition.Enumeration
+    override fun visit(enumeration: CaseCondition.Enumeration): CaseCondition.Enumeration =
+        super.visit(enumeration) as CaseCondition.Enumeration
 
-    override fun visit(binaryExpression: BinaryExpression): Expression = super.visit(binaryExpression) as BinaryExpression
+    override fun visit(binaryExpression: BinaryExpression): Expression =
+        super.visit(binaryExpression) as BinaryExpression
 
-    override fun visit(repeatStatement: RepeatStatement): RepeatStatement = super.visit(repeatStatement) as RepeatStatement
+    override fun visit(repeatStatement: RepeatStatement): RepeatStatement =
+        super.visit(repeatStatement) as RepeatStatement
 
     override fun visit(whileStatement: WhileStatement): WhileStatement = super.visit(whileStatement) as WhileStatement
 
     override fun visit(unaryExpression: UnaryExpression): Expression = super.visit(unaryExpression) as UnaryExpression
 
-    override fun visit(typeDeclarations: TypeDeclarations): TypeDeclarations = super.visit(typeDeclarations) as TypeDeclarations
+    override fun visit(typeDeclarations: TypeDeclarations): TypeDeclarations =
+        super.visit(typeDeclarations) as TypeDeclarations
 
     override fun visit(caseStatement: CaseStatement): CaseStatement = super.visit(caseStatement) as CaseStatement
 
     override fun visit(statements: StatementList): StatementList = super.visit(statements) as StatementList
 
-    override fun visit(programDeclaration: ProgramDeclaration): ProgramDeclaration = super.visit(programDeclaration) as ProgramDeclaration
+    override fun visit(programDeclaration: ProgramDeclaration): ProgramDeclaration =
+        super.visit(programDeclaration) as ProgramDeclaration
 
     override fun visit(expressions: ExpressionList): ExpressionList = super.visit(expressions) as ExpressionList
 
-    override fun visit(functionDeclaration: FunctionDeclaration): FunctionDeclaration = super.visit(functionDeclaration) as FunctionDeclaration
+    override fun visit(functionDeclaration: FunctionDeclaration): FunctionDeclaration =
+        super.visit(functionDeclaration) as FunctionDeclaration
 
     override fun visit(forStatement: ForStatement): Statement = super.visit(forStatement) as ForStatement
 
-    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): FunctionBlockDeclaration = super.visit(functionBlockDeclaration) as FunctionBlockDeclaration
+    override fun visit(functionBlockDeclaration: FunctionBlockDeclaration): FunctionBlockDeclaration =
+        super.visit(functionBlockDeclaration) as FunctionBlockDeclaration
 
     override fun visit(ifStatement: IfStatement): Statement = super.visit(ifStatement) as Statement
 
-    override fun visit(guardedStatement: GuardedStatement): GuardedStatement = super.visit(guardedStatement) as GuardedStatement
+    override fun visit(guardedStatement: GuardedStatement): GuardedStatement =
+        super.visit(guardedStatement) as GuardedStatement
 
     override fun visit(aCase: Case): Case = super.visit(aCase) as Case
 
     override fun visit(localScope: Scope): Scope = super.visit(localScope) as Scope
 
-    override fun visit(variableDeclaration: VariableDeclaration): VariableDeclaration = super.visit(variableDeclaration) as VariableDeclaration
+    override fun visit(variableDeclaration: VariableDeclaration): VariableDeclaration =
+        super.visit(variableDeclaration) as VariableDeclaration
 
-    override fun visit(arrayinit: ArrayInitialization): ArrayInitialization = super.visit(arrayinit) as ArrayInitialization
+    override fun visit(arrayinit: ArrayInitialization): ArrayInitialization =
+        super.visit(arrayinit) as ArrayInitialization
 
     override fun visit(invocation: Invocation): Expression = super.visit(invocation) as Invocation
 
-    override fun visit(parameter: InvocationParameter): InvocationParameter = super.visit(parameter) as InvocationParameter
+    override fun visit(parameter: InvocationParameter): InvocationParameter =
+        super.visit(parameter) as InvocationParameter
 
     override fun visit(invocation: InvocationStatement): Statement = super.visit(invocation) as Statement
 
-    override fun visit(stringTypeDeclaration: StringTypeDeclaration): StringTypeDeclaration = super.visit(stringTypeDeclaration) as StringTypeDeclaration
+    override fun visit(stringTypeDeclaration: StringTypeDeclaration): StringTypeDeclaration =
+        super.visit(stringTypeDeclaration) as StringTypeDeclaration
 
-    override fun visit(structureInitialization: StructureInitialization): StructureInitialization = super.visit(structureInitialization) as StructureInitialization
+    override fun visit(structureInitialization: StructureInitialization): StructureInitialization =
+        super.visit(structureInitialization) as StructureInitialization
 
     override fun visit(clazz: ClassDeclaration): ClassDeclaration = super.visit(clazz) as ClassDeclaration
 
-    override fun visit(interfaceDeclaration: InterfaceDeclaration): InterfaceDeclaration = super.visit(interfaceDeclaration) as InterfaceDeclaration
+    override fun visit(interfaceDeclaration: InterfaceDeclaration): InterfaceDeclaration =
+        super.visit(interfaceDeclaration) as InterfaceDeclaration
 
     override fun visit(method: MethodDeclaration): MethodDeclaration = super.visit(method) as MethodDeclaration
 
-    override fun visit(gvlDecl: GlobalVariableListDeclaration): GlobalVariableListDeclaration = super.visit(gvlDecl) as GlobalVariableListDeclaration
+    override fun visit(gvlDecl: GlobalVariableListDeclaration): GlobalVariableListDeclaration =
+        super.visit(gvlDecl) as GlobalVariableListDeclaration
 
     override fun visit(referenceValue: ReferenceValue): ReferenceValue = super.visit(referenceValue) as ReferenceValue
 
@@ -1017,29 +1034,39 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun visit(location: Location): Location = super.visit(location) as Location
 
-    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): ArrayTypeDeclaration = super.visit(arrayTypeDeclaration) as ArrayTypeDeclaration
+    override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration): ArrayTypeDeclaration =
+        super.visit(arrayTypeDeclaration) as ArrayTypeDeclaration
 
     override fun visit(exitStatement: ExitStatement): ExitStatement = super.visit(exitStatement) as ExitStatement
 
-    override fun visit(configurationDeclaration: ConfigurationDeclaration): ConfigurationDeclaration = super.visit(configurationDeclaration) as ConfigurationDeclaration
+    override fun visit(configurationDeclaration: ConfigurationDeclaration): ConfigurationDeclaration =
+        super.visit(configurationDeclaration) as ConfigurationDeclaration
 
-    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): EnumerationTypeDeclaration = super.visit(enumerationTypeDeclaration) as EnumerationTypeDeclaration
+    override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration): EnumerationTypeDeclaration =
+        super.visit(enumerationTypeDeclaration) as EnumerationTypeDeclaration
 
-    override fun visit(resourceDeclaration: ResourceDeclaration): ResourceDeclaration = super.visit(resourceDeclaration) as ResourceDeclaration
+    override fun visit(resourceDeclaration: ResourceDeclaration): ResourceDeclaration =
+        super.visit(resourceDeclaration) as ResourceDeclaration
 
-    override fun visit(returnStatement: ReturnStatement): ReturnStatement = super.visit(returnStatement) as ReturnStatement
+    override fun visit(returnStatement: ReturnStatement): ReturnStatement =
+        super.visit(returnStatement) as ReturnStatement
 
-    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): StructureTypeDeclaration = super.visit(structureTypeDeclaration) as StructureTypeDeclaration
+    override fun visit(structureTypeDeclaration: StructureTypeDeclaration): StructureTypeDeclaration =
+        super.visit(structureTypeDeclaration) as StructureTypeDeclaration
 
-    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): SubRangeTypeDeclaration = super.visit(subRangeTypeDeclaration) as SubRangeTypeDeclaration
+    override fun visit(subRangeTypeDeclaration: SubRangeTypeDeclaration): SubRangeTypeDeclaration =
+        super.visit(subRangeTypeDeclaration) as SubRangeTypeDeclaration
 
-    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): SimpleTypeDeclaration = super.visit(simpleTypeDeclaration) as SimpleTypeDeclaration
+    override fun visit(simpleTypeDeclaration: SimpleTypeDeclaration): SimpleTypeDeclaration =
+        super.visit(simpleTypeDeclaration) as SimpleTypeDeclaration
 
-    override fun visit(commentStatement: CommentStatement): CommentStatement = super.visit(commentStatement) as CommentStatement
+    override fun visit(commentStatement: CommentStatement): CommentStatement =
+        super.visit(commentStatement) as CommentStatement
 
     override fun visit(deref: Deref): Deref = super.visit(deref) as Deref
 
-    override fun visit(symbolicReference: SymbolicReference): Expression = super.visit(symbolicReference) as SymbolicReference
+    override fun visit(symbolicReference: SymbolicReference): Expression =
+        super.visit(symbolicReference) as SymbolicReference
 
     override fun visit(ptd: PointerTypeDeclaration): PointerTypeDeclaration = super.visit(ptd) as PointerTypeDeclaration
 
@@ -1049,7 +1076,8 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun visit(sfcStep: SFCStep): SFCStep = super.visit(sfcStep) as SFCStep
 
-    override fun visit(actionDeclaration: ActionDeclaration): ActionDeclaration = super.visit(actionDeclaration) as ActionDeclaration
+    override fun visit(actionDeclaration: ActionDeclaration): ActionDeclaration =
+        super.visit(actionDeclaration) as ActionDeclaration
 
     override fun visit(sfcNetwork: SFCNetwork): SFCNetwork = super.visit(sfcNetwork) as SFCNetwork
 
@@ -1057,7 +1085,8 @@ open class AstMutableVisitor : AstVisitor<Any>() {
 
     override fun visit(transition: SFCTransition): SFCTransition = super.visit(transition) as SFCTransition
 
-    override fun visit(referenceSpecification: ReferenceTypeDeclaration): ReferenceTypeDeclaration = super.visit(referenceSpecification) as ReferenceTypeDeclaration
+    override fun visit(referenceSpecification: ReferenceTypeDeclaration): ReferenceTypeDeclaration =
+        super.visit(referenceSpecification) as ReferenceTypeDeclaration
 
     override fun visit(empty: EMPTY_EXPRESSION): EMPTY_EXPRESSION = super.visit(empty) as EMPTY_EXPRESSION
 

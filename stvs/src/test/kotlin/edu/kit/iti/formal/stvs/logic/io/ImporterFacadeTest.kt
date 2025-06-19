@@ -1,6 +1,23 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonElement
 import edu.kit.iti.formal.stvs.StvsApplication
@@ -35,7 +52,7 @@ class ImporterFacadeTest {
         val importedSpec = ImporterFacade.importConstraintSpec(file)
         val testjson: JsonElement = JsonTableParser.jsonFromResource(
             "valid_table.json",
-            ConstraintSpecificationValidatorTest::class.java
+            ConstraintSpecificationValidatorTest::class.java,
         )
 
         val expectedSpec = JsonTableParser.constraintTableFromJson(testjson)
@@ -65,10 +82,12 @@ class ImporterFacadeTest {
         val file = XmlConstraintSpecImporter::class.java.getResourceAsStream("spec_constraint_valid_1.xml")!!
         val importedSpec: HybridSpecification = ImporterFacade.importHybridSpec(file)
         val testJson: JsonElement = JsonTableParser.jsonFromResource(
-            "valid_table.json", ConstraintSpecificationValidatorTest::class.java
+            "valid_table.json",
+            ConstraintSpecificationValidatorTest::class.java,
         )
         val expectedSpec = HybridSpecification(
-            JsonTableParser.constraintTableFromJson(testJson), true
+            JsonTableParser.constraintTableFromJson(testJson),
+            true,
         )
         assertEquals(expectedSpec, importedSpec)
     }
@@ -77,13 +96,13 @@ class ImporterFacadeTest {
     fun importConfigFile() {
         val file = File(
             this.javaClass.getResource(
-                "/edu/kit/iti/formal/stvs/logic/io/xml/config_valid_default.xml"
-            )!!.toURI()
+                "/edu/kit/iti/formal/stvs/logic/io/xml/config_valid_default.xml",
+            )!!.toURI(),
         )
         val actualConfig = ImporterFacade.importConfig(file)
         val expectedConfig = GlobalConfig()
 
-        //reset global config values
+        // reset global config values
         expectedConfig.nuxmvFilename = "[Path to NuXmv Executable]"
         expectedConfig.z3Path = "[Path to Z3 Executable]"
         assertEquals(expectedConfig, actualConfig)
@@ -95,15 +114,17 @@ class ImporterFacadeTest {
         val typeContext =
             listOf(TypeInt, TypeBool, TypeFactory.enumOfName("enumD", "literalOne", "literalTwo"))
         val constraintSpec: ConstraintSpecification = ImporterFacade.importConstraintSpec(
-            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml")
+            loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"),
         )
         val result: VerificationResult = ImporterFacade.importVerificationResult(
-            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"), typeContext, constraintSpec
+            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"),
+            typeContext,
+            constraintSpec,
         )
         assertTrue(result is VerificationSuccess)
     }
 
-    @Test//(expected = ImportException::class)
+    @Test // (expected = ImportException::class)
     @Disabled
     fun importVerificationResultBadFormat() {
         val typeContext =
@@ -111,7 +132,9 @@ class ImporterFacadeTest {
         val constraintSpec: ConstraintSpecification =
             ImporterFacade.importConstraintSpec(loadFromTestSets("/valid_1/constraint_spec_valid_1.xml"))
         ImporterFacade.importVerificationResult(
-            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"), typeContext, constraintSpec
+            loadFromTestSets("/valid_1/geteta_report_valid_1.xml"),
+            typeContext,
+            constraintSpec,
         )
     }
 
@@ -119,14 +142,15 @@ class ImporterFacadeTest {
     fun importSessionFile() {
         val importedSession: StvsRootModel = ImporterFacade.importSession(
             XmlSessionImporter::class.java.getResourceAsStream("session_valid_1.xml")!!,
-            GlobalConfig(), History()
+            GlobalConfig(),
+            History(),
         )
         val code = StvsApplication::class.java.getResourceAsStream("testSets/valid_1/code_valid_1.st")!!
             .bufferedReader().readText()
 
         assertEquals(
             code.replace("\\s+".toRegex(), " "),
-            importedSession.scenario.code.sourcecode.replace("\\s+".toRegex(), " ")
+            importedSession.scenario.code.sourcecode.replace("\\s+".toRegex(), " "),
         )
     }
 
@@ -137,7 +161,7 @@ class ImporterFacadeTest {
         val importedCode = ImporterFacade.importStCode(file)
         assertEquals(
             TestUtils.removeWhitespace(expectedCode),
-            TestUtils.removeWhitespace(importedCode.sourcecode)
+            TestUtils.removeWhitespace(importedCode.sourcecode),
         )
         assertEquals(file.absolutePath, importedCode.filename)
     }
@@ -147,21 +171,21 @@ class ImporterFacadeTest {
         val file = File(XmlSessionImporter::class.java.getResource("history_valid_1.xml")!!.toURI())
         val history = ImporterFacade.importHistory(file)
         assertThat(history.filenames[0]).isEqualTo(
-            "/home/bal/Projects/kit/pse/stverificationstudio/doc/FA-Testsession-Ressourcen/testsession_valid.xml"
+            "/home/bal/Projects/kit/pse/stverificationstudio/doc/FA-Testsession-Ressourcen/testsession_valid.xml",
         )
     }
 
     @Test
     fun importFile() {
         val specFile = File(
-            XmlConstraintSpecImporter::class.java.getResource("spec_constraint_valid_1.xml")!!.toURI()
+            XmlConstraintSpecImporter::class.java.getResource("spec_constraint_valid_1.xml")!!.toURI(),
         )
         val codeFile = File(
-            StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI()
+            StvsApplication::class.java.getResource("testSets/valid_1/code_valid_1.st")!!.toURI(),
         )
         val sessionFile = File(
             XmlSessionImporter::class.java.getResource("session_valid_1.xml")!!
-                .toURI()
+                .toURI(),
         )
         val testConfig = GlobalConfig()
         val testHistory = History()
@@ -169,8 +193,12 @@ class ImporterFacadeTest {
         val sessionHandler = DummyStvsRootModelHandler()
         val codeHandler = DummyCodeHandler()
         ImporterFacade.importFile(
-            specFile, testConfig, testHistory, specHandler, sessionHandler,
-            codeHandler
+            specFile,
+            testConfig,
+            testHistory,
+            specHandler,
+            sessionHandler,
+            codeHandler,
         )
         assertTrue(hybridSpecImported)
         assertFalse(sessionImported)

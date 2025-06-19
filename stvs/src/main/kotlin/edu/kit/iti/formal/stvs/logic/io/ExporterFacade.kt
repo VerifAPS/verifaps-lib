@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io
 
 import edu.kit.iti.formal.stvs.logic.io.xml.XmlConfigExporter
@@ -31,11 +49,9 @@ object ExporterFacade {
      * @throws ExportException if an error occurred while exporting
      */
     @Throws(ExportException::class)
-    fun exportSpec(spec: ConstraintSpecification, format: ExportFormat, out: OutputStream) {
-        return when (format) {
-            ExportFormat.XML -> XmlConstraintSpecExporter().export(spec, out)
-            ExportFormat.GETETA -> GeTeTaExporter().export(spec, out)
-        }
+    fun exportSpec(spec: ConstraintSpecification, format: ExportFormat, out: OutputStream) = when (format) {
+        ExportFormat.XML -> XmlConstraintSpecExporter().export(spec, out)
+        ExportFormat.GETETA -> GeTeTaExporter().export(spec, out)
     }
 
     /**
@@ -63,9 +79,7 @@ object ExporterFacade {
      * @throws ExportException if an error occurred while exporting
      */
     @Throws(ExportException::class)
-    fun exportConfig(config: GlobalConfig, out: OutputStream) {
-        return XmlConfigExporter().export(config, out)
-    }
+    fun exportConfig(config: GlobalConfig, out: OutputStream) = XmlConfigExporter().export(config, out)
 
     /**
      * Exports a [GlobalConfig] to a given file.
@@ -91,9 +105,7 @@ object ExporterFacade {
      * @throws ExportException if an error occurred while exporting
      */
     @Throws(ExportException::class)
-    fun exportSession(session: StvsRootModel, out: OutputStream) {
-        return XmlSessionExporter().export(session, out)
-    }
+    fun exportSession(session: StvsRootModel, out: OutputStream) = XmlSessionExporter().export(session, out)
 
     /**
      * Exports a [StvsRootModel] to a given file.
@@ -151,6 +163,7 @@ object ExporterFacade {
     }
 
     enum class ExportFormat {
-        XML, GETETA
+        XML,
+        GETETA,
     }
 }

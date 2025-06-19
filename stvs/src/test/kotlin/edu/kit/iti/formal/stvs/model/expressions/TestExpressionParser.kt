@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.expressions
 
 import edu.kit.iti.formal.stvs.model.expressions.SimpleExpressions.equal
@@ -44,7 +62,7 @@ class TestExpressionParser {
         assertParseExpressionEqual("b", equal(variable(columnName), variable("b")))
         assertParseExpressionEqual(
             "b = ! FALSE",
-            equal(variable("b"), SimpleExpressions.not(literal(false)))
+            equal(variable("b"), SimpleExpressions.not(literal(false))),
         )
     }
 
@@ -80,7 +98,7 @@ class TestExpressionParser {
             "*" to BinaryFunctionExpr.Op.MULTIPLICATION,
             "/" to BinaryFunctionExpr.Op.DIVISION,
             // power is commented out in grammar for some reason ?
-            //binaryOps.put("**", BinaryFunctionExpr.Op.POWER);
+            // binaryOps.put("**", BinaryFunctionExpr.Op.POWER);
             "%" to BinaryFunctionExpr.Op.MODULO,
             " MOD " to BinaryFunctionExpr.Op.MODULO,
             ">" to BinaryFunctionExpr.Op.GREATER_THAN,
@@ -95,13 +113,13 @@ class TestExpressionParser {
             "|" to BinaryFunctionExpr.Op.OR,
             " OR " to BinaryFunctionExpr.Op.OR,
             " XOR " to BinaryFunctionExpr.Op.XOR,
-            " xor " to BinaryFunctionExpr.Op.XOR
+            " xor " to BinaryFunctionExpr.Op.XOR,
         )
 
         for ((operator, operation) in binaryOps) {
             assertParseExpressionEqual(
                 "2" + operator + "2",
-                BinaryFunctionExpr(operation, literal(2), literal(2))
+                BinaryFunctionExpr(operation, literal(2), literal(2)),
             )
         }
     }
@@ -127,9 +145,11 @@ class TestExpressionParser {
             "[4, 1]",
             SimpleExpressions.and(
                 SimpleExpressions.lessEqual(
-                    literal(4), variable(columnName)
-                ), SimpleExpressions.lessEqual(variable(columnName), literal(1))
-            )
+                    literal(4),
+                    variable(columnName),
+                ),
+                SimpleExpressions.lessEqual(variable(columnName), literal(1)),
+            ),
         )
     }
 
@@ -158,7 +178,7 @@ class TestExpressionParser {
 
         parser.setTypeContext(typeContext)
         assertParseExpressionEqual("(blue)", SimpleExpressions.literalEnum("blue", colorsEnum))
-        //assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
+        // assertParseExpressionEqual("red", equal(var(cellName), literalEnum("red", colorsEnum)));
     }
 
     @Test

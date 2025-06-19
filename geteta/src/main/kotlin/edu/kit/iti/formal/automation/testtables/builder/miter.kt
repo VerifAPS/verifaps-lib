@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -333,7 +333,8 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
         be.right.accept(this),
     )
 
-    override fun visit(ue: SUnaryExpression): Expression = UnaryExpression(SMVToStVisitor.operator(ue.operator), ue.expr.accept(this))
+    override fun visit(ue: SUnaryExpression): Expression =
+        UnaryExpression(SMVToStVisitor.operator(ue.operator), ue.expr.accept(this))
 
     override fun visit(l: SLiteral): Expression = when (l.dataType) {
         is SMVTypes.BOOLEAN -> BooleanLit(l.value == true)
@@ -432,19 +433,22 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         return vd
     }
 
-    private fun createParameters(p: ReactiveProgram): MutableList<InvocationParameter> = p.scope.variables.filter { it.isInput }.map {
+    private fun createParameters(p: ReactiveProgram): MutableList<InvocationParameter> = p.scope.variables.filter {
+        it.isInput
+    }.map {
         InvocationParameter(it.name, false, findOrCreateInput(it))
     }.toMutableList()
 
     // looks up a given variable, if it is already declared as an output of a previous program
     // returns a ref to it, else an input variable is declared
-    private fun findOrCreateInput(it: VariableDeclaration): Expression = definedVariables.computeIfAbsent(it.name) { k ->
-        val vd = it.clone()
-        vd.type = VariableDeclaration.LOCAL
-        target.scope.add(vd)
-        target.body += SpecialCommentFactory.createHavoc(it.name, it.dataType!!)
-        SymbolicReference(it.name)
-    }
+    private fun findOrCreateInput(it: VariableDeclaration): Expression =
+        definedVariables.computeIfAbsent(it.name) { k ->
+            val vd = it.clone()
+            vd.type = VariableDeclaration.LOCAL
+            target.scope.add(vd)
+            target.body += SpecialCommentFactory.createHavoc(it.name, it.dataType!!)
+            SymbolicReference(it.name)
+        }
 
     fun add(program: ReactiveProgram) {
         val fbd = program.asFunctionBlock()
@@ -453,7 +457,11 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         val invocation = InvocationStatement(SymbolicReference(instance.name), parameter)
         invocation.invoked = Invoked.FunctionBlock(fbd)
 
-        val renamed = VariableRenamerSC(program.scope::isGlobalVariable, program.init.clone()) { instance.name + SCOPE_SEPARATOR + it }
+        val renamed = VariableRenamerSC(program.scope::isGlobalVariable, program.init.clone()) {
+            instance.name +
+                SCOPE_SEPARATOR +
+                it
+        }
         target.init.addAll(renamed.rename())
 
         // will be rewritten by simplify
@@ -494,7 +502,8 @@ class VariableRenamerSC(
     newName: (String) -> String,
 ) : VariableRenamer(isGlobal, statements, newName) {
     val commentsRenamer = SpecialCommentRenamer(isGlobal, newName, this)
-    override fun visit(commentStatement: CommentStatement): CommentStatement = commentStatement.accept(commentsRenamer) as CommentStatement
+    override fun visit(commentStatement: CommentStatement): CommentStatement =
+        commentStatement.accept(commentsRenamer) as CommentStatement
 }
 
 /**

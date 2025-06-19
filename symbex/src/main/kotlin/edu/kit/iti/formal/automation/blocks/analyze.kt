@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -167,7 +167,8 @@ fun redrawGotoEdges(bp: BlockProgram) {
  *
  */
 class GotoSplitter : AstVisitor<BlockProgram>() {
-    override fun defaultVisit(obj: Any): BlockProgram = throw IllegalStateException("$obj not supported by ${this.javaClass}")
+    override fun defaultVisit(obj: Any): BlockProgram =
+        throw IllegalStateException("$obj not supported by ${this.javaClass}")
 
     override fun visit(statements: StatementList): BlockProgram {
         val bp = BlockProgram()

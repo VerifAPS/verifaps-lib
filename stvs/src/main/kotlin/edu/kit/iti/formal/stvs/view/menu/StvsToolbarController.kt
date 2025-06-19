@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.menu
 
 import edu.kit.iti.formal.stvs.logic.examples.Example
@@ -26,7 +44,6 @@ import tornadofx.*
 import java.io.File
 import java.io.IOException
 
-
 /**
  *
  * @author Alexander Weigl
@@ -45,8 +62,11 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
             itemf("New Code", ikof = MaterialDesignC.CODE_BRACES_BOX).action { createNewCode() }
             itemf(
                 "New Session",
-                ikof = MaterialDesignB.BOOK_OPEN_BLANK_VARIANT
-            ).action { createNewCode(); createNewSpec() }
+                ikof = MaterialDesignB.BOOK_OPEN_BLANK_VARIANT,
+            ).action {
+                createNewCode()
+                createNewSpec()
+            }
         }.action { createNewSpec() }
 
         splitmenubutton("Open", FontIcon(MaterialDesignS.STORE)) {
@@ -58,7 +78,7 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
                 for (ex in ExamplesFacade.examples()) {
                     item(ex.name) {
                         isMnemonicParsing = true
-                        //Tooltip.install(mex, Tooltip(ex.description))
+                        // Tooltip.install(mex, Tooltip(ex.description))
                     }.action { openExample(ex) }
                 }
             }
@@ -88,16 +108,16 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
             val session: StvsRootModel = ImporterFacade.importSession(
                 url.openStream(),
                 rootModel.get().globalConfig,
-                rootModel.get().history
+                rootModel.get().history,
             )
 
-            //session.filename = null
+            // session.filename = null
             rootModel.set(session)
 
             if (null != ex.htmlHelp) {
                 ViewUtils.openHelpText(
                     "Help for " + ex.name + " Example",
-                    ex.htmlHelp
+                    ex.htmlHelp,
                 )
             }
         } catch (e: ImportException) {
@@ -110,41 +130,50 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
     private fun doOpenFile(file: File) {
         try {
             ImporterFacade.importFile(
-                file, rootModel.get().globalConfig,
-                rootModel.get().history, { hybridSpecification: HybridSpecification? ->
+                file,
+                rootModel.get().globalConfig,
+                rootModel.get().history,
+                { hybridSpecification: HybridSpecification? ->
                     // handle hybridspecification
                     rootModel.get().hybridSpecifications
                         .add(hybridSpecification)
-                }, { rootModel ->
+                },
+                { rootModel ->
                     // handle rootModel
                     rootModel.workingdir = file.getParentFile()
                     rootModel.filename = file.getName()
                     this.rootModel.value = rootModel
-                }, (ImportCodeHandler { code: Code ->
-                    // handle code
-                    rootModel.get().scenario.code = code
-                })
+                },
+                (
+                    ImportCodeHandler { code: Code ->
+                        // handle code
+                        rootModel.get().scenario.code = code
+                    }
+                    ),
             )
             rootModel.get().history.addFilename(file.absolutePath)
         } catch (ex: IOException) {
             createAlert(
-                Alert.AlertType.ERROR, "File Open Error",
+                Alert.AlertType.ERROR,
+                "File Open Error",
                 "An error occurred while opening a file.",
-                "The file " + file.absolutePath
-                        + " could not be opened.", ex.message
+                "The file " + file.absolutePath +
+                    " could not be opened.",
+                ex.message,
             )
                 .showAndWait()
         } catch (ex: ImportException) {
             createAlert(
-                Alert.AlertType.ERROR, "File Open Error",
+                Alert.AlertType.ERROR,
+                "File Open Error",
                 "An error occurred while opening a file.",
-                "The file " + file.absolutePath
-                        + " could not be opened.", ex.message
+                "The file " + file.absolutePath +
+                    " could not be opened.",
+                ex.message,
             )
                 .showAndWait()
         }
     }
-
 
     private fun saveSessionAs() {
         useSaveFile(SESSION) {
@@ -162,8 +191,11 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
         if (rootModel.get().scenario.code.sourcecode.isNotEmpty()) {
             val save = ButtonType("Save", ButtonBar.ButtonData.APPLY)
             val request = Alert(
-                Alert.AlertType.CONFIRMATION, "Do you really want to throw away your code?",
-                ButtonType.YES, save, ButtonType.NO
+                Alert.AlertType.CONFIRMATION,
+                "Do you really want to throw away your code?",
+                ButtonType.YES,
+                save,
+                ButtonType.NO,
             )
             val answer = request.showAndWait()
             if (answer.isPresent) {
@@ -180,11 +212,10 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
 
     private fun openConfigDialog() {
         val dialogManager = ConfigDialogManager(
-            rootModel.get().globalConfig
+            rootModel.get().globalConfig,
         )
         dialogManager.showAndWait()
     }
-
 
     private fun openAboutDialog() {
         val dialog: Dialog<*> = Dialog<Any?>()
@@ -207,7 +238,6 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
         return block(chosenFile)
     }
 
-
     private fun openCode() {
         useOpenFile(CODE) { chosenFile ->
             try {
@@ -226,8 +256,9 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
         useOpenFile(SESSION) { chosenFile ->
             try {
                 val model: StvsRootModel = ImporterFacade.importSession(
-                    chosenFile, rootModel.get().globalConfig,
-                    rootModel.get().history
+                    chosenFile,
+                    rootModel.get().globalConfig,
+                    rootModel.get().history,
                 )
                 setWorkingDir(chosenFile)
                 model.filename = chosenFile.getName()
@@ -272,8 +303,8 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
             handleSaveAll(
                 File(
                     rootModel.get().workingdir,
-                    rootModel.get().filename
-                )
+                    rootModel.get().filename,
+                ),
             )
         }
     }
@@ -284,7 +315,7 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
             rootModel.get().filename = path.getName()
             ExporterFacade.exportSession(
                 rootModel.get(),
-                path
+                path,
             )
         } catch (exception: IOException) {
             createAlert(exception).showAndWait()
@@ -317,7 +348,9 @@ class StvsToolbarController(private val rootModel: ObjectProperty<StvsRootModel>
             if (spec == null) { // There is no active specification tab open yet
                 createAlert(
                     Alert.AlertType.ERROR,
-                    "Save Specification", "No specification available.", ""
+                    "Save Specification",
+                    "No specification available.",
+                    "",
                 )
                     .showAndWait()
             } else {
@@ -342,11 +375,7 @@ fun toolbar(op: ToolBar.() -> Unit) = ToolBar().also { op(it) }
 fun MenuButton.itemf(name: String, ikof: Ikon? = null, op: MenuItem.() -> Unit = {}) =
     this.item(name, graphic = ikof?.let { FontIcon(it) }, op = op)
 
-
-class MappingList<E, F>(
-    val origin: ObservableList<F>,
-    val map: (F) -> E
-) : TransformationList<E, F>(origin) {
+class MappingList<E, F>(val origin: ObservableList<F>, val map: (F) -> E) : TransformationList<E, F>(origin) {
     override fun get(index: Int): E = map(origin[index])
 
     override fun sourceChanged(c: ListChangeListener.Change<out F>) {

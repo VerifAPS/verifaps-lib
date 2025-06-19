@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
@@ -35,17 +53,20 @@ import java.util.stream.Collectors
  * @author Philipp
  */
 class SpecificationTableController(
-    private val config: GlobalConfig, private val typeContext: ListProperty<Type>,
+    private val config: GlobalConfig,
+    private val typeContext: ListProperty<Type>,
     private val codeIoVariables: ListProperty<CodeIoVariable>,
     validVariables: ObservableList<ValidFreeVariable>,
-    val hybridSpecification: HybridSpecification?
+    val hybridSpecification: HybridSpecification?,
 ) : Controller {
     override val view: SpecificationTableView
     private val tableView = TableView<HybridRow>()
 
     val validator: ConstraintSpecificationValidator = ConstraintSpecificationValidator(
-        typeContext, codeIoVariables,
-        validVariables, hybridSpecification!!
+        typeContext,
+        codeIoVariables,
+        validVariables,
+        hybridSpecification!!,
     )
     private val durations: TableColumn<HybridRow?, String>
 
@@ -71,7 +92,6 @@ class SpecificationTableController(
 
         tableView.contextMenu = createContextMenu()
 
-
         this.view = SpecificationTableView(tableView)
 
         view.btnAddRows.onAction = EventHandler { event: ActionEvent? -> insertRow() }
@@ -79,7 +99,7 @@ class SpecificationTableController(
         view.btnRemoveRows.onAction = EventHandler { event: ActionEvent? -> deleteRow() }
         view.btnResize.onAction = EventHandler { event: ActionEvent? -> resizeColumns() }
 
-        //view.getHeader().setContextMenu(createTopLevelContextMenu());
+        // view.getHeader().setContextMenu(createTopLevelContextMenu());
         hybridSpecification.columnHeaders
             .forEach(Consumer { specIoVariable: SpecIoVariable -> this.addColumnToView(specIoVariable) })
 
@@ -99,10 +119,7 @@ class SpecificationTableController(
         tableView.items = hybridSpecification.hybridRowsProperty
     }
 
-    private fun onColumnSelectionChanged(
-        obs: ObservableValue<out String?>, before: String?,
-        columnNow: String?
-    ) {
+    private fun onColumnSelectionChanged(obs: ObservableValue<out String?>, before: String?, columnNow: String?) {
         if (before != null) {
             tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> before == column.userData }
                 .findFirst().ifPresent { column: TableColumn<HybridRow?, *> ->
@@ -124,7 +141,8 @@ class SpecificationTableController(
         tableView.edit(
             row,
             tableView.columns.stream().filter { column: TableColumn<HybridRow?, *> -> columnId == column.userData }
-                .findFirst().orElseThrow { IllegalArgumentException("Cannot focus unknown column: $columnId") })
+                .findFirst().orElseThrow { IllegalArgumentException("Cannot focus unknown column: $columnId") },
+        )
     }
 
     private fun onProblemsChange() {
@@ -144,9 +162,8 @@ class SpecificationTableController(
         }
     }
 
-    private fun cellFactory(table: TableColumn<HybridRow?, String>): SpecificationTableCell {
-        return SpecificationTableCell(validator)
-    }
+    private fun cellFactory(table: TableColumn<HybridRow?, String>): SpecificationTableCell =
+        SpecificationTableCell(validator)
 
     private fun <T> removeByReference(toBeRemovedFrom: MutableList<T>?, toRemove: List<T>) {
         for (referenceToRemove in toRemove) {
@@ -187,7 +204,7 @@ class SpecificationTableController(
             hybridSpecification.isEditable,
             tableColumn.graphic,
             0.0,
-            200.0
+            200.0,
         )
     }
 
@@ -195,7 +212,6 @@ class SpecificationTableController(
         LOGGER.debug("SpecificationTableController.resizeColumns")
         ViewUtils.autoFitTable(tableView)
     }
-
 
     private fun createContextMenu(): ContextMenu {
         val insertRow = MenuItem("Insert Row")
@@ -223,7 +239,6 @@ class SpecificationTableController(
         return ContextMenu(insertRow, deleteRow, addNewColumn, comment, columnResize)
     }
 
-
     private fun createColumnContextMenu(column: TableColumn<HybridRow?, *>): ContextMenu {
         val changeColumn = MenuItem("Change Column...")
         val removeColumn = MenuItem("Remove Column")
@@ -233,7 +248,7 @@ class SpecificationTableController(
             IoVariableChangeDialog(
                 hybridSpecification!!.getColumnHeaderByName(column.userData as String),
                 hybridSpecification.columnHeaders
-                    .filtered({ `var`: SpecIoVariable -> !`var`.name.equals(column.userData) })
+                    .filtered({ `var`: SpecIoVariable -> !`var`.name.equals(column.userData) }),
             ).showAndWait()
         }
         removeColumn.onAction = EventHandler { event: ActionEvent? ->
@@ -260,7 +275,8 @@ class SpecificationTableController(
         hybridSpecification!!.columnHeaders.forEach(
             Consumer { specIoVariable: SpecIoVariable ->
                 wildcardCells[specIoVariable.name] = ConstraintCell("-")
-            })
+            },
+        )
         val wildcardRow = ConstraintSpecification.createRow(wildcardCells)
         hybridSpecification.hybridRowsProperty.add(index, HybridRow(wildcardRow, ConstraintDuration("1")))
     }
@@ -279,7 +295,7 @@ class SpecificationTableController(
                 SpecificationColumn(
                     hybridSpecification.hybridRowsProperty.stream()
                         .map<ConstraintCell>({ row: HybridRow? -> ConstraintCell("-") })
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
                 )
             hybridSpecification.addColumn(specIoVariable, dataColumn)
         }
@@ -290,7 +306,7 @@ class SpecificationTableController(
 
     private fun addColumnToView(specIoVariable: SpecIoVariable) {
         val column = createViewColumn(
-            specIoVariable.name
+            specIoVariable.name,
         ) { hybridRow: HybridRow? -> hybridRow!!.cells[specIoVariable.name] }
 
         column.userData = specIoVariable.name
@@ -309,7 +325,7 @@ class SpecificationTableController(
 
     private fun createViewColumn(
         colName: String?,
-        extractCellFromRow: Function<HybridRow?, HybridCell<*>?>
+        extractCellFromRow: Function<HybridRow?, HybridCell<*>?>,
     ): TableColumn<HybridRow?, String> {
         val column = TableColumn<HybridRow?, String>(colName)
         column.isSortable = false
@@ -360,8 +376,8 @@ class SpecificationTableController(
         row.onDragOver = EventHandler { event: DragEvent ->
             val db = event.dragboard
             if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                if (tableView.isEditable
-                    && row.index != db.getContent(SERIALIZED_MIME_TYPE) as Int
+                if (tableView.isEditable &&
+                    row.index != db.getContent(SERIALIZED_MIME_TYPE) as Int
                 ) {
                     event.acceptTransferModes(*TransferMode.COPY_OR_MOVE)
                     event.consume()
@@ -386,7 +402,7 @@ class SpecificationTableController(
                 event.isDropCompleted = true
                 tableView.selectionModel.clearAndSelect(dropIndex)
 
-                //update indexProperty on TableCells (needed for the IndexColumn's CommentIcon)
+                // update indexProperty on TableCells (needed for the IndexColumn's CommentIcon)
                 tableView.refresh()
 
                 event.consume()

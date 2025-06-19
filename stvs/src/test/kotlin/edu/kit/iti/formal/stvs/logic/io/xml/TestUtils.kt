@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.StvsApplication
@@ -22,7 +40,7 @@ object TestUtils {
 
     private val statuses: HashMap<Status, Regex> = hashMapOf(
         Status.VALID to "(?!.*invalid.*).*valid.*".toRegex(),
-        Status.ALL to ".*".toRegex()
+        Status.ALL to ".*".toRegex(),
     )
 
     fun removeWhitespace(input: String) = input.replace("[\t\n\r ]+".toRegex(), "").replace("\r\n", "\n").trim()
@@ -36,8 +54,8 @@ object TestUtils {
             val children = testSet.list()
             if (children != null) {
                 for (childName in children) {
-                    if (childName.startsWith(prefixes[type]!!)
-                        && statuses[status]!!.matches(childName)
+                    if (childName.startsWith(prefixes[type]!!) &&
+                        statuses[status]!!.matches(childName)
                     ) {
                         res.add(File(testSet.absolutePath + File.separator + childName))
                     }
@@ -51,7 +69,7 @@ object TestUtils {
     private val testSets: List<File>
         get() {
             val testSetsDirectory = File(
-                StvsApplication::class.java.getResource("testSets")!!.toURI()
+                StvsApplication::class.java.getResource("testSets")!!.toURI(),
             )
             val res: MutableList<File> = ArrayList()
             for (childName in testSetsDirectory.list()!!) {
@@ -69,10 +87,14 @@ object TestUtils {
     }
 
     enum class FileType {
-        SESSION, CONCRETE, CONSTRAINT, CONFIG
+        SESSION,
+        CONCRETE,
+        CONSTRAINT,
+        CONFIG,
     }
 
     enum class Status {
-        VALID, ALL
+        VALID,
+        ALL,
     }
 }

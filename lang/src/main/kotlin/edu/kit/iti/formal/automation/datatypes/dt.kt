@@ -222,11 +222,7 @@ abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
     }
 }
 
-class ArrayType(
-    name: String,
-    val fieldType: AnyDt,
-    var ranges: MutableList<Range> = ArrayList(),
-) : AnyDt(name) {
+class ArrayType(name: String, val fieldType: AnyDt, var ranges: MutableList<Range> = ArrayList()) : AnyDt(name) {
     constructor(fieldType: AnyDt, ranges: List<Range>) :
         this(ANONYM_DATATYPE, fieldType, ranges.toMutableList())
 
@@ -300,7 +296,8 @@ sealed class ClassDataType(name: String) : AnyDt(name) {
     class ClassDt(val clazz: ClassDeclaration) : ClassDataType(clazz.name)
     class InterfaceDt(val clazz: InterfaceDeclaration) : ClassDataType(clazz.name)
 
-    override fun repr(obj: Any) = TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+    override fun repr(obj: Any) =
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
 
     /* override var fields: Scope
          get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
@@ -405,10 +402,7 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
  *
  * @author weigl
  */
-class EnumerateType(
-    name: String = "ENUM",
-    var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap(),
-) : AnyDt(name) {
+class EnumerateType(name: String = "ENUM", var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap()) : AnyDt(name) {
     lateinit var defValue: String
 
     val bitlength: Int

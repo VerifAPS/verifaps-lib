@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram
 
 import edu.kit.iti.formal.stvs.view.ViewUtils
@@ -62,11 +80,10 @@ class TimingDiagramCollectionView : VBox() {
 
         globalAxisContainer.children.add(xaxis)
 
-        //setPadding(new Insets(0, 0, 0, 0));
+        // setPadding(new Insets(0, 0, 0, 0));
         val yaxisStickRightContainer = AnchorPane()
         yaxisStickRightContainer.children.addAll(labelContainer, yaxisContainer)
         yaxisStickRightContainer.minWidth = 0.0
-
 
         AnchorPane.setRightAnchor(yaxisContainer, 0.0)
         AnchorPane.setLeftAnchor(labelContainer, 0.0)
@@ -113,9 +130,7 @@ class TimingDiagramCollectionView : VBox() {
         ViewUtils.setupView(this)
     }
 
-    fun getyAxisContainer(): Pane {
-        return yaxisContainer
-    }
+    fun getyAxisContainer(): Pane = yaxisContainer
 
     private fun showInDialog(event: ActionEvent) {
         val s = Stage(StageStyle.DECORATED)
@@ -123,9 +138,9 @@ class TimingDiagramCollectionView : VBox() {
         s.initModality(Modality.APPLICATION_MODAL)
         s.minHeight = 640.0
         s.minHeight = 480.0
-        //s.setFullScreen(true);
+        // s.setFullScreen(true);
         s.isMaximized = true
-        //TableView<HybridRow> newView = new TableView<>(tableView.getItems());
+        // TableView<HybridRow> newView = new TableView<>(tableView.getItems());
         val root = BorderPane(content)
         tp.content = Label("opened externally")
         val bb = ButtonBar()

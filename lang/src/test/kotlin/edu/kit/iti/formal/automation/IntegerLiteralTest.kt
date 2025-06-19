@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -52,7 +52,8 @@ import java.util.*
  * @version 1 (03.03.17)
  */
 object IntegerLiteralTest {
-    private fun getLiteral(s: String?) = IEC61131Facade.getParser(s!!).constant().accept(IECParseTreeToAST()) as IntegerLit
+    private fun getLiteral(s: String?) =
+        IEC61131Facade.getParser(s!!).constant().accept(IECParseTreeToAST()) as IntegerLit
 
     @ParameterizedTest
     @MethodSource("integers")

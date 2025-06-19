@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -38,10 +38,7 @@ interface SMVType {
     fun allowedValue(obj: Any): Boolean
 }
 
-data class SMVWordType(
-    val signed: Boolean,
-    val width: Int,
-) : SMVType {
+data class SMVWordType(val signed: Boolean, val width: Int) : SMVType {
 
     override fun valueOf(str: String) = SWordLiteral(read(str), this)
 
@@ -161,10 +158,7 @@ data class EnumType(var values: List<String>) : SMVType {
     }
 }
 
-data class ModuleType(
-    val moduleName: String,
-    val parameters: List<SMVExpr>,
-) : SMVType {
+data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>) : SMVType {
     override fun format(value: Any): String = error("not implemented")
     override fun read(str: String): Any = error("not implemented")
     override fun valueOf(str: String): SLiteral = error("not implemented")

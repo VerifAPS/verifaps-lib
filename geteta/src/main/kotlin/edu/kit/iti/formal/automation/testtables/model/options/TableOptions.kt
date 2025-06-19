@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -47,15 +47,9 @@ object BooleanConverter : StringConverter<Boolean> {
     override fun to(t: Boolean): String = t.toString()
 }
 
-open class Options(
-    val namespace: String,
-    val properties: MutableMap<String, String>,
-) {
+open class Options(val namespace: String, val properties: MutableMap<String, String>) {
 
-    inner class MapperN<T>(
-        private val default: T? = null,
-        private val conv: StringConverter<T>,
-    ) {
+    inner class MapperN<T>(private val default: T? = null, private val conv: StringConverter<T>) {
         operator fun setValue(obj: Options, property: KProperty<*>, value: T?) {
             val n = namespace + (if (namespace.isBlank()) "" else ".") + property.name
             if (value == null) {
@@ -71,10 +65,7 @@ open class Options(
         }
     }
 
-    inner class Mapper<T>(
-        private val default: T,
-        private val conv: StringConverter<T>,
-    ) {
+    inner class Mapper<T>(private val default: T, private val conv: StringConverter<T>) {
         operator fun setValue(obj: Options, property: KProperty<*>, value: T) {
             val n = namespace + (if (namespace.isBlank()) "" else ".") + property.name
             obj.properties[n] = conv.to(value)
@@ -93,11 +84,7 @@ open class Options(
     protected fun string(default: String) = Mapper(default, StrConverter)
     protected fun boolean(default: Boolean) = Mapper(default, BooleanConverter)
 
-    protected fun <T> any(
-        default: T,
-        to: (T) -> String,
-        from: (String) -> T,
-    ) = Mapper(default, AnyConverter(to, from))
+    protected fun <T> any(default: T, to: (T) -> String, from: (String) -> T) = Mapper(default, AnyConverter(to, from))
 }
 
 /**

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.menu
 
 import edu.kit.iti.formal.stvs.StvsApplication
@@ -53,64 +71,64 @@ class AboutDialogPane : DialogPane() {
                     "iec61131lang",
                     "https://github.com/VerifAPS/iec61131lang",
                     "GPLv3",
-                    "https://www.gnu.org/licenses/gpl-3.0.en.html"
+                    "https://www.gnu.org/licenses/gpl-3.0.en.html",
                 ),
 
                 createLibrary(
                     "Apache Commons Collections",
                     "https://commons.apache.org/proper/commons-collections/",
                     "Apache License Version 2.0",
-                    "https://www.apache.org/licenses/LICENSE-2.0"
+                    "https://www.apache.org/licenses/LICENSE-2.0",
                 ),
 
                 createLibrary(
                     "jsexp",
                     "https://github.com/julianmendez/jsexp",
                     "LGPLv3",
-                    "https://www.gnu.org/licenses/lgpl-3.0.txt"
+                    "https://www.gnu.org/licenses/lgpl-3.0.txt",
                 ),
 
                 createLibrary(
                     "Apache Commons Lang",
                     "https://commons.apache.org/proper/commons-lang/",
                     "Apache License Version 2.0",
-                    "https://www.apache.org/licenses/LICENSE-2.0"
+                    "https://www.apache.org/licenses/LICENSE-2.0",
                 ),
 
                 createLibrary(
                     "Apache Commons IO",
                     "https://commons.apache.org/proper/commons-io/",
                     "Apache License Version 2.0",
-                    "https://www.apache.org/licenses/LICENSE-2.0"
+                    "https://www.apache.org/licenses/LICENSE-2.0",
                 ),
 
                 createLibrary(
                     "gson",
                     "https://github.com/google/gson",
                     "Apache License Version 2.0",
-                    "https://github.com/google/gson/blob/master/LICENSE"
+                    "https://github.com/google/gson/blob/master/LICENSE",
                 ),
 
                 createLibrary(
                     "richtextfx",
                     "https://github.com/TomasMikula/RichTextFX",
                     "BSD 2-Clause License and GPLv2 with the Classpath Exception",
-                    "https://github.com/TomasMikula/RichTextFX/blob/master/LICENSE"
+                    "https://github.com/TomasMikula/RichTextFX/blob/master/LICENSE",
                 ),
 
                 createLibrary(
                     "antlr",
                     "http://www.antlr.org/",
                     "BSD 3-Clause License",
-                    "https://github.com/antlr/antlr4/blob/master/LICENSE.txt"
+                    "https://github.com/antlr/antlr4/blob/master/LICENSE.txt",
                 ),
 
                 createLibrary(
                     "JAXB",
                     "https://jaxb.java.net/",
                     "CDDLv1.1 and GPLv2",
-                    "https://glassfish.java.net/public/CDDL+GPL_1_1.html"
-                )
+                    "https://glassfish.java.net/public/CDDL+GPL_1_1.html",
+                ),
             )
 
             val tab = Tab("Acknowledgements", libraries)
@@ -124,23 +142,23 @@ class AboutDialogPane : DialogPane() {
             val name = Label("Structured Text Verification Studio")
             name.font = Font.font("DejaVu Sans Mono", 30.0)
             val version = Label(
-                "Version: " + version + " built from "
-                        + buildId
+                "Version: " + version + " built from " +
+                    buildId,
             )
 
             val license: Hyperlink = ActualHyperLink(
                 "License: GPLv3",
-                "https://github.com/VerifAPS/stvs/blob/master/LICENSE"
+                "https://github.com/VerifAPS/stvs/blob/master/LICENSE",
             )
 
             val homepage: Hyperlink = ActualHyperLink(
                 "Homepage",
-                "http://formal.iti.kit.edu/stvs"
+                "http://formal.iti.kit.edu/stvs",
             )
 
             val repo: Hyperlink = ActualHyperLink(
                 "Repository",
-                "https://github.com/verifaps/stvs"
+                "https://github.com/verifaps/stvs",
             )
 
             val versionAndLicense = HBox(version, license)
@@ -153,7 +171,7 @@ class AboutDialogPane : DialogPane() {
                 logoView,
                 name,
                 versionAndLicense,
-                links
+                links,
             )
             aboutBox.alignment = Pos.CENTER
             aboutBox.padding = Insets(20.0, 15.0, 20.0, 15.0)

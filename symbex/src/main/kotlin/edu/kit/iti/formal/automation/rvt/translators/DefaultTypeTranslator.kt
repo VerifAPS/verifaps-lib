@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -67,7 +67,8 @@ class DefaultTypeTranslator : TypeTranslator {
             return SMVWordType(anyInt.isSigned, anyInt.bitLength)
         }
 
-        override fun visit(enumerateType: EnumerateType): SMVType = EnumType(enumerateType.allowedValues.keys.toMutableList())
+        override fun visit(enumerateType: EnumerateType): SMVType =
+            EnumType(enumerateType.allowedValues.keys.toMutableList())
 
         override fun visit(timeType: TimeType): SMVType = SMVWordType(true, WORD_LENGTH)
 
@@ -79,7 +80,8 @@ class DefaultTypeTranslator : TypeTranslator {
 
         override fun visit(recordType: RecordType): SMVType = throw IllegalTypeException("Could not match $recordType")
 
-        override fun visit(pointerType: PointerType): SMVType = throw IllegalTypeException("Could not match$pointerType")
+        override fun visit(pointerType: PointerType): SMVType =
+            throw IllegalTypeException("Could not match$pointerType")
 
         override fun visit(string: IECString.STRING): SMVType = throw IllegalTypeException("Could not match$string")
 

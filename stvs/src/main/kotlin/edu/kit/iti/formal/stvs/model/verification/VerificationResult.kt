@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.verification
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteSpecification
@@ -35,7 +53,6 @@ data object VerificationResultEmpty : VerificationResult() {
     override val log: String? = null
 }
 
-
 /**
  * A [VerificationResult] indicating a successful verification (i.e. the code verified
  * against the specification).
@@ -48,24 +65,24 @@ data class VerificationSuccess(override val log: String) : VerificationResult()
  *
  * @author Benjamin Alt
  */
-data class VerificationError(
-    val reason: Reason,
-    override var log: String
-) : VerificationResult() {
+data class VerificationError(val reason: Reason, override var log: String) : VerificationResult() {
     /**
      * Reasons why a [VerificationError] may occur.
      */
     enum class Reason(val errorMessage: String) {
-        VERIFICATION_LAUNCH_ERROR("The verification could not be launched Check the verification engine command in the preferences dialog (Edit -> Preferences)"),
-        NUXMV_NOT_FOUND("""The nuXmv executable could not be found. Check the path to the nuXmv executable in the preferences dialog (Edit -> Preferences)"""),
+        VERIFICATION_LAUNCH_ERROR(
+            "The verification could not be launched Check the verification engine command in the preferences dialog (Edit -> Preferences)",
+        ),
+        NUXMV_NOT_FOUND(
+            """The nuXmv executable could not be found. Check the path to the nuXmv executable in the preferences dialog (Edit -> Preferences)""",
+        ),
         PROCESS_ABORTED("The verification process has been aborted."),
         TIMEOUT("The verification timed out."),
         ERROR("An error occurred during verification."),
         EXCEPTION("An error occurred during verification."),
-        UNKNOWN("An unknown error occurred during verification.")
+        UNKNOWN("An unknown error occurred during verification."),
     }
 }
-
 
 /**
  * A [VerificationResult] with a counterexample.
@@ -74,7 +91,7 @@ data class VerificationError(
 class Counterexample(
     val specification: ConstraintSpecification,
     val counterexample: ConcreteSpecification,
-    override val log: String
+    override val log: String,
 ) : VerificationResult() {
     /**
      * Create a new Counterexample from a given [ConcreteSpecification] and a log file.

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.expressions
 
 /**
@@ -14,9 +32,11 @@ class TypeChecker
  * string representation.
  *
  * @param variableTypeContext a map from variable names to types.
- */(private val variableTypeContext: Map<String, Type>) : ExpressionVisitor<Type> {
-    private class InternalTypeCheckException(val mistypedExpression: Expression, message: String?) :
-        RuntimeException(message)
+ */
+(
+    private val variableTypeContext: Map<String, Type>
+) : ExpressionVisitor<Type> {
+    private class InternalTypeCheckException(val mistypedExpression: Expression, message: String?) : RuntimeException(message)
 
     /**
      * Checks the type of an [Expression] or throws a [TypeCheckException] on an ill-typed
@@ -93,8 +113,9 @@ class TypeChecker
     private fun assertTypeEquality(expectedType: Type, actualType: Type?, expr: Expression) {
         if (!actualType!!.checksAgainst(expectedType)) {
             throw InternalTypeCheckException(
-                expr, "Expected type \"" + expectedType.typeName
-                        + "\"," + "but got \"" + actualType.typeName + "\""
+                expr,
+                    "Expected type \"" + expectedType.typeName +
+                        "\"," + "but got \"" + actualType.typeName + "\""
             )
         }
     }
@@ -104,19 +125,15 @@ class TypeChecker
         if (type1 != type2) {
             throw InternalTypeCheckException(
                 expr,
-                "Expected equal types, but got 2 different types: \"" + type1!!.typeName + "\""
-                        + " and \"" + type2!!.typeName + "\""
+                "Expected equal types, but got 2 different types: \"" + type1!!.typeName + "\"" +
+                        " and \"" + type2!!.typeName + "\""
             )
         }
     }
 
-    private fun <A> throwUnkownOperation(operationName: String, expr: Expression): A {
-        throw InternalTypeCheckException(expr, "Unknown Operation \"$operationName\"")
-    }
+    private fun <A> throwUnkownOperation(operationName: String, expr: Expression): A = throw InternalTypeCheckException(expr, "Unknown Operation \"$operationName\"")
 
-    override fun visitLiteral(literal: LiteralExpr): Type {
-        return literal.value.type
-    }
+    override fun visitLiteral(literal: LiteralExpr): Type = literal.value.type
 
     override fun visitVariable(expr: VariableExpr): Type {
         val varType = variableTypeContext[expr.variableName]

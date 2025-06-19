@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -157,7 +157,11 @@ private fun SMVExpr?.getVariables(): Set<String> {
     return a.variables
 }
 
-class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou: FunctionBlockDeclaration, val prefill: Boolean) : Callable<DifferenceSfc> {
+class ConstructDifferenceSfc(
+    val leftPou: FunctionBlockDeclaration,
+    val rightPou: FunctionBlockDeclaration,
+    val prefill: Boolean,
+) : Callable<DifferenceSfc> {
     val diffSfc = DifferenceSfc()
     val leftNetwork = leftPou.sfcBody?.networks!![0]
     val rightNetwork = rightPou.sfcBody?.networks!![0]
@@ -196,19 +200,13 @@ class ConstructDifferenceSfc(val leftPou: FunctionBlockDeclaration, val rightPou
         return diffSfc
     }
 
-    private fun prepareActions(
-        actions: HashMap<String, SymbolicState>,
-        pou: FunctionBlockDeclaration,
-    ) {
+    private fun prepareActions(actions: HashMap<String, SymbolicState>, pou: FunctionBlockDeclaration) {
         pou.actions.forEach { act ->
             actions[act.name] = executeAction(pou, act.stBody!!)
         }
     }
 
-    private fun executeAction(
-        pou: FunctionBlockDeclaration,
-        body: StatementList,
-    ): SymbolicState {
+    private fun executeAction(pou: FunctionBlockDeclaration, body: StatementList): SymbolicState {
         val program = ProgramDeclaration(scope = pou.scope.copy(), stBody = body)
         val se = SymbolicExecutioner(pou.scope.parent!!)
         program.accept(se)

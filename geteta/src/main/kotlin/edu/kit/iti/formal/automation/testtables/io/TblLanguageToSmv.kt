@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -50,7 +50,8 @@ class TblLanguageToSmv(
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext): SMVExpr = SLiteral.TRUE
 
-    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SMVExpr = ctx.variable().accept(this).equal(columnVariable)
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SMVExpr =
+        ctx.variable().accept(this).equal(columnVariable)
 
     override fun visitConstantInt(ctx: TestTableLanguageParser.ConstantIntContext): SMVExpr = ctx.i().accept(this)
 
@@ -104,9 +105,11 @@ class TblLanguageToSmv(
         )
     }
 
-    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): SMVExpr = SUnaryExpression(SUnaryOperator.MINUS, ctx.expr().accept(this))
+    override fun visitMinus(ctx: TestTableLanguageParser.MinusContext): SMVExpr =
+        SUnaryExpression(SUnaryOperator.MINUS, ctx.expr().accept(this))
 
-    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): SMVExpr = SUnaryExpression(SUnaryOperator.NEGATE, ctx.expr().accept(this))
+    override fun visitNegation(ctx: TestTableLanguageParser.NegationContext): SMVExpr =
+        SUnaryExpression(SUnaryOperator.NEGATE, ctx.expr().accept(this))
 
     override fun visitParens(ctx: TestTableLanguageParser.ParensContext): SMVExpr = ctx.expr().accept(this)
 
@@ -119,19 +122,26 @@ class TblLanguageToSmv(
         )
     }
 
-    override fun visitMod(ctx: TestTableLanguageParser.ModContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MOD, ctx.right.accept(this))
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MOD, ctx.right.accept(this))
 
-    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.PLUS, ctx.right.accept(this))
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.PLUS, ctx.right.accept(this))
 
-    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.DIV, ctx.right.accept(this))
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.DIV, ctx.right.accept(this))
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.NOT_EQUAL, ctx.right.accept(this))
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.NOT_EQUAL, ctx.right.accept(this))
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MINUS, ctx.right.accept(this))
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MINUS, ctx.right.accept(this))
 
-    override fun visitMult(ctx: TestTableLanguageParser.MultContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MUL, ctx.right.accept(this))
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.MUL, ctx.right.accept(this))
 
-    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext): SMVExpr = ctx.guardedcommand().accept(this)
+    override fun visitBinguardedCommand(ctx: TestTableLanguageParser.BinguardedCommandContext): SMVExpr =
+        ctx.guardedcommand().accept(this)
 
     override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SMVExpr {
         // TODO call function/symbolic execution
@@ -193,15 +203,19 @@ class TblLanguageToSmv(
         }
     }
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.AND, ctx.right.accept(this))
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.AND, ctx.right.accept(this))
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.XOR, ctx.right.accept(this))
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.XOR, ctx.right.accept(this))
 
     override fun visitBconstant(ctx: TestTableLanguageParser.BconstantContext): SMVExpr = ctx.constant().accept(this)
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.OR, ctx.right.accept(this))
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.OR, ctx.right.accept(this))
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): SMVExpr = SBinaryExpression(ctx.left.accept(this), SBinaryOperator.EQUAL, ctx.right.accept(this))
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): SMVExpr =
+        SBinaryExpression(ctx.left.accept(this), SBinaryOperator.EQUAL, ctx.right.accept(this))
 
     override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): SMVExpr {
         val c = SCaseExpression()

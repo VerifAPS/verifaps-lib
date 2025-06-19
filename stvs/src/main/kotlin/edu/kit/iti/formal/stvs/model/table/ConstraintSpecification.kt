@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.model.common.FreeVariableList
@@ -21,7 +39,9 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
         },
         Callback<ConstraintDuration, Array<Observable>> { durationCell: ConstraintDuration ->
             arrayOf(durationCell.stringRepresentationProperty, durationCell.commentProperty)
-        }), Commentable {
+        },
+    ),
+    Commentable {
 
     override val commentProperty = SimpleStringProperty()
     private val onSpecIoVariableNameChanged: ChangeListener<String?>
@@ -55,7 +75,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
      */
     constructor(sourceSpec: ConstraintSpecification) : this(
         sourceSpec.name,
-        FreeVariableList(sourceSpec.freeVariableList)
+        FreeVariableList(sourceSpec.freeVariableList),
     ) {
         comment = sourceSpec.comment
 
@@ -104,9 +124,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
         specIoVariable.nameProperty.removeListener(onSpecIoVariableNameChanged)
     }
 
-    private fun onSpecIoVariableNameChanged(
-        nameBefore: String?, nameAfter: String?
-    ) {
+    private fun onSpecIoVariableNameChanged(nameBefore: String?, nameAfter: String?) {
         for (row in rows) {
             val entry = row!!.cells[nameBefore]
             if (entry != null) {
@@ -129,7 +147,6 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
         if (durations != other.durations) return false
         if (columnHeaders != other.columnHeaders) return false
 
-
         return true
     }
 
@@ -143,9 +160,7 @@ open class ConstraintSpecification(name: String, val freeVariableList: FreeVaria
         return result
     }
 
-    override fun toString(): String {
-        return super.toString()
-    }
+    override fun toString(): String = super.toString()
 
     companion object {
         /**

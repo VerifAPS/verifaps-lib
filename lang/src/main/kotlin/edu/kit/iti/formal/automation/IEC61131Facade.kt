@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -162,16 +162,28 @@ object IEC61131Facade {
         return p to check(p)
     }
 
-    fun fileResolve(input: CharStream, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> = fileResolve(listOf(input), builtins)
+    fun fileResolve(input: CharStream, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> =
+        fileResolve(listOf(input), builtins)
 
-    fun fileResolve(input: File, builtins: Boolean = false) = fileResolve(CharStreams.fromFileName(input.absolutePath), builtins)
+    fun fileResolve(input: File, builtins: Boolean = false) =
+        fileResolve(CharStreams.fromFileName(input.absolutePath), builtins)
 
-    fun filefr(inputs: List<File>, builtins: Boolean = false) = fileResolve(inputs.map { CharStreams.fromFileName(it.absolutePath) }, builtins)
+    fun filefr(inputs: List<File>, builtins: Boolean = false) = fileResolve(
+        inputs.map {
+            CharStreams.fromFileName(it.absolutePath)
+        },
+        builtins,
+    )
 
     /**
      *
      */
-    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>, builtins: Boolean = false): List<PouExecutable?> {
+    fun readProgramsWLN(
+        libraryElements: List<File>,
+        programs: List<File>,
+        names: List<String>,
+        builtins: Boolean = false,
+    ): List<PouExecutable?> {
         val selectors = names.map { name ->
             { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
         }
@@ -181,7 +193,11 @@ object IEC61131Facade {
     /**
      * Read programs with support for common libraries and a selection either by name or PROGRAM_DECLARATION
      */
-    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>, builtins: Boolean = false): List<PouExecutable?> {
+    fun readProgramsWLPN(
+        libraryElements: List<File>,
+        programs: List<String>,
+        builtins: Boolean = false,
+    ): List<PouExecutable?> {
         val p = programs.map {
             if ('@' in it) {
                 val a = it.split('@', limit = 2)
@@ -202,10 +218,7 @@ object IEC61131Facade {
         return readProgramsWLS(libraryElements, pfiles, selectors, builtins)
     }
 
-    fun readProgramWLNP(
-        libraryElements: List<File>,
-        it: String,
-    ): Pair<PouElements, PouExecutable?> {
+    fun readProgramWLNP(libraryElements: List<File>, it: String): Pair<PouElements, PouExecutable?> {
         val (name, path) = if ('@' in it) {
             val a = it.split('@', limit = 2)
             a[0] to a[1]
@@ -350,15 +363,20 @@ object IEC61131Facade {
             return ctx.accept(IECParseTreeToAST()) as IlBody
         }
 
-        private class ShiftedTokenFactory(
-            val offset: Int = 0,
-            val offsetLine: Int = 0,
-            val offsetChar: Int = 0,
-        ) : CommonTokenFactory() {
+        private class ShiftedTokenFactory(val offset: Int = 0, val offsetLine: Int = 0, val offsetChar: Int = 0) : CommonTokenFactory() {
             constructor(position: Position) : this(position.offset, position.lineNumber, position.charInLine)
             constructor(token: Token) : this(token.startIndex, token.line, token.charPositionInLine)
 
-            override fun create(source: org.antlr.v4.runtime.misc.Pair<TokenSource, CharStream>?, type: Int, text: String?, channel: Int, start: Int, stop: Int, line: Int, charPositionInLine: Int): CommonToken {
+            override fun create(
+                source: org.antlr.v4.runtime.misc.Pair<TokenSource, CharStream>?,
+                type: Int,
+                text: String?,
+                channel: Int,
+                start: Int,
+                stop: Int,
+                line: Int,
+                charPositionInLine: Int,
+            ): CommonToken {
                 val token = super.create(source, type, text, channel, start, stop, line, charPositionInLine)
                 token.startIndex += offset
                 token.stopIndex += offset

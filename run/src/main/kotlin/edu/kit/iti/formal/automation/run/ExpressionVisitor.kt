@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -24,10 +24,7 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 
-class ExpressionVisitor(
-    private val state: State,
-    private val scope: Scope,
-) : DefaultVisitorNN<EValue>() {
+class ExpressionVisitor(private val state: State, private val scope: Scope) : DefaultVisitorNN<EValue>() {
 
     override fun defaultVisit(obj: Any) = TODO("missing visitor for visitable $obj")
 
@@ -105,7 +102,9 @@ class ExpressionVisitor(
             Operators.OR -> OperationEvaluator.or(leftValue, rightValue)
             Operators.SUB -> OperationEvaluator.subtract(leftValue, rightValue)
             Operators.MOD -> OperationEvaluator.modulo(leftValue, rightValue)
-            else -> TODO("operator ${binaryExpression.operator.symbol} isType not implemented (${binaryExpression.operator})")
+            else -> TODO(
+                "operator ${binaryExpression.operator.symbol} isType not implemented (${binaryExpression.operator})",
+            )
         }
     }
 }

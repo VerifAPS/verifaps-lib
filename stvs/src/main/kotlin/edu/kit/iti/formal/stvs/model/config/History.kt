@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.config
-
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
 import edu.kit.iti.formal.stvs.logic.io.ExporterFacade
@@ -22,14 +39,17 @@ import kotlin.io.path.isDirectory
  *
  * @author Benjamin Alt
  */
-class History// Don't silently cut off the part of the input collection that doesn't fit
+class History // Don't silently cut off the part of the input collection that doesn't fit
 /**
  * Creates a history of recently opened files from the given collection.
  * The Collections' size must be less then or equal to [.HISTORY_DEPTH].
  *
  * @param filenames the most recently opened files.
  * @throws IllegalArgumentException if the given collection is bigger than [.HISTORY_DEPTH]
- */(filenames: Collection<String> = listOf()) {
+ */
+(
+    filenames: Collection<String> = listOf()
+) {
     /**
      * Get the current file history.
      *
@@ -39,7 +59,6 @@ class History// Don't silently cut off the part of the input collection that doe
     val filenamesProperty = SimpleListProperty(FXCollections.observableArrayList<String>())
     var filenames: ObservableList<String> by filenamesProperty
 
-
     init {
         require(filenames.size <= HISTORY_DEPTH) {
             // Don't silently cut off the part of the input collection that doesn't fit
@@ -47,7 +66,6 @@ class History// Don't silently cut off the part of the input collection that doe
         }
         this.filenames.addAll(filenames)
     }
-
 
     /**
      * Add a filename to the history. If the file already exists inside this history, then
@@ -105,10 +123,7 @@ class History// Don't silently cut off the part of the input collection that doe
         return true
     }
 
-    override fun hashCode(): Int {
-        return filenames.hashCode()
-    }
-
+    override fun hashCode(): Int = filenames.hashCode()
 
     companion object {
         private const val AUTOLOAD_HISTORY_FILENAME = "stvs-history.xml"
@@ -124,12 +139,10 @@ class History// Don't silently cut off the part of the input collection that doe
          * @return either the history stored at the default path or a new history
          */
         @JvmStatic
-        fun autoloadHistory(): History {
-            return try {
+        fun autoloadHistory(): History = try {
                 ImporterFacade.importHistory(historyFile.toFile())
             } catch (e: ImportException) {
                 History()
             }
-        }
     }
 }

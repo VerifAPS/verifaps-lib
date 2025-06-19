@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException
@@ -21,7 +39,6 @@ import javax.xml.XMLConstants
 import javax.xml.parsers.ParserConfigurationException
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
-
 
 /**
  * Common superclass for all Importers that import from xml.
@@ -72,7 +89,6 @@ abstract class XmlImporter<T> : Importer<T> {
         }
     }
 
-
     /**
      * Must be implemented by subclasses. This method must provide the logic to convert the given
      * `source` [Node] into the corresponding object.
@@ -98,15 +114,13 @@ abstract class XmlImporter<T> : Importer<T> {
                         namespaceURI: String,
                         localName: String,
                         qName: String,
-                        atts: Attributes
-                    ) =
-                        super.startElement("", localName, qName, atts)
+                        atts: Attributes,
+                    ) = super.startElement("", localName, qName, atts)
 
                     override fun startPrefixMapping(prefix: String, uri: String) {
                     }
                 }
             }
-
 
             val readerFactory: XMLReaderJDOMFactory = XMLReaderXSDFactory(xsdResource)
             val sax = SAXBuilder(readerFactory)

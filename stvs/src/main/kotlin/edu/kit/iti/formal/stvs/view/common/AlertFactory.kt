@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.common
 
 import javafx.scene.control.Alert
@@ -21,12 +39,6 @@ object AlertFactory {
      * @param exception The exception for which the alert should be created
      * @param title The title of the alert
      * @param description The description in the alert
-     * @return The created alert
-     */
-    /**
-     * Create an alert for an exception with a default title and description.
-     *
-     * @param exception The exception for which the alert should be created
      * @return The created alert
      */
     @JvmOverloads
@@ -63,9 +75,7 @@ object AlertFactory {
     fun createAlert(
         type: AlertType, title: String?, description: String?,
         content: String?
-    ): Alert {
-        return createAlert(type, title, description, content, null)
-    }
+    ): Alert = createAlert(type, title, description, content, null)
 
     /**
      * Create an alert with a given type, title, desciption, content text and expandable content.

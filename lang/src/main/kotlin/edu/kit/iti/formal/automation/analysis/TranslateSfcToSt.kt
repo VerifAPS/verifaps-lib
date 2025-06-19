@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -57,7 +57,11 @@ class TranslateSfcToSt : AstVisitorWithScope<Unit>() {
         super.visit(functionBlockDeclaration)
         functionBlockDeclaration.sfcBody?.also {
             if (functionBlockDeclaration.stBody == null) {
-                val (t, st) = IEC61131Facade.translateSfcToSt(functionBlockDeclaration.scope, it, functionBlockDeclaration.name)
+                val (t, st) = IEC61131Facade.translateSfcToSt(
+                    functionBlockDeclaration.scope,
+                    it,
+                    functionBlockDeclaration.name,
+                )
                 functionBlockDeclaration.stBody = st
                 newTypes.addAll(t)
             }

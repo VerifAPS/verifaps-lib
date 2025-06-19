@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import javafx.application.Platform
@@ -18,8 +36,7 @@ import javafx.util.StringConverter
 /**
  * Created by Lukas on 13.07.2017.
  */
-open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter: StringConverter<T>? = null) :
-    TableCell<S, T>() {
+open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter: StringConverter<T>? = null) : TableCell<S, T>() {
 
     var textField: TextField? = null
 
@@ -45,12 +62,12 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
     private fun selectNextTableCell(forward: Boolean) {
         var nextColumn = getNextColumn(forward)
         var nextRowIndex = tableRow.index
-        //current column is at the end / start of the table
+        // current column is at the end / start of the table
         if (nextColumn == null) {
             // move to the next row, when direction is forward; backward if direction is backward
             nextRowIndex += (if (forward) 1 else -1)
-            //if forward? -> use 1 as next Column (since the 0th Column is assumed to not be editable
-            //if !forward? -> use last column in table
+            // if forward? -> use 1 as next Column (since the 0th Column is assumed to not be editable
+            // if !forward? -> use last column in table
             nextColumn = tableView.columns[if (forward) 1 else tableView.columns.size - 1]
         }
         tableView.edit(nextRowIndex, nextColumn)
@@ -79,14 +96,13 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
             }
         } else {
             nextIndex--
-            //assumes, that the first column is not editable
+            // assumes, that the first column is not editable
             if (nextIndex < 1) {
                 return null
             }
         }
         return columns[nextIndex]
     }
-
 
     /***************************************************************************
      * *
@@ -95,7 +111,8 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
      */
     // --- converter
     private val converter: ObjectProperty<StringConverter<T>?> = SimpleObjectProperty(
-        this, "converter"
+        this,
+        "converter",
     )
 
     /**
@@ -116,6 +133,7 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
      * Constructors                                                            *
      * *
      */
+
     /**
      * Creates a default TextFieldTableCell with a null converter. Without a
      * [StringConverter] specified, this cell will not be able to accept
@@ -133,9 +151,7 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
     /**
      * The [StringConverter] property.
      */
-    fun converterProperty(): ObjectProperty<StringConverter<T>?> {
-        return converter
-    }
+    fun converterProperty(): ObjectProperty<StringConverter<T>?> = converter
 
     /**
      * Sets the [StringConverter] to be used in this cell.
@@ -147,34 +163,35 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
     /**
      * Returns the [StringConverter] used in this cell.
      */
-    fun getConverter(): StringConverter<T>? {
-        return converterProperty().get()
-    }
-
+    fun getConverter(): StringConverter<T>? = converterProperty().get()
 
     /***************************************************************************
      * *
      * Public API                                                              *
      * *
      */
+
     /**
      * {@inheritDoc}
      */
     override fun startEdit() {
-        if (!isEditable
-            || !tableView.isEditable
-            || !tableColumn.isEditable
+        if (!isEditable ||
+            !tableView.isEditable ||
+            !tableColumn.isEditable
         ) {
             return
         }
         super.startEdit()
 
-
         if (isEditing) {
             if (textField == null) {
                 textField = AdvancedCellUtils.createTextField(this, getConverter())
                 textField?.focusedProperty()
-                    ?.addListener { observable: ObservableValue<out Boolean?>?, oldValue: Boolean?, newValue: Boolean? ->
+                    ?.addListener {
+                            observable: ObservableValue<out Boolean?>?,
+                            oldValue: Boolean?,
+                            newValue: Boolean?,
+                        ->
                         if (!newValue!!) {
                             commitEdit(converter.get()!!.fromString(textField?.text))
                         }
@@ -239,10 +256,9 @@ open class AdvancedTextFieldTableCell<S, T> @JvmOverloads constructor(converter:
          * [cell factory property][TableColumn.cellFactoryProperty] of a
          * TableColumn, that enables textual editing of the content.
          */
-        fun <S, T> forTableColumn(
-            converter: StringConverter<T>?
-        ): Callback<TableColumn<S, T>, TableCell<S?, T>> {
-            return Callback { list: TableColumn<S, T>? -> TextFieldTableCell(converter) }
-        }
+        fun <S, T> forTableColumn(converter: StringConverter<T>?): Callback<TableColumn<S, T>, TableCell<S?, T>> =
+            Callback { list: TableColumn<S, T>? ->
+                TextFieldTableCell(converter)
+            }
     }
 }

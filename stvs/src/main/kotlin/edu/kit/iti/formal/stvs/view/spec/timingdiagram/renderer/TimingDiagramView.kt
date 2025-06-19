@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram.renderer
 
 import edu.kit.iti.formal.stvs.model.table.ConcreteDuration
@@ -22,8 +40,7 @@ import java.util.stream.Collectors
  *
  * @author Leon Kaucher
  */
-class TimingDiagramView<A>(private val xaxis: NumberAxis, private val yaxis: Axis<A>) :
-    XYChart<Number?, A>(xaxis, yaxis) {
+class TimingDiagramView<A>(private val xaxis: NumberAxis, private val yaxis: Axis<A>) : XYChart<Number?, A>(xaxis, yaxis) {
     private val horizontalLines: ObservableList<Line> = FXCollections.observableArrayList()
     private val verticalLines: ObservableList<Line> = FXCollections.observableArrayList()
     private val durationLines: ObservableList<Line> = FXCollections.observableArrayList()
@@ -171,45 +188,45 @@ class TimingDiagramView<A>(private val xaxis: NumberAxis, private val yaxis: Axi
      * Called to update and layout the plot children.
      */
     override fun layoutPlotChildren() {
-        data.forEach(Consumer { series: Series<Number?, A?> ->
-            val cyclesData = series.data
-            for (i in cyclesData.indices) {
-                val horizontalLine = horizontalLines[i]
-                horizontalLine.startX = xAxis.getDisplayPosition(cyclesData[i].xValue)
-                horizontalLine.endX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
-                horizontalLine.startY = yAxis.getDisplayPosition(cyclesData[i].yValue)
-                horizontalLine.endY = yAxis.getDisplayPosition(cyclesData[i].yValue)
-                if (i < cyclesData.size - 1) {
-                    val verticalLine = verticalLines[i]
-                    verticalLine.startX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
-                    verticalLine.endX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
-                    verticalLine.startY = yAxis.getDisplayPosition(cyclesData[i].yValue)
-                    verticalLine.endY = yAxis.getDisplayPosition(cyclesData[i + 1].yValue)
+        data.forEach(
+            Consumer { series: Series<Number?, A?> ->
+                val cyclesData = series.data
+                for (i in cyclesData.indices) {
+                    val horizontalLine = horizontalLines[i]
+                    horizontalLine.startX = xAxis.getDisplayPosition(cyclesData[i].xValue)
+                    horizontalLine.endX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
+                    horizontalLine.startY = yAxis.getDisplayPosition(cyclesData[i].yValue)
+                    horizontalLine.endY = yAxis.getDisplayPosition(cyclesData[i].yValue)
+                    if (i < cyclesData.size - 1) {
+                        val verticalLine = verticalLines[i]
+                        verticalLine.startX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
+                        verticalLine.endX = xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
+                        verticalLine.startY = yAxis.getDisplayPosition(cyclesData[i].yValue)
+                        verticalLine.endY = yAxis.getDisplayPosition(cyclesData[i + 1].yValue)
+                    }
+
+                    val cycleSelectionRectangle = cycleSelectionRectangles[i]
+                    cycleSelectionRectangle.x = xAxis.getDisplayPosition(cyclesData[i].xValue)
+                    cycleSelectionRectangle.width = (
+                        xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1) -
+                            xAxis.getDisplayPosition(cyclesData[i].xValue)
+                        )
+                    cycleSelectionRectangle.height = yAxis.height
                 }
-
-                val cycleSelectionRectangle = cycleSelectionRectangles[i]
-                cycleSelectionRectangle.x = xAxis.getDisplayPosition(cyclesData[i].xValue)
-                cycleSelectionRectangle.width = (xAxis.getDisplayPosition(cyclesData[i].xValue!!.toInt() + 1)
-                        - xAxis.getDisplayPosition(cyclesData[i].xValue))
-                cycleSelectionRectangle.height = yAxis.height
-            }
-            for (i in durations.indices) {
-                val line = durationLines[i]
-                val duration = durations[i]
-                line.startX = getxAxis().getDisplayPosition(duration.endCycle)
-                line.endX = getxAxis().getDisplayPosition(duration.endCycle)
-                line.endY = yAxis.height
-            }
-        })
+                for (i in durations.indices) {
+                    val line = durationLines[i]
+                    val duration = durations[i]
+                    line.startX = getxAxis().getDisplayPosition(duration.endCycle)
+                    line.endX = getxAxis().getDisplayPosition(duration.endCycle)
+                    line.endY = yAxis.height
+                }
+            },
+        )
     }
 
-    fun getxAxis(): NumberAxis {
-        return xaxis
-    }
+    fun getxAxis(): NumberAxis = xaxis
 
-    fun getyAxis(): Axis<A> {
-        return yaxis
-    }
+    fun getyAxis(): Axis<A> = yaxis
 
     /**
      * Sets durations. This updates the lines that indicates a new row in the specification.
@@ -218,12 +235,14 @@ class TimingDiagramView<A>(private val xaxis: NumberAxis, private val yaxis: Axi
      */
     fun setDurations(durations: List<ConcreteDuration>) {
         this.durations = durations
-        durationLines.setAll(durations.stream().map { i: ConcreteDuration? ->
-            val line = Line()
-            line.styleClass.add("durationLine")
-            durationLinesPane.children.add(line)
-            line.startY = 0.0
-            line
-        }.collect(Collectors.toList()))
+        durationLines.setAll(
+            durations.stream().map { i: ConcreteDuration? ->
+                val line = Line()
+                line.styleClass.add("durationLine")
+                durationLinesPane.children.add(line)
+                line.startY = 0.0
+                line
+            }.collect(Collectors.toList()),
+        )
     }
 }

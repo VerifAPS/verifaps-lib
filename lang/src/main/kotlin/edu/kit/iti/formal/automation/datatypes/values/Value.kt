@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -30,10 +30,7 @@ import java.util.*
  * @author weigl
  * @version $Id: $Id
  */
-sealed class Value<T : AnyDt, S : Any>(
-    val dataType: T,
-    val value: S,
-) {
+sealed class Value<T : AnyDt, S : Any>(val dataType: T, val value: S) {
 
     operator fun component1() = dataType
     operator fun component2() = value
@@ -62,7 +59,8 @@ sealed class Value<T : AnyDt, S : Any>(
 class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
     constructor(dt: AnyInt, v: Long) : this(dt, BigInteger.valueOf(v))
 
-    override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo IntegerLit(dataType, value))
+    override fun assignTo(ref: SymbolicReference): StatementList? =
+        StatementList(ref assignTo IntegerLit(dataType, value))
 }
 
 class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>) : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v)
@@ -76,7 +74,8 @@ class VAnyBit(dt: AnyBit, v: Bits) : Value<AnyBit, Bits>(dt, v) {
 }
 
 class VBool(dt: AnyBit.BOOL, v: Boolean) : Value<AnyBit.BOOL, Boolean>(dt, v) {
-    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo if (value) BooleanLit.LTRUE else BooleanLit.LFALSE)
+    override fun assignTo(ref: SymbolicReference) =
+        StatementList(ref assignTo if (value) BooleanLit.LTRUE else BooleanLit.LFALSE)
 }
 
 val TRUE = VBool(AnyBit.BOOL, true)

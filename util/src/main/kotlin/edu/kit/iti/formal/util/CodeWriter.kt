@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -59,7 +59,9 @@ open class CodeWriter(val stream: Writer = StringWriter()) : Appendable by strea
         return this
     }
 
-    open fun keyword(keyword: String): CodeWriter = printf(if (uppercaseKeywords) keyword.uppercase(Locale.getDefault()) else keyword.lowercase(Locale.getDefault()))
+    open fun keyword(keyword: String): CodeWriter = printf(
+        if (uppercaseKeywords) keyword.uppercase(Locale.getDefault()) else keyword.lowercase(Locale.getDefault()),
+    )
 
     fun nl(): CodeWriter {
         write("\n")

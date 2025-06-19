@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -131,7 +131,8 @@ class Smv2SmtVisitor(
 
     override fun visit(smvModule: SMVModule): SExpr = throw IllegalStateException("illegal AST node discovered!")
 
-    override fun visit(quantified: SQuantified): SExpr = throw IllegalStateException("illegal AST node discovered! SQuantified not allowed in assignments")
+    override fun visit(quantified: SQuantified): SExpr =
+        throw IllegalStateException("illegal AST node discovered! SQuantified not allowed in assignments")
 
     private fun ifThenElse(cases: List<SCaseExpression.Case>, n: Int): SExpr {
         if (n >= cases.size) {

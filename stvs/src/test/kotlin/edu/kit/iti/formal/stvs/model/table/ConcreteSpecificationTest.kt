@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.logic.io.ImporterFacade
@@ -23,7 +41,7 @@ class ConcreteSpecificationTest {
     fun setUp() {
         concreteSpec = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_valid_1.xml")!!,
-            listOf(TypeInt, TypeBool)
+            listOf(TypeInt, TypeBool),
         )
     }
 
@@ -42,12 +60,12 @@ class ConcreteSpecificationTest {
             ConcreteCell(ValueInt(1)),
             ConcreteCell(ValueInt(2)),
             ConcreteCell(ValueInt(3)),
-            ConcreteCell(ValueInt(4))
+            ConcreteCell(ValueInt(4)),
         )
         Assertions.assertEquals(expectedCellsA, concreteSpec.getConcreteValuesForConstraintCell("A", 1))
         val expectedCellsB = listOf<ConcreteCell>(
             ConcreteCell(ValueBool.FALSE),
-            ConcreteCell(ValueBool.FALSE)
+            ConcreteCell(ValueBool.FALSE),
         )
         Assertions.assertEquals(expectedCellsB, concreteSpec.getConcreteValuesForConstraintCell("B", 0))
         Assertions.assertEquals(mutableListOf<Any>(), concreteSpec.getConcreteValuesForConstraintCell("A", 3))
@@ -58,7 +76,7 @@ class ConcreteSpecificationTest {
         Assertions.assertEquals(null, concreteSpec.getConcreteDurationForConstraintRow(3))
         Assertions.assertEquals(
             ConcreteDuration(2, 4),
-            concreteSpec.getConcreteDurationForConstraintRow(1)
+            concreteSpec.getConcreteDurationForConstraintRow(1),
         )
     }
 
@@ -86,12 +104,12 @@ class ConcreteSpecificationTest {
     fun testEquals() {
         val identicalSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_valid_1.xml")!!,
-            listOf(TypeInt, TypeBool)
+            listOf(TypeInt, TypeBool),
         )
         Assertions.assertEquals(identicalSpec, concreteSpec)
         val differentSpec: ConcreteSpecification = ImporterFacade.importConcreteSpec(
             XmlConcreteSpecExporterTest::class.java.getResourceAsStream("spec_concrete_empty.xml")!!,
-            listOf(TypeInt, TypeBool)
+            listOf(TypeInt, TypeBool),
         )
         Assertions.assertNotEquals(differentSpec, concreteSpec)
         Assertions.assertNotEquals(null, concreteSpec)

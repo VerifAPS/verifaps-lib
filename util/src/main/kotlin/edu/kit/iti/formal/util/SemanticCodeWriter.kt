@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -32,10 +32,7 @@ interface Semantic<T> {
  * @author weigla (23.10.2018)
  * @version 1
  */
-open class SemanticCodeWriter<T>(
-    var semantic: Semantic<T>,
-    var stream: Writer = StringWriter(),
-) : Appendable by stream {
+open class SemanticCodeWriter<T>(var semantic: Semantic<T>, var stream: Writer = StringWriter()) : Appendable by stream {
 
     protected var identation = 0
     var identationChar: String = " "
@@ -115,11 +112,7 @@ open class SemanticCodeWriter<T>(
         return this
     }
 
-    fun cblock(
-        head: String,
-        tail: String,
-        function: SemanticCodeWriter<T>.() -> Unit,
-    ): SemanticCodeWriter<T> {
+    fun cblock(head: String, tail: String, function: SemanticCodeWriter<T>.() -> Unit): SemanticCodeWriter<T> {
         printf(head)
         increaseIndent()
         nl()

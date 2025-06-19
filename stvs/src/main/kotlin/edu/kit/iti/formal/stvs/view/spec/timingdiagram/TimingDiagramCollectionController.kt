@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.timingdiagram
 
 import edu.kit.iti.formal.stvs.model.common.Selection
@@ -30,10 +48,7 @@ import kotlin.math.max
  *
  * @author Leon Kaucher
  */
-class TimingDiagramCollectionController(
-    concreteSpec: ConcreteSpecification?,
-    private val selection: Selection?
-) : Controller {
+class TimingDiagramCollectionController(concreteSpec: ConcreteSpecification?, private val selection: Selection?) : Controller {
     private val totalCycleCount = concreteSpec!!.rows.size
     private val dragState = XAxisDragState()
     override val view: TimingDiagramCollectionView = TimingDiagramCollectionView()
@@ -57,9 +72,11 @@ class TimingDiagramCollectionController(
         view.outdatedMessage.visibleProperty().bind(activatedProperty.not())
         view.outdatedMessage.managedProperty().bind(activatedProperty.not())
 
-        concreteSpec!!.columnHeaders.forEach(Consumer { validIoVariable: ValidIoVariable ->
-            createTimingDiagram(concreteSpec, validIoVariable)
-        })
+        concreteSpec!!.columnHeaders.forEach(
+            Consumer { validIoVariable: ValidIoVariable ->
+                createTimingDiagram(concreteSpec, validIoVariable)
+            },
+        )
         view.xaxis.upperBound = concreteSpec.rows.size.toDouble()
         initxScrollbar()
     }
@@ -80,29 +97,37 @@ class TimingDiagramCollectionController(
      * information
      * @param validIoVariable the variable for which a diagram should be generated
      */
-    private fun createTimingDiagram(
-        concreteSpec: ConcreteSpecification?,
-        validIoVariable: ValidIoVariable
-    ) {
+    private fun createTimingDiagram(concreteSpec: ConcreteSpecification?, validIoVariable: ValidIoVariable) {
         val diagramAxisPair = validIoVariable.validType.match(
             {
                 TimingDiagramController.createIntegerTimingDiagram(
-                    concreteSpec, validIoVariable,
-                    view.xaxis, selection, activatedProperty
+                    concreteSpec,
+                    validIoVariable,
+                    view.xaxis,
+                    selection,
+                    activatedProperty,
                 )
             },
             {
                 TimingDiagramController.createBoolTimingDiagram(
-                    concreteSpec, validIoVariable,
-                    view.xaxis, selection, activatedProperty
+                    concreteSpec,
+                    validIoVariable,
+                    view.xaxis,
+                    selection,
+                    activatedProperty,
                 )
             },
             { e: TypeEnum? ->
                 TimingDiagramController.createEnumTimingDiagram(
-                    concreteSpec, validIoVariable, e,
-                    view.xaxis, selection, activatedProperty
+                    concreteSpec,
+                    validIoVariable,
+                    e,
+                    view.xaxis,
+                    selection,
+                    activatedProperty,
                 )
-            })!!
+            },
+        )!!
         val timingDiagramView = diagramAxisPair.first.view
 
         if (concreteSpec!!.isCounterExample) {
@@ -126,7 +151,7 @@ class TimingDiagramCollectionController(
         // Ensures that labels are always centered vertically relative to their diagram
         label.layoutYProperty().bind(
             externalYAxis.layoutYProperty()
-                .add(externalYAxis.heightProperty().divide(2)).subtract(label.heightProperty().divide(2))
+                .add(externalYAxis.heightProperty().divide(2)).subtract(label.heightProperty().divide(2)),
         )
     }
 
@@ -165,7 +190,7 @@ class TimingDiagramCollectionController(
     private fun updateAxisExternalPosition(timingDiagramView: TimingDiagramView<*>?, externalYAxis: Axis<*>) {
         val transformation = ViewUtils.calculateTransformRelativeTo(
             view.diagramContainer,
-            timingDiagramView!!.getyAxis()
+            timingDiagramView!!.getyAxis(),
         )
         val yaxisPosition =
             transformation.transform(timingDiagramView.getyAxis().layoutBounds).minY
@@ -201,9 +226,9 @@ class TimingDiagramCollectionController(
         val displayForAxis = xaxis.getValueForDisplay(point2D.x).toDouble()
         val displayForAxisPlus100 = xaxis.getValueForDisplay(point2D.x + 100).toDouble()
         /*
-     * Calculates Ratio between pixel and axis units by taking to different points on the axis and
-     * dividing them by the screen distance
-     */
+         * Calculates Ratio between pixel and axis units by taking to different points on the axis and
+         * dividing them by the screen distance
+         */
         dragState.screenDistanceToAxisRatio = (displayForAxisPlus100 - displayForAxis) / 100
         dragState.startXPosition = point2D.x
         dragState.startLowerBound = xaxis.lowerBound

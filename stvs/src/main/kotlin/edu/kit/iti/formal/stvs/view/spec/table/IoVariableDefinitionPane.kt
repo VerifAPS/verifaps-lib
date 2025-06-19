@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import edu.kit.iti.formal.stvs.model.common.IoVariable
@@ -24,7 +42,7 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
     initialCategory: VariableCategory? = VariableCategory.INPUT,
     initialRole: VariableRole? = VariableRole.ASSUME,
     initialName: String? = "",
-    initialType: String? = ""
+    initialType: String? = "",
 ) : GridPane() {
     val categoryComboBox: ComboBox<VariableCategory?>
     private val variableRoleComboBox: ComboBox<VariableRole>
@@ -37,6 +55,7 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
      * @param initialName Default name
      * @param initialType Default type
      */
+
     /**
      * Creates an instance for an input variable with empty name/type.
      */
@@ -45,10 +64,10 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
         hgap = 10.0
 
         this.categoryComboBox = ComboBox(
-            FXCollections.observableArrayList(*VariableCategory.entries.toTypedArray())
+            FXCollections.observableArrayList(*VariableCategory.entries.toTypedArray()),
         )
         this.variableRoleComboBox = ComboBox(
-            FXCollections.observableArrayList(*VariableRole.entries.toTypedArray())
+            FXCollections.observableArrayList(*VariableRole.entries.toTypedArray()),
         )
         this.nameTextField = TextField(initialName)
         this.typeTextField = TextField(initialType)
@@ -83,8 +102,9 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
          * @return Generated variable
          */
         get() = SpecIoVariable(
-            category = categoryComboBox.value!!, typeIdentifier = typeTextField.text,
-            name = nameTextField.text
+            category = categoryComboBox.value!!,
+            typeIdentifier = typeTextField.text,
+            name = nameTextField.text,
         )
 
     /**
@@ -98,8 +118,8 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
     fun isDefinitionInvalid(alreadyDefinedVariables: List<SpecIoVariable?>?): Boolean {
         val chosenName = nameTextField.text
         val chosenType = typeTextField.text
-        if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches()
-            || !VariableExpr.IDENTIFIER_PATTERN.matcher(chosenType).matches()
+        if (!VariableExpr.IDENTIFIER_PATTERN.matcher(chosenName).matches() ||
+            !VariableExpr.IDENTIFIER_PATTERN.matcher(chosenType).matches()
         ) {
             return true
         }
@@ -113,15 +133,12 @@ class IoVariableDefinitionPane @JvmOverloads constructor(
      * @return binding that always represents the return value of
      * [IoVariableDefinitionPane.isDefinitionInvalid].
      */
-    fun createDefinitionInvalidBinding(
-        alreadyDefinedVariables: List<SpecIoVariable?>?
-    ): BooleanBinding {
-        return Bindings.createBooleanBinding(
+    fun createDefinitionInvalidBinding(alreadyDefinedVariables: List<SpecIoVariable?>?): BooleanBinding =
+        Bindings.createBooleanBinding(
             { isDefinitionInvalid(alreadyDefinedVariables) },
             nameTextField.textProperty(),
-            typeTextField.textProperty()
+            typeTextField.textProperty(),
         )
-    }
 
     /**
      * Write the made changes to a variable.

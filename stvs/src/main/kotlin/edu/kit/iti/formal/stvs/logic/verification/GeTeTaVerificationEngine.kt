@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.verification
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -62,7 +80,7 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
         getetaProcess = null
         /* Check if nuXmv executable exists */
         val nuxmvFile = File(config.nuxmvFilename)
-        //TODO check if nuXmv is executable by running it.
+        // TODO check if nuXmv is executable by running it.
     }
 
     /**
@@ -82,16 +100,14 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
         val (_, modCode) = SymbExFacade.evaluateProgramWithLineMap(code, disableSimplify)
         val superEnumType = GetetaFacade.createSuperEnum(listOf(code.scope))
 
-
         val (freeVars, validTT) = spec.validate(this.code.definedVariables, this.code.definedTypes)
 
         val gtt: GeneralizedTestTable = validTT.asGtt(freeVars)
 
-
         val tt = GetetaFacade.constructSMV(gtt, superEnumType)
 
         if (drawAutomaton) {
-            //Getata.drawAutomaton(gtt, tt)
+            // Getata.drawAutomaton(gtt, tt)
         }
 
         val modTable = tt.tableModule
@@ -105,11 +121,12 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
 
         val folder = File.createTempFile("gtt_", ".smv").absolutePath
 
-
         val process =
             GetetaFacade.createNuXMVProcess(
-                folder, modules, config.nuxmvFilename,
-                VerificationTechnique.IC3
+                folder,
+                modules,
+                config.nuxmvFilename,
+                VerificationTechnique.IC3,
             )
 
         val op = process.outputParser
@@ -141,7 +158,7 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
                         Counterexample(
                             spec,
                             b.counterExample.asConcreteSpecification(validTT),
-                            output
+                            output,
                         )
                     }
                 }
@@ -158,11 +175,10 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
             if (cexAnalysation.runAnalyzer) createRowMapping(b, tt)
             else info("Use `--row-map' to print possible row mappings.")*/
             }
-            //exitProcess(errorLevel)
+            // exitProcess(errorLevel)
         } catch (e: TimeoutException) {
             cancelVerification()
         }
-
     }
 
     override fun cancelVerification() {
@@ -172,22 +188,22 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
         }
     }
 
-
     companion object {
         private val LOGGER: Logger = LoggerFactory.getLogger(GeTeTaVerificationEngine::class.java)
     }
 
-
     private fun ConstraintSpecification.validate(
         codeIoVariables: List<CodeIoVariable>,
-        typeContext: List<Type>
+        typeContext: List<Type>,
     ): Pair<List<ValidFreeVariable>, ValidSpecification> {
         val tc = SimpleListProperty(typeContext.asObservable())
         val freeVariableListValidator = FreeVariableListValidator(tc, freeVariableList)
         val freeVariables: List<ValidFreeVariable> = freeVariableListValidator.validFreeVariables
         val validator = ConstraintSpecificationValidator(
-            tc, SimpleListProperty(codeIoVariables.asObservable()),
-            freeVariables.asObservable(), this
+            tc,
+            SimpleListProperty(codeIoVariables.asObservable()),
+            freeVariables.asObservable(),
+            this,
         )
 
         // TODO throw exception
@@ -202,7 +218,7 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
         val durations = List(this.states.size) { idx -> ConcreteDuration(idx, 1) }
         val rows = this.states.map {
             SpecificationRow.createUnobservableRow(
-                it.map { (k, v) -> k to ConcreteCell(v.nxAsValue()) }.toMap()
+                it.map { (k, v) -> k to ConcreteCell(v.nxAsValue()) }.toMap(),
             )
         }
         return ConcreteSpecification(ioVars, rows, durations, true)
@@ -240,8 +256,8 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
             constraintVariables = freeVars.map { it.asConstraintVariable() }.toMutableList(),
             region = Region(
                 "0",
-                rows.mapIndexed { idx, it -> it.asTableNode(idx + 1, cvars, durations[idx]!!) }.toMutableList()
-            )
+                rows.mapIndexed { idx, it -> it.asTableNode(idx + 1, cvars, durations[idx]!!) }.toMutableList(),
+            ),
         )
 
         return gtt
@@ -250,22 +266,22 @@ class GeTeTaVerificationEngine(val config: GlobalConfig, val code: ParsedCode) :
     private fun SpecificationRow<Expression>.asTableNode(
         id: Int,
         columnVars: Map<String, ColumnVariable>,
-        duration: LowerBoundedInterval
-    ): TableNode {
-        return TableRow(id).also {
-            this.cells.forEach { (t, u) ->
-                val v = columnVars[t]!!
-                it.rawFields[v] = GetetaFacade.parseCell(u.asString ?: "TRUE").cell()
-                it.duration = duration.asDuration()
-            }
+        duration: LowerBoundedInterval,
+    ): TableNode = TableRow(id).also {
+        this.cells.forEach { (t, u) ->
+            val v = columnVars[t]!!
+            it.rawFields[v] = GetetaFacade.parseCell(u.asString ?: "TRUE").cell()
+            it.duration = duration.asDuration()
         }
     }
 
     private fun LowerBoundedInterval.asDuration(): Duration = GetetaFacade.parseDuration(toString())
 
     private fun ValidFreeVariable.asConstraintVariable() = ConstraintVariable(
-        name, type.asDT(), type.asSmvType(),
-        GetetaFacade.parseCell(this.constraint.toString()).cell()
+        name,
+        type.asDT(),
+        type.asSmvType(),
+        GetetaFacade.parseCell(this.constraint.toString()).cell(),
     )
 
     private fun ValidIoVariable.asColumnVariable() =

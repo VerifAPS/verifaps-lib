@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -80,11 +80,7 @@ class DefaultIecToSmtDataTypeTranslator(val useBv: Boolean) : IecToSmtDataTypeTr
     }
 }
 
-class SmtEncoder(
-    val gtt: GeneralizedTestTable,
-    val smvModel: SMVConstructionModel,
-    val traceLength: Int,
-) {
+class SmtEncoder(val gtt: GeneralizedTestTable, val smvModel: SMVConstructionModel, val traceLength: Int) {
 
     val model = SmtModel()
     val row2Id = hashMapOf<TableRow, Int>()
@@ -282,11 +278,7 @@ class SmtEncoder(
 // fun nameOf(v: ProgramVariable, tableRow: Int, iter: Int) = "|${v.name}_${tableRow}_$iter|"
 }
 
-class TblExprToSExpr(
-    columnVar: String,
-    val programVar: Set<String>,
-    val access: String? = null,
-) : TestTableLanguageParserBaseVisitor<SExpr>() {
+class TblExprToSExpr(columnVar: String, val programVar: Set<String>, val access: String? = null) : TestTableLanguageParserBaseVisitor<SExpr>() {
 
     val translation: (String) -> String = { it }
 
@@ -306,7 +298,8 @@ class TblExprToSExpr(
 
     override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext) = SSymbol("false")
 
-    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext) = SList(translation(ctx.relational_operator().text), variable, ctx.expr().accept(this))
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext) =
+        SList(translation(ctx.relational_operator().text), variable, ctx.expr().accept(this))
 
     override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): SExpr = SList(
         "and",
@@ -320,9 +313,11 @@ class TblExprToSExpr(
 
     override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) = binop(ctx.op.text, ctx.left, ctx.right)
 
-    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SExpr = sexpr("=", variable, ctx.variable().accept(this))
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SExpr =
+        sexpr("=", variable, ctx.variable().accept(this))
 
-    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): SExpr = sexpr("=", ctx.constant().accept(this))
+    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): SExpr =
+        sexpr("=", ctx.constant().accept(this))
 
     private fun binop(
         text: String,
@@ -334,7 +329,12 @@ class TblExprToSExpr(
 
     override fun visitMult(ctx: TestTableLanguageParser.MultContext) = binop("bvmult", ctx.left, ctx.right)
 
-    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SExpr = fnapply(ctx.IDENTIFIER().text, ctx.expr().map { it.accept(this) })
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SExpr = fnapply(
+        ctx.IDENTIFIER().text,
+        ctx.expr().map {
+            it.accept(this)
+        },
+    )
 
     override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = binop("and", ctx.left, ctx.right)
 
@@ -344,7 +344,8 @@ class TblExprToSExpr(
 
     override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) = binop("bvdiv", ctx.left, ctx.right)
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) = binop("distinct", ctx.left, ctx.right)
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) =
+        binop("distinct", ctx.left, ctx.right)
 
     override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) = binop("or", ctx.left, ctx.right)
 
@@ -362,5 +363,6 @@ class TblExprToSExpr(
         SSymbol(ctx.name.text)
     }
 
-    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext?): SExpr = super.visitGuardedcommand(ctx)
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext?): SExpr =
+        super.visitGuardedcommand(ctx)
 }

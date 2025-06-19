@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ImportException
@@ -45,7 +63,7 @@ class XmlConstraintSpecImporter : XmlImporter<ConstraintSpecification>() {
     private fun importConstraintSpec(
         freeVariables: FreeVariableList,
         ioVariables: List<SpecIoVariable>,
-        importedSpec: Element
+        importedSpec: Element,
     ): ConstraintSpecification {
         val constraintSpec = ConstraintSpecification(freeVariables)
         constraintSpec.name = importedSpec.getAttributeValue("name") ?: "unnamed"
@@ -78,8 +96,10 @@ class XmlConstraintSpecImporter : XmlImporter<ConstraintSpecification>() {
      * @throws ImportException Mismatch between size of `row` and size of `ioVariables`
      */
     @Throws(ImportException::class)
-    private fun createSpecificationRowForCycle(ioVariables: List<SpecIoVariable>, row: Element)
-            : SpecificationRow<ConstraintCell> {
+    private fun createSpecificationRowForCycle(
+        ioVariables: List<SpecIoVariable>,
+        row: Element,
+    ): SpecificationRow<ConstraintCell> {
         val cellsMap = hashMapOf<String, ConstraintCell>()
 
         row.getChildren("cell").forEachIndexed { j, cell ->
@@ -111,14 +131,14 @@ class XmlConstraintSpecImporter : XmlImporter<ConstraintSpecification>() {
             val category =
                 VariableCategory.valueOf(
                     variable.getAttributeValue("io")
-                        .uppercase(Locale.getDefault())
+                        .uppercase(Locale.getDefault()),
                 )
             val specIoVariable =
                 SpecIoVariable(
                     category,
                     category.defaultRole,
                     variable.getAttributeValue("data-type"),
-                    variable.getAttributeValue("name")
+                    variable.getAttributeValue("name"),
                 )
             variable.getAttributeValue("colwidth")?.let {
                 specIoVariable.columnConfig.width = it.toDouble()

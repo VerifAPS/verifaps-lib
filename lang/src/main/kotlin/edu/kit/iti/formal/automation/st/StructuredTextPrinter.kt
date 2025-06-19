@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -63,9 +63,10 @@ open class StructuredTextPrinter(var sb: CodeWriter = CodeWriter()) : AstVisitor
         sb.nl().print("//! END_REGION")
     }
 
-    private fun blockParam(p: MutableList<SymbolicReference>, pre: String, suf: String) = p.joinInto(sb, ", ", pre, suf) {
-        it.accept(this@StructuredTextPrinter)
-    }
+    private fun blockParam(p: MutableList<SymbolicReference>, pre: String, suf: String) =
+        p.joinInto(sb, ", ", pre, suf) {
+            it.accept(this@StructuredTextPrinter)
+        }
 
     override fun visit(empty: EMPTY_EXPRESSION) {
         sb.print("(* empty expression *)")

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -47,10 +47,7 @@ import edu.kit.iti.formal.automation.exceptions.DataTypeNotDefinedException
  * @author Alexander Weigl
  * @since 04.03.2017
 </T> */
-class RefTo<T : Identifiable>(
-    private var name: String?,
-    private var identified: T?,
-) : Cloneable {
+class RefTo<T : Identifiable>(private var name: String?, private var identified: T?) : Cloneable {
     var identifier: String?
         get() = if (obj != null) obj!!.name else name
         set(new) {

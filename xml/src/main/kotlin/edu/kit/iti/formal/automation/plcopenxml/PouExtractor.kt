@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -25,7 +25,8 @@ import org.jdom2.filter.Filters
 class PouExtractor(
     val pous: List<Element>,
     val writer: CodeWriter,
-    val translators: List<XMLTranslator> = listOf<XMLTranslator>(FunctionTranslator, FunctionBlockTranslator, ProgramTranslator),
+    val translators: List<XMLTranslator> =
+        listOf<XMLTranslator>(FunctionTranslator, FunctionBlockTranslator, ProgramTranslator),
 ) {
     fun run() {
         val p = pous.sortedWith(compareBy({ it.getAttributeValue("pouType") }, { it.getAttributeValue("name") }))

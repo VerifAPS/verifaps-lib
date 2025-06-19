@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -39,7 +39,9 @@ class ParserTest {
         testReadFirstSexpr("abc", "abc (123 (456) 789) 2423424"),
     )
 
-    fun testReadFirstSexpr(exp: String, input: String): DynamicTest = DynamicTest.dynamicTest(exp) { Assertions.assertEquals(exp, getSexpr(input)) }
+    fun testReadFirstSexpr(exp: String, input: String): DynamicTest = DynamicTest.dynamicTest(exp) {
+        Assertions.assertEquals(exp, getSexpr(input))
+    }
 
     fun getSexpr(s: String): String = readFirstSexpr(StringReader(s))
 }

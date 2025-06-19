@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -60,7 +60,8 @@ const val HAVOC_PREFIX = "__havoc_"
  * @version 2 (12.12.16)
  */
 object SymbExFacade {
-    fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr = evaluateFunction(decl, listOf(*args))
+    fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr =
+        evaluateFunction(decl, listOf(*args))
 
     fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
         val se = SymbolicExecutioner()
@@ -127,7 +128,8 @@ object SymbExFacade {
      * }
      */
 
-    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule = evaluateProgramWithLineMap(exec, skipSimplify).second
+    fun evaluateProgram(exec: PouExecutable, skipSimplify: Boolean = false): SMVModule =
+        evaluateProgramWithLineMap(exec, skipSimplify).second
 
     @JvmOverloads
     fun evaluateProgramWithLineMap(exec: PouExecutable, skipSimplify: Boolean = false): Pair<LineMap, SMVModule> {
@@ -205,11 +207,7 @@ object SymbExFacade {
     }
 
     @JvmStatic
-    fun execute(
-        program: PouExecutable,
-        skipSimplify: Boolean = false,
-        cycles: Int = 10,
-    ): VisualizeTrace {
+    fun execute(program: PouExecutable, skipSimplify: Boolean = false, cycles: Int = 10): VisualizeTrace {
         val (lineMap, mod) = evaluateProgramWithLineMap(program, skipSimplify)
 
         mod.name = "main"

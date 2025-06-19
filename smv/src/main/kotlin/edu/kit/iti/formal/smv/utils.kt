@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -27,11 +27,15 @@ fun Iterable<SMVExpr>.joinToExpr(operator: SBinaryOperator): SMVExpr = reduce { 
 fun Iterable<SMVExpr>.disjunction(): SMVExpr = joinToExpr(SBinaryOperator.OR)
 fun Iterable<SMVExpr>.conjunction(): SMVExpr = joinToExpr(SBinaryOperator.AND)
 
-fun Collection<SMVExpr>.joinToExpr(operator: SBinaryOperator = SBinaryOperator.AND, default: SMVExpr? = null): SMVExpr = if (size > 0 || default == null) {
-    reduce { a, b -> a.op(operator, b) }
-} else {
-    default
-}
+fun Collection<SMVExpr>.joinToExpr(operator: SBinaryOperator = SBinaryOperator.AND, default: SMVExpr? = null): SMVExpr =
+    if (size >
+        0 ||
+        default == null
+    ) {
+        reduce { a, b -> a.op(operator, b) }
+    } else {
+        default
+    }
 
 fun Collection<SMVExpr>.disjunction(default: SMVExpr): SMVExpr = joinToExpr(SBinaryOperator.OR, default)
 
@@ -42,11 +46,7 @@ fun Collection<SMVExpr>.conjunction(default: SMVExpr): SMVExpr = joinToExpr(SBin
  * @author Alexander Weigl
  * @version 1 (31.07.18)
  */
-open class HistoryModuleBuilder(
-    val name: String = "History",
-    val variables: List<SVariable>,
-    val length: Int,
-) : Runnable {
+open class HistoryModuleBuilder(val name: String = "History", val variables: List<SVariable>, val length: Int) : Runnable {
     val module = SMVModule(name)
     val moduleType = ModuleType(name, variables)
 

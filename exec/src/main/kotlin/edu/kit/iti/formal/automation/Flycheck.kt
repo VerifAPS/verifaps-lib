@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -213,8 +213,31 @@ class FlycheckRunner(
             )
         }
 
-        override fun reportAttemptingFullContext(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, conflictingAlts: BitSet?, configs: ATNConfigSet?) {}
-        override fun reportAmbiguity(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, exact: Boolean, ambigAlts: BitSet?, configs: ATNConfigSet?) {}
-        override fun reportContextSensitivity(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, prediction: Int, configs: ATNConfigSet?) {}
+        override fun reportAttemptingFullContext(
+            recognizer: Parser?,
+            dfa: DFA?,
+            startIndex: Int,
+            stopIndex: Int,
+            conflictingAlts: BitSet?,
+            configs: ATNConfigSet?,
+        ) {
+        }
+        override fun reportAmbiguity(
+            recognizer: Parser?,
+            dfa: DFA?,
+            startIndex: Int,
+            stopIndex: Int,
+            exact: Boolean,
+            ambigAlts: BitSet?,
+            configs: ATNConfigSet?,
+        ) {}
+        override fun reportContextSensitivity(
+            recognizer: Parser?,
+            dfa: DFA?,
+            startIndex: Int,
+            stopIndex: Int,
+            prediction: Int,
+            configs: ATNConfigSet?,
+        ) {}
     }
 }

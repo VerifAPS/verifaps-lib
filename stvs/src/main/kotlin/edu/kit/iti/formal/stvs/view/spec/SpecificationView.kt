@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec
 
 import edu.kit.iti.formal.stvs.model.table.ConstraintSpecification
@@ -25,13 +43,14 @@ import java.util.function.Supplier
  *
  * @author Carsten Csiky
  */
-class SpecificationView : VBox(), Lockable {
+class SpecificationView :
+    VBox(),
+    Lockable {
     private val variablesPane = StackPane()
     private val tablePane = StackPane()
     private val timingDiagramPane = StackPane()
 
-
-    //private final SplitPane splitPane = new SplitPane();
+    // private final SplitPane splitPane = new SplitPane();
     private val buttonBox = HBox(5.0)
 
     val startButton: Button
@@ -62,8 +81,8 @@ class SpecificationView : VBox(), Lockable {
      * Creates an instance.
      */
     init {
-        //splitPane = new SplitPane();
-        //SplitPane.setResizableWithParent(variablesPane,true);
+        // splitPane = new SplitPane();
+        // SplitPane.setResizableWithParent(variablesPane,true);
 
         buttonBox.styleClass.addAll("button-box", "verification-action-buttons", "action-buttons")
         startButton = Button()
@@ -74,17 +93,19 @@ class SpecificationView : VBox(), Lockable {
         buttonBox.children.addAll(startButton, startConcretizerButton)
         buttonBox.alignment = Pos.TOP_RIGHT
 
-        //splitPane.setOrientation(Orientation.VERTICAL);
-        //splitPane.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
-        //splitPane.setDividerPosition(0, 0.25);
-        //splitPane.setDividerPosition(1, 0.5);
-        //getChildren().addAll(splitPane);
+        // splitPane.setOrientation(Orientation.VERTICAL);
+        // splitPane.getItems().addAll(variablesPane, tablePane, timingDiagramPane);
+        // splitPane.setDividerPosition(0, 0.25);
+        // splitPane.setDividerPosition(1, 0.5);
+        // getChildren().addAll(splitPane);
         val scrollPane = ScrollPane(
             VBox(
                 variablesPane,
-                ResizerPane { variableCollection!!.content }, tablePane,
-                ResizerPane { tableView!!.content }, timingDiagramPane
-            )
+                ResizerPane { variableCollection!!.content },
+                tablePane,
+                ResizerPane { tableView!!.content },
+                timingDiagramPane,
+            ),
         )
         children.addAll(scrollPane)
         scrollPane.hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
@@ -148,7 +169,6 @@ class SpecificationView : VBox(), Lockable {
         tablePane.children.setAll(tableView)
     }
 
-
     /**
      * Displays a placeholder in the timing diagram area.
      */
@@ -170,13 +190,12 @@ class SpecificationView : VBox(), Lockable {
         this.diagram = null
         timingDiagramPane.children.setAll(emptyDiagram)
 
-        //timingDiagramPane.getChildren().add(emptyDiagram);
+        // timingDiagramPane.getChildren().add(emptyDiagram);
         AnchorPane.setLeftAnchor(emptyDiagram, 0.0)
         AnchorPane.setRightAnchor(emptyDiagram, 0.0)
         AnchorPane.setTopAnchor(emptyDiagram, 0.0)
         AnchorPane.setBottomAnchor(emptyDiagram, 0.0)
     }
-
 
     override var editable: Boolean
         get() = false
@@ -204,7 +223,7 @@ class SpecificationView : VBox(), Lockable {
             onMouseDragged = EventHandler { event: MouseEvent ->
                 event.consume()
                 val diff = event.screenY - startY
-                //System.out.println("DIFF" + diff + "  " + startHeight + diff);
+                // System.out.println("DIFF" + diff + "  " + startHeight + diff);
                 (nodeSupplier.get() as Region).prefHeight = startHeight + diff
             }
         }

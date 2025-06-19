@@ -252,10 +252,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
     }
 }
 
-class AbstractExpressionEvaluator<T>(
-    val state: AState<T>,
-    val operator: AiLattice<T>,
-) : AstVisitor<T>() {
+class AbstractExpressionEvaluator<T>(val state: AState<T>, val operator: AiLattice<T>) : AstVisitor<T>() {
     override fun defaultVisit(obj: Any): T {
         TODO("${obj.javaClass} is not covered")
     }
@@ -398,7 +395,8 @@ class IntLattice : AiLattice<IntervalSet> {
     private val INTERVAL_TRUE = Interval(1, 1)
     private val INTERVAL_ALL = Interval(0, 1)
 
-    override fun add(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::plus)
+    override fun add(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue, Interval::plus)
 
     fun combine(a: IntervalSet, b: IntervalSet, op: (Interval, Interval) -> Interval): IntervalSet {
         val s = IntervalSet()
@@ -411,15 +409,26 @@ class IntLattice : AiLattice<IntervalSet> {
         return s
     }
 
-    override fun sub(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::minus)
+    override fun sub(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue, Interval::minus)
 
-    override fun div(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::div)
+    override fun div(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue, Interval::div)
 
-    override fun mult(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::times)
+    override fun mult(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue, Interval::times)
 
-    override fun power(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::power)
+    override fun power(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue, Interval::power)
 
-    override fun and(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a and b }
+    override fun and(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combineBoolean(leftValue, rightValue) {
+                a,
+                b,
+            ->
+            a and
+                b
+        }
 
     private fun combineBoolean(left: IntervalSet, right: IntervalSet, f: (Boolean, Boolean) -> Boolean): IntervalSet {
         val s = IntervalSet()
@@ -438,11 +447,28 @@ class IntLattice : AiLattice<IntervalSet> {
         return s
     }
 
-    override fun or(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a or b }
+    override fun or(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combineBoolean(leftValue, rightValue) {
+                a,
+                b,
+            ->
+            a or
+                b
+        }
 
-    override fun xor(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a xor b }
+    override fun xor(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combineBoolean(leftValue, rightValue) {
+                a,
+                b,
+            ->
+            a xor
+                b
+        }
 
-    override fun gt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+    override fun gt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) {
+            l,
+            r,
+        ->
         when {
             l.a > r.b -> INTERVAL_TRUE
             l.b <= r.b -> INTERVAL_FALSE
@@ -450,7 +476,10 @@ class IntLattice : AiLattice<IntervalSet> {
         }
     }
 
-    override fun lt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+    override fun lt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) {
+            l,
+            r,
+        ->
         when {
             l.b < r.a -> INTERVAL_TRUE
             l.a >= r.b -> INTERVAL_FALSE
@@ -458,7 +487,10 @@ class IntLattice : AiLattice<IntervalSet> {
         }
     }
 
-    override fun ge(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+    override fun ge(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) {
+            l,
+            r,
+        ->
         when {
             l.a >= r.b -> INTERVAL_TRUE
             l.b < r.b -> INTERVAL_FALSE
@@ -466,7 +498,10 @@ class IntLattice : AiLattice<IntervalSet> {
         }
     }
 
-    override fun le(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+    override fun le(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) {
+            l,
+            r,
+        ->
         when {
             l.b <= r.a -> INTERVAL_TRUE
             l.a > r.b -> INTERVAL_FALSE
@@ -474,7 +509,10 @@ class IntLattice : AiLattice<IntervalSet> {
         }
     }
 
-    override fun equals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { a, b ->
+    override fun equals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) {
+            a,
+            b,
+        ->
         when {
             a.disjoint(b) -> INTERVAL_FALSE
             a == b -> INTERVAL_TRUE
@@ -482,13 +520,17 @@ class IntLattice : AiLattice<IntervalSet> {
         }
     }
 
-    override fun notEquals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { a, b ->
-        when {
-            a.disjoint(b) -> INTERVAL_TRUE
-            a == b -> INTERVAL_FALSE
-            else -> INTERVAL_ALL
+    override fun notEquals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet =
+        combine(leftValue, rightValue) {
+                a,
+                b,
+            ->
+            when {
+                a.disjoint(b) -> INTERVAL_TRUE
+                a == b -> INTERVAL_FALSE
+                else -> INTERVAL_ALL
+            }
         }
-    }
 
     override fun literal(literal: Literal): IntervalSet {
         val s = emptyElement()

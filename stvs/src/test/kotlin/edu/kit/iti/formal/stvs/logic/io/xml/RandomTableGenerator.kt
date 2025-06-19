@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io.xml
 
 import edu.kit.iti.formal.stvs.logic.io.ExportException
@@ -59,8 +77,8 @@ class RandomTableGenerator {
             constraintSpec.rows.add(
                 randomSpecificationRow(
                     constraintSpec.columnHeaders,
-                    freeVariableList
-                )
+                    freeVariableList,
+                ),
             )
             constraintSpec.durations.add(randomDuration())
         }
@@ -74,14 +92,16 @@ class RandomTableGenerator {
         }
         if (randomInt < 6) {
             val lowerBound = random.nextInt(10)
-            return ConstraintDuration("[" + lowerBound.toString() + "," + (lowerBound + random.nextInt(10)).toString() + "]")
+            return ConstraintDuration(
+                "[" + lowerBound.toString() + "," + (lowerBound + random.nextInt(10)).toString() + "]",
+            )
         }
         return ConstraintDuration("[" + random.nextInt(10).toString() + ",-]")
     }
 
     private fun randomSpecificationRow(
         columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
+        freeVariableList: FreeVariableList,
     ): SpecificationRow<ConstraintCell> {
         val cells = hashMapOf<String, ConstraintCell>()
         for (ioVariable in columnHeaders) {
@@ -98,7 +118,7 @@ class RandomTableGenerator {
     private fun randomConstraintCell(
         ioVariable: SpecIoVariable,
         columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
+        freeVariableList: FreeVariableList,
     ): ConstraintCell {
         val cellString: String
         val randomInt = random.nextInt(10)
@@ -117,25 +137,20 @@ class RandomTableGenerator {
     private fun randomAssignment(
         ioVariable: SpecIoVariable,
         columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
-    ): String {
-        return "=" + randomExpressionOfType(ioVariable, columnHeaders, freeVariableList)
-    }
+        freeVariableList: FreeVariableList,
+    ): String = "=" + randomExpressionOfType(ioVariable, columnHeaders, freeVariableList)
 
     private fun randomExpressionOfType(
-        ioVariable: SpecIoVariable, columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
-    ): String {
-        return when (ioVariable.type) {
-            "INT" -> randomIntegerExpression(columnHeaders, freeVariableList)
-            "BOOL" -> randomBooleanExpression(columnHeaders, freeVariableList)
-            else -> randomEnumExpression(ioVariable)
-        }
+        ioVariable: SpecIoVariable,
+        columnHeaders: List<SpecIoVariable>,
+        freeVariableList: FreeVariableList,
+    ): String = when (ioVariable.type) {
+        "INT" -> randomIntegerExpression(columnHeaders, freeVariableList)
+        "BOOL" -> randomBooleanExpression(columnHeaders, freeVariableList)
+        else -> randomEnumExpression(ioVariable)
     }
 
-    private fun randomEnumExpression(
-        ioVariable: SpecIoVariable
-    ): String {
+    private fun randomEnumExpression(ioVariable: SpecIoVariable): String {
         // Enums can only be compared --> boolean expression
         // So the only expression of enum value is a single enum literal
         var enumType: TypeEnum? = null
@@ -150,7 +165,7 @@ class RandomTableGenerator {
 
     private fun randomIntegerExpression(
         columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
+        freeVariableList: FreeVariableList,
     ): String {
         val randomInt = random.nextInt(10)
         if (randomInt == 1) {
@@ -159,9 +174,11 @@ class RandomTableGenerator {
         }
         if (randomInt < 4) {
             // random binary expression
-            return ("(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
-                    randomIntegerBinaryOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList)
-                    + ")")
+            return (
+                "(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
+                    randomIntegerBinaryOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList) +
+                    ")"
+                )
         }
         if (randomInt < 6) {
             // back reference or variable
@@ -194,13 +211,11 @@ class RandomTableGenerator {
         return random.nextInt(MAX_INT).toString()
     }
 
-    private fun randomIntegerBinaryOp(): String {
-        return INTEGER_BINARY_OPS[random.nextInt(INTEGER_BINARY_OPS.size)]
-    }
+    private fun randomIntegerBinaryOp(): String = INTEGER_BINARY_OPS[random.nextInt(INTEGER_BINARY_OPS.size)]
 
     private fun randomBooleanExpression(
         columnHeaders: List<SpecIoVariable>,
-        freeVariableList: FreeVariableList
+        freeVariableList: FreeVariableList,
     ): String {
         val randomInt = random.nextInt(10)
         if (randomInt == 0) {
@@ -209,14 +224,18 @@ class RandomTableGenerator {
         }
         if (randomInt == 1) {
             // random binary op
-            return ("(" + randomBooleanExpression(columnHeaders, freeVariableList) + " " +
-                    randomBooleanBinaryOp() + " " + randomBooleanExpression(columnHeaders, freeVariableList)
-                    + ")")
+            return (
+                "(" + randomBooleanExpression(columnHeaders, freeVariableList) + " " +
+                    randomBooleanBinaryOp() + " " + randomBooleanExpression(columnHeaders, freeVariableList) +
+                    ")"
+                )
         }
         if (randomInt == 2) {
-            return ("(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
-                    randomComparisonOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList)
-                    + ")")
+            return (
+                "(" + randomIntegerExpression(columnHeaders, freeVariableList) + " " +
+                    randomComparisonOp() + " " + randomIntegerExpression(columnHeaders, freeVariableList) +
+                    ")"
+                )
         }
         if (randomInt == 3) {
             // back reference or variable
@@ -249,13 +268,9 @@ class RandomTableGenerator {
         return if (random.nextBoolean()) "TRUE" else "FALSE"
     }
 
-    private fun randomComparisonOp(): String {
-        return COMPARISON_OPS[random.nextInt(COMPARISON_OPS.size)]
-    }
+    private fun randomComparisonOp(): String = COMPARISON_OPS[random.nextInt(COMPARISON_OPS.size)]
 
-    private fun randomBooleanBinaryOp(): String {
-        return BOOLEAN_BINARY_OPS[random.nextInt(BOOLEAN_BINARY_OPS.size)]
-    }
+    private fun randomBooleanBinaryOp(): String = BOOLEAN_BINARY_OPS[random.nextInt(BOOLEAN_BINARY_OPS.size)]
 
     private fun randomSpecIoVariable(specIoVariables: List<SpecIoVariable>): SpecIoVariable {
         val specIoVariableNames = arrayListOf<String>()
@@ -313,7 +328,7 @@ class RandomTableGenerator {
             }
             val newEnum = enumOfName(
                 nonConflictingName(enumNames),
-                *enumLiterals.toTypedArray()
+                *enumLiterals.toTypedArray(),
             )
             enumTypes.add(newEnum)
             return newEnum
@@ -380,13 +395,15 @@ class RandomTableGenerator {
             val generator = RandomTableGenerator()
             val constraintSpec = generator.randomConstraintSpec(5000, 10, 10)
             ExporterFacade.exportSpec(
-                constraintSpec, ExporterFacade.ExportFormat.XML, File(
+                constraintSpec,
+                ExporterFacade.ExportFormat.XML,
+                File(
                     "/home/bal/Projects/kit/pse/stverificationstudio/src/test" +
-                            "/resources/edu/kit/iti/formal/stvs/logic/io/xml/random" +
-                            "/spec_constraint_random_5000_10_10_1.xml"
-                )
+                        "/resources/edu/kit/iti/formal/stvs/logic/io/xml/random" +
+                        "/spec_constraint_random_5000_10_10_1.xml",
+                ),
             )
-            //System.out.println(baos.toString("utf-8"));
+            // System.out.println(baos.toString("utf-8"));
         }
     }
 }

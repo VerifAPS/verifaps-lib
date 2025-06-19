@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -48,7 +48,11 @@ import java.math.BigInteger
  */
 object MonitorGenerationST : MonitorGeneration {
     override val key: String = "st"
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton, options: MonitorGenerationOptions): Monitor {
+    override fun generate(
+        gtt: GeneralizedTestTable,
+        automaton: TestTableAutomaton,
+        options: MonitorGenerationOptions,
+    ): Monitor {
         val mg = MonitorGenerationSTImpl(gtt, automaton)
         val elements = mg.call()
         return Monitor(body = IEC61131Facade.print(elements, true))
@@ -58,10 +62,7 @@ object MonitorGenerationST : MonitorGeneration {
      * @author Alexander Weigl
      * @version 1 (23.03.17)
      */
-    class MonitorGenerationSTImpl(
-        private val gtt: GeneralizedTestTable,
-        private val automaton: TestTableAutomaton,
-    ) {
+    class MonitorGenerationSTImpl(private val gtt: GeneralizedTestTable, private val automaton: TestTableAutomaton) {
         private val fb = FunctionBlockDeclaration()
         private val stBody = StatementList()
 
@@ -265,7 +266,8 @@ object SMVToStVisitor : SMVAstVisitor<Expression> {
     }
 
     override fun visit(v: SVariable): Expression = SymbolicReference(v.name.removePrefix("code\$"))
-    override fun visit(be: SBinaryExpression): Expression = BinaryExpression(be.left.accept(this), operator(be.operator), be.right.accept(this))
+    override fun visit(be: SBinaryExpression): Expression =
+        BinaryExpression(be.left.accept(this), operator(be.operator), be.right.accept(this))
 
     fun operator(operator: SBinaryOperator): BinaryOperator = when (operator) {
         SBinaryOperator.PLUS -> Operators.ADD

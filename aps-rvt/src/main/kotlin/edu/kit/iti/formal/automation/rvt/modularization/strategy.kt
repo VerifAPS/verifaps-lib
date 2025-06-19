@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -597,7 +597,11 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     fun rewriteInvocation(
         a: Frame,
         abstractedInvocation: List<BlockStatement>,
-    ): Triple<BlockStatement, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
+    ): Triple<
+        BlockStatement,
+        HashMap<BlockStatement, Map<String, String>>,
+        HashMap<BlockStatement, Map<String, String>>,
+        > {
         val new = a.block.clone()
         val scope = a.scope.copy()
 
@@ -716,8 +720,7 @@ private class SmvReveBuilder(
     }
 }
 
-private class InvocationRewriter(val prefix: String, val scope: Scope, val toBeReplaced: BlockStatement) :
-    AstMutableVisitor() {
+private class InvocationRewriter(val prefix: String, val scope: Scope, val toBeReplaced: BlockStatement) : AstMutableVisitor() {
 
     val inputs = hashMapOf<String, String>()
     val outputs = hashMapOf<String, String>()

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.code
 
 import com.google.common.truth.Truth
@@ -68,7 +86,7 @@ class CodeTest {
     @Test
     fun testParsedCodeIOVariableExtraction() {
         val parsed = enumDefinition.parsedCode!!
-        //Assertions.assertEquals(7, parsed.definedVariables.size.toLong(), "Find all defined IOVariables")
+        // Assertions.assertEquals(7, parsed.definedVariables.size.toLong(), "Find all defined IOVariables")
 
         val myEnum: Type = TypeEnum("MY_ENUM", mutableListOf("possible", "values", "enum"))
         val expectedVariables = setOf(
@@ -78,13 +96,13 @@ class CodeTest {
             CodeIoVariable(VariableCategory.OUTPUT, myEnum.typeName, "my_output"),
             CodeIoVariable(VariableCategory.OUTPUT, "BOOL", "seriously"),
             CodeIoVariable(VariableCategory.LOCAL, myEnum.typeName, "my_enum_local"),
-            CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout")
+            CodeIoVariable(VariableCategory.INOUT, "BOOL", "active_inout"),
         )
         Truth.assertThat(parsed.definedVariables.toSet()).isEqualTo(expectedVariables)
     }
 
     @Test
-    @Disabled //TODO later check
+    @Disabled // TODO later check
     fun testParsedCodeBlocks() {
         val expectedBlock = FoldableCodeBlock(5, 27)
         val pcode = enumDefinition.parsedCode!!
@@ -112,7 +130,7 @@ class CodeTest {
         Assertions.assertEquals(enumDefinition.hashCode().toLong(), enumDefinition.hashCode().toLong())
         Assertions.assertEquals(
             loadCodeFromFile("define_type.st").hashCode().toLong(),
-            enumDefinition.hashCode().toLong()
+            enumDefinition.hashCode().toLong(),
         )
         Assertions.assertNotEquals(invalidCode.hashCode().toLong(), enumDefinition.hashCode().toLong())
     }

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -72,7 +72,14 @@ fun Column.item(
     return item
 }
 
-private fun buildItem(ikon: String?, ikof: Ikon?, graphic: Node? = null, key: String?, name: String, event: () -> Unit): Button {
+private fun buildItem(
+    ikon: String?,
+    ikof: Ikon?,
+    graphic: Node? = null,
+    key: String?,
+    name: String,
+    event: () -> Unit,
+): Button {
     val icon = ikon?.let { ref ->
         FontIcon(ref)
     } ?: ikof?.let { FontIcon(ikof) } ?: graphic

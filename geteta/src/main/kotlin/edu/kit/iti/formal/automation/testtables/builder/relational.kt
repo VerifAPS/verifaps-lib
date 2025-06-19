@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -102,8 +102,9 @@ object BackwardToAssumption : AbstractTransformer<SMVConstructionModel>() {
 
                 if (isJumpTarget && !tableRow.duration.isOneStep) {
                     fail(
-                        "The table row `${tableRow.id}? in table `${model.testTable.name}` is addressed by a backward-jump, " +
-                            "but does not have the required of duration [1,1]. Please split up the row manually. ",
+                        "The table row `${tableRow.id}? in table `${model.testTable.name}` " +
+                            "is addressed by a backward-jump, but does not have the required of duration [1,1]. " +
+                            "Please split up the row manually. ",
                     )
                 }
             }

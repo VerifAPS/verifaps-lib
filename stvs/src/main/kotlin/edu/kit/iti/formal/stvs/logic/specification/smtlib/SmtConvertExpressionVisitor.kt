@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
 import edu.kit.iti.formal.smt.*
@@ -12,8 +30,10 @@ import kotlin.math.max
  * @author Carsten Csiky
  */
 class SmtConvertExpressionVisitor(
-    private val smtEncoder: SmtEncoder, private val row: Int, private val iteration: Int,
-    private val column: ValidIoVariable
+    private val smtEncoder: SmtEncoder,
+    private val row: Int,
+    private val iteration: Int,
+    private val column: ValidIoVariable,
 ) : ExpressionVisitor<SExpr> {
     val constraint: SmtModel
 
@@ -30,7 +50,7 @@ class SmtConvertExpressionVisitor(
         val name = sym("|${column.name}_${row}_$iteration|")
 
         this.constraint = SmtModel().addHeaderDefinition(
-            SList("declare-const", name, SmtEncoder.getSmtLibVariableTypeName(column.validType))
+            SList("declare-const", name, SmtEncoder.getSmtLibVariableTypeName(column.validType)),
         )
 
         // Constraint enum bitvectors to their valid range
@@ -49,10 +69,9 @@ class SmtConvertExpressionVisitor(
     private fun addEnumBitvectorConstraints(name: SSymbol, enumeration: TypeEnum?) {
         constraint.addGlobalConstraint(SList("bvsge", name, hexFromInt(0, 4)))
         constraint.addGlobalConstraint(
-            SList("bvslt", name, hexFromInt(enumeration!!.values.size, 4))
+            SList("bvslt", name, hexFromInt(enumeration!!.values.size, 4)),
         )
     }
-
 
     override fun visitBinaryFunction(binary: BinaryFunctionExpr): SExpr {
         val left = binary.firstArgument.accept(this)
@@ -63,7 +82,7 @@ class SmtConvertExpressionVisitor(
             else -> {
                 val name = smtlibBinOperationNames[binary.operation]
                     ?: throw IllegalArgumentException(
-                        "Operation " + binary.operation + " is " + "not supported"
+                        "Operation " + binary.operation + " is " + "not supported",
                     )
                 return SList(name, left, right)
             }
@@ -77,35 +96,35 @@ class SmtConvertExpressionVisitor(
                 return SList("-", SNumber(0), argument)
             } else {
                 throw IllegalArgumentException(
-                    "Operation " + unary.operation + "is " + "not supported"
+                    "Operation " + unary.operation + "is " + "not supported",
                 )
             }
 
         return SList(name, argument)
     }
 
-    override fun visitLiteral(literal: LiteralExpr): SExpr {
-        return literal.value.match(
-            { hexFromInt(it, 4) },
-            { sym(if (it) "true" else "false") },
-            { getEnumValueAsBitvector(it) })
-
-    }
+    override fun visitLiteral(literal: LiteralExpr): SExpr = literal.value.match(
+        { hexFromInt(it, 4) },
+        { sym(if (it) "true" else "false") },
+        { getEnumValueAsBitvector(it) },
+    )
 
     private fun getEnumValueAsBitvector(enumeration: ValueEnum) =
         hexFromInt(enumeration.type.values.indexOf(enumeration), 4)
 
     /*
-   * private String integerLiteralAsBitVector(int integer, int length){
-   * 
-   * }
-   */
+     * private String integerLiteralAsBitVector(int integer, int length){
+     *
+     * }
+     */
     override fun visitVariable(expr: VariableExpr): SExpr {
         val variableName = expr.variableName
         val variableReferenceIndex = expr.index ?: 0
 
         // Check if variable is in getTypeForVariable
-        checkNotNull(smtEncoder.getTypeForVariable(variableName)) { "Wrong Context: No variable of name '$variableName' in getTypeForVariable" }
+        checkNotNull(smtEncoder.getTypeForVariable(variableName)) {
+            "Wrong Context: No variable of name '$variableName' in getTypeForVariable"
+        }
 
         // is an IOVariable?
         if (smtEncoder.isIoVariable(variableName)) {
@@ -116,9 +135,10 @@ class SmtConvertExpressionVisitor(
             if (variableReferenceIndex < 0) {
                 constraint.addGlobalConstraint( // sum(z-1) >= max(0, alpha - i)
                     SList(
-                        "bvuge", sumRowIterations(row - 1),
-                        hexFromInt(max(0.0, -(iteration + variableReferenceIndex).toDouble()).toInt(), 4)
-                    )
+                        "bvuge",
+                        sumRowIterations(row - 1),
+                        hexFromInt(max(0.0, -(iteration + variableReferenceIndex).toDouble()).toInt(), 4),
+                    ),
                 )
             }
 
@@ -150,7 +170,7 @@ class SmtConvertExpressionVisitor(
         // static maps
         private val smtlibUnaryOperationNames = mapOf(
             UnaryFunctionExpr.Op.NOT to "not",
-            UnaryFunctionExpr.Op.UNARY_MINUS to "bvneg"
+            UnaryFunctionExpr.Op.UNARY_MINUS to "bvneg",
         )
         private val smtlibBinOperationNames = mapOf(
             BinaryFunctionExpr.Op.AND to "and",
@@ -165,7 +185,7 @@ class SmtConvertExpressionVisitor(
             BinaryFunctionExpr.Op.GREATER_THAN to "bvsgt",
             BinaryFunctionExpr.Op.MINUS to "bvsub",
             BinaryFunctionExpr.Op.PLUS to "bvadd",
-            BinaryFunctionExpr.Op.MODULO to "bvsmod"
+            BinaryFunctionExpr.Op.MODULO to "bvsmod",
         )
     }
 }

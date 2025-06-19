@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -25,9 +25,10 @@ import edu.kit.iti.formal.automation.testtables.model.Duration
  */
 class ConcreteTableOptions(val properties: MutableMap<String, String>) {
 
-    fun getCount(step: String, defaultValue: Duration): Int = properties["cycles.$step"]?.toInt() ?: when (defaultValue) {
-        is Duration.Omega -> 10
-        is Duration.OpenInterval -> defaultValue.lower
-        is Duration.ClosedInterval -> (defaultValue.lower + defaultValue.upper) / 2
-    }
+    fun getCount(step: String, defaultValue: Duration): Int =
+        properties["cycles.$step"]?.toInt() ?: when (defaultValue) {
+            is Duration.Omega -> 10
+            is Duration.OpenInterval -> defaultValue.lower
+            is Duration.ClosedInterval -> (defaultValue.lower + defaultValue.upper) / 2
+        }
 }

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
 import com.google.common.truth.Truth
@@ -25,7 +43,7 @@ class SmtModelTest {
             .replace(")", "\\)") + "\\s?"
         Assertions.assertTrue(
             Pattern.matches(escapedPattern, string),
-            "Tried to match <<$string>> with $escapedPattern"
+            "Tried to match <<$string>> with $escapedPattern",
         )
     }
 
@@ -33,11 +51,11 @@ class SmtModelTest {
     fun setup() {
         this.simple = fromString(
             "a bb ccc",
-            "d ee fff"
+            "d ee fff",
         )
         this.other = fromString(
             "l o s",
-            "ggg (1 2 3 h) i"
+            "ggg (1 2 3 h) i",
         )
     }
 
@@ -47,8 +65,9 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc l o s",
-                "d ee fff ggg (1 2 3 h) i"
-            ), simple
+                "d ee fff ggg (1 2 3 h) i",
+            ),
+            simple,
         )
     }
 
@@ -78,15 +97,17 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc",
-                "d ee fff new new2"
-            ), simple
+                "d ee fff new new2",
+            ),
+            simple,
         )
         other.addGlobalConstraint(SList("newA", sexpr("newB", "newC")))
         Assertions.assertEquals(
             fromString(
                 "l o s",
-                "ggg (1 2 3 h) i (newA (newB newC))"
-            ), other
+                "ggg (1 2 3 h) i (newA (newB newC))",
+            ),
+            other,
         )
     }
 
@@ -97,15 +118,17 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc",
-                "d ee fff (new new2)"
-            ), simple
+                "d ee fff (new new2)",
+            ),
+            simple,
         )
         other.addGlobalConstraint(sexpr(SList("newA", sexpr("newB", "newC"))))
         Assertions.assertEquals(
             fromString(
                 "l o s",
-                "ggg (1 2 3 h) i (newA (newB newC))"
-            ), other
+                "ggg (1 2 3 h) i (newA (newB newC))",
+            ),
+            other,
         )
     }
 
@@ -117,15 +140,17 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc new new2",
-                "d ee fff"
-            ), simple
+                "d ee fff",
+            ),
+            simple,
         )
         other.addHeaderDefinition(sexpr("newA", sexpr("newB", "newC")))
         Assertions.assertEquals(
             fromString(
                 "l o s (newA (newB newC))",
-                "ggg (1 2 3 h) i"
-            ), other
+                "ggg (1 2 3 h) i",
+            ),
+            other,
         )
     }
 
@@ -136,15 +161,17 @@ class SmtModelTest {
         Assertions.assertEquals(
             fromString(
                 "a bb ccc (new new2)",
-                "d ee fff"
-            ), simple
+                "d ee fff",
+            ),
+            simple,
         )
         other.addHeaderDefinition(sexpr(SList("newA", sexpr("newB", "newC"))))
         Assertions.assertEquals(
             fromString(
                 "l o s (newA (newB newC))",
-                "ggg (1 2 3 h) i"
-            ), other
+                "ggg (1 2 3 h) i",
+            ),
+            other,
         )
     }
 
@@ -154,8 +181,9 @@ class SmtModelTest {
             listOf(
                 sym("d"),
                 sym("ee"),
-                sym("fff")
-            ), simple.globalConstraints
+                sym("fff"),
+            ),
+            simple.globalConstraints,
         )
     }
 
@@ -165,8 +193,9 @@ class SmtModelTest {
             listOf(
                 sym("a"),
                 sym("bb"),
-                sym("ccc")
-            ), simple.variableDefinitions
+                sym("ccc"),
+            ),
+            simple.variableDefinitions,
         )
     }
 
@@ -181,11 +210,11 @@ class SmtModelTest {
     fun equals() {
         val simpleCompare = fromString(
             "a bb ccc",
-            "d ee fff"
+            "d ee fff",
         )
         val otherCompare = fromString(
             "l o s",
-            "ggg (1 2 3 h) i"
+            "ggg (1 2 3 h) i",
         )
         Assertions.assertEquals(simpleCompare, simple)
         Assertions.assertEquals(otherCompare, other)
@@ -202,16 +231,15 @@ class SmtModelTest {
     fun testHashCode() {
         val simpleCompare = fromString(
             "a bb ccc",
-            "d ee fff"
+            "d ee fff",
         )
         val otherCompare = fromString(
             "l o s",
-            "ggg (1 2 3 h) i"
+            "ggg (1 2 3 h) i",
         )
         Assertions.assertEquals(simpleCompare.hashCode().toLong(), simple.hashCode().toLong())
         Assertions.assertEquals(otherCompare.hashCode().toLong(), other.hashCode().toLong())
     }
-
 
     @Test
     fun testEmptyConstructor() {

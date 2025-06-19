@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -50,7 +50,13 @@ object IECXMLFacade {
     fun extractPLCOpenXml(filename: Path) = extractPLCOpenXml(filename.toUri().toURL())
 
     val SFC_KEYWORDS = setOf("step", "end_step", "transition", "end_transition")
-    fun quoteVariable(name: String): String = if (name.lowercase(Locale.getDefault()) in SFC_KEYWORDS) "`$name`" else name
+    fun quoteVariable(name: String): String = if (name.lowercase(Locale.getDefault()) in
+        SFC_KEYWORDS
+    ) {
+        "`$name`"
+    } else {
+        name
+    }
 
     fun quoteStBody(body: String): String = body.replace("\\b\\w+\\b".toRegex()) {
         quoteVariable(it.value)

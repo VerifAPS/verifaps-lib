@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -41,8 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Alexander Weigl
  * @version 1 (21.02.19)
  */
-class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope, val state: SymbolicState = SymbolicState()) :
-    Callable<SymbolicState> {
+class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope, val state: SymbolicState = SymbolicState()) : Callable<SymbolicState> {
     private val context = IlSymbexContext(scope)
 
     fun initState() {

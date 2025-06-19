@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -36,11 +36,7 @@ import java.io.IOException
  * @author Alexander Weigl
  * @version 1 (07.03.18)
  */
-class AutomatonDrawer(
-    val outputFile: File,
-    val regions: List<Region>,
-    val automata: TestTableAutomaton,
-) : Runnable {
+class AutomatonDrawer(val outputFile: File, val regions: List<Region>, val automata: TestTableAutomaton) : Runnable {
 
     var runDot: Boolean = false
 

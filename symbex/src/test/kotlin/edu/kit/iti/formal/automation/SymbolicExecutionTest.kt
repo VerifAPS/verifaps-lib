@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -231,37 +231,55 @@ class SymbolicExecutionTest {
             containsEntry("a$00020", "a$00000")
             containsEntry("a$00028", "case\n    b$00001 = 0sd16_0 : a$00020; \n    TRUE : a$00000; \nesac")
             containsEntry("a$00035", "case\n    a$00000 = 0sd16_0 : a$00028; \n    TRUE : a$00000; \nesac")
-            containsEntry("a$00042", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : a$00000; \n    a$00000 = 0sd16_3 : a$00011; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : a$00000; \n    TRUE : a$00035; \nesac")
+            containsEntry(
+                "a$00042",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : a$00000; \n    a$00000 = 0sd16_3 : a$00011; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : a$00000; \n    TRUE : a$00035; \nesac",
+            )
             containsEntry("b$00001", "b")
             containsEntry("b$00012", "b$00001")
             containsEntry("b$00021", "b$00001")
             containsEntry("b$00029", "case\n    b$00001 = 0sd16_0 : b$00021; \n    TRUE : b$00001; \nesac")
             containsEntry("b$00036", "case\n    a$00000 = 0sd16_0 : b$00029; \n    TRUE : b$00001; \nesac")
-            containsEntry("b$00043", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : b$00001; \n    a$00000 = 0sd16_3 : b$00012; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : b$00001; \n    TRUE : b$00036; \nesac")
+            containsEntry(
+                "b$00043",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : b$00001; \n    a$00000 = 0sd16_3 : b$00012; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : b$00001; \n    TRUE : b$00036; \nesac",
+            )
             containsEntry("c$00002", "c")
             containsEntry("c$00013", "c$00002")
             containsEntry("c$00022", "c$00002")
             containsEntry("c$00030", "case\n    b$00001 = 0sd16_0 : c$00022; \n    TRUE : c$00002; \nesac")
             containsEntry("c$00037", "case\n    a$00000 = 0sd16_0 : c$00030; \n    TRUE : c$00002; \nesac")
-            containsEntry("c$00044", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : c$00002; \n    a$00000 = 0sd16_3 : c$00013; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : c$00002; \n    TRUE : c$00037; \nesac")
+            containsEntry(
+                "c$00044",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : c$00002; \n    a$00000 = 0sd16_3 : c$00013; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : c$00002; \n    TRUE : c$00037; \nesac",
+            )
             containsEntry("d$00003", "d")
             containsEntry("d$00014", "d$00003")
             containsEntry("d$00023", "d$00003")
             containsEntry("d$00031", "case\n    b$00001 = 0sd16_0 : d$00023; \n    TRUE : d$00003; \nesac")
             containsEntry("d$00038", "case\n    a$00000 = 0sd16_0 : d$00031; \n    TRUE : d$00003; \nesac")
-            containsEntry("d$00045", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : d$00003; \n    a$00000 = 0sd16_3 : d$00014; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : d$00003; \n    TRUE : d$00038; \nesac")
+            containsEntry(
+                "d$00045",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : d$00003; \n    a$00000 = 0sd16_3 : d$00014; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : d$00003; \n    TRUE : d$00038; \nesac",
+            )
             containsEntry("e$00004", "e")
             containsEntry("e$00015", "e$00004")
             containsEntry("e$00024", "e$00004")
             containsEntry("e$00032", "case\n    b$00001 = 0sd16_0 : e$00024; \n    TRUE : e$00004; \nesac")
             containsEntry("e$00039", "case\n    a$00000 = 0sd16_0 : e$00032; \n    TRUE : e$00004; \nesac")
-            containsEntry("e$00046", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : e$00004; \n    a$00000 = 0sd16_3 : e$00015; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : e$00004; \n    TRUE : e$00039; \nesac")
+            containsEntry(
+                "e$00046",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : e$00004; \n    a$00000 = 0sd16_3 : e$00015; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : e$00004; \n    TRUE : e$00039; \nesac",
+            )
             containsEntry("f$00005", "f")
             containsEntry("f$00016", "f$00005")
             containsEntry("f$00025", "f$00005")
             containsEntry("f$00033", "case\n    b$00001 = 0sd16_0 : f$00025; \n    TRUE : f$00005; \nesac")
             containsEntry("f$00040", "case\n    a$00000 = 0sd16_0 : f$00033; \n    TRUE : f$00005; \nesac")
-            containsEntry("f$00047", "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : f$00005; \n    a$00000 = 0sd16_3 : f$00016; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : f$00005; \n    TRUE : f$00040; \nesac")
+            containsEntry(
+                "f$00047",
+                "case\n    a$00000 = 0sd16_1 | a$00000 = 0sd16_2 : f$00005; \n    a$00000 = 0sd16_3 : f$00016; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : f$00005; \n    TRUE : f$00040; \nesac",
+            )
             containsEntry("o$00006", "o")
             containsEntry("o$00007", "0sd16_1")
             containsEntry("o$00008", "0sd16_2")
@@ -274,7 +292,10 @@ class SymbolicExecutionTest {
             containsEntry("o$00026", "case\n    c$00002 = 0sd16_0 : o$00019; \n    TRUE : o$00006; \nesac")
             containsEntry("o$00034", "case\n    b$00001 = 0sd16_0 : o$00026; \n    TRUE : o$00027; \nesac")
             containsEntry("o$00041", "case\n    a$00000 = 0sd16_0 : o$00034; \n    TRUE : o$00006; \nesac")
-            containsEntry("o$00048", "case\n    a$00000 = 0sd16_1 : o$00007; \n    a$00000 = 0sd16_2 : o$00008; \n    a$00000 = 0sd16_3 : o$00017; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : o$00018; \n    TRUE : o$00041; \nesac")
+            containsEntry(
+                "o$00048",
+                "case\n    a$00000 = 0sd16_1 : o$00007; \n    a$00000 = 0sd16_2 : o$00008; \n    a$00000 = 0sd16_3 : o$00017; \n    a$00000 = 0sd16_4 | a$00000 = 0sd16_5 | a$00000 = 0sd16_6 : o$00018; \n    TRUE : o$00041; \nesac",
+            )
         }
         assertThat(states).run {
             containsEntry("a", "a$00042")

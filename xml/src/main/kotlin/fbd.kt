@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -281,9 +281,10 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
             }
         }
 
-        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String = fbd.findOutputForInput(inputSlots.first())?.let { (n, s) ->
-            n.getOutputValue(fbd, s)
-        } ?: "/*error?*/"
+        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String =
+            fbd.findOutputForInput(inputSlots.first())?.let { (n, s) ->
+                n.getOutputValue(fbd, s)
+            } ?: "/*error?*/"
     }
 
     data class Variable(val ref: String?, val store: Boolean = false, val read: Boolean = false) : FbdNode() {

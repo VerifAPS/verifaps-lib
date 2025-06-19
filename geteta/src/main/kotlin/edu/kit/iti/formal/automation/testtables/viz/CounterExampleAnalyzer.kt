@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -40,11 +40,7 @@ data class Mapping(private val state2Row: MutableList<Pair<Int, String>> = array
     fun state(row: String) = state2Row.find { (_, r) -> row == r }?.first
 }
 
-private data class SearchNode(
-    val cycle: Int,
-    val state: AutomatonState,
-    val parent: SearchNode? = null,
-) {
+private data class SearchNode(val cycle: Int, val state: AutomatonState, val parent: SearchNode? = null) {
 
     fun jumpTo(to: AutomatonState): SearchNode = SearchNode(cycle + 1, to, this)
 

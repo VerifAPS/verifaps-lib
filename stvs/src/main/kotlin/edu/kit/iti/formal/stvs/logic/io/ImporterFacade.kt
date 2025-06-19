@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.io
 
 import edu.kit.iti.formal.stvs.logic.io.xml.*
@@ -34,9 +52,7 @@ object ImporterFacade {
      * @throws ImportException if an error occurred during importing
      */
     @Throws(ImportException::class)
-    fun importConstraintSpec(input: InputStream): ConstraintSpecification {
-        return XmlConstraintSpecImporter().doImport(input)
-    }
+    fun importConstraintSpec(input: InputStream): ConstraintSpecification = XmlConstraintSpecImporter().doImport(input)
 
     /**
      * Imports a [ConstraintSpecification] from a file.
@@ -63,9 +79,8 @@ object ImporterFacade {
      * @throws ImportException if an error occurred during importing
      */
     @Throws(ImportException::class)
-    fun importConcreteSpec(input: InputStream, typeContext: List<Type>): ConcreteSpecification {
-        return XmlConcreteSpecImporter(typeContext).doImport(input)
-    }
+    fun importConcreteSpec(input: InputStream, typeContext: List<Type>): ConcreteSpecification =
+        XmlConcreteSpecImporter(typeContext).doImport(input)
 
     /**
      * Imports a [ConcreteSpecification] from a file.
@@ -121,9 +136,7 @@ object ImporterFacade {
      * @throws ImportException exception during importing
      */
     @Throws(ImportException::class)
-    fun importConfig(input: InputStream): GlobalConfig {
-        return XmlConfigImporter().doImport(input)
-    }
+    fun importConfig(input: InputStream): GlobalConfig = XmlConfigImporter().doImport(input)
 
     /**
      * Imports a [GlobalConfig] from a file.
@@ -134,8 +147,7 @@ object ImporterFacade {
      * @throws ImportException if an error occured while importing.
      */
     @Throws(FileNotFoundException::class, ImportException::class)
-    fun importConfig(file: File): GlobalConfig =
-        file.inputStream().use { importConfig(it) }
+    fun importConfig(file: File): GlobalConfig = file.inputStream().use { importConfig(it) }
 
     /**
      * Imports a [VerificationResult] from an [InputStream] using the specified
@@ -149,11 +161,10 @@ object ImporterFacade {
      */
     @Throws(ImportException::class)
     fun importVerificationResult(
-        input: InputStream, typeContext: List<Type>,
-        constraintSpec: ConstraintSpecification
-    ): VerificationResult {
-        return GeTeTaImporter(typeContext, constraintSpec).doImport(input)
-    }
+        input: InputStream,
+        typeContext: List<Type>,
+        constraintSpec: ConstraintSpecification,
+    ): VerificationResult = GeTeTaImporter(typeContext, constraintSpec).doImport(input)
 
     /**
      * Imports a [StvsRootModel] from an [InputStream] using the specified
@@ -166,12 +177,8 @@ object ImporterFacade {
      * @throws ImportException exception during importing
      */
     @Throws(ImportException::class)
-    fun importSession(
-        input: InputStream, currentConfig: GlobalConfig,
-        currentHistory: History
-    ): StvsRootModel {
-        return XmlSessionImporter(currentConfig, currentHistory).doImport(input)
-    }
+    fun importSession(input: InputStream, currentConfig: GlobalConfig, currentHistory: History): StvsRootModel =
+        XmlSessionImporter(currentConfig, currentHistory).doImport(input)
 
     /**
      * Imports a [StvsRootModel] from a file.
@@ -184,12 +191,8 @@ object ImporterFacade {
      * @throws ImportException if an error occured while importing
      */
     @Throws(IOException::class, ImportException::class)
-    fun importSession(
-        file: File, currentConfig: GlobalConfig,
-        currentHistory: History
-    ): StvsRootModel {
-        return importSession(FileInputStream(file), currentConfig, currentHistory)
-    }
+    fun importSession(file: File, currentConfig: GlobalConfig, currentHistory: History): StvsRootModel =
+        importSession(FileInputStream(file), currentConfig, currentHistory)
 
     /**
      * Imports a [Code] from a file.
@@ -202,7 +205,7 @@ object ImporterFacade {
     fun importStCode(chosenFile: File): Code {
         val plaintext = String(
             Files.readAllBytes(Paths.get(chosenFile.absolutePath)),
-            charset("utf-8")
+            charset("utf-8"),
         )
         return Code(chosenFile.absolutePath, plaintext)
     }
@@ -240,10 +243,12 @@ object ImporterFacade {
      */
     @Throws(IOException::class, ImportException::class)
     fun importFile(
-        file: File, globalConfig: GlobalConfig, currentHistory: History,
+        file: File,
+        globalConfig: GlobalConfig,
+        currentHistory: History,
         importHybridSpecificationHandler: ImportHybridSpecificationHandler,
         importStvsRootModelHandler: ImportStvsRootModelHandler,
-        codeConsumer: ImportCodeHandler
+        codeConsumer: ImportCodeHandler,
     ) {
         val inputString = file.bufferedReader().readText()
         val dbf = DocumentBuilderFactory.newInstance()
@@ -279,6 +284,7 @@ object ImporterFacade {
     }
 
     enum class ImportFormat {
-        XML, GETETA
+        XML,
+        GETETA,
     }
 }

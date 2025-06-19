@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import javafx.beans.Observable
@@ -23,9 +41,10 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
             arrayOf(
                 hybridCell.stringRepresentationProperty,
                 hybridCell.commentProperty,
-                hybridCell.counterExamplesProperty
+                hybridCell.counterExamplesProperty,
             )
-        }) {
+        },
+    ) {
     val duration = HybridCell(duration)
 
     /**
@@ -43,9 +62,7 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
         commentProperty.bindBidirectional(sourceRow.commentProperty)
     }
 
-    private fun onSourceCellsChange(
-        change: MapChangeListener.Change<out String?, out ConstraintCell>
-    ) {
+    private fun onSourceCellsChange(change: MapChangeListener.Change<out String?, out ConstraintCell>) {
         if (change.wasAdded()) {
             cells[change.key] = HybridCell(change.valueAdded)
         }
@@ -62,9 +79,7 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
      * @param rowIndex the constraint row to look for cells
      * @param counterExample the concrete specification to look for counterexample values
      */
-    fun updateCounterExampleCells(
-        rowIndex: Int, counterExample: ConcreteSpecification?
-    ) {
+    fun updateCounterExampleCells(rowIndex: Int, counterExample: ConcreteSpecification?) {
         if (counterExample != null) {
             for ((key, value) in cells) {
                 value!!.counterExamplesProperty
@@ -79,12 +94,12 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
     }
 
     private fun createCounterExampleCells(
-        columnId: String, rowIndex: Int, counterExample: ConcreteSpecification
-    ): List<String?> {
-        return counterExample.getConcreteValuesForConstraintCell(columnId, rowIndex).stream()
-            .map { cell: ConcreteCell? -> cell!!.value.valueString }
-            .collect(Collectors.toList())
-    }
+        columnId: String,
+        rowIndex: Int,
+        counterExample: ConcreteSpecification,
+    ): List<String?> = counterExample.getConcreteValuesForConstraintCell(columnId, rowIndex).stream()
+        .map { cell: ConcreteCell? -> cell!!.value.valueString }
+        .collect(Collectors.toList())
 
     override fun hashCode(): Int {
         var result = super.hashCode()
@@ -106,8 +121,11 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
 
         val hybridRow = o as HybridRow
 
-        if (if (duration != null) duration != hybridRow.duration
-            else hybridRow.duration != null
+        if (if (duration != null) {
+                duration != hybridRow.duration
+            } else {
+                hybridRow.duration != null
+            }
         ) {
             return false
         }
@@ -116,7 +134,7 @@ class HybridRow(val sourceRow: SpecificationRow<ConstraintCell>, duration: Const
 
     companion object {
         private fun createCellsFromRow(
-            subscribingRow: SpecificationRow<ConstraintCell>
+            subscribingRow: SpecificationRow<ConstraintCell>,
         ): Map<String, HybridCell<ConstraintCell>> {
             val cells = hashMapOf<String, HybridCell<ConstraintCell>>()
             for ((key, value) in subscribingRow.cells) {

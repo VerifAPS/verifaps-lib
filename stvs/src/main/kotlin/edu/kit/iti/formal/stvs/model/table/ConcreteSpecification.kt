@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import edu.kit.iti.formal.stvs.model.common.ValidIoVariable
@@ -20,11 +38,12 @@ class ConcreteSpecification(
     ioVariables: MutableList<ValidIoVariable>,
     rows: MutableList<SpecificationRow<ConcreteCell>>,
     durations: MutableList<ConcreteDuration>,
-    val isCounterExample: Boolean
+    val isCounterExample: Boolean,
 ) : SpecificationTable<ValidIoVariable, ConcreteCell, ConcreteDuration>(
     name,
     Callback<ValidIoVariable, Array<Observable>> { p: ValidIoVariable? -> arrayOf() },
-    Callback<ConcreteDuration, Array<Observable>> { p: ConcreteDuration? -> arrayOf() }) {
+    Callback<ConcreteDuration, Array<Observable>> { p: ConcreteDuration? -> arrayOf() },
+) {
     /**
      * Construct a new ConcreteSpecification with no rows or columns.
      *
@@ -34,7 +53,7 @@ class ConcreteSpecification(
         ArrayList<ValidIoVariable>(),
         ArrayList<SpecificationRow<ConcreteCell>>(),
         ArrayList<ConcreteDuration>(),
-        isCounterExample
+        isCounterExample,
     )
 
     /**
@@ -49,14 +68,15 @@ class ConcreteSpecification(
      */
     constructor(
         ioVariables: List<ValidIoVariable>,
-        rows: List<SpecificationRow<ConcreteCell>>, durations: List<ConcreteDuration>,
-        isCounterExample: Boolean
+        rows: List<SpecificationRow<ConcreteCell>>,
+        durations: List<ConcreteDuration>,
+        isCounterExample: Boolean,
     ) : this(
         DEFAULT_NAME,
         ioVariables.toMutableList(),
         rows.toMutableList(),
         durations.toMutableList(),
-        isCounterExample
+        isCounterExample,
     )
 
     /**
@@ -156,10 +176,8 @@ class ConcreteSpecification(
         return result
     }
 
-
     companion object {
-        private fun isCycleInDuration(cycle: Int, duration: ConcreteDuration): Boolean {
-            return duration.beginCycle <= cycle && duration.endCycle > cycle
-        }
+        private fun isCycleInDuration(cycle: Int, duration: ConcreteDuration): Boolean =
+            duration.beginCycle <= cycle && duration.endCycle > cycle
     }
 }

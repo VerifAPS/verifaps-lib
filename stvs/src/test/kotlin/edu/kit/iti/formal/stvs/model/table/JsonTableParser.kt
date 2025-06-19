@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.table
 
 import com.google.gson.GsonBuilder
@@ -16,7 +34,6 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.stream.Collectors
 
-
 /**
  * Created by Philipp on 04.02.2017.
  */
@@ -29,9 +46,8 @@ object JsonTableParser {
 
     inline fun <reified T> jsonFromResource(resource: String) = jsonFromResource(resource, T::class.java)
 
-    fun jsonFromResource(resource: String, clazz: Class<*>): JsonElement {
-        return GSON.fromJson(readResource(resource, clazz), JsonElement::class.java)
-    }
+    fun jsonFromResource(resource: String, clazz: Class<*>): JsonElement =
+        GSON.fromJson(readResource(resource, clazz), JsonElement::class.java)
 
     private fun readResource(resource: String, clazz: Class<*>): String =
         InputStreamReader(clazz.getResourceAsStream(resource)!!).readText()
@@ -49,8 +65,11 @@ object JsonTableParser {
         return ioVars.codeiovars.map { CodeIoVariable(VariableCategory.valueOf(it.kind), it.type, it.name) }
     }
 
-    fun concreteTableFromJson(types: List<Type>?, isCounterExample: Boolean, element: JsonElement)
-            : ConcreteSpecification {
+    fun concreteTableFromJson(
+        types: List<Type>?,
+        isCounterExample: Boolean,
+        element: JsonElement,
+    ): ConcreteSpecification {
         val parsedTable: SpecificationTable<SpecIoVariable, String, String> = specificationTableFromJson(element)
 
         val concreteSpec = ConcreteSpecification(isCounterExample)
@@ -67,7 +86,7 @@ object JsonTableParser {
                 val validIoVariable: ValidIoVariable = InvalidIoVarProblem.tryGetValidIoVariable(
                     specIoVariable,
                     emptyList(),
-                    typesByName
+                    typesByName,
                 ) { problem -> } // ignore insignificant problems
 
                 concreteSpec.columnHeaders.add(validIoVariable)
@@ -81,7 +100,11 @@ object JsonTableParser {
             val cells = MapUtil.mapValuesWithKey(row.cells) { columnId: String, cellString: String ->
                 ConcreteCell(
                     concreteSpec.getColumnHeaderByName(columnId).validType.parseLiteral(cellString.trim { it <= ' ' })
-                        ?: error("Couldnt parse: $cellString of type ${concreteSpec.getColumnHeaderByName(columnId).validType.typeName} in column $columnId")
+                        ?: error(
+                            "Couldnt parse: $cellString of type ${concreteSpec.getColumnHeaderByName(
+                                columnId,
+                            ).validType.typeName} in column $columnId",
+                        ),
                 )
             }
             concreteSpec.rows.add(SpecificationRow.createUnobservableRow(cells))
@@ -118,24 +141,21 @@ object JsonTableParser {
         spec.durations.addAll(
             parsedTable.durations.stream()
                 .map { stringRepresentation: String? -> ConstraintDuration(stringRepresentation) }
-                .collect(Collectors.toList()))
+                .collect(Collectors.toList()),
+        )
 
         return spec
     }
 
-    fun freeVariableSetFromJson(element: JsonElement): FreeVariableList {
-        return FreeVariableList(
-            fromJson<JsonFreeVarSet>(element).freevariables.map { toFreeVariable(it) }.toMutableList()
-        )
-    }
+    fun freeVariableSetFromJson(element: JsonElement): FreeVariableList = FreeVariableList(
+        fromJson<JsonFreeVarSet>(element).freevariables.map { toFreeVariable(it) }.toMutableList(),
+    )
 
-    private fun toFreeVariable(jsonFreeVar: JsonFreeVar): FreeVariable {
-        return FreeVariable(jsonFreeVar.name, jsonFreeVar.type)
-    }
+    private fun toFreeVariable(jsonFreeVar: JsonFreeVar): FreeVariable =
+        FreeVariable(jsonFreeVar.name, jsonFreeVar.type)
 
-    fun specificationTableFromJson(element: JsonElement): SpecificationTable<SpecIoVariable, String, String> {
-        return specificationTableFromJsonTable(fromJson<JsonTable>(element))
-    }
+    fun specificationTableFromJson(element: JsonElement): SpecificationTable<SpecIoVariable, String, String> =
+        specificationTableFromJsonTable(fromJson<JsonTable>(element))
 
     private fun specificationTableFromJsonTable(table: JsonTable): SpecificationTable<SpecIoVariable, String, String> {
         val spec: SpecificationTable<SpecIoVariable, String, String> =
@@ -159,16 +179,13 @@ object JsonTableParser {
         return SpecificationRow.createUnobservableRow(elems)
     }
 
-    private fun toSpecIoVariable(iovar: JsonIoVariable): SpecIoVariable {
-        return SpecIoVariable(iovar.iotype, iovar.iotype.defaultRole, iovar.type, iovar.name)
-    }
+    private fun toSpecIoVariable(iovar: JsonIoVariable): SpecIoVariable =
+        SpecIoVariable(iovar.iotype, iovar.iotype.defaultRole, iovar.type, iovar.name)
 
-    private fun typeFromString(input: String): Type {
-        return when (input) {
-            "INT" -> TypeInt
-            "BOOL" -> TypeBool
-            else -> TypeEnum(input, emptyList())
-        }
+    private fun typeFromString(input: String): Type = when (input) {
+        "INT" -> TypeInt
+        "BOOL" -> TypeBool
+        else -> TypeEnum(input, emptyList())
     }
 
     class JsonExpectedProblems(var expected_problems: List<String>)
@@ -183,5 +200,5 @@ object JsonTableParser {
 
     data class JsonTable(var variables: List<JsonIoVariable>, var rows: List<String>, var durations: List<String>)
 
-    data class JsonIoVariable(var iotype: VariableCategory, var name: String, var type: String) {}
+    data class JsonIoVariable(var iotype: VariableCategory, var name: String, var type: String)
 }

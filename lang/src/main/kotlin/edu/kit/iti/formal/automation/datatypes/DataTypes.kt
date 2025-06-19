@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -92,7 +92,9 @@ object DataTypes {
     }
      */
 
-    private operator fun <T : AnyDt> get(anyClazz: Class<T>) = map.values.filter { anyClazz.isAssignableFrom(it.javaClass) }
+    private operator fun <T : AnyDt> get(anyClazz: Class<T>) = map.values.filter {
+        anyClazz.isAssignableFrom(it.javaClass)
+    }
 
     fun findSuitableInteger(s: BigInteger, signed: Boolean): AnyInt = findSuitableInteger(
         s,

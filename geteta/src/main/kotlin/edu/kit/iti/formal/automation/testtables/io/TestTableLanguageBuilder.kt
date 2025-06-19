@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -120,11 +120,7 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
         }
     }
 
-    data class VariableModifier(
-        val category: ColumnCategory,
-        val next: Boolean,
-        val state: Boolean,
-    )
+    data class VariableModifier(val category: ColumnCategory, val next: Boolean, val state: Boolean)
 
     fun visit(ctx: TestTableLanguageParser.Var_modifierContext): VariableModifier {
         val assert = ctx.ASSERT().isNotEmpty()
@@ -271,7 +267,8 @@ class RegionVisitor(
         return r
     }
 
-    fun rowId(ctx: TestTableLanguageParser.IntOrIdContext?): String = ctx?.id?.text ?: String.format("r%02d", ctx?.idi?.text?.toInt() ?: ++currentId)
+    fun rowId(ctx: TestTableLanguageParser.IntOrIdContext?): String =
+        ctx?.id?.text ?: String.format("r%02d", ctx?.idi?.text?.toInt() ?: ++currentId)
 
     lateinit var currentRow: TableRow
 
@@ -411,25 +408,29 @@ class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserB
         }
     }
 
-    override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration = Duration.ClosedInterval(
-        accept(ctx.l),
-        accept(ctx.u),
-        accept(ctx.duration_flags()),
-    )
+    override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration =
+        Duration.ClosedInterval(
+            accept(ctx.l),
+            accept(ctx.u),
+            accept(ctx.duration_flags()),
+        )
 
-    override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration = Duration.OpenInterval(accept(ctx.l), accept(ctx.duration_flags()))
+    override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration =
+        Duration.OpenInterval(accept(ctx.l), accept(ctx.duration_flags()))
 
     override fun visitTimeFixed(ctx: TestTableLanguageParser.TimeFixedContext): Duration {
         val i = accept(ctx.intOrConst())
         return Duration.ClosedInterval(i, i)
     }
 
-    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration = Duration.OpenInterval(0)
+    override fun visitTimeDontCare(ctx: TestTableLanguageParser.TimeDontCareContext?): Duration =
+        Duration.OpenInterval(0)
 
     override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
 }
 
-internal fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> = resolveName(fqVariable.text, current, Position.start(fqVariable.symbol))
+internal fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> =
+    resolveName(fqVariable.text, current, Position.start(fqVariable.symbol))
 
 // TODO Write tests
 internal fun resolveName(fqVariable: String, current: GeneralizedTestTable, pos: Position? = null): Pair<Int, String> {

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -23,9 +23,7 @@ package edu.kit.iti.formal.automation.absint
  * @author Alexander Weigl
  * @version 1 (20.11.18)
  */
-abstract class Lattice<T>(
-    val elements: Set<T>,
-) {
+abstract class Lattice<T>(val elements: Set<T>) {
 
     open fun cup(seq: Collection<T>): T = seq.reduce(this::cup)
 

@@ -38,7 +38,10 @@ spotless {
         )
         // or licenseHeaderFile
         // ktfmt("0.55").kotlinlangStyle()
-        ktlint("1.6.0").setEditorConfigPath("$rootDir/.editorconfig")
+        var editorConfig = File(rootDir, ".editorconfig")
+        println(editorConfig)
+        println(editorConfig.exists())
+        ktlint("1.6.0").setEditorConfigPath(editorConfig.absolutePath)
     }
 }
 

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -30,9 +30,7 @@ interface CTransformation {
     operator fun plus(x: CTransformation): CTransformationPipeline = CTransformationPipeline(arrayListOf(this, x))
 }
 
-class CTransformationPipeline(
-    val seq: MutableList<CTransformation>,
-) : CTransformation {
+class CTransformationPipeline(val seq: MutableList<CTransformation>) : CTransformation {
     override fun translate(state: CTState): CTState = seq.fold(state) { s, t -> t.translate(s) }
 }
 

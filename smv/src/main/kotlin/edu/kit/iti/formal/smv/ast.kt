@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -72,11 +72,7 @@ data class SAssignment(
     override fun clone() = copy()
 }
 
-data class SBinaryExpression(
-    private var _left: SMVExpr,
-    var operator: SBinaryOperator,
-    private var _right: SMVExpr,
-) : SMVExpr() {
+data class SBinaryExpression(private var _left: SMVExpr, var operator: SBinaryOperator, private var _right: SMVExpr) : SMVExpr() {
 
     var left: SMVExpr
         get() = _left
@@ -204,10 +200,7 @@ data class SCaseExpression(var cases: MutableList<Case> = arrayListOf()) : SMVEx
  * @author Alexander Weigl
  * @version 1 (12.12.16)
  */
-data class SFunction(
-    val name: String,
-    var arguments: List<SMVExpr>,
-) : SMVExpr() {
+data class SFunction(val name: String, var arguments: List<SMVExpr>) : SMVExpr() {
     var typeSolver: FunctionTypeSolver? = null
 
     override val dataType: SMVType?
@@ -281,10 +274,7 @@ data class SFloatLiteral(override var value: BigDecimal) : SLiteral(value, SMVTy
     override fun clone() = copy()
 }
 
-data class SWordLiteral(
-    override var value: BigInteger,
-    override var dataType: SMVWordType,
-) : SLiteral(value, dataType) {
+data class SWordLiteral(override var value: BigInteger, override var dataType: SMVWordType) : SLiteral(value, dataType) {
     override fun prefix(prefix: String): SMVExpr = SWordLiteral(value, dataType)
     override fun clone() = copy()
 }
@@ -294,19 +284,13 @@ data class SBooleanLiteral(override var value: Boolean) : SLiteral(value, SMVTyp
     override fun clone() = copy()
 }
 
-data class SEnumLiteral(
-    override var value: String,
-    override var dataType: EnumType = SMVTypes.GENERIC_ENUM,
-) : SLiteral(value, dataType) {
+data class SEnumLiteral(override var value: String, override var dataType: EnumType = SMVTypes.GENERIC_ENUM) : SLiteral(value, dataType) {
     override fun prefix(prefix: String): SMVExpr = SEnumLiteral(value)
     override fun clone() = copy()
 }
 
 // Use with caution!
-data class SGenericLiteral(
-    override var value: Any,
-    override var dataType: SMVType,
-) : SLiteral(value, dataType) {
+data class SGenericLiteral(override var value: Any, override var dataType: SMVType) : SLiteral(value, dataType) {
     init {
         require(dataType.allowedValue(value)) {
             "Value $value is not allowed for $dataType"
@@ -615,10 +599,7 @@ enum class SBinaryOperator private constructor(private val symbol: String, priva
  * @author Alexander Weigl
  * @version 1 (11.06.17)
  */
-data class SQuantified(
-    var operator: STemporalOperator,
-    var quantified: MutableList<SMVExpr> = ArrayList(2),
-) : SMVExpr() {
+data class SQuantified(var operator: STemporalOperator, var quantified: MutableList<SMVExpr> = ArrayList(2)) : SMVExpr() {
 
     override val dataType: SMVTypes.BOOLEAN
         get() = SMVTypes.BOOLEAN

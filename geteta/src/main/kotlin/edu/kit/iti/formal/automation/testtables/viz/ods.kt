@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -198,10 +198,7 @@ class ODSCounterExampleWriter(
     }
 }
 
-open class TableUnwinder(
-    private val gtt: GeneralizedTestTable,
-    private val unwinding: Map<TableNode, Int>,
-) {
+open class TableUnwinder(private val gtt: GeneralizedTestTable, private val unwinding: Map<TableNode, Int>) {
     private val ret = ArrayList<TableRow>()
     operator fun invoke(): List<TableRow> {
         ret.clear()
@@ -388,10 +385,7 @@ class VariableMulti<T>(
 }
 */
 
-abstract class ValueColumn<T>(
-    val group: Array<String>,
-    val variableName: String = "",
-) {
+abstract class ValueColumn<T>(val group: Array<String>, val variableName: String = "") {
     fun getGroup(x: Int) = if (group.size <= x) "" else group[x]
     abstract fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: T)
 }
@@ -436,10 +430,7 @@ class ValueDebugColumn(
     }
 }
 
-class ConstraintDebugColumn(
-    group: Array<String>,
-    private val programVar: ProgramVariable,
-) : ValueColumn<ODSDebugTable>(group) {
+class ConstraintDebugColumn(group: Array<String>, private val programVar: ProgramVariable) : ValueColumn<ODSDebugTable>(group) {
     override fun writeCell(cell: TableCell, cindex: Int, row: TableRow, table: ODSDebugTable) {
         val constraint = row.rawFields[programVar]!!
         val fml = constraint.accept(table.formulaTblPrinter(programVar.name))
@@ -586,11 +577,7 @@ private fun <T> Iterable<T>.runLengthEncoding(): List<Pair<T, Int>> {
     return ret
 }
 
-class Smv2OdsFml(
-    val var2column: Map<String, Int>,
-    val inputVariables: Set<String>,
-    val currentRow: Int,
-) : SMVAstDefaultVisitorNN<String>() {
+class Smv2OdsFml(val var2column: Map<String, Int>, val inputVariables: Set<String>, val currentRow: Int) : SMVAstDefaultVisitorNN<String>() {
     override fun defaultVisit(top: SMVAst): String = ""
     override fun visit(v: SVariable): String {
         val free = v.name !in var2column
@@ -675,7 +662,8 @@ class ODSFormulaPrinter(
     val currentRow: Int,
     val var2column: Map<String, Int>,
 ) : TestTableLanguageParserBaseVisitor<String>() {
-    override fun visitCell(ctx: TestTableLanguageParser.CellContext): String = ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
+    override fun visitCell(ctx: TestTableLanguageParser.CellContext): String =
+        ctx.chunk().joinToString("; ", "AND(", ")") { it.accept(this) }
 
     override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): String {
         val constant = ctx.constant().accept(this)
@@ -695,7 +683,8 @@ class ODSFormulaPrinter(
 
     override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext?) = "FALSE()"
 
-    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): String = columnOf(variable, 0) + ctx.relational_operator().text + ctx.expr().accept(this)
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): String =
+        columnOf(variable, 0) + ctx.relational_operator().text + ctx.expr().accept(this)
 
     private fun columnOf(variable: String, i: Int): String = when {
         gtt.isProgramVariable(variable) ->
@@ -705,8 +694,9 @@ class ODSFormulaPrinter(
         else -> "\"$variable\"" // ENUM CONSTANT
     }
 
-    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String = "AND(" + ctx.lower.accept(this) + "<=" + columnOf(variable, 0) + "; " +
-        columnOf(variable, 0) + "<=" + ctx.upper.accept(this) + ")"
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String =
+        "AND(" + ctx.lower.accept(this) + "<=" + columnOf(variable, 0) + "; " +
+            columnOf(variable, 0) + "<=" + ctx.upper.accept(this) + ")"
 
     override fun visitMinus(ctx: TestTableLanguageParser.MinusContext) = "-" + ctx.expr().accept(this)
 
@@ -714,32 +704,44 @@ class ODSFormulaPrinter(
 
     override fun visitParens(ctx: TestTableLanguageParser.ParensContext) = "(" + ctx.expr().accept(this) + ")"
 
-    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) = ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
+    override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) =
+        ctx.left.accept(this) + ctx.op.text + ctx.right.accept(this)
 
-    override fun visitMod(ctx: TestTableLanguageParser.ModContext) = "MOD(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
+    override fun visitMod(ctx: TestTableLanguageParser.ModContext) =
+        "MOD(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
 
-    override fun visitMult(ctx: TestTableLanguageParser.MultContext) = ctx.left.accept(this) + "*" + ctx.right.accept(this)
+    override fun visitMult(ctx: TestTableLanguageParser.MultContext) =
+        ctx.left.accept(this) + "*" + ctx.right.accept(this)
 
     override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext) = ctx.IDENTIFIER().text +
         ctx.expr().joinToString("; ", "(", ")") { it.accept(this) }
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = ctx.left.accept(this) + "AND" + ctx.right.accept(this)
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) =
+        ctx.left.accept(this) + "AND" + ctx.right.accept(this)
 
-    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) = ctx.left.accept(this) + "+" + ctx.right.accept(this)
+    override fun visitPlus(ctx: TestTableLanguageParser.PlusContext) =
+        ctx.left.accept(this) + "+" + ctx.right.accept(this)
 
-    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) = " DIV(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
+    override fun visitDiv(ctx: TestTableLanguageParser.DivContext) =
+        " DIV(" + ctx.left.accept(this) + "," + ctx.right.accept(this) + ")"
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) = ctx.left.accept(this) + "<>" + ctx.right.accept(this)
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext) =
+        ctx.left.accept(this) + "<>" + ctx.right.accept(this)
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) = "XOR(" + ctx.left.accept(this) + ";" + ctx.right.accept(this) + ")"
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext) =
+        "XOR(" + ctx.left.accept(this) + ";" + ctx.right.accept(this) + ")"
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) = "OR( " + ctx.left.accept(this) + "; " + ctx.right.accept(this) + ")"
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext) =
+        "OR( " + ctx.left.accept(this) + "; " + ctx.right.accept(this) + ")"
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) = ctx.left.accept(this) + "=" + ctx.right.accept(this)
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext) =
+        ctx.left.accept(this) + "=" + ctx.right.accept(this)
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) = ctx.left.accept(this) + "-" + ctx.right.accept(this)
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) =
+        ctx.left.accept(this) + "-" + ctx.right.accept(this)
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) = columnOf(ctx.IDENTIFIER().text, 0) // TODO for relational
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) =
+        columnOf(ctx.IDENTIFIER().text, 0) // TODO for relational
 
     override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String {
         val ret = StringBuffer()

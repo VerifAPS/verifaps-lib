@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -211,7 +211,8 @@ class LatexTablePrinter(
  * @version 1 (01.03.18)
  */
 class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguageParserBaseVisitor<String>() {
-    private fun latex(command: String, args: Iterable<String>): String = "\\$command" + args.map { "{$it}" }.joinToString("")
+    private fun latex(command: String, args: Iterable<String>): String =
+        "\\$command" + args.map { "{$it}" }.joinToString("")
 
     private fun latex(command: String, vararg args: ParserRuleContext): String = if (args.isEmpty()) {
         "\\$command"
@@ -219,7 +220,9 @@ class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguagePar
         latex(command, args.map { it.accept(this) })
     }
 
-    override fun visitCell(ctx: TestTableLanguageParser.CellContext): String = accept(ctx.chunk()).reduce { t, u -> "$t, $u" }.orElse("")
+    override fun visitCell(ctx: TestTableLanguageParser.CellContext): String = accept(ctx.chunk()).reduce { t, u ->
+        "$t, $u"
+    }.orElse("")
 
     private fun accept(ctx: Collection<ParserRuleContext>): Stream<String> = ctx.stream().map { c -> c.accept(this) }
 
@@ -238,9 +241,11 @@ class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguagePar
 
     override fun visitConstantFalse(ctx: TestTableLanguageParser.ConstantFalseContext): String = latex("FALSE")
 
-    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): String = ctx.relational_operator().accept(this) + " " + ctx.expr().accept(this)
+    override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext): String =
+        ctx.relational_operator().accept(this) + " " + ctx.expr().accept(this)
 
-    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String = "[" + ctx.lower.accept(this) + ", " + ctx.upper.accept(this) + "]"
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): String =
+        "[" + ctx.lower.accept(this) + ", " + ctx.upper.accept(this) + "]"
 
     override fun visitRelational_operator(ctx: TestTableLanguageParser.Relational_operatorContext): String {
         when (ctx.text) {
@@ -266,7 +271,8 @@ class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguagePar
 
     override fun visitMult(ctx: TestTableLanguageParser.MultContext): String = latex("MULT", ctx.left, ctx.right)
 
-    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String = latex("FUNCTION", ctx.n.text, ctx.expr())
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): String =
+        latex("FUNCTION", ctx.n.text, ctx.expr())
 
     private fun latex(command: String, n: String, stream: Collection<ParserRuleContext>): String {
         val list = stream.map { a -> a.accept(this) }.toMutableList()
@@ -274,23 +280,31 @@ class LatexPrinter(val options: LatexTablePrinterOptions) : TestTableLanguagePar
         return latex(command, list)
     }
 
-    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): String = latex("LAND", ctx.left, ctx.right)
+    override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext): String =
+        latex("LAND", ctx.left, ctx.right)
 
     override fun visitPlus(ctx: TestTableLanguageParser.PlusContext): String = latex("PLUS", ctx.left, ctx.right)
 
     override fun visitDiv(ctx: TestTableLanguageParser.DivContext): String = latex("DIV", ctx.left, ctx.right)
 
-    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): String = latex("NOTEQUAL", ctx.left, ctx.right)
+    override fun visitInequality(ctx: TestTableLanguageParser.InequalityContext): String =
+        latex("NOTEQUAL", ctx.left, ctx.right)
 
-    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): String = latex("XOR", ctx.left, ctx.right)
+    override fun visitLogicalXor(ctx: TestTableLanguageParser.LogicalXorContext): String =
+        latex("XOR", ctx.left, ctx.right)
 
-    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): String = latex("LOR", ctx.left, ctx.right)
+    override fun visitLogicalOr(ctx: TestTableLanguageParser.LogicalOrContext): String =
+        latex("LOR", ctx.left, ctx.right)
 
-    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): String = latex("EQUAL", ctx.left, ctx.right)
+    override fun visitEquality(ctx: TestTableLanguageParser.EqualityContext): String =
+        latex("EQUAL", ctx.left, ctx.right)
 
-    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): String = latex("SUB", ctx.left, ctx.right)
+    override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext): String =
+        latex("SUB", ctx.left, ctx.right)
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): String = escape(ctx.IDENTIFIER().symbol.text) + if (ctx.RBRACKET() != null) "[" + ctx.i().accept(this) + "]" else ""
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext): String =
+        escape(ctx.IDENTIFIER().symbol.text) + if (ctx.RBRACKET() != null) "[" + ctx.i().accept(this) + "]" else ""
 
-    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String = throw TODO("guarded command to latex is not implemented")
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext): String =
+        throw TODO("guarded command to latex is not implemented")
 }

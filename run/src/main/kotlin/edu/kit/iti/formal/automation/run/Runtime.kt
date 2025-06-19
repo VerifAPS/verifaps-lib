@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -81,7 +81,9 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
 
     private fun evaluateExpression(it: Expression) = it.accept(ExpressionVisitor(state, peekScope()))
 
-    fun createCondition(expr: Expression): () -> Boolean = { expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean }
+    fun createCondition(expr: Expression): () -> Boolean = {
+        expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean
+    }
 
     override fun visit(whileStatement: WhileStatement) {
         val condition = createCondition(whileStatement.condition)

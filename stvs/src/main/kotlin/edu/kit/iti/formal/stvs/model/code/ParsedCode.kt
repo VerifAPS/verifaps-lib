@@ -1,10 +1,27 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.model.code
 
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
-import edu.kit.iti.formal.automation.parser.IEC61131Lexer
-import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
+import edu.kit.iti.formal.automation.parser.*
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.st.util.AstVisitor
+import edu.kit.iti.formal.automation.st.util.*
 import edu.kit.iti.formal.stvs.model.common.CodeIoVariable
 import edu.kit.iti.formal.stvs.model.common.VariableCategory
 import edu.kit.iti.formal.stvs.model.expressions.Type
@@ -16,19 +33,15 @@ import org.antlr.v4.runtime.CharStreams
 
 /**
  * Represents the formal model of source code (extracted from [Code]).
- * @author Lukas Fritsch
- */
-data class ParsedCode
-/**
- * Creates a parsed code.
- *
  * @param foldableCodeBlocks list of codeblocks
  * @param definedVariables list of all defined variables (in the source code)
  * @param definedTypes list of all defined types (in the source code)
- */(
+ * @author Lukas Fritsch
+ */
+data class ParsedCode(
     val foldableCodeBlocks: List<FoldableCodeBlock> = listOf(),
     val definedVariables: List<CodeIoVariable> = listOf(),
-    val definedTypes: List<Type> = listOf()
+    val definedTypes: List<Type> = listOf(),
 ) {
     /**
      * A visitor for type declarations. Builds a list of types which have been declared in the code.
@@ -49,7 +62,7 @@ data class ParsedCode
             if (enumerationTypeDeclaration.allowedValues.isNotEmpty()) {
                 val type = TypeEnum(
                     enumerationTypeDeclaration.name,
-                    enumerationTypeDeclaration.allowedValues.map { it.text }
+                    enumerationTypeDeclaration.allowedValues.map { it.text },
                 )
                 definedTypes.add(type)
             }
@@ -78,16 +91,14 @@ data class ParsedCode
 
         override fun defaultVisit(obj: Any) {}
 
-        private fun getCategoryFromDeclaration(varDecl: VariableDeclaration): VariableCategory? {
-            return when {
-                varDecl.isConstant -> null
-                varDecl.isInput -> VariableCategory.INPUT
-                varDecl.isOutput -> VariableCategory.OUTPUT
-                varDecl.isLocal -> VariableCategory.LOCAL
-                varDecl.isInternal -> VariableCategory.LOCAL
-                varDecl.isInOut -> VariableCategory.INOUT
-                else -> null
-            }
+        private fun getCategoryFromDeclaration(varDecl: VariableDeclaration): VariableCategory? = when {
+            varDecl.isConstant -> null
+            varDecl.isInput -> VariableCategory.INPUT
+            varDecl.isOutput -> VariableCategory.OUTPUT
+            varDecl.isLocal -> VariableCategory.LOCAL
+            varDecl.isInternal -> VariableCategory.LOCAL
+            varDecl.isInOut -> VariableCategory.INOUT
+            else -> null
         }
     }
 
@@ -102,8 +113,8 @@ data class ParsedCode
             foldableCodeBlocks.add(
                 FoldableCodeBlock(
                     topElement.ruleContext!!.start.line,
-                    topElement.ruleContext!!.stop.line
-                )
+                    topElement.ruleContext!!.stop.line,
+                ),
             )
         }
 
@@ -126,14 +137,16 @@ data class ParsedCode
          */
         @JvmStatic
         fun parseCode(
-            input: String, parsedTokenHandler: ParsedTokenHandler,
-            syntaxErrorsListener: ParsedSyntaxErrorHandler, parsedCodeListener: ParsedCodeHandler
+            input: String,
+            parsedTokenHandler: ParsedTokenHandler,
+            syntaxErrorsListener: ParsedSyntaxErrorHandler,
+            parsedCodeListener: ParsedCodeHandler,
         ) {
             val syntaxErrorListener = SyntaxErrorListener()
 
             lex(input, parsedTokenHandler, syntaxErrorListener)
 
-            val stream = CharStreams.fromString(input) //, parsedTokenHandler, syntaxErrorListener);
+            val stream = CharStreams.fromString(input) // , parsedTokenHandler, syntaxErrorListener);
 
             try {
                 val ast = parse(stream, syntaxErrorListener)
@@ -142,7 +155,7 @@ data class ParsedCode
                 // Find types in parsed code
                 val typeVisitor = TypeDeclarationVisitor()
                 ast.accept(typeVisitor)
-                //val definedTypesByName = typeVisitor.definedTypes.associateBy { it.typeName }
+                // val definedTypesByName = typeVisitor.definedTypes.associateBy { it.typeName }
 
                 // Find IoVariables in parsed code
                 val variableVisitor = VariableVisitor()
@@ -157,11 +170,11 @@ data class ParsedCode
                     ParsedCode(
                         foldableCodeBlocks,
                         variableVisitor.definedVariables,
-                        typeVisitor.definedTypes
-                    )
+                        typeVisitor.definedTypes,
+                    ),
                 )
             } catch (_: SyntaxErrorReporter.ParserException) {
-                //ignore
+                // ignore
             }
         }
 
@@ -185,8 +198,9 @@ data class ParsedCode
          * @return The lexer used for lexing
          */
         private fun lex(
-            input: String, parsedTokenHandler: ParsedTokenHandler,
-            syntaxErrorListener: SyntaxErrorListener
+            input: String,
+            parsedTokenHandler: ParsedTokenHandler,
+            syntaxErrorListener: SyntaxErrorListener,
         ): IEC61131Lexer {
             val lexer = IEC61131Lexer(CharStreams.fromString(input))
             lexer.removeErrorListeners()

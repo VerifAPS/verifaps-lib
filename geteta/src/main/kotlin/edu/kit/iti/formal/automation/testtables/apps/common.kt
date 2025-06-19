@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -39,8 +39,14 @@ class CexAnalysationArguments : OptionGroup() {
 }
 
 class AutomataOptions : OptionGroup() {
-    val drawAutomaton by option("--debug-automaton", help = "generate a dot file, showing the generated automaton").flag(default = false)
-    val showAutomaton by option("--show-automaton", help = "run dot and show the image of the automaton").flag(default = false)
+    val drawAutomaton by option(
+        "--debug-automaton",
+        help = "generate a dot file, showing the generated automaton",
+    ).flag(default = false)
+    val showAutomaton by option(
+        "--show-automaton",
+        help = "run dot and show the image of the automaton",
+    ).flag(default = false)
 }
 
 class TableArguments : OptionGroup() {

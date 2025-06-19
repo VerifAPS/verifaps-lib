@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -24,9 +24,7 @@ import java.util.*
 /**
  * Created by weigl on 10.06.14.
  */
-data class RecordValue(
-    var fieldValues: MutableMap<String, Value<*, *>> = HashMap(),
-) {
+data class RecordValue(var fieldValues: MutableMap<String, Value<*, *>> = HashMap()) {
     constructor(recordType: RecordType) : this() {
         for (field in recordType.fields) {
             // TODO factory for getting values of initializations

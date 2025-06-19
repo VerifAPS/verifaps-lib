@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.view.spec.table
 
 import javafx.beans.property.ObjectProperty
@@ -24,23 +42,16 @@ object AdvancedCellUtils {
      * *
      */
     private val defaultStringConverter: StringConverter<*> = object : StringConverter<Any>() {
-        override fun toString(t: Any): String {
-            return t.toString()
-        }
+        override fun toString(t: Any): String = t.toString()
 
-        override fun fromString(string: String): Any {
-            return string
-        }
+        override fun fromString(string: String): Any = string
     }
 
     private val defaultTreeItemStringConverter: StringConverter<*> = object : StringConverter<TreeItem<*>?>() {
-        override fun toString(treeItem: TreeItem<*>?): String {
-            return if ((treeItem == null || treeItem.value == null)) "" else treeItem.value.toString()
-        }
+        override fun toString(treeItem: TreeItem<*>?): String =
+            if ((treeItem == null || treeItem.value == null)) "" else treeItem.value.toString()
 
-        override fun fromString(string: String): TreeItem<*>? {
-            return TreeItem(string)
-        }
+        override fun fromString(string: String): TreeItem<*>? = TreeItem(string)
     }
 
     /***************************************************************************
@@ -52,38 +63,29 @@ object AdvancedCellUtils {
      * Simple method to provide a StringConverter implementation in various cell
      * implementations.
      */
-    fun <T> defaultStringConverter(): StringConverter<T> {
-        return defaultStringConverter as StringConverter<T>
-    }
+    fun <T> defaultStringConverter(): StringConverter<T> = defaultStringConverter as StringConverter<T>
 
     /*
      * Simple method to provide a TreeItem-specific StringConverter
      * implementation in various cell implementations.
      */
-    fun <T> defaultTreeItemStringConverter(): StringConverter<TreeItem<T>> {
-        return defaultTreeItemStringConverter as StringConverter<TreeItem<T>>
+    fun <T> defaultTreeItemStringConverter(): StringConverter<TreeItem<T>> =
+        defaultTreeItemStringConverter as StringConverter<TreeItem<T>>
+
+    private fun <T> getItemText(cell: Cell<T>, converter: StringConverter<T>?): String = if (converter ==
+        null
+    ) if (cell.item == null) "" else cell.item.toString() else {
+        converter.toString(cell.item)
     }
 
-    private fun <T> getItemText(cell: Cell<T>, converter: StringConverter<T>?): String {
-        return if (converter == null) if (cell.item == null) "" else cell.item.toString() else converter.toString(cell.item)
-    }
-
-
-    fun getGraphic(treeItem: TreeItem<*>?): Node? {
-        return treeItem?.graphic
-    }
-
+    fun getGraphic(treeItem: TreeItem<*>?): Node? = treeItem?.graphic
 
     /***************************************************************************
      * *
      * ChoiceBox convenience                                                   *
      * *
      */
-    fun <T> updateItem(
-        cell: Cell<T>,
-        converter: StringConverter<T>?,
-        choiceBox: ChoiceBox<T>?
-    ) {
+    fun <T> updateItem(cell: Cell<T>, converter: StringConverter<T>?, choiceBox: ChoiceBox<T>?) {
         updateItem(cell, converter, null, null, choiceBox)
     }
 
@@ -92,7 +94,7 @@ object AdvancedCellUtils {
         converter: StringConverter<T>?,
         hbox: HBox?,
         graphic: Node?,
-        choiceBox: ChoiceBox<T>?
+        choiceBox: ChoiceBox<T>?,
     ) {
         if (cell.isEmpty) {
             cell.text = null
@@ -118,7 +120,7 @@ object AdvancedCellUtils {
     fun <T> createChoiceBox(
         cell: Cell<T>,
         items: ObservableList<T>?,
-        converter: ObjectProperty<StringConverter<T>?>?
+        converter: ObjectProperty<StringConverter<T>?>?,
     ): ChoiceBox<T> {
         val choiceBox = ChoiceBox(items)
         choiceBox.maxWidth = Double.MAX_VALUE
@@ -132,17 +134,12 @@ object AdvancedCellUtils {
         return choiceBox
     }
 
-
     /***************************************************************************
      * *
      * TextField convenience                                                   *
      * *
      */
-    fun <T> updateItem(
-        cell: Cell<T>,
-        converter: StringConverter<T>?,
-        textField: TextField?
-    ) {
+    fun <T> updateItem(cell: Cell<T>, converter: StringConverter<T>?, textField: TextField?) {
         updateItem(cell, converter, null, null, textField)
     }
 
@@ -151,7 +148,7 @@ object AdvancedCellUtils {
         converter: StringConverter<T>?,
         hbox: HBox?,
         graphic: Node?,
-        textField: TextField?
+        textField: TextField?,
     ) {
         if (cell.isEmpty) {
             cell.text = null
@@ -181,7 +178,7 @@ object AdvancedCellUtils {
         converter: StringConverter<T>?,
         hbox: HBox?,
         graphic: Node?,
-        textField: TextField?
+        textField: TextField?,
     ) {
         if (textField != null) {
             textField.text = getItemText<T>(cell, converter)
@@ -214,9 +211,11 @@ object AdvancedCellUtils {
         // as otherwise we encounter RT-34685
         textField.onAction = EventHandler { event: ActionEvent ->
             checkNotNull(converter) {
-                ("Attempting to convert text input into Object, but provided "
-                        + "StringConverter is null. Be sure to set a StringConverter "
-                        + "in your cell factory.")
+                (
+                    "Attempting to convert text input into Object, but provided " +
+                        "StringConverter is null. Be sure to set a StringConverter " +
+                        "in your cell factory."
+                    )
             }
             cell.commitEdit(converter.fromString(textField.text))
             event.consume()
@@ -229,7 +228,6 @@ object AdvancedCellUtils {
         }
         return textField
     }
-
 
     /***************************************************************************
      * *
@@ -245,7 +243,7 @@ object AdvancedCellUtils {
         converter: StringConverter<T>?,
         hbox: HBox?,
         graphic: Node?,
-        comboBox: ComboBox<T>?
+        comboBox: ComboBox<T>?,
     ) {
         if (cell.isEmpty) {
             cell.text = null
@@ -271,7 +269,7 @@ object AdvancedCellUtils {
     fun <T> createComboBox(
         cell: Cell<T>,
         items: ObservableList<T>?,
-        converter: ObjectProperty<StringConverter<T>?>?
+        converter: ObjectProperty<StringConverter<T>?>?,
     ): ComboBox<T> {
         val comboBox = ComboBox(items)
         comboBox.converterProperty().bind(converter)

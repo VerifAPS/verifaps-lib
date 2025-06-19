@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -44,7 +44,8 @@ object StructEmbedding : CodeTransformation {
     }
 }
 
-private fun rewriteBody(vd: VariableDeclaration, body: StatementList): StatementList = body.accept(StructEmbeddingVisitor(vd)) as StatementList
+private fun rewriteBody(vd: VariableDeclaration, body: StatementList): StatementList =
+    body.accept(StructEmbeddingVisitor(vd)) as StatementList
 
 private fun expandStructureVariables(structVars: List<VariableDeclaration>, scope: VariableScope) {
     scope.removeAll(structVars)
@@ -99,7 +100,11 @@ private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVi
         return invocation
     }
 
-    private fun expandParameters(parameter: InvocationParameter, rt: RecordType, expr: SymbolicReference): Collection<InvocationParameter> {
+    private fun expandParameters(
+        parameter: InvocationParameter,
+        rt: RecordType,
+        expr: SymbolicReference,
+    ): Collection<InvocationParameter> {
         var path = expr.toPath()
         path = path.subList(1, path.size)
         var subFields = rt.fields
@@ -138,9 +143,12 @@ private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVi
         }
     }
 
-    override fun visit(symbolicReference: SymbolicReference): Expression = if (symbolicReference.identifier == vd.name && symbolicReference.hasSub()) {
-        SymbolicReference(symbolicReference.toPath().joinToString("$"))
-    } else {
-        super.visit(symbolicReference)
-    }
+    override fun visit(symbolicReference: SymbolicReference): Expression =
+        if (symbolicReference.identifier == vd.name &&
+            symbolicReference.hasSub()
+        ) {
+            SymbolicReference(symbolicReference.toPath().joinToString("$"))
+        } else {
+            super.visit(symbolicReference)
+        }
 }

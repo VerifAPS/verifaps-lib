@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -452,7 +452,8 @@ object MainAction : ActionQualifierHandler(WHILE) {
 }
 
 object SimpleMainAction : ActionQualifierHandler(WHILE) {
-    override fun invoke(actionInfo: ActionInfo, steps: Set<String>, data: PipelineData) = NonStored.invoke(actionInfo, steps, data)
+    override fun invoke(actionInfo: ActionInfo, steps: Set<String>, data: PipelineData) =
+        NonStored.invoke(actionInfo, steps, data)
 }
 
 object SetHandler : ActionQualifierHandler(SET) {
@@ -619,7 +620,13 @@ data class PipelineData(
 
     fun enumValue(step: SFCStep) = EnumLit(stateEnumType, enumStepName(stepName(step.name)))
 
-    fun stepName(stepName: String, idx: Int = index, sfcName: String = name): String = if (idx <= 0) stepName else "_${idx}_$stepName"
+    fun stepName(stepName: String, idx: Int = index, sfcName: String = name): String = if (idx <=
+        0
+    ) {
+        stepName
+    } else {
+        "_${idx}_$stepName"
+    }
 
     // 0 -> "$sfcName$stepName"
     // else -> "$sfcName${idx}_$stepName"
@@ -831,8 +838,9 @@ private operator fun Statement.plus(statement: Statement): StatementList {
     return sl
 }
 
-internal fun createEnumerationTypeForSfc(enumName: String, network: SFCNetwork, enumStepName: (String) -> String) = EnumerateType(
-    enumName,
-    network.steps.map { enumStepName(it.name) }.toMutableList(),
-    enumStepName(network.initialStep!!.name),
-)
+internal fun createEnumerationTypeForSfc(enumName: String, network: SFCNetwork, enumStepName: (String) -> String) =
+    EnumerateType(
+        enumName,
+        network.steps.map { enumStepName(it.name) }.toMutableList(),
+        enumStepName(network.initialStep!!.name),
+    )

@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -26,7 +26,8 @@ import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
 
 fun findProgram(tles: PouElements): ProgramDeclaration? = tles.findFirstProgram()
-fun PouElements.findFirstProgram(): ProgramDeclaration? = asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
+fun PouElements.findFirstProgram(): ProgramDeclaration? =
+    asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
 fun selectByName(name: String) = { elements: PouElements -> elements.find { it.name == name } as? PouExecutable? }
 
 /**

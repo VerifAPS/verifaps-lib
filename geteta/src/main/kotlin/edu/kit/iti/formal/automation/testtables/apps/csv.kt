@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -62,11 +62,7 @@ class CsvApp : CliktCommand(name = "ttcsv") {
     }
 }
 
-class CsvTranslator(
-    val writer: Writer,
-    val quoteChar: String,
-    val delimChar: String,
-) {
+class CsvTranslator(val writer: Writer, val quoteChar: String, val delimChar: String) {
 
     fun run(name: String, content: String) {
         val cw = CodeWriter(writer)

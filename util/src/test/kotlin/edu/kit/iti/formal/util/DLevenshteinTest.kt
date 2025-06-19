@@ -1,7 +1,7 @@
 /* *****************************************************************
  * This file belongs to verifaps-lib (https://verifaps.github.io).
  * SPDX-License-Header: GPL-3.0-or-later
- *
+ * 
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -37,7 +37,10 @@ class DLevenshteinTest {
         dlevenshteinTest("abc", "cba", 2),
     )
 
-    private fun dlevenshteinTest(source: String, target: String, expCost: Int) = DynamicTest.dynamicTest("$source/$target/$expCost", { doTest(source, target, expCost) })
+    private fun dlevenshteinTest(source: String, target: String, expCost: Int) =
+        DynamicTest.dynamicTest("$source/$target/$expCost", {
+            doTest(source, target, expCost)
+        })
 
     private fun doTest(source: String, target: String, expCost: Int) {
         assertEquals(expCost, dlevenshtein(source, target))

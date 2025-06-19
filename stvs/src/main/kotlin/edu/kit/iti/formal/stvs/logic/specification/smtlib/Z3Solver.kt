@@ -1,5 +1,23 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
-
+ 
 import edu.kit.iti.formal.smt.SExpr
 import edu.kit.iti.formal.smt.SExprFacade
 import edu.kit.iti.formal.smt.SList
@@ -44,7 +62,7 @@ class Z3Solver(config: GlobalConfig) {
      */
     @Throws(ConcretizationException::class)
     private fun concretize(smtString: String, ioVariables: List<ValidIoVariable>): ConcreteSpecification {
-        val processBuilder = ProcessBuilder(z3Path, "-in", "-smt2") //TODO timeout
+        val processBuilder = ProcessBuilder(z3Path, "-in", "-smt2") // TODO timeout
         try {
             val process = processBuilder.start()
             this.process = process
@@ -118,7 +136,8 @@ class Z3Solver(config: GlobalConfig) {
     }
 
     companion object {
-        private val VAR_PATTERN: Pattern = Pattern.compile("(?<name>[\$a-zA-Z0-9_]+)_(?<row>\\d+)_(?<cycle>\\d+)")
+        private val VAR_PATTERN: Pattern =
+            Pattern.compile("(?<name>[\$a-zA-Z0-9_]+)_(?<row>\\d+)_(?<cycle>\\d+)")
         private val DURATION_PATTERN: Pattern = Pattern.compile("n_(?<cycleCount>\\d+)")
 
         /**
@@ -130,8 +149,7 @@ class Z3Solver(config: GlobalConfig) {
          * the solver output
          * @return converted specification
          */
-        private fun buildConcreteSpecFromSExp(sexpr: List<SList>, validIoVariables: List<ValidIoVariable>)
-                : ConcreteSpecification {
+        private fun buildConcreteSpecFromSExp(sexpr: List<SList>, validIoVariables: List<ValidIoVariable>): ConcreteSpecification {
             val rawDurations = extractRawDurations(sexpr)
             // convert raw durations into duration list
             val durations = buildConcreteDurations(rawDurations)
@@ -180,7 +198,8 @@ class Z3Solver(config: GlobalConfig) {
             for (cycle in 0 until duration.duration) {
                 val rawRow: Map<String?, String>? = rawRows[duration.beginCycle + cycle]
                 val newRow = hashMapOf<String, ConcreteCell>()
-                validIoVariables.forEach(Consumer { validIoVariable: ValidIoVariable? ->
+                validIoVariables.forEach(
+                    Consumer { validIoVariable: ValidIoVariable? ->
                     if (rawRow == null) {
                         newRow[validIoVariable!!.name] = ConcreteCell(validIoVariable.validType.generateDefaultValue())
                         return@Consumer
@@ -193,9 +212,11 @@ class Z3Solver(config: GlobalConfig) {
                     val value = validIoVariable.validType.match(
                         { ValueInt(BitvectorUtils.intFromHex(solvedValue, true)) },
                         { if (solvedValue == "true") ValueBool.TRUE else ValueBool.FALSE },
-                        { typeEnum: TypeEnum? -> typeEnum!!.values[BitvectorUtils.intFromHex(solvedValue, false)] })
-                    newRow[validIoVariable.name] = ConcreteCell(value!!)
-                })
+                        { typeEnum: TypeEnum? -> typeEnum!!.values[BitvectorUtils.intFromHex(solvedValue, false)] }
+                    )
+                    newRow[validIoVariable.name] = ConcreteCell(value)
+                }
+                )
                 specificationRows.add(SpecificationRow.createUnobservableRow(newRow))
             }
         }
@@ -225,8 +246,7 @@ class Z3Solver(config: GlobalConfig) {
          * @param durations concrete durations for each row
          * @return mapping
          */
-        private fun extractRawRows(sexpr: List<SList>, durations: List<ConcreteDuration>)
-                : Map<Int, MutableMap<String?, String>> {
+        private fun extractRawRows(sexpr: List<SList>, durations: List<ConcreteDuration>): Map<Int, MutableMap<String?, String>> {
             val rawRows = HashMap<Int, MutableMap<String?, String>>()
             sexpr.forEach { addRowToMap(durations, rawRows, it) }
             return rawRows
@@ -275,14 +295,12 @@ class Z3Solver(config: GlobalConfig) {
          * @param sexpr parsed solver output
          * @return Map from row to duration
          */
-        private fun extractRawDurations(sexpr: List<SList>): Map<Int, Int> {
-            return sexpr
+        private fun extractRawDurations(sexpr: List<SList>): Map<Int, Int> = sexpr
                 .filter { isDurationLength(it) }
                 .associate {
                     val cycleCount = it[1].toString().substring(2).toInt()
                     cycleCount to BitvectorUtils.intFromHex(it[4].toString(), false)
                 }
-        }
 
         /**
          * Adds a duration from solver output to map if `varAssign` has the following format

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.stvs.logic.specification.smtlib
 
 import edu.kit.iti.formal.smt.SExpr
@@ -20,7 +38,7 @@ import kotlin.math.min
 class SmtEncoder(
     private val maxDurations: List<Int>,
     private val specification: ValidSpecification,
-    private val validFreeVariables: List<ValidFreeVariable>
+    private val validFreeVariables: List<ValidFreeVariable>,
 ) {
     // Map<Row, Max. number of cycles for that row>
     private val ioVariables: List<ValidIoVariable>
@@ -38,11 +56,13 @@ class SmtEncoder(
      * @param validFreeVariables The free variables that are referred to in `specification`
      */
     constructor(
-        maxDuration: Int, specification: ValidSpecification,
-        validFreeVariables: List<ValidFreeVariable>
+        maxDuration: Int,
+        specification: ValidSpecification,
+        validFreeVariables: List<ValidFreeVariable>,
     ) : this(
         generateAllSameList(maxDuration, specification.rows.size),
-        specification, validFreeVariables
+        specification,
+        validFreeVariables,
     )
 
     /**
@@ -54,7 +74,9 @@ class SmtEncoder(
      * @param validFreeVariables free variables that appear in the specification
      */
     init {
-        require(maxDurations.size == specification.rows.size) { "Size of maxDurations and size of specification rows do not match" }
+        require(maxDurations.size == specification.rows.size) {
+            "Size of maxDurations and size of specification rows do not match"
+        }
         ioVariables = specification.columnHeaders
         freeVariablesContext = validFreeVariables.associate { it.name to it.type }
         ioVariableTypes = ioVariables.map { it.name }
@@ -87,7 +109,7 @@ class SmtEncoder(
                 column.cells[z]
                 // Add n_x to const declaration
                 constraint.addHeaderDefinition(
-                    SList("declare-const", sym("n_$z"), TYPE_BV_16)
+                    SList("declare-const", sym("n_$z"), TYPE_BV_16),
                 )
                 // Iterate over potential backward steps
                 for (i in 1..getMaxDurationSum(z - 1)) {
@@ -98,23 +120,24 @@ class SmtEncoder(
                             SList(
                                 "implies",
                                 SList(
-                                    "=", sym("n_${z - 1}"),
-                                    BitvectorUtils.hexFromInt(k, 4)
+                                    "=",
+                                    sym("n_${z - 1}"),
+                                    BitvectorUtils.hexFromInt(k, 4),
                                 ),
                                 SList(
                                     "=",
                                     sym("|${variableName}_${z}_${-i}|"),
-                                    sym("|${variableName}_${z - 1}_${k - i}|")
-                                )
-                            )
+                                    sym("|${variableName}_${z - 1}_${k - i}|"),
+                                ),
+                            ),
                         )
                         // Add backward reference to const declaration
                         constraint.addHeaderDefinition(
                             SList(
                                 "declare-const",
                                 sym("|${variableName}_${z - 1}_${k - i}|"),
-                                getSmtLibVariableTypeName(ioVariable.validType)
-                            )
+                                getSmtLibVariableTypeName(ioVariable.validType),
+                            ),
                         )
                     }
                     // Add backward reference to const declaration
@@ -122,8 +145,8 @@ class SmtEncoder(
                         SList(
                             "declare-const",
                             sym("|${variableName}_${z}_${-i}|"),
-                            getSmtLibVariableTypeName(ioVariable.validType)
-                        )
+                            getSmtLibVariableTypeName(ioVariable.validType),
+                        ),
                     )
                 }
             }
@@ -142,21 +165,24 @@ class SmtEncoder(
 
                 for (i in 0 until getMaxDuration(z)) {
                     val visitor = SmtConvertExpressionVisitor(
-                        this, z, i, ioVariable
+                        this,
+                        z,
+                        i,
+                        ioVariable,
                     )
                     val expressionConstraint = expression.accept(visitor)
                     // n_z >= i => ExpressionVisitor(z,i,...)
                     this.constraint = SmtModel(
                         visitor.constraint.globalConstraints,
-                        visitor.constraint.variableDefinitions
+                        visitor.constraint.variableDefinitions,
                     )
                         .combine(this.constraint)
                     constraint.addGlobalConstraint(
                         SList(
                             "implies",
                             SList("bvuge", sym("n_$z"), BitvectorUtils.hexFromInt(i, 4)),
-                            expressionConstraint
-                        )
+                            expressionConstraint,
+                        ),
                     )
                 }
             }
@@ -175,29 +201,33 @@ class SmtEncoder(
             // n_z >= lowerBound_z
             constraint.addGlobalConstraint(
                 SList(
-                    "bvuge", sym("n_$z"),
-                    BitvectorUtils.hexFromInt(interval.lowerBound, 4)
-                )
+                    "bvuge",
+                    sym("n_$z"),
+                    BitvectorUtils.hexFromInt(interval.lowerBound, 4),
+                ),
             )
             // n_z <= upperBound_z
             if (interval.upperBound != null) {
                 constraint.addGlobalConstraint(
                     SList(
-                        "bvule", sym("n_$z"),
+                        "bvule",
+                        sym("n_$z"),
                         BitvectorUtils.hexFromInt(
                             min(
                                 interval.upperBound.toDouble(),
-                                getMaxDuration(z).toDouble()
-                            ).toInt(), 4
-                        )
-                    )
+                                getMaxDuration(z).toDouble(),
+                            ).toInt(),
+                            4,
+                        ),
+                    ),
                 )
             } else {
                 constraint.addGlobalConstraint(
                     SList(
-                        "bvule", sym("n_$z"),
-                        BitvectorUtils.hexFromInt(getMaxDuration(z), 4)
-                    )
+                        "bvule",
+                        sym("n_$z"),
+                        BitvectorUtils.hexFromInt(getMaxDuration(z), 4),
+                    ),
                 )
             }
         }
@@ -215,7 +245,9 @@ class SmtEncoder(
 
         val scev = SmtConvertExpressionVisitor(
             this,
-            0, 0, variable.asIOVariable()
+            0,
+            0,
+            variable.asIOVariable(),
         )
         return constraint!!.accept(scev)
 
@@ -230,16 +262,12 @@ class SmtEncoder(
                                 4)));*/
     }
 
-    fun isIoVariable(name: String?): Boolean {
-        return ioVariableTypes.contains(name)
-    }
+    fun isIoVariable(name: String?): Boolean = ioVariableTypes.contains(name)
 
-    private fun setFreeVariablesDefaultValues(): List<SExpr> {
-        return validFreeVariables
-            .filter { variable: ValidFreeVariable -> variable.constraint != null }
-            .map { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
-            .map { SList("assert", it) }
-    }
+    private fun setFreeVariablesDefaultValues(): List<SExpr> = validFreeVariables
+        .filter { variable: ValidFreeVariable -> variable.constraint != null }
+        .map { variable: ValidFreeVariable -> this.getDefaultValueEquality(variable) }
+        .map { SList("assert", it) }
 
     fun getTypeForVariable(variableName: String?): Type? {
         var type = freeVariablesContext[variableName]
@@ -253,16 +281,14 @@ class SmtEncoder(
         return type
     }
 
-    private fun createFreeVariables(): List<SExpr> {
-        return freeVariablesContext.entries.stream()
-            .filter { item: Map.Entry<String?, Type> -> !isIoVariable(item.key) }
-            .map { item: Map.Entry<String?, Type> ->
-                getDeclarationForVariable(
-                    item.value,
-                    item.key!!
-                )
-            }.collect(Collectors.toList())
-    }
+    private fun createFreeVariables(): List<SExpr> = freeVariablesContext.entries.stream()
+        .filter { item: Map.Entry<String?, Type> -> !isIoVariable(item.key) }
+        .map { item: Map.Entry<String?, Type> ->
+            getDeclarationForVariable(
+                item.value,
+                item.key!!,
+            )
+        }.collect(Collectors.toList())
 
     private fun getMaxDurationSum(z: Int): Int {
         var sum = 0
@@ -294,10 +320,9 @@ class SmtEncoder(
          * @param times  how many times `number` should be repeated
          * @return List of number repeated `times` times.
          */
-        private fun generateAllSameList(number: Int, times: Int): List<Int> {
-            return IntStream.generate { number }.limit(times.toLong()).boxed()
+        private fun generateAllSameList(number: Int, times: Int): List<Int> =
+            IntStream.generate { number }.limit(times.toLong()).boxed()
                 .collect(Collectors.toList())
-        }
 
         private fun getDeclarationForVariable(type: Type, variableName: String) =
             SList("declare-const", SSymbol(variableName), getSmtLibVariableTypeName(type))
