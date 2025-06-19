@@ -22,8 +22,8 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.file
-import edu.kit.iti.formal.automation.IEC61131Facade
-import edu.kit.iti.formal.automation.sfclang.getUniqueName
+import edu.kit.iti.formal.automation.*
+import edu.kit.iti.formal.automation.sfclang.*
 import edu.kit.iti.formal.smv.SMVFacade
 import edu.kit.iti.formal.smv.ast.SLiteral
 import edu.kit.iti.formal.smv.conjunction
@@ -88,12 +88,12 @@ class ModularizationApp : CliktCommand() {
 
     val library by option().file().multiple()
 
-    val nuxmvPath by option("--nuxmv", envvar = "NUXMV").default("nuXmv")
+    val nuxmvPath by option("--nuxmv", envvar = "NUXMV")
+        .default(nuxmvDefaultPath)
 
     override fun run() {
         outputFolder.mkdirs()
-
-        NUXMV_PATH_DEFAULT = nuxmvPath
+        nuxmvDefaultPath = nuxmvPath
 
         val (oldExec, newExec) = IEC61131Facade.readProgramsWLPN(library, listOf(old, new))
         require(oldExec != null) { "Could not find program in $old" }
@@ -112,7 +112,11 @@ class ModularizationApp : CliktCommand() {
         info("Proof for perfect equality? ${ctx.isPerfect}")
         info("Only equalities? ${ctx.onlyEquivalence}")
 
-        val reveContextManager = ModFacade.createReveContextsBySpecification(relationalFrameContracts, oldProgram, newProgram)
+        val reveContextManager = ModFacade.createReveContextsBySpecification(
+            relationalFrameContracts,
+            oldProgram,
+            newProgram,
+        )
 
         val m = ModularProver(
             oldProgram,
@@ -130,7 +134,8 @@ class ModularizationApp : CliktCommand() {
         m.proveStrategy.disableProofBodyEquivalenceSource = disableProofBodyEquivalenceSource
         m.proveStrategy.disableProofBodyEquivalenceWithAbstraction = disableProofBodyEquivalenceWithAbstraction
         m.proveStrategy.disableProofBodyEquivalenceWithAbstractionBody = disableProofBodyEquivalenceWithAbstractionBody
-        m.proveStrategy.disableProofBodyEquivalenceWithAbstractionSubFrames = disableProofBodyEquivalenceWithAbstractionSubFrames
+        m.proveStrategy.disableProofBodyEquivalenceWithAbstractionSubFrames =
+            disableProofBodyEquivalenceWithAbstractionSubFrames
         m.proveStrategy.disableUpdateCache = disableUpdateCache
 
         m.proveStrategy.assumeAsProven.addAll(this.assume)

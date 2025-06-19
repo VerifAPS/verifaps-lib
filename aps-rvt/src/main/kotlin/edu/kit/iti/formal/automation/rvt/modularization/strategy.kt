@@ -84,11 +84,7 @@ class DefaultEqualityStrategy(mp: ModularProver) {
     fun proofEquivalenceTopLevel() = proofEquivalence(oldProgram.frame, newProgram.frame, topLevelContext)
 
     /*suspend*/
-    fun proofEquivalence(
-        old: Frame,
-        new: Frame,
-        ctx: ReveContext = reveContextManager.get(old, new),
-    ): Boolean {
+    fun proofEquivalence(old: Frame, new: Frame, ctx: ReveContext = reveContextManager.get(old, new)): Boolean {
         val lp = logprfx("proofEquivalence", old, new)
 
         info("$lp ${old.block.repr()}: ${printStatistic(old)}")
@@ -215,7 +211,13 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return r
     }
 
-    private fun glueWithMiter(oldFrame: Frame, newFrame: Frame, old: SMVModule, new: SMVModule, ctx: ReveContext): List<SMVModule> {
+    private fun glueWithMiter(
+        oldFrame: Frame,
+        newFrame: Frame,
+        old: SMVModule,
+        new: SMVModule,
+        ctx: ReveContext,
+    ): List<SMVModule> {
         val a = SmvReveBuilder(oldFrame, newFrame, old, new, ctx)
         a.run()
         return a.modules
@@ -569,7 +571,10 @@ class DefaultEqualityStrategy(mp: ModularProver) {
 
     //region symbolic execution with abstraction
     var uniqueCnt = 0
-    fun abstractFrames(exec: Frame, abstractedBlocks: List<BlockStatement>): Triple<Frame, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
+    fun abstractFrames(
+        exec: Frame,
+        abstractedBlocks: List<BlockStatement>,
+    ): Triple<Frame, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
         val (abstracted, inputs, outputs) =
             createProgramWithAbstraction(exec, abstractedBlocks)
 
@@ -586,9 +591,13 @@ class DefaultEqualityStrategy(mp: ModularProver) {
         return Triple(f, inputs, outputs)
     }
 
-    private fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) = rewriteInvocation(a, abstractedInvocation)
+    private fun createProgramWithAbstraction(a: Frame, abstractedInvocation: List<BlockStatement>) =
+        rewriteInvocation(a, abstractedInvocation)
 
-    fun rewriteInvocation(a: Frame, abstractedInvocation: List<BlockStatement>): Triple<BlockStatement, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
+    fun rewriteInvocation(
+        a: Frame,
+        abstractedInvocation: List<BlockStatement>,
+    ): Triple<BlockStatement, HashMap<BlockStatement, Map<String, String>>, HashMap<BlockStatement, Map<String, String>>> {
         val new = a.block.clone()
         val scope = a.scope.copy()
 
@@ -707,11 +716,8 @@ private class SmvReveBuilder(
     }
 }
 
-private class InvocationRewriter(
-    val prefix: String,
-    val scope: Scope,
-    val toBeReplaced: BlockStatement,
-) : AstMutableVisitor() {
+private class InvocationRewriter(val prefix: String, val scope: Scope, val toBeReplaced: BlockStatement) :
+    AstMutableVisitor() {
 
     val inputs = hashMapOf<String, String>()
     val outputs = hashMapOf<String, String>()
@@ -762,10 +768,7 @@ private class InvocationRewriter(
  *
  * All terms variables must be equal w.r.t. to their name.
  */
-private fun SymbolicState.equal(
-    otherState: SymbolicState,
-    outputVariables: Map<String, String>,
-): Boolean {
+private fun SymbolicState.equal(otherState: SymbolicState, outputVariables: Map<String, String>): Boolean {
     val (r, stateMap) = InferEqualMod(this, otherState, outputVariables).run()
     return r && stateMap.all { (a, b) -> a == b }
 }
@@ -869,10 +872,10 @@ class ProcessRunner(
     }
 }
 
-const val NUXMV_PATH_DEFAULT = "nuXmv"
+var nuxmvDefaultPath = "nuXmv"
 
 class NuXMVProcess(var moduleFile: File, val commandFile: File) {
-    var executablePath = NUXMV_PATH_DEFAULT
+    var executablePath = nuxmvDefaultPath
     var workingDirectory = moduleFile.parentFile
     var outputFile = File(workingDirectory, "nuxmv.log")
     var result: NuXMVOutput? = null
