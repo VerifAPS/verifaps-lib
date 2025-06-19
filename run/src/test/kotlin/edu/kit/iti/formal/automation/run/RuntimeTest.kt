@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -17,11 +35,14 @@ class RuntimeTest {
         val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.testIfStatement.st"))
         println(ast.toString())
         val state = ExecutionFacade.execute(ast)
-        assertEquals(hashMapOf(
+        assertEquals(
+            hashMapOf(
                 "number" to VAnyInt(INT, 300),
                 "n2" to VAnyInt(INT, 4),
-                "active" to TRUE),
-                state)
+                "active" to TRUE,
+            ),
+            state,
+        )
     }
 
     @Test
@@ -29,7 +50,8 @@ class RuntimeTest {
         val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.testVariableReference.st"))
         val state = ExecutionFacade.execute(ast)
         print("result of execution: $state")
-        assertEquals(hashMapOf(
+        assertEquals(
+            hashMapOf(
                 "b2" to TRUE,
                 "n8" to TRUE,
                 "n9" to TRUE,
@@ -41,9 +63,10 @@ class RuntimeTest {
                 "n4" to VAnyInt(INT, 0),
                 "n5" to VAnyInt(INT, 6),
                 "n6" to VAnyInt(INT, 6),
-                "n7" to VAnyInt(INT, -1)
-        ),
-                state)
+                "n7" to VAnyInt(INT, -1),
+            ),
+            state,
+        )
     }
 
     @Test
@@ -71,12 +94,16 @@ class RuntimeTest {
         val enumMotorState = ec.entryPoint.scope.resolveDataType("MOTOR_STATE") as EnumerateType
         val enumDoorState = ec.entryPoint.scope.resolveDataType("DOOR_STATE") as EnumerateType
 
-        assertEquals(hashMapOf("RequestedPos" to VAnyInt(INT, 5),
+        assertEquals(
+            hashMapOf(
+                "RequestedPos" to VAnyInt(INT, 5),
                 "CurrentPos" to VAnyInt(INT, 3),
                 "Motor" to VAnyEnum(enumMotorState, "GoUp"),
                 "ButtonPressed" to TRUE,
-                "Door" to VAnyEnum(enumDoorState, "Closed")
-        ), ec.lastState)
+                "Door" to VAnyEnum(enumDoorState, "Closed"),
+            ),
+            ec.lastState,
+        )
 
         val input2 = State()
         input2["CurrentPos"] = VAnyInt(UINT, 5)
@@ -84,13 +111,16 @@ class RuntimeTest {
         println("2nd state:")
         ec.lastState.forEach { println(it) }
 
-        assertEquals(hashMapOf(
+        assertEquals(
+            hashMapOf(
                 "RequestedPos" to VAnyInt(INT, 5),
                 "CurrentPos" to VAnyInt(UINT, 5),
                 "Motor" to VAnyEnum(enumMotorState, "Stationary"),
                 "ButtonPressed" to TRUE,
-                "Door" to VAnyEnum(enumDoorState, "Open")
-        ), ec.lastState)
+                "Door" to VAnyEnum(enumDoorState, "Open"),
+            ),
+            ec.lastState,
+        )
     }
 
     @Test
@@ -131,7 +161,7 @@ class RuntimeTest {
     @Test
     fun functionBlockTest() {
         val ast = IEC61131Facade.file(this.javaClass.getResourceAsStream("runtimeTest.functionBlockTest.st"))
-        //val state = ExecutionFacade.execute(ast)
+        // val state = ExecutionFacade.execute(ast)
         val exec = ExecutionFacade.createExecutionContext(ast)
         exec.lastState.forEach { println(it) }
         exec.executeCycle()
@@ -168,7 +198,8 @@ class RuntimeTest {
         for (i in 1..1000.toLong()) {
             val startTime = System.nanoTime()
             val state = exec.executeCycle(
-                    "I" to VAnyInt(INT, i))
+                "I" to VAnyInt(INT, i),
+            )
             val stopTime = System.nanoTime()
             execTime.add(stopTime - startTime)
 
@@ -176,6 +207,6 @@ class RuntimeTest {
             assertEquals(VAnyInt(INT, counter), state["counter"])
         }
 
-        println("Average cycle time: ${execTime.average()/1000/1000} ms")
+        println("Average cycle time: ${execTime.average() / 1000 / 1000} ms")
     }
 }

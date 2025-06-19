@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.util
 
 import java.io.StringWriter
@@ -15,9 +33,9 @@ interface Semantic<T> {
  * @version 1
  */
 open class SemanticCodeWriter<T>(
-        var semantic: Semantic<T>,
-        var stream: Writer = StringWriter())
-    : Appendable by stream {
+    var semantic: Semantic<T>,
+    var stream: Writer = StringWriter(),
+) : Appendable by stream {
 
     protected var identation = 0
     var identationChar: String = " "
@@ -73,20 +91,21 @@ open class SemanticCodeWriter<T>(
         return this
     }
 
-
     fun print(vararg args: Any): SemanticCodeWriter<T> {
         args.forEach { write(it.toString()) }
         return this
     }
-
 
     fun appendReformat(text: String): SemanticCodeWriter<T> {
         text.splitToSequence('\n').forEach { nl().printf(it) }
         return this
     }
 
-    fun block(text: String = "", nl: Boolean = false,
-              function: SemanticCodeWriter<T>.() -> Unit): SemanticCodeWriter<T> {
+    fun block(
+        text: String = "",
+        nl: Boolean = false,
+        function: SemanticCodeWriter<T>.() -> Unit,
+    ): SemanticCodeWriter<T> {
         printf(text)
         if (nl) nl()
         increaseIndent()
@@ -96,8 +115,11 @@ open class SemanticCodeWriter<T>(
         return this
     }
 
-    fun cblock(head: String, tail: String,
-               function: SemanticCodeWriter<T>.() -> Unit): SemanticCodeWriter<T> {
+    fun cblock(
+        head: String,
+        tail: String,
+        function: SemanticCodeWriter<T>.() -> Unit,
+    ): SemanticCodeWriter<T> {
         printf(head)
         increaseIndent()
         nl()
@@ -129,13 +151,41 @@ open class SemanticCodeWriter<T>(
 }
 
 enum class SemanticClasses {
-    KEYWORD, STATEMENT, CASE_INTEGER_CONDITION, CASE_ENUM_CONDITION,
-    OPERATOR, BINARY_EXPRESSION, ASSIGNMENT, TYPE_DECL_ENUM, TYPE_NAME,
-    REPEAT, WHILE, UNARY_EXPRESSION, TYPE_DECL, CASE_STATEMENT,
-    VARIABLE, SUBSCRIPT, STATEMENT_BLOCK, PROGRAM, VALUE, EXPRESSION_LIST,
-    SEPARATOR, FUNC_CALL, FOR, FB, IFSTATEMENT, FB_CALL,
-    CASE, TYPE_DECL_SIMPLE, VARIABLES_DEFINITION, COMMENT, TYPE_DECL_DECL,
-    VARIABLES_DEFINITIONS, SPECIAL_VARIABLE, CONSTANT, ERROR
+    KEYWORD,
+    STATEMENT,
+    CASE_INTEGER_CONDITION,
+    CASE_ENUM_CONDITION,
+    OPERATOR,
+    BINARY_EXPRESSION,
+    ASSIGNMENT,
+    TYPE_DECL_ENUM,
+    TYPE_NAME,
+    REPEAT,
+    WHILE,
+    UNARY_EXPRESSION,
+    TYPE_DECL,
+    CASE_STATEMENT,
+    VARIABLE,
+    SUBSCRIPT,
+    STATEMENT_BLOCK,
+    PROGRAM,
+    VALUE,
+    EXPRESSION_LIST,
+    SEPARATOR,
+    FUNC_CALL,
+    FOR,
+    FB,
+    IFSTATEMENT,
+    FB_CALL,
+    CASE,
+    TYPE_DECL_SIMPLE,
+    VARIABLES_DEFINITION,
+    COMMENT,
+    TYPE_DECL_DECL,
+    VARIABLES_DEFINITIONS,
+    SPECIAL_VARIABLE,
+    CONSTANT,
+    ERROR,
 }
 
 class DefaultHtmlSemantic : Semantic<SemanticClasses> {

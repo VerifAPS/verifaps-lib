@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.datatypes.values
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.datatypes.values
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.datatypes.RecordType
 import java.util.*
@@ -29,11 +25,12 @@ import java.util.*
  * Created by weigl on 10.06.14.
  */
 data class RecordValue(
-        var fieldValues: MutableMap<String, Value<*, *>> = HashMap()) {
+    var fieldValues: MutableMap<String, Value<*, *>> = HashMap(),
+) {
     constructor(recordType: RecordType) : this() {
         for (field in recordType.fields) {
-            //TODO factory for getting values of initializations
-            //fieldValues[field.name] = field.typeDeclaration.initialization
+            // TODO factory for getting values of initializations
+            // fieldValues[field.name] = field.typeDeclaration.initialization
         }
     }
 }

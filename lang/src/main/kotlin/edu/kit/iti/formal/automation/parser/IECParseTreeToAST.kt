@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.parser
 
 /*-
@@ -54,42 +72,57 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     private lateinit var sfc: SFCImplementation
     private lateinit var currentStep: SFCStep
 
-    //private lateinit var currentTopLevelScopeElement: HasScope
+    // private lateinit var currentTopLevelScopeElement: HasScope
     private var tscope = TypeScope.builtin()
 
     override fun visitStart(
-            ctx: IEC61131Parser.StartContext): PouElements {
+        ctx: IEC61131Parser.StartContext,
+    ): PouElements {
         val ast = PouElements()
         ast.ruleContext = ctx
         ctx.library_element_declaration().forEach { l ->
             val accept = l.accept(this) as? PouElement
-            if (accept != null)
+            if (accept != null) {
                 ast.add(accept)
+            }
         }
         return ast
     }
 
     override fun visitLibrary_element_declaration(ctx: IEC61131Parser.Library_element_declarationContext): Any {
         val elemen = oneOf<Top>(
-                ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
-                ctx.function_declaration(), ctx.global_variable_list_declaration(), ctx.interface_declaration(),
-                ctx.namespace_declaration(), ctx.program_declaration())
+            ctx.class_declaration(),
+            ctx.data_type_declaration(),
+            ctx.function_block_declaration(),
+            ctx.function_declaration(),
+            ctx.global_variable_list_declaration(),
+            ctx.interface_declaration(),
+            ctx.namespace_declaration(),
+            ctx.program_declaration(),
+        )
         if (ctx.pragma() != null && elemen != null) {
             if (elemen is HasPragma) {
                 val p = ctx.pragma().map { it.accept(this) as Pragma }
                 elemen.pragmas.addAll(p)
             } else {
-                throw RuntimeException("Pragma not supported ${elemen.nodeName} " +
-                        "at line ${ctx.start.tokenSource.sourceName}:${ctx.start.line}.")
+                throw RuntimeException(
+                    "Pragma not supported ${elemen.nodeName} " +
+                        "at line ${ctx.start.tokenSource.sourceName}:${ctx.start.line}.",
+                )
             }
         }
         return elemen!!
     }
 
     override fun visitNamespace_elements(ctx: IEC61131Parser.Namespace_elementsContext): Any {
-        val elemen = oneOf<Any>(ctx.class_declaration(), ctx.data_type_declaration(), ctx.function_block_declaration(),
-                ctx.function_declaration(), ctx.interface_declaration(),
-                ctx.namespace_declaration())
+        val elemen = oneOf<Any>(
+            ctx.class_declaration(),
+            ctx.data_type_declaration(),
+            ctx.function_block_declaration(),
+            ctx.function_declaration(),
+            ctx.interface_declaration(),
+            ctx.namespace_declaration(),
+        )
 
         if (ctx.pragma() != null) {
             if (elemen is HasPragma) {
@@ -104,23 +137,24 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitPragma(ctx: IEC61131Parser.PragmaContext): Any {
         val rawParameters = HashMap<String, String>()
-        var position: Int = 0;
+        var position: Int = 0
         ctx.pragma_arg().forEach {
             val value = it.value.text.trim('\'', '"')
-            if (it.ASSIGN() == null)
+            if (it.ASSIGN() == null) {
                 rawParameters["#" + (position++)] = value
-            else
+            } else {
                 rawParameters[it.arg.text.trim('"', '\'')] = value
+            }
         }
         val p = makePragma(ctx.type.text, rawParameters)
-                ?: throw IllegalArgumentException("Pragma ${ctx.type.text} in line ${ctx.type.line} not supported")
+            ?: throw IllegalArgumentException("Pragma ${ctx.type.text} in line ${ctx.type.line} not supported")
         return p
     }
 
     override fun visitCast(ctx: IEC61131Parser.CastContext): Literal {
         val (dt, _, v) = split(ctx.CAST_LITERAL().text)
         val ast = EnumLit(dt, v)
-        //ast.originalToken = ctx.CAST_LITERAL().symbol
+        // ast.originalToken = ctx.CAST_LITERAL().symbol
         ast.ruleContext = ctx
         return ast
     }
@@ -134,13 +168,15 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val ordinal = splitted.ordinal ?: 10
 
         var int = BigInteger(v.replace("_", ""), ordinal)
-        if (ctx.MINUS() != null)
+        if (ctx.MINUS() != null) {
             int *= -BigInteger.ONE
+        }
         val ast = IntegerLit(dt, int)
         try {
-            //weigl: quick type for common integer type
-            if (dt in tscope)
+            // weigl: quick type for common integer type
+            if (dt in tscope) {
                 ast.dataType.obj = tscope[dt] as AnyInt
+            }
         } catch (e: ClassCastException) {
         }
         ast.ruleContext = ctx
@@ -152,11 +188,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val splitted = split(text.text)
         val dt = splitted.prefix
         val v = splitted.value
-        if (v.equals("false", true))
+        if (v.equals("false", true)) {
             return BooleanLit(false)
-        if (v.equals("true", true))
+        }
+        if (v.equals("true", true)) {
             return BooleanLit(true)
-
+        }
 
         val ordinal = splitted.ordinal ?: 10
         val ast = BitLit(dt, v.toLong(ordinal))
@@ -173,10 +210,17 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitString(ctx: IEC61131Parser.StringContext): Any {
         val ast = StringLit(
-                if (ctx.STRING_LITERAL() != null) IECString.STRING
-                else IECString.WSTRING,
-                if (ctx.WSTRING_LITERAL() != null) ctx.text.trim('"')
-                else ctx.text.trim('\''))
+            if (ctx.STRING_LITERAL() != null) {
+                IECString.STRING
+            } else {
+                IECString.WSTRING
+            },
+            if (ctx.WSTRING_LITERAL() != null) {
+                ctx.text.trim('"')
+            } else {
+                ctx.text.trim('\'')
+            },
+        )
         ast.ruleContext = ctx
         return ast
     }
@@ -220,7 +264,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitData_type_declaration(
-            ctx: IEC61131Parser.Data_type_declarationContext): Any {
+        ctx: IEC61131Parser.Data_type_declarationContext,
+    ): Any {
         val ast = TypeDeclarations()
         ast.ruleContext = ctx
         for (i in 0 until ctx.type_declaration().size) {
@@ -228,21 +273,21 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ast.add(t)
             t.name = ctx.IDENTIFIER(i).text
         }
-        //Utils.setPosition(ast, ctx.TYPE, ctx.END_TYPE);
+        // Utils.setPosition(ast, ctx.TYPE, ctx.END_TYPE);
         return ast
     }
 
     override fun visitData_type_name(
-            ctx: IEC61131Parser.Data_type_nameContext): SimpleTypeDeclaration {
+        ctx: IEC61131Parser.Data_type_nameContext,
+    ): SimpleTypeDeclaration {
         val td = SimpleTypeDeclaration()
         td.ruleContext = ctx
         td.baseType.identifier = ctx.non_generic_type_name().text
         return td
     }
 
-    private fun <T> allOf(ctx: List<ParserRuleContext>) =
-            ctx.map { a -> a.accept(this) as T }
-                    .toMutableList()
+    private fun <T> allOf(ctx: List<ParserRuleContext>) = ctx.map { a -> a.accept(this) as T }
+        .toMutableList()
 
     private fun <T> oneOf(vararg children: ParserRuleContext?): T? {
         val fnn = children.find { it != null }
@@ -262,9 +307,15 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitType_declaration(
-            ctx: IEC61131Parser.Type_declarationContext): Any {
-        val init = (if (ctx.initializations() != null)
-            ctx.initializations().accept(this) else null) as Initialization?
+        ctx: IEC61131Parser.Type_declarationContext,
+    ): Any {
+        val init = (
+            if (ctx.initializations() != null) {
+                ctx.initializations().accept(this)
+            } else {
+                null
+            }
+            ) as Initialization?
 
         if (ctx.array_specification() != null) {
             val t = visitArray_specification(ctx.array_specification())
@@ -291,36 +342,37 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             t.initialization = init as Literal?
             return t
         } else
-        //if(ctx.data_type_name() != null)
-        {
-            val t = visitData_type_name(ctx.data_type_name())
-            t.setInit(init)
-            return t
-        }
+            // if(ctx.data_type_name() != null)
+            {
+                val t = visitData_type_name(ctx.data_type_name())
+                t.setInit(init)
+                return t
+            }
     }
 
     override fun visitInitializations_identifier(
-            ctx: IEC61131Parser.Initializations_identifierContext) = IdentifierInitializer(null, ctx.IDENTIFIER().text)
+        ctx: IEC61131Parser.Initializations_identifierContext,
+    ) = IdentifierInitializer(null, ctx.IDENTIFIER().text)
 
     override fun visitSubrange_spec_init(
-            ctx: IEC61131Parser.Subrange_spec_initContext): SubRangeTypeDeclaration {
+        ctx: IEC61131Parser.Subrange_spec_initContext,
+    ): SubRangeTypeDeclaration {
         val ast = SubRangeTypeDeclaration()
         ast.ruleContext = ctx
 
         ast.baseType.identifier = ctx.integer_type_name().text
         ast.range = ctx.subrange().accept(this) as Range
-        //Utils.setPosition(ast, ctx.integer_type_name.ctx, ctx.RPAREN);
+        // Utils.setPosition(ast, ctx.integer_type_name.ctx, ctx.RPAREN);
         return ast
     }
 
-    override fun visitSubrange(ctx: IEC61131Parser.SubrangeContext) =
-            Range(ctx.c.accept(this) as IntegerLit, ctx.d.accept(this) as IntegerLit)
+    override fun visitSubrange(ctx: IEC61131Parser.SubrangeContext) = Range(ctx.c.accept(this) as IntegerLit, ctx.d.accept(this) as IntegerLit)
 
     override fun visitEnumerated_specification(
-            ctx: IEC61131Parser.Enumerated_specificationContext): EnumerationTypeDeclaration {
+        ctx: IEC61131Parser.Enumerated_specificationContext,
+    ): EnumerationTypeDeclaration {
         val ast = EnumerationTypeDeclaration()
         ast.ruleContext = ctx
-
 
         for (i in ctx.value.indices) {
             ast.addValue(ctx.value[i])
@@ -336,21 +388,25 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitArray_specification(
-            ctx: IEC61131Parser.Array_specificationContext): ArrayTypeDeclaration {
+        ctx: IEC61131Parser.Array_specificationContext,
+    ): ArrayTypeDeclaration {
         val ast = ArrayTypeDeclaration(
-                type = if (ctx.non_generic_type_name() != null)
-                    SimpleTypeDeclaration(ctx.non_generic_type_name()!!.text)
-                else
-                    ctx.string_type_declaration().accept(this) as StringTypeDeclaration
+            type = if (ctx.non_generic_type_name() != null) {
+                SimpleTypeDeclaration(ctx.non_generic_type_name()!!.text)
+            } else {
+                ctx.string_type_declaration().accept(this) as StringTypeDeclaration
+            },
         )
 
-        for (src in ctx.ranges)
+        for (src in ctx.ranges) {
             ast.addSubRange(src.accept(this) as Range)
+        }
         return ast
     }
 
     override fun visitArray_initialization(
-            ctx: IEC61131Parser.Array_initializationContext): Any {
+        ctx: IEC61131Parser.Array_initializationContext,
+    ): Any {
         val ast = ArrayInitialization()
         ast.ruleContext = ctx
 
@@ -362,43 +418,47 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitArray_initial_elements(
-            ctx: IEC61131Parser.Array_initial_elementsContext): Any {
+        ctx: IEC61131Parser.Array_initial_elementsContext,
+    ): Any {
         val initializations = ArrayList<Initialization>()
         var count = 1
         if (ctx.integer() != null) {
             val lit = ctx.integer().accept(this) as IntegerLit
             count = lit.value.toInt()
         }
-        for (i in 0 until count)
+        for (i in 0 until count) {
             initializations.add(ctx.array_initial_element().accept(this) as Initialization)
+        }
         return initializations
     }
 
     override fun visitArray_initial_element(
-            ctx: IEC61131Parser.Array_initial_elementContext): Any? {
-        return oneOf<Any>(ctx.constant(), ctx.structure_initialization(), ctx.array_initialization())
-    }
+        ctx: IEC61131Parser.Array_initial_elementContext,
+    ): Any? = oneOf<Any>(ctx.constant(), ctx.structure_initialization(), ctx.array_initialization())
 
     override fun visitStructure_declaration(
-            ctx: IEC61131Parser.Structure_declarationContext): StructureTypeDeclaration {
+        ctx: IEC61131Parser.Structure_declarationContext,
+    ): StructureTypeDeclaration {
         val ast = StructureTypeDeclaration()
         val localScope = Scope()
         gather = localScope.builder()
         ctx.ids.zip(ctx.tds).forEach { (id, type) ->
             gather.identifiers(id.IDENTIFIER().symbol).type(type.accept(this) as TypeDeclaration).close()
         }
-        //gather = null
+        // gather = null
         ast.fields = localScope.variables
         return ast
     }
 
     override fun visitStructure_initialization(
-            ctx: IEC61131Parser.Structure_initializationContext): Any {
+        ctx: IEC61131Parser.Structure_initializationContext,
+    ): Any {
         // Includes class and FB initializations
         val ast = StructureInitialization()
         ast.ruleContext = ctx
-        for (i in ctx.IDENT.indices)
+        for (i in ctx.IDENT.indices) {
             ast.addField(ctx.IDENT[i].text, ctx.init[i].accept(this) as Initialization)
+        }
         return ast
     }
 
@@ -410,7 +470,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitString_type_declaration(
-            ctx: IEC61131Parser.String_type_declarationContext): StringTypeDeclaration {
+        ctx: IEC61131Parser.String_type_declarationContext,
+    ): StringTypeDeclaration {
         val ast = StringTypeDeclaration()
         ast.ruleContext = ctx
 
@@ -422,14 +483,14 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitIdentifier_list(
-            ctx: IEC61131Parser.Identifier_listContext): List<String> {
-        return ctx.names.map { it.text }
-    }
+        ctx: IEC61131Parser.Identifier_listContext,
+    ): List<String> = ctx.names.map { it.text }
 
     override fun visitFunction_declaration(
-            ctx: IEC61131Parser.Function_declarationContext): Any {
+        ctx: IEC61131Parser.Function_declarationContext,
+    ): Any {
         val ast = FunctionDeclaration()
-        //currentTopLevelScopeElement = ast
+        // currentTopLevelScopeElement = ast
         ast.ruleContext = ctx
         ast.name = ctx.identifier.text
         ast.scope = ctx.var_decls().accept(this) as Scope
@@ -449,8 +510,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         gather.push(VariableDeclaration.GLOBAL)
         ctx.var_decl_inner().accept(this)
 
-        //gvl.scope.forEach { v -> v.parent = gvl }
-        //gather = null
+        // gvl.scope.forEach { v -> v.parent = gvl }
+        // gather = null
         return gvl
     }
 
@@ -471,7 +532,6 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return null
     }
 
-
     fun <T> List<ParserRuleContext>.map(): MutableList<T> = this.map { it -> it.accept(this@IECParseTreeToAST) as T }.toMutableList()
 
     override fun visitBlock_statement(ctx: IEC61131Parser.Block_statementContext): BlockStatement {
@@ -486,9 +546,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return bs
     }
 
-    override fun visitRef_list(ctx: IEC61131Parser.Ref_listContext): Any {
-        return ctx.symbolic_variable().map { it.accept(this) }
-    }
+    override fun visitRef_list(ctx: IEC61131Parser.Ref_listContext): Any = ctx.symbolic_variable().map { it.accept(this) }
 
     override fun visitVar_decl_inner(ctx: IEC61131Parser.Var_decl_innerContext): Any? {
         val p: List<Pragma> = ctx.pragma().map()
@@ -496,11 +554,11 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             val seq = ctx.identifier_list(i).names.map { it }
 
             gather
-                    .pushPragma(p)
-                    .identifiers(seq)
-                    .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
-                    .close()
-                    .popPragma()
+                .pushPragma(p)
+                .identifiers(seq)
+                .type(ctx.type_declaration(i).accept(this) as TypeDeclaration)
+                .close()
+                .popPragma()
         }
         return null
     }
@@ -543,7 +601,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitFunction_block_declaration(ctx: IEC61131Parser.Function_block_declarationContext): Any {
         val ast = FunctionBlockDeclaration()
-        //currentTopLevelScopeElement = ast
+        // currentTopLevelScopeElement = ast
         ast.ruleContext = ctx
         ast.scope = ctx.var_decls()?.accept(this) as Scope
         ast.isFinal = ctx.FINAL() != null
@@ -554,7 +612,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         }
         if (ctx.interfaces != null) {
             (ctx.interfaces.accept(this) as List<String>)
-                    .forEach { i -> ast.interfaces.add(RefTo(i)) }
+                .forEach { i -> ast.interfaces.add(RefTo(i)) }
         }
         ast.scope = ctx.var_decls().accept(this) as Scope
         ast.methods.addAll(ctx.methods().accept(this) as List<MethodDeclaration>)
@@ -563,21 +621,25 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             ast.addAction(act.accept(this) as ActionDeclaration)
         }
 
-        if (ctx.body().stBody() != null)
+        if (ctx.body().stBody() != null) {
             ast.stBody = ctx.body().stBody().accept(this) as StatementList
-        if (ctx.body().sfc() != null)
+        }
+        if (ctx.body().sfc() != null) {
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
-        if (ctx.body().ilBody() != null)
+        }
+        if (ctx.body().ilBody() != null) {
             ast.ilBody = ctx.body().ilBody().accept(this) as IlBody
-        if (ctx.body().fbBody() != null)
+        }
+        if (ctx.body().fbBody() != null) {
             ast.fbBody = ctx.body().fbBody().accept(this) as FbdBody
+        }
         return ast
     }
 
     override fun visitInterface_declaration(ctx: IEC61131Parser.Interface_declarationContext): Any {
         val ast = InterfaceDeclaration()
         ast.ruleContext = ctx
-        //ast.scope = ctx.var_decls().accept(this) as Scope
+        // ast.scope = ctx.var_decls().accept(this) as Scope
         ast.name = ctx.identifier.text
         ast.methods.setAll(ctx.methods().accept(this) as List<MethodDeclaration>)
 
@@ -590,7 +652,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitClass_declaration(ctx: IEC61131Parser.Class_declarationContext): Any {
         val ast = ClassDeclaration()
         ast.ruleContext = ctx
-        //currentTopLevelScopeElement = ast
+        // currentTopLevelScopeElement = ast
         ast.scope = ctx.var_decls().accept(this) as Scope
         ast.isFinal = ctx.FINAL() != null
         ast.isAbstract = ctx.ABSTRACT() != null
@@ -600,22 +662,21 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         }
         if (ctx.interfaces != null) {
             (ctx.interfaces.accept(this) as List<String>)
-                    .forEach { ast.interfaces.add(it) }
+                .forEach { ast.interfaces.add(it) }
         }
         ast.methods.setAll(ctx.methods().accept(this) as List<MethodDeclaration>)
         return ast
     }
 
     override fun visitMethods(
-            ctx: IEC61131Parser.MethodsContext): List<MethodDeclaration> {
-        return ctx.method().map { a -> a.accept(this) as MethodDeclaration }
-    }
+        ctx: IEC61131Parser.MethodsContext,
+    ): List<MethodDeclaration> = ctx.method().map { a -> a.accept(this) as MethodDeclaration }
 
     override fun visitMethod(ctx: IEC61131Parser.MethodContext): Any {
         val ast = MethodDeclaration()
-        //ast.ruleContext = (ctx);
+        // ast.ruleContext = (ctx);
         ast.name = ctx.identifier.text
-        //ast.parent = currentTopLevelScopeElement as Classifier<*>?
+        // ast.parent = currentTopLevelScopeElement as Classifier<*>?
         if (ctx.access_specifier() != null) {
             ast.accessSpecifier = AccessSpecifier.valueOf(ctx.access_specifier().text)
         }
@@ -633,33 +694,38 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             }
         }
 
-
-        //currentTopLevelScopeElement = ast;
+        // currentTopLevelScopeElement = ast;
         ast.scope = ctx.var_decls().accept(this) as Scope
 
-        if (ctx.body().stBody() != null)
+        if (ctx.body().stBody() != null) {
             ast.stBody = ctx.body().stBody().accept(this) as StatementList
+        }
 
-        //currentTopLevelScopeElement = ast.getParent();
+        // currentTopLevelScopeElement = ast.getParent();
         return ast
     }
 
     override fun visitProgram_declaration(
-            ctx: IEC61131Parser.Program_declarationContext): Any {
+        ctx: IEC61131Parser.Program_declarationContext,
+    ): Any {
         val ast = ProgramDeclaration()
         ast.ruleContext = ctx
         ast.name = ctx.identifier.text
-        //currentTopLevelScopeElement = ast
+        // currentTopLevelScopeElement = ast
         ast.scope = ctx.var_decls().accept(this) as Scope
 
-        if (ctx.body().stBody() != null)
+        if (ctx.body().stBody() != null) {
             ast.stBody = ctx.body().stBody().accept(this) as StatementList
-        if (ctx.body().sfc() != null)
+        }
+        if (ctx.body().sfc() != null) {
             ast.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
-        if (ctx.body().ilBody() != null)
+        }
+        if (ctx.body().ilBody() != null) {
             ast.ilBody = ctx.body().ilBody().accept(this) as IlBody
-        if (ctx.body().fbBody() != null)
+        }
+        if (ctx.body().fbBody() != null) {
             ast.fbBody = ctx.body().fbBody().accept(this) as FbdBody
+        }
 
         ctx.action().forEach { act -> ast.addAction(act.accept(this) as ActionDeclaration) }
 
@@ -667,97 +733,113 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitUnaryNegateExpr(
-            ctx: IEC61131Parser.UnaryNegateExprContext): Expression {
-        val ast = UnaryExpression(Operators.NOT,
-                ctx.sub.accept(this) as Expression)
-        //Utils.setPosition(ast, ctx.NOT(), ctx.sub);
+        ctx: IEC61131Parser.UnaryNegateExprContext,
+    ): Expression {
+        val ast = UnaryExpression(
+            Operators.NOT,
+            ctx.sub.accept(this) as Expression,
+        )
+        // Utils.setPosition(ast, ctx.NOT(), ctx.sub);
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitBinaryOrExpr(
-            ctx: IEC61131Parser.BinaryOrExprContext): Any {
+        ctx: IEC61131Parser.BinaryOrExprContext,
+    ): Any {
         val binaryExpr = binaryExpr(ctx.left, ctx.op, ctx.right)
         binaryExpr.ruleContext = (ctx)
         return binaryExpr
     }
 
     override fun visitBinaryCmpExpr(
-            ctx: IEC61131Parser.BinaryCmpExprContext): Any {
+        ctx: IEC61131Parser.BinaryCmpExprContext,
+    ): Any {
         val expr = binaryExpr(ctx.left, ctx.op, ctx.right)
         expr.ruleContext = (ctx)
         return expr
     }
 
     override fun visitBinaryModDivExpr(
-            ctx: IEC61131Parser.BinaryModDivExprContext): Any {
+        ctx: IEC61131Parser.BinaryModDivExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitParenExpr(
-            ctx: IEC61131Parser.ParenExprContext): Any {
-        return ctx.expression().accept(this)
-    }
+        ctx: IEC61131Parser.ParenExprContext,
+    ): Any = ctx.expression().accept(this)
 
     override fun visitBinaryXORExpr(
-            ctx: IEC61131Parser.BinaryXORExprContext): Any {
+        ctx: IEC61131Parser.BinaryXORExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitUnaryMinusExpr(
-            ctx: IEC61131Parser.UnaryMinusExprContext): Any {
+        ctx: IEC61131Parser.UnaryMinusExprContext,
+    ): Any {
         val ast = UnaryExpression(Operators.MINUS, ctx.sub.accept(this) as Expression)
-        //Utils.setPosition(ast, ctx.NOT, ctx.sub.accept(this));
+        // Utils.setPosition(ast, ctx.NOT, ctx.sub.accept(this));
         ast.ruleContext = ctx
         return ast
     }
 
     override fun visitBinaryPowerExpr(
-            ctx: IEC61131Parser.BinaryPowerExprContext): Any {
+        ctx: IEC61131Parser.BinaryPowerExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitBinaryMultExpr(
-            ctx: IEC61131Parser.BinaryMultExprContext): Any {
+        ctx: IEC61131Parser.BinaryMultExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitBinaryPlusMinusExpr(
-            ctx: IEC61131Parser.BinaryPlusMinusExprContext): Any {
+        ctx: IEC61131Parser.BinaryPlusMinusExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitBinaryEqExpr(
-            ctx: IEC61131Parser.BinaryEqExprContext): Any {
+        ctx: IEC61131Parser.BinaryEqExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
     override fun visitBinaryAndExpr(
-            ctx: IEC61131Parser.BinaryAndExprContext): Any {
+        ctx: IEC61131Parser.BinaryAndExprContext,
+    ): Any {
         val e = binaryExpr(ctx.left, ctx.op, ctx.right)
         e.ruleContext = (ctx)
         return e
     }
 
-    fun binaryExpr(left: IEC61131Parser.ExpressionContext,
-                   op: Token, right: IEC61131Parser.ExpressionContext): Expression {
+    fun binaryExpr(
+        left: IEC61131Parser.ExpressionContext,
+        op: Token,
+        right: IEC61131Parser.ExpressionContext,
+    ): Expression {
         val binOp = Operators.lookup(op.text) as BinaryOperator
         return BinaryExpression(
-                left.accept(this) as Expression,
-                binOp,
-                right.accept(this) as Expression)
+            left.accept(this) as Expression,
+            binOp,
+            right.accept(this) as Expression,
+        )
     }
 
     override fun visitInvocation(ctx: IEC61131Parser.InvocationContext): Any {
@@ -774,18 +856,17 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return i
     }
 
-
     override fun visitStatement_list(
-            ctx: IEC61131Parser.Statement_listContext): Any {
-        return StatementList(allOf(ctx.statement()))
-    }
-
+        ctx: IEC61131Parser.Statement_listContext,
+    ): Any = StatementList(allOf(ctx.statement()))
 
     override fun visitAssignment_statement(
-            ctx: IEC61131Parser.Assignment_statementContext): Any {
+        ctx: IEC61131Parser.Assignment_statementContext,
+    ): Any {
         val ast = AssignmentStatement(
-                ctx.a.accept(this) as SymbolicReference,
-                ctx.expression().accept(this) as Expression)
+            ctx.a.accept(this) as SymbolicReference,
+            ctx.expression().accept(this) as Expression,
+        )
         ast.reference = ctx.RASSIGN() != null
         ast.isAssignmentAttempt = ctx.ASSIGN_ATTEMPT() != null
         ast.ruleContext = ctx
@@ -793,33 +874,32 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitStatement(ctx: IEC61131Parser.StatementContext): Any? {
-        val statement = oneOf<Any>(ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
-                ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
-                ctx.case_statement(), ctx.invocation_statement(), ctx.block_statement(),
-                ctx.jump_statement(), ctx.for_statement(), ctx.special_statement()) as Statement
+        val statement = oneOf<Any>(
+            ctx.assignment_statement(), ctx.if_statement(), ctx.exit_statement(),
+            ctx.repeat_statement(), ctx.return_statement(), ctx.while_statement(),
+            ctx.case_statement(), ctx.invocation_statement(), ctx.block_statement(),
+            ctx.jump_statement(), ctx.for_statement(), ctx.special_statement(),
+        ) as Statement
         val p = ctx.pragma().map { it.accept(this) as Pragma }
         if (p.isNullOrEmpty()) statement.pragmas += p
         return statement
     }
 
+    override fun visitJump_statement(ctx: IEC61131Parser.Jump_statementContext) = JumpStatement(ctx.id.text)
 
-    override fun visitJump_statement(ctx: IEC61131Parser.Jump_statementContext) =
-            JumpStatement(ctx.id.text)
-
-    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext) =
-            LabelStatement(ctx.id.text)
-
+    override fun visitLabel_statement(ctx: IEC61131Parser.Label_statementContext) = LabelStatement(ctx.id.text)
 
     override fun visitSymbolic_variable(ctx: IEC61131Parser.Symbolic_variableContext): Any {
-        //TODO REWORK
+        // TODO REWORK
         val ast = SymbolicReference()
         ast.ruleContext = ctx
 
         ast.identifier = ctx.a.text.trim('`')
-        ast.sub = if (ctx.DOT() != null)
+        ast.sub = if (ctx.DOT() != null) {
             ctx.other.accept(this) as SymbolicReference
-        else
+        } else {
             null
+        }
 
         if (ctx.subscript_list() != null) {
             ast.subscripts = ctx.subscript_list().accept(this) as ExpressionList
@@ -831,12 +911,12 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitSubscript_list(
-            ctx: IEC61131Parser.Subscript_listContext): ExpressionList {
-        return ExpressionList(allOf<Expression>(ctx.expression()))
-    }
+        ctx: IEC61131Parser.Subscript_listContext,
+    ): ExpressionList = ExpressionList(allOf<Expression>(ctx.expression()))
 
     override fun visitDirect_variable(
-            ctx: IEC61131Parser.Direct_variableContext): Any {
+        ctx: IEC61131Parser.Direct_variableContext,
+    ): Any {
         val ast = DirectVariable(ctx.text)
         ast.ruleContext = ctx
         return ast
@@ -859,21 +939,25 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitParam_assignment(
-            ctx: IEC61131Parser.Param_assignmentContext): Any {
+        ctx: IEC61131Parser.Param_assignmentContext,
+    ): Any {
         val p = InvocationParameter()
         p.ruleContext = ctx
         if (ctx.ARROW_RIGHT() != null) {
             p.isOutput = true
             p.expression = ctx.v.accept(this) as Expression
-        } else
+        } else {
             p.expression = ctx.expression().accept(this) as Expression
-        if (ctx.id != null)
+        }
+        if (ctx.id != null) {
             p.name = ctx.id.text
+        }
         return p
     }
 
     override fun visitIf_statement(
-            ctx: IEC61131Parser.If_statementContext): Any {
+        ctx: IEC61131Parser.If_statementContext,
+    ): Any {
         val ast = IfStatement()
         ast.ruleContext = ctx
         for (i in ctx.cond.indices) {
@@ -890,13 +974,15 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitCase_statement(
-            ctx: IEC61131Parser.Case_statementContext): Any {
+        ctx: IEC61131Parser.Case_statementContext,
+    ): Any {
         val ast = CaseStatement()
         ast.ruleContext = ctx
 
         ast.cases.addAll(allOf<Case>(ctx.case_entry()))
-        if (ctx.elselist != null)
+        if (ctx.elselist != null) {
             ast.elseCase = ctx.elselist.accept(this) as StatementList
+        }
 
         ast.expression = ctx.cond.accept(this) as Expression
         return ast
@@ -944,7 +1030,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitWhile_statement(
-            ctx: IEC61131Parser.While_statementContext): Any {
+        ctx: IEC61131Parser.While_statementContext,
+    ): Any {
         val ast = WhileStatement()
         ast.ruleContext = ctx
 
@@ -954,7 +1041,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     override fun visitRepeat_statement(
-            ctx: IEC61131Parser.Repeat_statementContext): Any {
+        ctx: IEC61131Parser.Repeat_statementContext,
+    ): Any {
         val ast = RepeatStatement()
         ast.condition = ctx.expression().accept(this) as Expression
         ast.statements = ctx.statement_list().accept(this) as StatementList
@@ -969,8 +1057,8 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
 
     override fun visitSpecial_statement(ctx: IEC61131Parser.Special_statementContext): SpecialStatement {
         val exprs = ctx.expression()
-                .map { it.accept(this) as Expression }
-                .toMutableList()
+            .map { it.accept(this) as Expression }
+            .toMutableList()
         val id = ctx.id?.text
         val s = when (val name = ctx.type.text) {
             "assert" -> SpecialStatement.Assert(exprs, id)
@@ -998,7 +1086,7 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
             network.steps.add(visitStep(stepContext))
         }
 
-        //ctx.action().forEach { a -> sfc!!.actions.add(visitAction(a)) }
+        // ctx.action().forEach { a -> sfc!!.actions.add(visitAction(a)) }
 
         ctx.transition().forEach { t -> visitTransition(t) }
 
@@ -1008,23 +1096,28 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     override fun visitAction(ctx: IEC61131Parser.ActionContext): ActionDeclaration {
         val action = ActionDeclaration()
         action.name = ctx.IDENTIFIER().symbol.text
-        if (ctx.body().stBody() != null)
+        if (ctx.body().stBody() != null) {
             action.stBody = ctx.body().stBody().accept(this) as StatementList
-        if (ctx.body().sfc() != null)
+        }
+        if (ctx.body().sfc() != null) {
             action.sfcBody = ctx.body().sfc().accept(this) as SFCImplementation
-        if (ctx.body().ilBody() != null)
+        }
+        if (ctx.body().ilBody() != null) {
             action.ilBody = ctx.body().ilBody().accept(this) as IlBody
-        if (ctx.body().fbBody() != null)
+        }
+        if (ctx.body().fbBody() != null) {
             action.fbBody = ctx.body().fbBody().accept(this) as FbdBody
+        }
         action.ruleContext = ctx
         return action
     }
 
     override fun visitStBody(ctx: IEC61131Parser.StBodyContext): Any {
         val statements = StatementList()
-        if (ctx.startlbl != null)
+        if (ctx.startlbl != null) {
             statements.add(ctx.startlbl.accept())
-        statements.addAll(ctx.startstmts.accept());
+        }
+        statements.addAll(ctx.startstmts.accept())
 
         for (i in 0 until ctx.lbls.size) {
             statements.add(ctx.lbls[i].accept())
@@ -1034,7 +1127,6 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
     }
 
     inline fun <T> ParserRuleContext?.accept(): T = this?.accept(this@IECParseTreeToAST) as T
-
 
     override fun visitInit_step(ctx: IEC61131Parser.Init_stepContext): SFCStep {
         currentStep = SFCStep()
@@ -1080,8 +1172,9 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         val transition = SFCTransition()
         transition.ruleContext = ctx
 
-        if (ctx.id != null)
+        if (ctx.id != null) {
             transition.name = ctx.id.text
+        }
 
         if (ctx.INTEGER_LITERAL() != null) {
             val s = split(ctx.INTEGER_LITERAL().text)
@@ -1099,13 +1192,11 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return transition
     }
 
-    override fun visitSteps(ctx: IEC61131Parser.StepsContext): MutableSet<SFCStep> {
-        return ctx.IDENTIFIER()
-                .map { n -> network.getStep(n.symbol.text) }
-                .filter { it.isPresent() }
-                .map { it.get() }
-                .toHashSet()
-    }
+    override fun visitSteps(ctx: IEC61131Parser.StepsContext): MutableSet<SFCStep> = ctx.IDENTIFIER()
+        .map { n -> network.getStep(n.symbol.text) }
+        .filter { it.isPresent() }
+        .map { it.get() }
+        .toHashSet()
     //endregion
 
     //region il
@@ -1124,22 +1215,29 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return instr
     }
 
-    override fun visitIlInstr(ctx: IEC61131Parser.IlInstrContext) =
-            oneOf<IlInstr>(ctx.ilCall(), ctx.ilExpr(), ctx.ilFormalFunctionCall(), ctx.ilJump(), ctx.ilSimple(),
-                    ctx.ilFunctionCall())!!
+    override fun visitIlInstr(ctx: IEC61131Parser.IlInstrContext) = oneOf<IlInstr>(
+        ctx.ilCall(),
+        ctx.ilExpr(),
+        ctx.ilFormalFunctionCall(),
+        ctx.ilJump(),
+        ctx.ilSimple(),
+        ctx.ilFunctionCall(),
+    )!!
 
+    override fun visitIlSInstr(ctx: IEC61131Parser.IlSInstrContext) = oneOf<IlInstr>(ctx.ilExpr(), ctx.ilFormalFunctionCall(), ctx.ilSimple(), ctx.ilFunctionCall())!!
 
-    override fun visitIlSInstr(ctx: IEC61131Parser.IlSInstrContext) =
-            oneOf<IlInstr>(ctx.ilExpr(), ctx.ilFormalFunctionCall(), ctx.ilSimple(), ctx.ilFunctionCall())!!
+    override fun visitIlSimple(ctx: IEC61131Parser.IlSimpleContext) = SimpleInstr(
+        SimpleOperand.valueOf(ctx.op.text),
+        ctx.ilOperand().accept(this) as IlOperand,
+    )
+        .also { it.ruleContext = ctx }
 
-    override fun visitIlSimple(ctx: IEC61131Parser.IlSimpleContext) = SimpleInstr(SimpleOperand.valueOf(ctx.op.text),
-            ctx.ilOperand().accept(this) as IlOperand)
-            .also { it.ruleContext = ctx }
-
-    override fun visitIlExpr(ctx: IEC61131Parser.IlExprContext) = ExprInstr(ExprOperand.valueOf(ctx.op.text),
-            ctx.ilOperand()?.accept(this) as? IlOperand,
-            ctx.ilSInstrList()?.accept(this) as? IlBody)
-            .also { it.ruleContext = ctx }
+    override fun visitIlExpr(ctx: IEC61131Parser.IlExprContext) = ExprInstr(
+        ExprOperand.valueOf(ctx.op.text),
+        ctx.ilOperand()?.accept(this) as? IlOperand,
+        ctx.ilSInstrList()?.accept(this) as? IlBody,
+    )
+        .also { it.ruleContext = ctx }
 
     override fun visitIlSInstrList(ctx: IEC61131Parser.IlSInstrListContext): IlBody {
         val body = IlBody()
@@ -1149,30 +1247,34 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         return body
     }
 
-    override fun visitIlFunctionCall(ctx: IEC61131Parser.IlFunctionCallContext) = FunctionCallInstr(ctx.symbolic_variable().accept(this) as SymbolicReference,
-            ctx.ilOperand().map { it.accept(this) as IlOperand }.toMutableList())
-            .also { it.ruleContext = ctx }
+    override fun visitIlFunctionCall(ctx: IEC61131Parser.IlFunctionCallContext) = FunctionCallInstr(
+        ctx.symbolic_variable().accept(this) as SymbolicReference,
+        ctx.ilOperand().map { it.accept(this) as IlOperand }.toMutableList(),
+    )
+        .also { it.ruleContext = ctx }
 
-    override fun visitIlFormalFunctionCall(ctx: IEC61131Parser.IlFormalFunctionCallContext): CallInstr {
-        return CallInstr(CallOperand.IMPLICIT_CALLED,
-                ctx.symbolic_variable().accept(this) as SymbolicReference,
-                ctx.il_param_assignment().map { it.accept(this) as IlParameter }.toMutableList())
-                .also { it.ruleContext = ctx }
-    }
+    override fun visitIlFormalFunctionCall(ctx: IEC61131Parser.IlFormalFunctionCallContext): CallInstr = CallInstr(
+        CallOperand.IMPLICIT_CALLED,
+        ctx.symbolic_variable().accept(this) as SymbolicReference,
+        ctx.il_param_assignment().map { it.accept(this) as IlParameter }.toMutableList(),
+    )
+        .also { it.ruleContext = ctx }
 
     override fun visitIlJump(ctx: IEC61131Parser.IlJumpContext) = JumpInstr(JumpOperand.valueOf(ctx.op.text), ctx.label.text)
-            .also { it.ruleContext = ctx }
+        .also { it.ruleContext = ctx }
 
     override fun visitIlCall(ctx: IEC61131Parser.IlCallContext): CallInstr {
-        val callInstr = CallInstr(CallOperand.valueOf(ctx.op.text),
-                ctx.symbolic_variable().accept(this) as SymbolicReference,
-                ctx.il_param_assignment()
-                        .map { it.accept(this) as IlParameter }.toMutableList())
+        val callInstr = CallInstr(
+            CallOperand.valueOf(ctx.op.text),
+            ctx.symbolic_variable().accept(this) as SymbolicReference,
+            ctx.il_param_assignment()
+                .map { it.accept(this) as IlParameter }.toMutableList(),
+        )
 
         val seq = if (ctx.LPAREN() != null) {
             ctx.ilOperand()
-                    .map { it.accept(this) as IlOperand }
-                    .map { IlParameter(right = it) }
+                .map { it.accept(this) as IlOperand }
+                .map { IlParameter(right = it) }
         } else {
             ctx.il_param_assignment().map { it.accept(this) as IlParameter }
         }
@@ -1196,16 +1298,16 @@ class IECParseTreeToAST : IEC61131ParserBaseVisitor<Any>() {
         throw IllegalStateException()
     }
 
-    override fun visitIl_param_assignment(ctx: IEC61131Parser.Il_param_assignmentContext): IlParameter {
-        return IlParameter(negated = ctx.NOT() != null, input = ctx.ASSIGN() != null,
-                left = ctx.id.text,
-                right = if (ctx.ASSIGN() != null)
-                    ctx.arg.accept(this) as IlOperand
-                else
-                    IlOperand.Variable(SymbolicReference(ctx.target.text))
-        )
-
-    }
+    override fun visitIl_param_assignment(ctx: IEC61131Parser.Il_param_assignmentContext): IlParameter = IlParameter(
+        negated = ctx.NOT() != null,
+        input = ctx.ASSIGN() != null,
+        left = ctx.id.text,
+        right = if (ctx.ASSIGN() != null) {
+            ctx.arg.accept(this) as IlOperand
+        } else {
+            IlOperand.Variable(SymbolicReference(ctx.target.text))
+        },
+    )
     //endregion
 
     override fun visitFbBody(ctx: IEC61131Parser.FbBodyContext): FbdBody {

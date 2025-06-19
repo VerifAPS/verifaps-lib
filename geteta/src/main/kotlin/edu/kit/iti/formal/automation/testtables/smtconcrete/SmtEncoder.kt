@@ -1,9 +1,27 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.smtconcrete
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.testtables.builder.SMVConstructionModel
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
+import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParserBaseVisitor
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.automata.AutomatonState
@@ -50,18 +68,23 @@ class DefaultIecToSmtDataTypeTranslator(val useBv: Boolean) : IecToSmtDataTypeTr
 
     var enumType: SmtEnumType = SmtEnumType("emptyenum", listOf())
     override fun translate(dt: Any): SmtType {
-        return if (dt is EnumerateType)
-            if (useBv) return map[INT]!!
-            else enumType
-        else map[dt] ?: throw IllegalStateException("Undefined translation for $dt")
+        return if (dt is EnumerateType) {
+            if (useBv) {
+                return map[INT]!!
+            } else {
+                enumType
+            }
+        } else {
+            map[dt] ?: throw IllegalStateException("Undefined translation for $dt")
+        }
     }
 }
 
-
 class SmtEncoder(
-        val gtt: GeneralizedTestTable,
-        val smvModel: SMVConstructionModel,
-        val traceLength: Int) {
+    val gtt: GeneralizedTestTable,
+    val smvModel: SMVConstructionModel,
+    val traceLength: Int,
+) {
 
     val model = SmtModel()
     val row2Id = hashMapOf<TableRow, Int>()
@@ -94,9 +117,9 @@ class SmtEncoder(
 
         createTimeToRowBinding()
 
-        //defineDurationBounds()
-        //unrollRowsToConstraints()
-        //connectBackwardReferences()
+        // defineDurationBounds()
+        // unrollRowsToConstraints()
+        // connectBackwardReferences()
     }
 
     private fun createTimeToRowBinding() {
@@ -132,11 +155,17 @@ class SmtEncoder(
                 (ite (= c row1) (constraint_row_01 i)
                     (ite (= c row2) (constraint_row_02 i)
                         false)))
-        */
+         */
 
-        model.file.add(sexpr("define-fun", "rconstraint",
+        model.file.add(
+            sexpr(
+                "define-fun",
+                "rconstraint",
                 SList.singleton(sexpr("i", "Int")),
-                SmtBoolType.type, body))
+                SmtBoolType.type,
+                body,
+            ),
+        )
     }
 
     fun createRowConstraints() {
@@ -153,11 +182,15 @@ class SmtEncoder(
         }
 
         model.file.add(
-                sexpr("define-fun", "constraints_row_${it.id}",
-                        SList.singleton(sexpr("i", SmtIntType.type)), SmtBoolType.type,
-                        fnapply("and", body)))
+            sexpr(
+                "define-fun",
+                "constraints_row_${it.id}",
+                SList.singleton(sexpr("i", SmtIntType.type)),
+                SmtBoolType.type,
+                fnapply("and", body),
+            ),
+        )
     }
-
 
     /**(0)
      * (declare-datatypes () ((BoolT True False Bot)))
@@ -171,8 +204,7 @@ class SmtEncoder(
         model.file.add(typeSEnum.declaration)
     }
 
-
-    //(1)
+    // (1)
     private fun createFreeVariables() {
         gtt.constraintVariables.forEach { v ->
             model.file.add(sexpr(v.name, typeTranslator.translate(v.dataType).type))
@@ -184,35 +216,49 @@ class SmtEncoder(
     }
 
     /**
-    ```
-    (define-fun succ ((from Int) (to Int)) Bool
-    (or (and (= from X) (= to Y))
-    ..))
+     ```
+     (define-fun succ ((from Int) (to Int)) Bool
+     (or (and (= from X) (= to Y))
+     ..))
      */
     private fun encodeRowTransitionFunction() {
         val body = sexpr("or")
         smvModel.automaton.transitions
-                .filter {
-                    it.to != smvModel.automaton.stateError
-                }
-                .forEach {
-                    val from = SSymbol(it.from.name)
-                    val to = SSymbol(it.to.name)
-                    body.add(sexpr("and",
-                            sexpr("=", "from", from),
-                            sexpr("=", "to", to)))
-                }
-        model.file.add(sexpr(
-                "define-fun", succFn, sexpr(sexpr("from", typeState), sexpr("to", typeState)), "Bool",
-                body))
+            .filter {
+                it.to != smvModel.automaton.stateError
+            }
+            .forEach {
+                val from = SSymbol(it.from.name)
+                val to = SSymbol(it.to.name)
+                body.add(
+                    sexpr(
+                        "and",
+                        sexpr("=", "from", from),
+                        sexpr("=", "to", to),
+                    ),
+                )
+            }
+        model.file.add(
+            sexpr(
+                "define-fun",
+                succFn,
+                sexpr(sexpr("from", typeState), sexpr("to", typeState)),
+                "Bool",
+                body,
+            ),
+        )
     }
-
 
     val symCycleRow = SSymbol("cyclerow")
     private fun createRowSelectors() {
         model.file.add(
-                sexpr("declare-fun", symCycleRow,
-                        sexpr("Int"), typeState))
+            sexpr(
+                "declare-fun",
+                symCycleRow,
+                sexpr("Int"),
+                typeState,
+            ),
+        )
 
         val row = (0 until traceLength)
         row.zipWithNext().forEach { (a, b) ->
@@ -222,35 +268,35 @@ class SmtEncoder(
 
     private fun defineVariableTraces() {
         for (v in gtt.programVariables) {
-            val defVar = sexpr("declare-fun", v.name,
-                    SList.singleton(sexpr("i", "Int")),
-                    model.dtTranslator.translate(model.typeTranslator.translate(v.dataType))
+            val defVar = sexpr(
+                "declare-fun",
+                v.name,
+                SList.singleton(sexpr("i", "Int")),
+                model.dtTranslator.translate(model.typeTranslator.translate(v.dataType)),
             )
             model.file.add(defVar)
         }
     }
 
-
-//fun counterOf(row: TableRow) = SSymbol("${row.id}_cnt")
-//fun nameOf(v: ProgramVariable, tableRow: Int, iter: Int) = "|${v.name}_${tableRow}_$iter|"
+// fun counterOf(row: TableRow) = SSymbol("${row.id}_cnt")
+// fun nameOf(v: ProgramVariable, tableRow: Int, iter: Int) = "|${v.name}_${tableRow}_$iter|"
 }
 
-class TblExprToSExpr(columnVar: String,
-                     val programVar: Set<String>,
-                     val access: String? = null)
-    : TestTableLanguageParserBaseVisitor<SExpr>() {
+class TblExprToSExpr(
+    columnVar: String,
+    val programVar: Set<String>,
+    val access: String? = null,
+) : TestTableLanguageParserBaseVisitor<SExpr>() {
 
     val translation: (String) -> String = { it }
 
     private val variable: SExpr = if (access == null) SSymbol(columnVar) else sexpr(columnVar, access)
 
-
-    override fun visitCell(ctx: TestTableLanguageParser.CellContext) =
-            when {
-                ctx.chunk().size == 1 -> ctx.chunk(0).accept(this)
-                ctx.chunk().size == 0 -> SSymbol("true")
-                else -> fnapply("and", ctx.chunk().map { it.accept(this) })
-            }
+    override fun visitCell(ctx: TestTableLanguageParser.CellContext) = when {
+        ctx.chunk().size == 1 -> ctx.chunk(0).accept(this)
+        ctx.chunk().size == 0 -> SSymbol("true")
+        else -> fnapply("and", ctx.chunk().map { it.accept(this) })
+    }
 
     override fun visitDontcare(ctx: TestTableLanguageParser.DontcareContext) = SSymbol("true")
 
@@ -262,9 +308,11 @@ class TblExprToSExpr(columnVar: String,
 
     override fun visitSinglesided(ctx: TestTableLanguageParser.SinglesidedContext) = SList(translation(ctx.relational_operator().text), variable, ctx.expr().accept(this))
 
-    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): SExpr =
-            SList("and", SList(">=", variable, ctx.lower.accept(this)),
-                    SList("<=", variable, ctx.upper.accept(this)))
+    override fun visitInterval(ctx: TestTableLanguageParser.IntervalContext): SExpr = SList(
+        "and",
+        SList(">=", variable, ctx.lower.accept(this)),
+        SList("<=", variable, ctx.upper.accept(this)),
+    )
 
     override fun visitMinus(ctx: TestTableLanguageParser.MinusContext) = SList("bvneg", ctx.expr().accept(this))
 
@@ -272,24 +320,21 @@ class TblExprToSExpr(columnVar: String,
 
     override fun visitCompare(ctx: TestTableLanguageParser.CompareContext) = binop(ctx.op.text, ctx.left, ctx.right)
 
-    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SExpr {
-        return sexpr("=", variable, ctx.variable().accept(this))
-    }
+    override fun visitCvariable(ctx: TestTableLanguageParser.CvariableContext): SExpr = sexpr("=", variable, ctx.variable().accept(this))
 
-    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): SExpr {
-        return sexpr("=", ctx.constant().accept(this))
-    }
+    override fun visitCconstant(ctx: TestTableLanguageParser.CconstantContext): SExpr = sexpr("=", ctx.constant().accept(this))
 
-    private fun binop(text: String,
-                      left: TestTableLanguageParser.ExprContext,
-                      right: TestTableLanguageParser.ExprContext) = SList(text, left.accept(this), right.accept(this))
+    private fun binop(
+        text: String,
+        left: TestTableLanguageParser.ExprContext,
+        right: TestTableLanguageParser.ExprContext,
+    ) = SList(text, left.accept(this), right.accept(this))
 
     override fun visitMod(ctx: TestTableLanguageParser.ModContext) = binop("bvmod", ctx.left, ctx.right)
 
     override fun visitMult(ctx: TestTableLanguageParser.MultContext) = binop("bvmult", ctx.left, ctx.right)
 
-    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SExpr =
-            fnapply(ctx.IDENTIFIER().text, ctx.expr().map { it.accept(this) })
+    override fun visitFunctioncall(ctx: TestTableLanguageParser.FunctioncallContext): SExpr = fnapply(ctx.IDENTIFIER().text, ctx.expr().map { it.accept(this) })
 
     override fun visitLogicalAnd(ctx: TestTableLanguageParser.LogicalAndContext) = binop("and", ctx.left, ctx.right)
 
@@ -307,16 +352,15 @@ class TblExprToSExpr(columnVar: String,
 
     override fun visitSubstract(ctx: TestTableLanguageParser.SubstractContext) = binop("bvsub", ctx.left, ctx.right)
 
-    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) =
-            if (ctx.name.text in programVar)
-                if (access != null)
-                    sexpr(ctx.name.text, access)
-                else
-                    SSymbol(ctx.name.text)
-            else
-                SSymbol(ctx.name.text)
-
-    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext?): SExpr {
-        return super.visitGuardedcommand(ctx)
+    override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) = if (ctx.name.text in programVar) {
+        if (access != null) {
+            sexpr(ctx.name.text, access)
+        } else {
+            SSymbol(ctx.name.text)
+        }
+    } else {
+        SSymbol(ctx.name.text)
     }
+
+    override fun visitGuardedcommand(ctx: TestTableLanguageParser.GuardedcommandContext?): SExpr = super.visitGuardedcommand(ctx)
 }

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.print
 
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -37,14 +55,14 @@ interface TablePrinter {
  * PrintCellContent holds printing information about table cells.
  */
 data class PrintCellContent(
-        /** Content to be displayed */
-        var content: String = "",
-        /** position in a down streaming group */
-        var groupPosition: Int = 0,
-        /** signals if the cell was empty and only filled by "down streaming" */
-        var originalEmpty: Boolean = false,
-        /** signals if the cell is the end of a "down streaming" */
-        var endGroup: Boolean = false
+    /** Content to be displayed */
+    var content: String = "",
+    /** position in a down streaming group */
+    var groupPosition: Int = 0,
+    /** signals if the cell was empty and only filled by "down streaming" */
+    var originalEmpty: Boolean = false,
+    /** signals if the cell is the end of a "down streaming" */
+    var endGroup: Boolean = false,
 ) {
     val beginGroup: Boolean
         get() = groupPosition == 0
@@ -64,8 +82,10 @@ typealias CellPrinter = (TestTableLanguageParser.CellContext) -> String
 /**
  * This class helps printer with serialization of the table cell contents.
  */
-class PrinterHelper(gtt: GeneralizedTestTable,
-                    val cellPrinter: CellPrinter) {
+class PrinterHelper(
+    gtt: GeneralizedTestTable,
+    val cellPrinter: CellPrinter,
+) {
     val states = gtt.region.flat()
     val columns = LinkedHashMap<String, List<PrintCellContent>>()
 
@@ -106,8 +126,7 @@ class PrinterHelper(gtt: GeneralizedTestTable,
 class Counter {
     private val counter = LinkedHashMap<String, Int>()
 
-    fun peek(s: String): Int =
-            counter.computeIfAbsent(s) { _ -> 0 }
+    fun peek(s: String): Int = counter.computeIfAbsent(s) { _ -> 0 }
 
     fun getAndIncrement(s: String): Int {
         val peek = peek(s)
@@ -121,8 +140,10 @@ class Counter {
  *
  * This class provides visitor functions that get called during table visialization.
  */
-abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
-                                    protected val stream: CodeWriter) : TablePrinter {
+abstract class AbstractTablePrinter(
+    protected val gtt: GeneralizedTestTable,
+    protected val stream: CodeWriter,
+) : TablePrinter {
 
     protected lateinit var helper: PrinterHelper
     protected var currentRow = 0
@@ -149,8 +170,8 @@ abstract class AbstractTablePrinter(protected val gtt: GeneralizedTestTable,
 
     protected open fun printGroupDuration(dur: Duration, rowSpan: Int) {}
     protected open fun printCell(v: ColumnVariable, row: TableRow) {
-        if(v is ProjectionVariable) printCell(v, row)
-        if(v is ProgramVariable) printCell(v, row)
+        if (v is ProjectionVariable) printCell(v, row)
+        if (v is ProgramVariable) printCell(v, row)
     }
     protected open fun printCell(v: ProgramVariable, row: TableRow) {}
     protected open fun printCell(v: ProjectionVariable, row: TableRow) {}

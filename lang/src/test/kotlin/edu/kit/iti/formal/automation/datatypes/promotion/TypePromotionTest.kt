@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.datatypes.promotion
-
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.*
@@ -8,7 +25,6 @@ import edu.kit.iti.formal.automation.exceptions.VariableNotDefinedException
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -34,9 +50,7 @@ class TypePromotionTest {
         vd.add(VariableDeclaration("q", AnyReal.LREAL))
 
         vd.add(VariableDeclaration("s", IECString.STRING))
-
     }
-
 
     @Test
     fun testSignedInteger() {
@@ -48,7 +62,6 @@ class TypePromotionTest {
         assertEquals(LINT, DINT promoteWith LINT)
         assertEquals(LINT, LINT promoteWith LINT)
 
-
         assertEquals(SINT, SINT promoteWith SINT)
         assertEquals(INT, SINT promoteWith INT)
         assertEquals(DINT, SINT promoteWith DINT)
@@ -57,7 +70,6 @@ class TypePromotionTest {
         assertEquals(INT, INT promoteWith INT)
         assertEquals(DINT, INT promoteWith DINT)
         assertEquals(LINT, INT promoteWith LINT)
-
     }
 
     @Test
@@ -78,21 +90,17 @@ class TypePromotionTest {
         assertEquals(UINT, UINT promoteWith UINT)
         assertEquals(UDINT, UINT promoteWith UDINT)
         assertEquals(ULINT, UINT promoteWith ULINT)
-
     }
-
 
     @Test
     fun conversionInteger() {
     }
-
 
     @Test
     fun integerMixed() {
         assertEquals(DINT, INT promoteWith UINT)
         assertEquals(DINT, UINT promoteWith INT)
     }
-
 
     @Test
     fun nonConformity() {
@@ -121,7 +129,7 @@ class TypePromotionTest {
 
     @Test
     fun functions() {
-        //assertDataType(INT, "MAX(2,3)", null);
+        // assertDataType(INT, "MAX(2,3)", null);
     }
 
     private fun assertDataType(dt: AnyDt?, sexpr: String, scope: Scope = vd) {

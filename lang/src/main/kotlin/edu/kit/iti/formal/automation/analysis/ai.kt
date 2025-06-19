@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.analysis
-
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.values.MultiDimArrayValue
@@ -26,6 +43,7 @@ typealias AState<T> = HashMap<String, T>
 /**
  * An lattice is defined as several operations needed on the elements of the lattice.
  */
+@Suppress("ktlint:standard:property-naming")
 interface AiLattice<T> {
     fun branchReducer(a: T, b: T): T
     fun isAlwaysTrue(t: T): Boolean
@@ -57,14 +75,13 @@ interface AiLattice<T> {
     fun havoc(state: AState<T>, name: String, dt: AnyDt)
 }
 
-
 /**
  * This class contains an API for abstract interpretation.
  * @author Alexander Weigl
  * @version 1 (06.11.19)
  */
 class AbstractInterpretation<T>(val lattice: AiLattice<T>, val startSpace: AState<T>) {
-    var space = startSpace;
+    var space = startSpace
 
     /**
      * Initialize the scope, given by the default values of the datatype or initialisation.
@@ -74,7 +91,6 @@ class AbstractInterpretation<T>(val lattice: AiLattice<T>, val startSpace: AStat
             lattice.declare(space, variable.name, (variable.initValue as Value<AnyDt, Any>))
         }
     }
-
 
     /**
      * Havoc the input and inout variables.
@@ -90,13 +106,12 @@ class AbstractInterpretation<T>(val lattice: AiLattice<T>, val startSpace: AStat
         do {
             if (scope != null && havoc) havocInputVariables(scope)
             val oldSpace = HashMap(space)
-            interpret(e);
+            interpret(e)
             val newSpace = HashMap(space)
 
             println(oldSpace)
             println(newSpace)
-
-        } while (!lattice.stateEquals(newSpace, oldSpace)) //TODO maybe projection on non-input variables?!
+        } while (!lattice.stateEquals(newSpace, oldSpace)) // TODO maybe projection on non-input variables?!
         return space
     }
 
@@ -139,7 +154,6 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
         return s
     }
 
-
     fun evaluateTrue(expr: Expression): Boolean {
         val v = evaluate(expr)
         return lattice.isTrueable(v)
@@ -181,7 +195,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
     }
 
     override fun visit(forStatement: ForStatement) {
-        //TODO Maybe variable renaming!
+        // TODO Maybe variable renaming!
         val initialAssignment = forStatement.variable.assignTo(forStatement.start)
         val v = SymbolicReference(forStatement.variable)
         val cond = v.le(forStatement.stop)
@@ -195,7 +209,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
             forStatement.statements.accept(this)
             incrAssign.accept(this)
             val new = peek()
-            if (lattice.stateEquals(old, new)) break //Fixpoint reached
+            if (lattice.stateEquals(old, new)) break // Fixpoint reached
             iter++
         }
     }
@@ -207,7 +221,7 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
             val old = HashMap(peek())
             whileStatement.statements.accept(this)
             val new = peek()
-            if (lattice.stateEquals(old, new)) break //Fixpoint reached
+            if (lattice.stateEquals(old, new)) break // Fixpoint reached
             iter++
         }
     }
@@ -219,28 +233,29 @@ class AbstractStateInterpreter<T>(init: AState<T>, val lattice: AiLattice<T>) : 
             val old = HashMap(peek())
             repeatStatement.statements.accept(this)
             val new = peek()
-            if (lattice.stateEquals(old, new)) break //Fixpoint reached
+            if (lattice.stateEquals(old, new)) break // Fixpoint reached
             iter++
-        } while (!evaluateFalse(cond) && iter < maxIterations) //TODO test what is correct here
+        } while (!evaluateFalse(cond) && iter < maxIterations) // TODO test what is correct here
     }
 
     override fun visit(assignmentStatement: AssignmentStatement) {
-        //TODO allow sub references, arrays?
+        // TODO allow sub references, arrays?
         peek()[assignmentStatement.location.identifier] = evaluate(assignmentStatement.expression)
     }
 
     override fun visit(returnStatement: ReturnStatement) {
-        //throw LoopAbortException()
+        // throw LoopAbortException()
     }
 
     override fun visit(exitStatement: ExitStatement) {
-        //throw BodyAbortException()
+        // throw BodyAbortException()
     }
 }
 
-
-class AbstractExpressionEvaluator<T>(val state: AState<T>,
-                                     val operator: AiLattice<T>) : AstVisitor<T>() {
+class AbstractExpressionEvaluator<T>(
+    val state: AState<T>,
+    val operator: AiLattice<T>,
+) : AstVisitor<T>() {
     override fun defaultVisit(obj: Any): T {
         TODO("${obj.javaClass} is not covered")
     }
@@ -284,14 +299,12 @@ class AbstractExpressionEvaluator<T>(val state: AState<T>,
         }
     }
 
-    override fun visit(literal: Literal): T {
-        return operator.literal(literal)
-    }
+    override fun visit(literal: Literal): T = operator.literal(literal)
 
     override fun visit(symbolicReference: SymbolicReference): T {
-        //TODO sub identifier, and arrays
+        // TODO sub identifier, and arrays
         return state[symbolicReference.identifier]
-                ?: operator.emptyElement()
+            ?: operator.emptyElement()
     }
 
     override fun visit(invocation: Invocation): T {
@@ -300,7 +313,6 @@ class AbstractExpressionEvaluator<T>(val state: AState<T>,
         return operator.invocation(invocation.calleeName, dt, parameters)
     }
 }
-
 
 /**
  * see https://de.wikipedia.org/wiki/Intervallarithmetik#Grundrechenarten
@@ -386,9 +398,7 @@ class IntLattice : AiLattice<IntervalSet> {
     private val INTERVAL_TRUE = Interval(1, 1)
     private val INTERVAL_ALL = Interval(0, 1)
 
-    override fun add(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue, Interval::plus)
-    }
+    override fun add(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::plus)
 
     fun combine(a: IntervalSet, b: IntervalSet, op: (Interval, Interval) -> Interval): IntervalSet {
         val s = IntervalSet()
@@ -401,25 +411,15 @@ class IntLattice : AiLattice<IntervalSet> {
         return s
     }
 
-    override fun sub(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue, Interval::minus)
-    }
+    override fun sub(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::minus)
 
-    override fun div(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue, Interval::div)
-    }
+    override fun div(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::div)
 
-    override fun mult(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue, Interval::times)
-    }
+    override fun mult(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::times)
 
-    override fun power(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue, Interval::power)
-    }
+    override fun power(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue, Interval::power)
 
-    override fun and(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combineBoolean(leftValue, rightValue) { a, b -> a and b }
-    }
+    override fun and(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a and b }
 
     private fun combineBoolean(left: IntervalSet, right: IntervalSet, f: (Boolean, Boolean) -> Boolean): IntervalSet {
         val s = IntervalSet()
@@ -438,71 +438,55 @@ class IntLattice : AiLattice<IntervalSet> {
         return s
     }
 
-    override fun or(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combineBoolean(leftValue, rightValue) { a, b -> a or b }
-    }
+    override fun or(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a or b }
 
-    override fun xor(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combineBoolean(leftValue, rightValue) { a, b -> a xor b }
-    }
+    override fun xor(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combineBoolean(leftValue, rightValue) { a, b -> a xor b }
 
-    override fun gt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { l, r ->
-            when {
-                l.a > r.b -> INTERVAL_TRUE
-                l.b <= r.b -> INTERVAL_FALSE
-                else -> INTERVAL_ALL
-            }
+    override fun gt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+        when {
+            l.a > r.b -> INTERVAL_TRUE
+            l.b <= r.b -> INTERVAL_FALSE
+            else -> INTERVAL_ALL
         }
     }
 
-    override fun lt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { l, r ->
-            when {
-                l.b < r.a -> INTERVAL_TRUE
-                l.a >= r.b -> INTERVAL_FALSE
-                else -> INTERVAL_ALL
-            }
+    override fun lt(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+        when {
+            l.b < r.a -> INTERVAL_TRUE
+            l.a >= r.b -> INTERVAL_FALSE
+            else -> INTERVAL_ALL
         }
     }
 
-    override fun ge(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { l, r ->
-            when {
-                l.a >= r.b -> INTERVAL_TRUE
-                l.b < r.b -> INTERVAL_FALSE
-                else -> INTERVAL_ALL
-            }
+    override fun ge(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+        when {
+            l.a >= r.b -> INTERVAL_TRUE
+            l.b < r.b -> INTERVAL_FALSE
+            else -> INTERVAL_ALL
         }
     }
 
-    override fun le(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { l, r ->
-            when {
-                l.b <= r.a -> INTERVAL_TRUE
-                l.a > r.b -> INTERVAL_FALSE
-                else -> INTERVAL_ALL
-            }
+    override fun le(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { l, r ->
+        when {
+            l.b <= r.a -> INTERVAL_TRUE
+            l.a > r.b -> INTERVAL_FALSE
+            else -> INTERVAL_ALL
         }
     }
 
-    override fun equals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { a, b ->
-            when {
-                a.disjoint(b) -> INTERVAL_FALSE
-                a == b -> INTERVAL_TRUE
-                else -> INTERVAL_ALL
-            }
+    override fun equals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { a, b ->
+        when {
+            a.disjoint(b) -> INTERVAL_FALSE
+            a == b -> INTERVAL_TRUE
+            else -> INTERVAL_ALL
         }
     }
 
-    override fun notEquals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet {
-        return combine(leftValue, rightValue) { a, b ->
-            when {
-                a.disjoint(b) -> INTERVAL_TRUE
-                a == b -> INTERVAL_FALSE
-                else -> INTERVAL_ALL
-            }
+    override fun notEquals(leftValue: IntervalSet, rightValue: IntervalSet): IntervalSet = combine(leftValue, rightValue) { a, b ->
+        when {
+            a.disjoint(b) -> INTERVAL_TRUE
+            a == b -> INTERVAL_FALSE
+            else -> INTERVAL_ALL
         }
     }
 
@@ -532,12 +516,10 @@ class IntLattice : AiLattice<IntervalSet> {
         return s
     }
 
-    override fun byDatatype(dataType: AnyDt): IntervalSet {
-        return dataType.accept(object : DataTypeVisitorNN<IntervalSet> {
-            override fun defaultVisit(obj: Any) = IntervalSet(0)
-            override fun visit(enumerateType: EnumerateType) = IntervalSet(enumerateType.get(enumerateType.defValue)!!)
-        })
-    }
+    override fun byDatatype(dataType: AnyDt): IntervalSet = dataType.accept(object : DataTypeVisitorNN<IntervalSet> {
+        override fun defaultVisit(obj: Any) = IntervalSet(0)
+        override fun visit(enumerateType: EnumerateType) = IntervalSet(enumerateType.get(enumerateType.defValue)!!)
+    })
 
     override fun not(rightValue: IntervalSet): IntervalSet {
         val s = emptyElement()
@@ -557,7 +539,7 @@ class IntLattice : AiLattice<IntervalSet> {
     override fun emptyElement(): IntervalSet = IntervalSet()
 
     override fun invocation(calleeName: String, dt: AnyDt?, parameters: List<IntervalSet>): IntervalSet {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun branchReducer(a: IntervalSet, b: IntervalSet): IntervalSet {
@@ -573,7 +555,7 @@ class IntLattice : AiLattice<IntervalSet> {
     override fun isFalseable(t: IntervalSet) = 0 in t
 
     override fun stateEquals(a: AState<IntervalSet>, b: AState<IntervalSet>): Boolean {
-        if(a===b) return true
+        if (a === b) return true
         if (a.keys != b.keys) return false
         return a.keys.all { k ->
             val x = a[k]
@@ -596,16 +578,12 @@ private fun <T> Collection<AState<T>>.groupByVariables(): Map<String, List<T>> {
     return seq
 }
 
-private operator fun Interval.plus(ri: Interval): Interval {
-    return Interval(a + ri.a, b + ri.b)
-}
+private operator fun Interval.plus(ri: Interval): Interval = Interval(a + ri.a, b + ri.b)
 
-private operator fun Interval.minus(ri: Interval): Interval {
-    return Interval(a - ri.b, b - ri.a)
-}
+private operator fun Interval.minus(ri: Interval): Interval = Interval(a - ri.b, b - ri.a)
 
 private operator fun Interval.times(ri: Interval): Interval {
-    //[x_1, x_2] \cdot [y_1, y_2] = [\min(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2), \max(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2)]
+    // [x_1, x_2] \cdot [y_1, y_2] = [\min(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2), \max(x_1 y_1,x_1 y_2,x_2 y_1,x_2 y_2)]
     val s = listOf(a * ri.a, a * ri.b, b * ri.a, b * ri.b)
     return Interval(s.minOrNull()!!, s.maxOrNull()!!)
 }
@@ -619,7 +597,7 @@ private fun Int.pow(a: Int): Double = Math.pow(this.toDouble(), a.toDouble())
 
 private operator fun Interval.div(ri: Interval): Interval {
     if (0 in ri) {
-        //TODO Division by zero possible
+        // TODO Division by zero possible
     }
     val x = 1.0 / ri.b
     val y = 1.0 / ri.a
@@ -629,10 +607,7 @@ private operator fun Interval.div(ri: Interval): Interval {
     return Interval(mi, ma)
 }
 
-private operator fun Interval.contains(i: Int): Boolean {
-    return a <= i && i <= b;
-}
-
+private operator fun Interval.contains(i: Int): Boolean = a <= i && i <= b
 
 /*sealed class IntTree {
     abstract val lower: Int

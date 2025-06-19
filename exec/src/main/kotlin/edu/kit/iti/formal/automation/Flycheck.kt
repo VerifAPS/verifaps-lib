@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -18,13 +36,11 @@ import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.st.ast.PouElements
 import edu.kit.iti.formal.util.info
-
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
 import java.io.File
 import java.util.*
-
 
 object Check {
     @JvmStatic
@@ -34,7 +50,7 @@ object Check {
 object Flycheck {
     @JvmStatic
     fun main(args: Array<String>) {
-        //println("{version:\"0.9\"}")
+        // println("{version:\"0.9\"}")
         val reader = System.`in`.bufferedReader()
         do {
             val line = reader.readLine() ?: break
@@ -86,36 +102,37 @@ class CheckApp : CliktCommand() {
     val verbose by option(help = "enable verbose mode").flag()
     val format by option("--json", help = "Flag for enabling json, line based format").flag()
     val include by option("-L", help = "folder for looking includes")
-            .file()
-            .multiple()
+        .file()
+        .multiple()
 
     val includeBuiltIn by option("-b", help = "")
-            .flag("-B")
+        .flag("-B")
 
     val files by argument(name = "FILE", help = "Files to check")
-            .file()
-            .multiple()
+        .file()
+        .multiple()
 
     override fun run() {
         val base = if (includeBuiltIn) BuiltinLoader.loadDefault() else PouElements()
 
         val r = FlycheckRunner(
-                files.map { CharStreams.fromFileName(it.absolutePath) },
-                base,
-                verbose,
-                format,
-                include
+            files.map { CharStreams.fromFileName(it.absolutePath) },
+            base,
+            verbose,
+            format,
+            include,
         )
         r.run()
     }
 }
 
 class FlycheckRunner(
-        val streams: List<CharStream>,
-        val library: PouElements = PouElements(),
-        val verbose: Boolean = false,
-        val json: Boolean = false,
-        val includeStubs: List<File> = arrayListOf()) {
+    val streams: List<CharStream>,
+    val library: PouElements = PouElements(),
+    val verbose: Boolean = false,
+    val json: Boolean = false,
+    val includeStubs: List<File> = arrayListOf(),
+) {
 
     val underInvestigation: PouElements = PouElements()
 
@@ -149,7 +166,6 @@ class FlycheckRunner(
         underInvestigation.addAll(tles)
     }
 
-
     private fun resolve() {
         IEC61131Facade.resolveDataTypes(library)
     }
@@ -165,7 +181,6 @@ class FlycheckRunner(
             } else {
                 info("Everything is fine.")
             }
-
         } else {
             if (json) {
                 val msg = messages.joinToString(",") { it.toJson() }
@@ -178,17 +193,24 @@ class FlycheckRunner(
     }
 
     private fun printMessage(message: ReporterMessage) {
-
     }
 
-    class MyAntlrErrorListener(private val reporter: Reporter)
-        : ANTLRErrorListener {
-        override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int,
-                                 charPositionInLine: Int, msg: String?, e: RecognitionException?) {
+    class MyAntlrErrorListener(private val reporter: Reporter) : ANTLRErrorListener {
+        override fun syntaxError(
+            recognizer: Recognizer<*, *>?,
+            offendingSymbol: Any?,
+            line: Int,
+            charPositionInLine: Int,
+            msg: String?,
+            e: RecognitionException?,
+        ) {
             val token = (offendingSymbol as Token)
-            reporter.report(token, msg!!,
-                    ReportCategory.SYNTAX,
-                    ReportLevel.ERROR)
+            reporter.report(
+                token,
+                msg!!,
+                ReportCategory.SYNTAX,
+                ReportLevel.ERROR,
+            )
         }
 
         override fun reportAttemptingFullContext(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, conflictingAlts: BitSet?, configs: ATNConfigSet?) {}
@@ -196,7 +218,3 @@ class FlycheckRunner(
         override fun reportContextSensitivity(recognizer: Parser?, dfa: DFA?, startIndex: Int, stopIndex: Int, prediction: Int, configs: ATNConfigSet?) {}
     }
 }
-
-
-
-

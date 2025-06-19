@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.datatypes.AnyInt
@@ -37,23 +55,24 @@ class RemoveConversionCalls : CodeTransformation {
             val name = invocation.callee.identifier
             val b = regexToInt.matchEntire(name) != null || regexToReal.matchEntire(name) != null
 
-            if (b)
+            if (b) {
                 return invocation.parameters[0].expression
-            else
+            } else {
                 return invocation
+            }
         }
     }
 }
 
-
 class RewriteRealDeclaration(val factor: Int, val intDataType: AnyInt) : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState {
         state.scope.variables.forEach {
-            if (it.dataType == AnyReal.REAL)
+            if (it.dataType == AnyReal.REAL) {
                 rewriteRealDecl(it)
-            if (it.dataType == AnyReal.LREAL)
+            }
+            if (it.dataType == AnyReal.LREAL) {
                 rewriteLRealDecl(it)
-
+            }
         }
         return state
     }
@@ -64,7 +83,6 @@ class RewriteRealDeclaration(val factor: Int, val intDataType: AnyInt) : CodeTra
         rewriteRealLiteral(factor, intDataType, it)
     }
 
-
     private fun rewriteLRealDecl(it: VariableDeclaration) {
         val dt = intDataType.next() ?: intDataType
         it.dataType = dt
@@ -73,12 +91,11 @@ class RewriteRealDeclaration(val factor: Int, val intDataType: AnyInt) : CodeTra
     }
 }
 
-
-private fun rewriteRealLiteral(factor: Int, dt: AnyInt, lit: RealLit?): IntegerLit? =
-        if (lit == null)
-            null
-        else
-            IntegerLit(rewriteRealLiteral(factor, dt, lit.value))
+private fun rewriteRealLiteral(factor: Int, dt: AnyInt, lit: RealLit?): IntegerLit? = if (lit == null) {
+    null
+} else {
+    IntegerLit(rewriteRealLiteral(factor, dt, lit.value))
+}
 
 private fun rewriteRealLiteral(factor: Int, dataType: AnyInt, value: VariableDeclaration) {
     if (value.initValue != null) {
@@ -87,9 +104,7 @@ private fun rewriteRealLiteral(factor: Int, dataType: AnyInt, value: VariableDec
     }
 }
 
-private fun rewriteRealLiteral(factor: Int, dataType: AnyInt, value: BigDecimal): VAnyInt =
-        VAnyInt(dataType, value.multiply(BigDecimal(factor)).toBigInteger())
-
+private fun rewriteRealLiteral(factor: Int, dataType: AnyInt, value: BigDecimal): VAnyInt = VAnyInt(dataType, value.multiply(BigDecimal(factor)).toBigInteger())
 
 class RewriteRealConversions(val factor: Int, val intDataType: AnyInt) : CodeTransformation {
     override fun transform(state: TransformationState): TransformationState {
@@ -97,13 +112,12 @@ class RewriteRealConversions(val factor: Int, val intDataType: AnyInt) : CodeTra
         return state
     }
 
-    inner class RealLiteralRewriter() : AstMutableVisitor() {
-        override fun visit(literal: Literal): Expression =
-                when (literal) {
-                    is RealLit -> {
-                        rewriteRealLiteral(factor, intDataType, literal)!!
-                    }
-                    else -> literal
-                }
+    inner class RealLiteralRewriter : AstMutableVisitor() {
+        override fun visit(literal: Literal): Expression = when (literal) {
+            is RealLit -> {
+                rewriteRealLiteral(factor, intDataType, literal)!!
+            }
+            else -> literal
+        }
     }
 }

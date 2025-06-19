@@ -1,9 +1,7 @@
-/*
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2017 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -17,9 +15,7 @@
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.VariableScope
@@ -60,7 +56,7 @@ fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclarati
         is RecordType -> { // recursion for struct, => list of variables + prefix
             val rt = sv.dataType as RecordType
             val (_, rv) =
-                    (sv.initValue ?: DefaultInitValue.getInit(sv.dataType!!)) as VStruct
+                (sv.initValue ?: DefaultInitValue.getInit(sv.dataType!!)) as VStruct
 
             return rt.fields.flatMap {
                 createStructVariables(it)
@@ -79,60 +75,72 @@ fun createStructVariables(sv: VariableDeclaration): Collection<VariableDeclarati
     }
 }
 
-
 private class StructEmbeddingVisitor(val vd: VariableDeclaration) : AstMutableVisitor() {
     override fun visit(invocation: Invocation): Expression {
         val newParameter = ArrayList<InvocationParameter>()
         for (parameter in invocation.parameters) {
             val expr = parameter.expression.accept(this) as Expression
-            parameter.expression = expr;
+            parameter.expression = expr
             if (expr is SymbolicReference && expr.identifier == vd.name) {
-                newParameter.addAll(expandParameters(parameter,
+                newParameter.addAll(
+                    expandParameters(
+                        parameter,
                         vd.dataType as RecordType,
-                        expr))
+                        expr,
+                    ),
+                )
                 // Found structure being passed as parameter
                 newParameter.remove(parameter)
-            } else newParameter.add(parameter)
+            } else {
+                newParameter.add(parameter)
+            }
         }
         invocation.parameters.setAll(newParameter)
         return invocation
     }
 
-    private fun expandParameters(parameter: InvocationParameter, rt: RecordType, expr: SymbolicReference)
-            : Collection<InvocationParameter> {
+    private fun expandParameters(parameter: InvocationParameter, rt: RecordType, expr: SymbolicReference): Collection<InvocationParameter> {
         var path = expr.toPath()
         path = path.subList(1, path.size)
         var subFields = rt.fields
         for (it in path) {
             val sub = subFields[it]
-                    ?: throw IllegalStateException("Try to access a composed variable, but inner field not found.")
-            if (sub.dataType is RecordType)
+                ?: throw IllegalStateException("Try to access a composed variable, but inner field not found.")
+            if (sub.dataType is RecordType) {
                 subFields = (sub.dataType as RecordType).fields
-            else {
+            } else {
                 // paramter ends in a single value
                 return Collections.singleton(
-                        InvocationParameter(
-                                if (parameter.name != null) "${parameter.name}"
-                                else null,
-                                parameter.isOutput,
-                                SymbolicReference(expr.toPath().joinToString("$"))))
+                    InvocationParameter(
+                        if (parameter.name != null) {
+                            "${parameter.name}"
+                        } else {
+                            null
+                        },
+                        parameter.isOutput,
+                        SymbolicReference(expr.toPath().joinToString("$")),
+                    ),
+                )
             }
             break
         }
 
         return subFields.map {
             InvocationParameter(
-                    if (parameter.name != null) "${parameter.name}$${it.name}"
-                    else null,
-                    parameter.isOutput,
-                    SymbolicReference("${expr.toPath().joinToString()}$${it.name}"))
+                if (parameter.name != null) {
+                    "${parameter.name}$${it.name}"
+                } else {
+                    null
+                },
+                parameter.isOutput,
+                SymbolicReference("${expr.toPath().joinToString()}$${it.name}"),
+            )
         }
     }
 
-    override fun visit(symbolicReference: SymbolicReference): Expression {
-        return if (symbolicReference.identifier == vd.name && symbolicReference.hasSub())
-            SymbolicReference(symbolicReference.toPath().joinToString("$"))
-        else super.visit(symbolicReference)
+    override fun visit(symbolicReference: SymbolicReference): Expression = if (symbolicReference.identifier == vd.name && symbolicReference.hasSub()) {
+        SymbolicReference(symbolicReference.toPath().joinToString("$"))
+    } else {
+        super.visit(symbolicReference)
     }
 }
-

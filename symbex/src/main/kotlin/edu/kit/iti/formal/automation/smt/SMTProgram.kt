@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.smt
 
 import edu.kit.iti.formal.smt.SExpr
@@ -25,21 +43,24 @@ import java.util.*
  * @version 1 (15.10.17)
  */
 class SMTProgram(
-        var inputDataTypes: MutableMap<String, SExpr> = HashMap(),
-        var stateDataTypes: MutableMap<String, SExpr> = HashMap(),
-        var initPredicates: MutableMap<String, SExpr> = TreeMap(),
-        var nextPredicates: MutableMap<String, SExpr> = TreeMap(),
-        var nextDefines: MutableMap<String, SExpr> = TreeMap(),
-        var initFuncName: String = "init",
-        var nextFuncName: String = "next") {
+    var inputDataTypes: MutableMap<String, SExpr> = HashMap(),
+    var stateDataTypes: MutableMap<String, SExpr> = HashMap(),
+    var initPredicates: MutableMap<String, SExpr> = TreeMap(),
+    var nextPredicates: MutableMap<String, SExpr> = TreeMap(),
+    var nextDefines: MutableMap<String, SExpr> = TreeMap(),
+    var initFuncName: String = "init",
+    var nextFuncName: String = "next",
+) {
 
     val initFunction: SExpr
         get() {
             return sexpr(
-                    DEFINE_FUNCTION, initFuncName,
-                    sexpr(createSortSExpr(STATE_NAME, stateDataTypes)),
-                    SMT_BOOLEAN,
-                    initBody)
+                DEFINE_FUNCTION,
+                initFuncName,
+                sexpr(createSortSExpr(STATE_NAME, stateDataTypes)),
+                SMT_BOOLEAN,
+                initBody,
+            )
         }
 
     protected val initBody: SExpr
@@ -89,13 +110,11 @@ class SMTProgram(
         get() {
             val sb = StringBuilder()
             sb.append("(set-logic QF_BV)\n")
-            sb.append(
-                    "(define-fun <> ((a Bool) (b Bool)) Bool\n" + "  (not (= a b)))\n")
+            sb.append("(define-fun <> ((a Bool) (b Bool)) Bool\n" + "  (not (= a b)))\n")
 
             for (i in 1..64) {
                 sb.append(String.format("(define-fun <> ((a (_ BitVec %d)) (b (_ BitVec %d))) Bool (not (= a b)))\n", i, i))
             }
-
 
             val init = initFunction
             val next = nextFunction
@@ -114,19 +133,17 @@ class SMTProgram(
     public SExpr getInputDataType() throws SExprParserException {
         return createRecord(getInputDataTypeName(), inputDataTypes);
     }
-    */
+     */
 
-    fun getDefineSteps(prefix: String, suffix: String) =
-            getDefineInputTypes(prefix, suffix) + getDefineStateTypes(prefix, suffix)
+    fun getDefineSteps(prefix: String, suffix: String) = getDefineInputTypes(prefix, suffix) + getDefineStateTypes(prefix, suffix)
 
     fun getDefineStateTypes(prefix: String, suffix: String) = this.stateDataTypes.entries
-            .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
+        .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
 
     fun getDefineInputTypes(prefix: String, suffix: String) = this.inputDataTypes.entries
-            .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
+        .map { e -> createDefineConst(prefix + e.key + suffix, e.value) }
 
-    private fun createDefineConst(name: String, sort: SExpr): SExpr =
-            sexpr("declare-const", name, sort)
+    private fun createDefineConst(name: String, sort: SExpr): SExpr = sexpr("declare-const", name, sort)
 
     /**
      * @return
@@ -161,7 +178,6 @@ class SMTProgram(
         asser.add(app)
         this.stateDataTypes.keys.forEach { name -> app.add(SSymbol(name + previousSuffix)) }
 
-
         this.inputDataTypes.keys.forEach { name -> app.add(SSymbol(name + previousSuffix)) }
 
         this.stateDataTypes.keys.forEach { name -> app.add(SSymbol(name + nextSuffix)) }
@@ -184,12 +200,11 @@ class SMTProgram(
          *
          * @param dt
          */
-        private fun createSortSExpr(prefix: String, dt: Map<String, SExpr>) =
-                dt.entries.map { entry ->
-                    val s = SList()
-                    s.add(SSymbol(prefix + entry.key))
-                    s.add(entry.value)
-                    s
-                }
+        private fun createSortSExpr(prefix: String, dt: Map<String, SExpr>) = dt.entries.map { entry ->
+            val s = SList()
+            s.add(SSymbol(prefix + entry.key))
+            s.add(entry.value)
+            s
+        }
     }
 }

@@ -1,22 +1,21 @@
-/*
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -84,7 +83,7 @@ class GetetaApp : CliktCommand(name = "geteta") {
 
         val (lineMap, modCode) = SymbExFacade.evaluateProgramWithLineMap(
             code,
-            programOptions.disableSimplify
+            programOptions.disableSimplify,
         )
         info("Program evaluation")
 
@@ -110,7 +109,8 @@ class GetetaApp : CliktCommand(name = "geteta") {
                 val tableJoiner = GetetaFacade.meshTables(tt)
                 val dummyGtt = GetetaFacade.createMeshedDummy(gtts)
                 val smv = GetetaFacade.constructSMV(
-                    AutomataTransformerState(dummyGtt, tableJoiner), superEnumType
+                    AutomataTransformerState(dummyGtt, tableJoiner),
+                    superEnumType,
                 )
 
                 if (automataOptions.drawAutomaton) {
@@ -144,13 +144,15 @@ class GetetaApp : CliktCommand(name = "geteta") {
         val t = this.tableOptions.table.first()
         val folder = File(t.parent, t.nameWithoutExtension).absolutePath
         val verificationTechnique = gtts.first().options.verificationTechnique
-        info("Run nuXmv: $nuxmv in $folder using ${verificationTechnique}")
+        info("Run nuXmv: $nuxmv in $folder using $verificationTechnique")
         val nuxmv = findProgram(nuxmv)
 
         val process =
             GetetaFacade.createNuXMVProcess(
-                folder, modules, nuxmv?.absolutePath ?: "n/a",
-                verificationTechnique
+                folder,
+                modules,
+                nuxmv?.absolutePath ?: "n/a",
+                verificationTechnique,
             )
 
         if (dryRun) {
@@ -177,13 +179,21 @@ class GetetaApp : CliktCommand(name = "geteta") {
                 if (cexAnalysation.cexPrinter) {
                     useCounterExamplePrinter(outputFolder, b, tt, lineMap, code)
                     useCounterExamplePrinterHtml(outputFolder, b, tt, lineMap, code)
-                } else info("Use `--cexout' to print a cex analysation.")
+                } else {
+                    info("Use `--cexout' to print a cex analysation.")
+                }
 
-                if (cexAnalysation.cexJson) useCounterExamplePrinterJson(outputFolder, b, tt)
-                else info("Use `--cexjson' to print a cex analysation as json.")
+                if (cexAnalysation.cexJson) {
+                    useCounterExamplePrinterJson(outputFolder, b, tt)
+                } else {
+                    info("Use `--cexjson' to print a cex analysation as json.")
+                }
 
-                if (cexAnalysation.runAnalyzer) createRowMapping(b, tt)
-                else info("Use `--row-map' to print possible row mappings.")
+                if (cexAnalysation.runAnalyzer) {
+                    createRowMapping(b, tt)
+                } else {
+                    info("Use `--row-map' to print possible row mappings.")
+                }
             }
             info("STATUS: $status")
             exitProcess(errorLevel)
@@ -195,7 +205,7 @@ class GetetaApp : CliktCommand(name = "geteta") {
     private fun useCounterExamplePrinterJson(
         outputFolder: String,
         result: NuXMVOutput.Cex,
-        tt: List<SMVConstructionModel>
+        tt: List<SMVConstructionModel>,
     ) {
         for (model in tt) {
             val file = File(outputFolder, "cex_${model.testTable.name}.json")
@@ -203,7 +213,7 @@ class GetetaApp : CliktCommand(name = "geteta") {
             val cep = CounterExamplePrinterJson(
                 automaton = model.automaton,
                 testTable = model.testTable,
-                cex = result.counterExample
+                cex = result.counterExample,
             )
             file.writeText(cep.call())
         }
@@ -212,7 +222,8 @@ class GetetaApp : CliktCommand(name = "geteta") {
     private fun drawAutomaton(gtt: List<GeneralizedTestTable>, tt: TestTableAutomaton) {
         val ad = AutomatonDrawer(
             File(outputFolder, "${gtt.first().name}.dot"),
-            gtt.map { it.region }, tt
+            gtt.map { it.region },
+            tt,
         )
         ad.runDot = true
         ad.show = automataOptions.showAutomaton
@@ -225,7 +236,8 @@ class GetetaApp : CliktCommand(name = "geteta") {
     private fun drawAutomaton(gtt: GeneralizedTestTable, tt: SMVConstructionModel) {
         val ad = AutomatonDrawer(
             File(outputFolder, "${gtt.name}.dot"),
-            listOf(gtt.region), tt.automaton
+            listOf(gtt.region),
+            tt.automaton,
         )
         ad.runDot = true
         ad.show = automataOptions.showAutomaton
@@ -238,7 +250,9 @@ class GetetaApp : CliktCommand(name = "geteta") {
     private fun createRowMapping(result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>) {
         val mappings = tt.map {
             GetetaFacade.analyzeCounterExample(
-                it.automaton, it.testTable, result.counterExample
+                it.automaton,
+                it.testTable,
+                result.counterExample,
             )
         }
 
@@ -265,16 +279,18 @@ class GetetaApp : CliktCommand(name = "geteta") {
     }
 }
 
-internal fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> =
-    if (tableWhitelist.isNotEmpty())
-        this.filter { it.name in tableWhitelist }
-    else
-        this
-
+internal fun List<GeneralizedTestTable>.filterByName(tableWhitelist: List<String>): List<GeneralizedTestTable> = if (tableWhitelist.isNotEmpty()) {
+    this.filter { it.name in tableWhitelist }
+} else {
+    this
+}
 
 fun useCounterExamplePrinter(
-    outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
-    lineMap: LineMap, program: PouExecutable
+    outputFolder: String?,
+    result: NuXMVOutput.Cex,
+    tt: List<SMVConstructionModel>,
+    lineMap: LineMap,
+    program: PouExecutable,
 ) {
     for (model in tt) {
         val file = File(outputFolder, "cex_${model.testTable.name}.txt")
@@ -286,17 +302,19 @@ fun useCounterExamplePrinter(
                 cex = result.counterExample,
                 lineMap = lineMap,
                 program = program,
-                stream = stream
+                stream = stream,
             )
             cep.getAll()
         }
     }
 }
 
-
 fun useCounterExamplePrinterHtml(
-    outputFolder: String?, result: NuXMVOutput.Cex, tt: List<SMVConstructionModel>,
-    lineMap: LineMap, program: PouExecutable
+    outputFolder: String?,
+    result: NuXMVOutput.Cex,
+    tt: List<SMVConstructionModel>,
+    lineMap: LineMap,
+    program: PouExecutable,
 ) {
     for (model in tt) {
         for (k in 0 until result.counterExample.stateSize - 1) {
@@ -311,14 +329,13 @@ fun useCounterExamplePrinterHtml(
                     lineMap = lineMap,
                     program = program,
                     stream = it,
-                    name = name
+                    name = name,
                 )
                 cep.print(k)
             }
         }
     }
 }
-
 
 object GetetaSmt {
     @JvmStatic
@@ -343,13 +360,13 @@ class GetetaSmtApp : CliktCommand() {
             it.simplify()
         }.filterByName(tableOptions.tableWhitelist)
 
-
         //endregion
         info("Tables found: ${tables.joinToString()}")
 
         //region read program
         val (pous, exec) = IEC61131Facade.readProgramWLNP(
-            programOptions.library, programOptions.program.first()
+            programOptions.library,
+            programOptions.program.first(),
         )
         require(pous.isNotEmpty()) { "No program was given" }
         require(exec != null) { "Could not find any program by ${pous.first()}" }

@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.rvt
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.rvt
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
@@ -33,13 +29,12 @@ import java.util.*
  * @version 1 (12.12.16)
  */
 class VariableDependency(private val state: SymbolicState) {
-    fun dependsOn(names: Collection<VariableDeclaration>,
-                  ignoredVars: List<VariableDeclaration>): Set<SVariable> {
+    fun dependsOn(names: Collection<VariableDeclaration>, ignoredVars: List<VariableDeclaration>): Set<SVariable> {
         val reached = names.map { SymbExFacade.asSVariable(it) }.toHashSet()
-        val ignored = ignoredVars.map{ SymbExFacade.asSVariable(it) }.toSet()
+        val ignored = ignoredVars.map { SymbExFacade.asSVariable(it) }.toSet()
         val vv = VarVisitor(reached, ignored)
 
-        //fixpoint
+        // fixpoint
         var changed = false
         do {
             val backup = LinkedList(reached)
@@ -53,16 +48,15 @@ class VariableDependency(private val state: SymbolicState) {
         return reached
     }
 
-    internal class VarVisitor(
-            private val reached: MutableSet<SVariable>,
-            private val ignored: Set<SVariable>) : SMVAstDefaultVisitor<Unit>() {
+    internal class VarVisitor(private val reached: MutableSet<SVariable>, private val ignored: Set<SVariable>) : SMVAstDefaultVisitor<Unit>() {
 
         override fun visit(top: SMVAst) {
         }
 
         override fun visit(v: SVariable) {
-            if (!ignored.contains(v))
+            if (!ignored.contains(v)) {
                 reached.add(v)
+            }
         }
 
         override fun visit(be: SBinaryExpression) {

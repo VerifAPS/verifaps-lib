@@ -1,28 +1,41 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
 
 /**Extensions**/
 
-fun Iterable<SMVExpr>.joinToExpr(operator: SBinaryOperator): SMVExpr =
-        reduce { a, b -> a.op(operator, b) }
+fun Iterable<SMVExpr>.joinToExpr(operator: SBinaryOperator): SMVExpr = reduce { a, b -> a.op(operator, b) }
 
 fun Iterable<SMVExpr>.disjunction(): SMVExpr = joinToExpr(SBinaryOperator.OR)
 fun Iterable<SMVExpr>.conjunction(): SMVExpr = joinToExpr(SBinaryOperator.AND)
 
-fun Collection<SMVExpr>.joinToExpr(operator: SBinaryOperator = SBinaryOperator.AND, default: SMVExpr? = null): SMVExpr =
-        if (size > 0 || default == null) {
-            reduce { a, b -> a.op(operator, b) }
-        } else {
-            default
-        }
+fun Collection<SMVExpr>.joinToExpr(operator: SBinaryOperator = SBinaryOperator.AND, default: SMVExpr? = null): SMVExpr = if (size > 0 || default == null) {
+    reduce { a, b -> a.op(operator, b) }
+} else {
+    default
+}
 
-fun Collection<SMVExpr>.disjunction(default: SMVExpr): SMVExpr =
-        joinToExpr(SBinaryOperator.OR, default)
+fun Collection<SMVExpr>.disjunction(default: SMVExpr): SMVExpr = joinToExpr(SBinaryOperator.OR, default)
 
-fun Collection<SMVExpr>.conjunction(default: SMVExpr): SMVExpr =
-        joinToExpr(SBinaryOperator.AND, default)
-
+fun Collection<SMVExpr>.conjunction(default: SMVExpr): SMVExpr = joinToExpr(SBinaryOperator.AND, default)
 
 /**
  * Creates a modules that maintains the history of the given variables.
@@ -30,9 +43,10 @@ fun Collection<SMVExpr>.conjunction(default: SMVExpr): SMVExpr =
  * @version 1 (31.07.18)
  */
 open class HistoryModuleBuilder(
-        val name: String = "History",
-        val variables: List<SVariable>,
-        val length: Int) : Runnable {
+    val name: String = "History",
+    val variables: List<SVariable>,
+    val length: Int,
+) : Runnable {
     val module = SMVModule(name)
     val moduleType = ModuleType(name, variables)
 
@@ -66,7 +80,6 @@ open class HistoryModuleBuilder(
     }
 }
 
-
 fun SMVExpr.find(pred: (SMVExpr) -> Boolean) = this.accept(FindSExpr(pred))
 
 class FindSExpr(val pred: (SMVExpr) -> Boolean) : SMVAstDefaultVisitor<SMVExpr>() {
@@ -95,7 +108,6 @@ class FindSExpr(val pred: (SMVExpr) -> Boolean) : SMVAstDefaultVisitor<SMVExpr>(
         if (pred(ce)) return ce
         return super.visit(ce)
     }
-
 
     override fun visit(func: SFunction): SMVExpr? {
         if (pred(func)) return func

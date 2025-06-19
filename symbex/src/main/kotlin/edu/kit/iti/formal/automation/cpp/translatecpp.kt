@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.cpp
 
 import edu.kit.iti.formal.automation.datatypes.*
@@ -21,54 +39,50 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 object TranslateToCppFacade {
-    fun value(v: Value<*, *>?): String {
-        return when (v) {
-            null -> "/* null value */"
-            is VBool -> v.value.toString()
-            is VAnyBit -> "(${dataType(v.dataType)}) ${v.value}"
-            is VAnyEnum -> "${v.dataType.name}_${v.value}"
-            is VAnyInt -> "(${dataType(v.dataType)}) ${v.value}"
-            is VStruct -> {
-                "(struct ${v.dataType.name}_t)" +
-                        v.fieldValues.joinToString(", ", "{", "}") { (n, v) ->
-                            ".$n = ${value(v)}"
-                        }
-            }
-            else -> "/* value $v unsupported */"
+    fun value(v: Value<*, *>?): String = when (v) {
+        null -> "/* null value */"
+        is VBool -> v.value.toString()
+        is VAnyBit -> "(${dataType(v.dataType)}) ${v.value}"
+        is VAnyEnum -> "${v.dataType.name}_${v.value}"
+        is VAnyInt -> "(${dataType(v.dataType)}) ${v.value}"
+        is VStruct -> {
+            "(struct ${v.dataType.name}_t)" +
+                v.fieldValues.joinToString(", ", "{", "}") { (n, v) ->
+                    ".$n = ${value(v)}"
+                }
         }
+        else -> "/* value $v unsupported */"
     }
 
-    fun dataType(any: AnyDt?): String {
-        return when (any) {
-            null -> "/* datatype is null */"
-            VOID -> "void"
-            is INT -> "int16_t"
-            is SINT -> "int8_t"
-            is LINT -> "int64_t"
-            is DINT -> "int32_t"
+    fun dataType(any: AnyDt?): String = when (any) {
+        null -> "/* datatype is null */"
+        VOID -> "void"
+        is INT -> "int16_t"
+        is SINT -> "int8_t"
+        is LINT -> "int64_t"
+        is DINT -> "int32_t"
 
-            is UINT -> "uint16_t"
-            is USINT -> "uint8_t"
-            is ULINT -> "uint64_t"
-            is UDINT -> "uint32_t"
+        is UINT -> "uint16_t"
+        is USINT -> "uint8_t"
+        is ULINT -> "uint64_t"
+        is UDINT -> "uint32_t"
 
-            is AnyBit.BOOL -> "bool"
-            is AnyBit.BYTE -> "uint8_t"
-            is AnyBit.WORD -> "uint32_t"
-            is AnyBit.DWORD -> "uint64_t"
+        is AnyBit.BOOL -> "bool"
+        is AnyBit.BYTE -> "uint8_t"
+        is AnyBit.WORD -> "uint32_t"
+        is AnyBit.DWORD -> "uint64_t"
 
-            //TODO ranges * any.ranges.size)
-            is ArrayType -> dataType(any.fieldType) + "[]"
+        // TODO ranges * any.ranges.size)
+        is ArrayType -> dataType(any.fieldType) + "[]"
 
-            is IECString -> "const char*"
-            is FunctionBlockDataType -> "struct ${any.functionBlock.name}_t"
-            is EnumerateType -> "enum ${any.name}"
-            is RecordType -> "struct " + any.name
-            is PointerType -> dataType(any.of) + "*"
-            is AnyReal.REAL -> "float"
-            is AnyReal.LREAL -> "double"
-            else -> "/* datatype: $any is not supported */"
-        }
+        is IECString -> "const char*"
+        is FunctionBlockDataType -> "struct ${any.functionBlock.name}_t"
+        is EnumerateType -> "enum ${any.name}"
+        is RecordType -> "struct " + any.name
+        is PointerType -> dataType(any.of) + "*"
+        is AnyReal.REAL -> "float"
+        is AnyReal.LREAL -> "double"
+        else -> "/* datatype: $any is not supported */"
     }
 
     fun translate(writer: Writer, pous: PouElements) {
@@ -90,28 +104,25 @@ object TranslateToCppFacade {
         else -> op.symbol
     }
 
-    fun translate(dataType: SMVType?): String {
-        return when (dataType) {
-            null -> "/* datatype is null */"
-            is SMVTypes.INT -> "int"
-            is SMVTypes.FLOAT -> "float"
-            is SMVTypes.BOOLEAN -> "bool"
-            is SMVWordType -> {
-                (if (dataType.signed) "" else "u") +
-                        when {
-                            dataType.width >= 64 -> "long"
-                            dataType.width >= 32 -> "int"
-                            dataType.width >= 16 -> "short"
-                            dataType.width >= 8 -> "byte"
-                            else -> "int"
-                        }
-            }
-            is EnumType -> "int"
-            else -> "/* datatype: $dataType is not supported */"
+    fun translate(dataType: SMVType?): String = when (dataType) {
+        null -> "/* datatype is null */"
+        is SMVTypes.INT -> "int"
+        is SMVTypes.FLOAT -> "float"
+        is SMVTypes.BOOLEAN -> "bool"
+        is SMVWordType -> {
+            (if (dataType.signed) "" else "u") +
+                when {
+                    dataType.width >= 64 -> "long"
+                    dataType.width >= 32 -> "int"
+                    dataType.width >= 16 -> "short"
+                    dataType.width >= 8 -> "byte"
+                    else -> "int"
+                }
         }
+        is EnumType -> "int"
+        else -> "/* datatype: $dataType is not supported */"
     }
 }
-
 
 /**
  *
@@ -176,8 +187,9 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     //region statements
     override fun visit(caseStatement: CaseStatement) {
         out.cblock("switch(${expr(caseStatement.expression)}) {", "}") {
-            for (c in caseStatement.cases)
+            for (c in caseStatement.cases) {
                 c.accept(this@TranslateToCpp)
+            }
 
             if (caseStatement.elseCase.isNotEmpty()) {
                 caseStatement.elseCase.also {
@@ -224,7 +236,6 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
                 ifStatement.elseBranch.accept(this@TranslateToCpp)
             }
         }
-
     }
 
     override fun visit(aCase: Case) {
@@ -238,8 +249,9 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     override fun visit(invocation: InvocationStatement) {
         val fbd = invocation.invoked as Invoked.FunctionBlock
 
-        if (invocation.parameters.isNotEmpty())
+        if (invocation.parameters.isNotEmpty()) {
             throw IllegalStateException()
+        }
 
         out.nl().append("${fbd.fb.name}(& ${expr(invocation.callee)});")
     }
@@ -269,15 +281,15 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
     override fun visit(functionDeclaration: FunctionDeclaration) {
         val rt = dataType(functionDeclaration.returnType.obj!!)
         val args = functionDeclaration.scope.variables.filter { it.isInput }
-                .joinToString(", ") { "${dataType(it.dataType)} ${it.name}" }
+            .joinToString(", ") { "${dataType(it.dataType)} ${it.name}" }
 
         out.cblock("$rt ${functionDeclaration.name}($args) {", "}") {
             functionDeclaration.scope.variables
-                    .filter { !it.isInput }
-                    .forEach {
-                        it.accept(this@TranslateToCpp)
-                        out.print(";").nl()
-                    }
+                .filter { !it.isInput }
+                .forEach {
+                    it.accept(this@TranslateToCpp)
+                    out.print(";").nl()
+                }
 
             functionDeclaration.stBody?.accept(this@TranslateToCpp)
 
@@ -299,9 +311,10 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
         out.println(
             "struct ${programDeclaration.name}_t ${programDeclaration.name.uppercase(Locale.getDefault())} = ${
                 value(
-                    DefaultInitValue.getInit(rt)
+                    DefaultInitValue.getInit(rt),
                 )
-            };")
+            };",
+        )
     }
 
     fun visit(pd: PouExecutable, actions: LookupList<ActionDeclaration>) {
@@ -314,7 +327,7 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
         out.nl()
         translateToCppExpr.enableRewriteStateVariables(pd.scope, "$currentStateVariable->")
 
-        out.cblock("void ${pd.name}(struct ${currentStateType}* $currentStateVariable) {", "}") {
+        out.cblock("void ${pd.name}(struct $currentStateType* $currentStateVariable) {", "}") {
             pd.stBody?.accept(this@TranslateToCpp)
         }
 
@@ -331,12 +344,12 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
         out.cblock("struct $name {", "};") {
             scope.variables.forEach {
                 out.print("${dataType(it.dataType)} ${it.name};")
-                        .print("/* ${it.type.toString(2)} */")
-                        .nl()
+                    .print("/* ${it.type.toString(2)} */")
+                    .nl()
                 values.add(value(it.initValue))
             }
         }
-        //out.nl().print("const struct $name ${name}_default = {${values.joinToString(", ")}};\n")
+        // out.nl().print("const struct $name ${name}_default = {${values.joinToString(", ")}};\n")
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable, functionBlockDeclaration.actions)
@@ -349,10 +362,11 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
 
     override fun visit(variableDeclaration: VariableDeclaration) {
         val v = variableDeclaration.initValue
-        if (v != null)
+        if (v != null) {
             out.print("${dataType(variableDeclaration.dataType)} ${variableDeclaration.name} = ${value(v)}")
-        else
+        } else {
             out.print("${dataType(variableDeclaration.dataType)} ${variableDeclaration.name}")
+        }
     }
 
     override fun visit(elements: PouElements) {
@@ -383,21 +397,18 @@ class TranslateToCpp(val out: CodeWriter) : AstVisitor<Unit>() {
             out.print("${enumerationTypeDeclaration.name}_$t = $u")
         }
         out.println("};")
-
     }
 //endregion
 
     override fun visit(empty: EMPTY_EXPRESSION) {
         out.print("/* empty */")
     }
-
 }
 
 class TranslateToCppExpr : AstVisitor<String>() {
     private lateinit var statePrefix: String
     private lateinit var rewriteScope: Scope
     private var rewriteStateVariables: Boolean = false
-
 
     override fun defaultVisit(obj: Any) = "/* $obj not implemented in $this */"
 
@@ -432,17 +443,18 @@ class TranslateToCppExpr : AstVisitor<String>() {
     override fun visit(symbolicReference: SymbolicReference): String {
         val sb = StringBuilder()
 
-        if (rewriteStateVariables && rewriteScope.variables.contains(symbolicReference.identifier))
+        if (rewriteStateVariables && rewriteScope.variables.contains(symbolicReference.identifier)) {
             sb.append(statePrefix + symbolicReference.identifier)
-        else
+        } else {
             sb.append(symbolicReference.identifier)
+        }
 
         symbolicReference.subscripts?.forEach {
             sb.append("[").append(it.accept(this)).append("]")
         }
 
         if (symbolicReference.hasSub()) {
-            val rw = rewriteStateVariables //rewrite only top level
+            val rw = rewriteStateVariables // rewrite only top level
             rewriteStateVariables = false
             sb.append(".").append(symbolicReference.sub?.accept(this))
             rewriteStateVariables = rw
@@ -468,7 +480,8 @@ class TranslateToCppExpr : AstVisitor<String>() {
 }
 
 fun generateHeader(cw: CodeWriter) {
-    cw.println("""
+    cw.println(
+        """
         //Generated on ${Date()}
     
         #include <stdint.h>
@@ -477,9 +490,9 @@ fun generateHeader(cw: CodeWriter) {
         #define true 1
 
         typedef int bool;
-    """.trimIndent())
+        """.trimIndent(),
+    )
 }
-
 
 fun generateRunnableStub(cw: CodeWriter, main: PouElements) {
     cw.nl()

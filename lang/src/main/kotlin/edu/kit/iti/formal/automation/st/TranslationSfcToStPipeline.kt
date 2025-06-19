@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.analysis.toHuman
@@ -22,24 +40,26 @@ private val SFCStep.onExit: String?
     get() = events.find { it.qualifier?.qualifier == FALLING }?.actionName
 
 private val SFCStep.onWhile: String?
-    get() = (events.find { it.qualifier?.qualifier == WHILE }
-            ?: events.find { it.qualifier?.qualifier == NON_STORED })?.actionName
+    get() = (
+        events.find { it.qualifier?.qualifier == WHILE }
+            ?: events.find { it.qualifier?.qualifier == NON_STORED }
+        )?.actionName
 
 private val Scope.resetStatements: StatementList
     get() {
         val seq = StatementList()
         variables
-                .filter { !it.isType(VD_EXCLUDE_RESET) } //for none SFC flags
-                .forEach {
-                    val v = it.initValue
-                            ?: throw IllegalStateException("value not set for variable declaration ${it.toHuman()}")
-                    val s = v.assignTo(SymbolicReference(it.name))
-                    if (s != null) {
-                        seq.addAll(s)
-                    } else {
-                        seq.comment("Do not know how to handle reset for: $it")
-                    }
+            .filter { !it.isType(VD_EXCLUDE_RESET) } // for none SFC flags
+            .forEach {
+                val v = it.initValue
+                    ?: throw IllegalStateException("value not set for variable declaration ${it.toHuman()}")
+                val s = v.assignTo(SymbolicReference(it.name))
+                if (s != null) {
+                    seq.addAll(s)
+                } else {
+                    seq.comment("Do not know how to handle reset for: $it")
                 }
+            }
         return seq
     }
 
@@ -71,20 +91,20 @@ sealed class TokenAmount {
  * Transformation pipeline from SFC implementation to ST Code.
  */
 open class TranslationSfcToStPipeline(
-        network: SFCNetwork,
-        name: String,
-        index: Int = 0,
-        scope: Scope,
-        finalScan: Boolean = true,
-        sfcFlags: Boolean = true,
-        maxNeededTokens: TokenAmount = TokenAmount.Unbounded)
-    : Callable<StatementList> {
+    network: SFCNetwork,
+    name: String,
+    index: Int = 0,
+    scope: Scope,
+    finalScan: Boolean = true,
+    sfcFlags: Boolean = true,
+    maxNeededTokens: TokenAmount = TokenAmount.Unbounded,
+) : Callable<StatementList> {
 
     val pipelineData = PipelineData(network, name, index, scope, finalScan, sfcFlags, maxNeededTokens)
     protected val pipelineSteps: MutableList<PipelineStep> = mutableListOf()
 
     init {
-        //configures the pipeline if the maximal needed token is 1
+        // configures the pipeline if the maximal needed token is 1
         if (pipelineData.tokenIsBoundedTo1) {
             pipelineSteps += IntroduceStateEnumVariable
             pipelineSteps += AssignStepVariables
@@ -98,8 +118,9 @@ open class TranslationSfcToStPipeline(
         pipelineSteps += RunActions
         pipelineSteps += IncreaseStepTime
 
-        if (sfcFlags)
+        if (sfcFlags) {
             pipelineSteps += SfcFlagIntroduction
+        }
     }
 
     override fun call(): StatementList {
@@ -224,13 +245,14 @@ private object ProcessTransitionsToken1 : PipelineStep {
                 step.outgoing.forEach {
                     val guard = ExpressionList(mutableListOf(it.guard)).clone()
 
-                    if (index > 0)
+                    if (index > 0) {
                         AstMutableVisitorWithReplacedStepNames(this).visit(guard)
+                    }
 
                     val cond = guard.chainAnd()
                     val stepName = (stepName(step.name))
                     val seq = StatementList()
-                    //by assumption there is only one outgoing state
+                    // by assumption there is only one outgoing state
                     seq += stateName assignTo enumValue(it.to.first())
                     seq += stepName(it.to.first().name).assignTo("X", LTRUE)
                     seq += stepName.assignTo("T", TimeLit(TimeData()))
@@ -244,8 +266,16 @@ private object ProcessTransitionsToken1 : PipelineStep {
 private fun ExpressionList.chainAnd() = if (isEmpty()) LTRUE else reduce { a, b -> a and b }
 
 private class ControlActions : PipelineStep {
-    private val handlers = listOf(NonStored, SetHandler, TimeLimited, TimeDelayed, Pulse, StoreAndDelay,
-            DelayedAndStored, StoreAndLimited)
+    private val handlers = listOf(
+        NonStored,
+        SetHandler,
+        TimeLimited,
+        TimeDelayed,
+        Pulse,
+        StoreAndDelay,
+        DelayedAndStored,
+        StoreAndLimited,
+    )
     private val secondaryHandlers = listOf(Rising, Falling)
 
     override operator fun invoke(data: PipelineData) {
@@ -268,8 +298,12 @@ private class ControlActions : PipelineStep {
                 it.value.actionBlockPairs.filter { maybeTimedActionBlockPair ->
                     maybeTimedActionBlockPair.first.hasTime()
                 }.forEach { timedActionBlockPair ->
-                    ifBranches.add(GuardedStatement(subRef(timedActionBlockPair.second, "X"),
-                            StatementList(actionT assignTo timedActionBlockPair.first.time)))
+                    ifBranches.add(
+                        GuardedStatement(
+                            subRef(timedActionBlockPair.second, "X"),
+                            StatementList(actionT assignTo timedActionBlockPair.first.time),
+                        ),
+                    )
                 }
                 specialResetStatements += actionT.assignTo(TimeLit(TimeData()))
                 stBody.add(IfStatement(ifBranches))
@@ -295,14 +329,17 @@ private class ControlActions : PipelineStep {
             val optimizableMainAction: ActionQualifierHandler
             if (iecStep) {
                 if (finalScan) {
-                    if (stepsInQualifiers.contains(OVERRIDING_RESET))
+                    if (stepsInQualifiers.contains(OVERRIDING_RESET)) {
                         andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
+                    }
                     val trigName = "${name}_TRIG"
                     moduleTRIG(trigName, SymbolicReference(actionQ), "F_TRIG")
                     oredAssign(SymbolicReference(actionQ), subRef(trigName, "Q"))
                 }
                 optimizableMainAction = MainAction
-            } else optimizableMainAction = SimpleMainAction
+            } else {
+                optimizableMainAction = SimpleMainAction
+            }
             stepsInQualifiers.forEach { (qualifier, steps) ->
                 if (qualifier == WHILE) optimizableMainAction(it.value, steps, this)
             }
@@ -311,8 +348,9 @@ private class ControlActions : PipelineStep {
                     if (qualifier == handler.qualifier) handler(it.value, steps, this)
                 }
             }
-            if (!finalScan && stepsInQualifiers.contains(OVERRIDING_RESET))
+            if (!finalScan && stepsInQualifiers.contains(OVERRIDING_RESET)) {
                 andedNotAssign(SymbolicReference(actionQ), it.value.resetExpr)
+            }
         }
     }
 }
@@ -323,12 +361,13 @@ private object RunActions : PipelineStep {
             actions.keys.forEach {
                 val actionQ = SymbolicReference(actions[it]!!.actionQ)
                 val name = actions[it]!!.originalName
-                if (scope.hasVariable(name))
+                if (scope.hasVariable(name)) {
                     stBody.add(it assignTo actionQ)
-                else
+                } else {
                     stBody.add(Statements.ifthen(actionQ, InvocationStatement(SymbolicReference(name))))
+                }
             }
-            //val ifBranches = mutableListOf<GuardedStatement>()
+            // val ifBranches = mutableListOf<GuardedStatement>()
         }
     }
 }
@@ -339,7 +378,7 @@ private object IncreaseStepTime : PipelineStep {
             network.steps.forEach {
                 val varName = SymbolicReference(stepName(it.name))
                 val addition = varName["T"] assignTo
-                        (varName["T"] plus SymbolicReference("CYCLE_TIME"))
+                    (varName["T"] plus SymbolicReference("CYCLE_TIME"))
                 stBody.add(Statements.ifthen(varName["X"], addition))
             }
         }
@@ -370,14 +409,9 @@ private object SfcFlagIntroduction : PipelineStep {
 
 private fun stepsWithThisActionBlock(stepNames: Collection<String>) = stepNames.mapRef().chainORs()
 
-private fun Collection<String>.mapRef(sub: String = "X"): List<Expression> {
-    return map { name -> subRef(name, sub) }
-}
+private fun Collection<String>.mapRef(sub: String = "X"): List<Expression> = map { name -> subRef(name, sub) }
 
-private fun List<Expression>.chainORs(): Expression {
-    return reduce { acc, s -> acc or s }
-}
-
+private fun List<Expression>.chainORs(): Expression = reduce { acc, s -> acc or s }
 
 private fun subRef(name: String, sub: String) = SymbolicReference(name, SymbolicReference(sub))
 
@@ -385,15 +419,16 @@ fun String.assignTo(sub: String, expr: Expression) = AssignmentStatement(subRef(
 
 private fun String.assignSubTo(sub: String) = assignSubTo(sub, "_$sub")
 
-private fun String.assignSubTo(sub: String, other: String) =
-        AssignmentStatement(subRef(this, sub), subRef(this, other))
+private fun String.assignSubTo(sub: String, other: String) = AssignmentStatement(subRef(this, sub), subRef(this, other))
 
 private class AstMutableVisitorWithReplacedStepNames(val data: PipelineData) : AstMutableVisitor() {
     override fun visit(symbolicReference: SymbolicReference): Expression {
         data.run {
             for (i in 0 until network.steps.size) {
-                if (symbolicReference.identifier == network.steps[i].name)
-                    symbolicReference.identifier = stepName(network.steps[i].name); break
+                if (symbolicReference.identifier == network.steps[i].name) {
+                    symbolicReference.identifier = stepName(network.steps[i].name)
+                }
+                break
             }
         }
         return super.visit(symbolicReference) as SymbolicReference
@@ -417,8 +452,7 @@ object MainAction : ActionQualifierHandler(WHILE) {
 }
 
 object SimpleMainAction : ActionQualifierHandler(WHILE) {
-    override fun invoke(actionInfo: ActionInfo, steps: Set<String>, data: PipelineData) =
-            NonStored.invoke(actionInfo, steps, data)
+    override fun invoke(actionInfo: ActionInfo, steps: Set<String>, data: PipelineData) = NonStored.invoke(actionInfo, steps, data)
 }
 
 object SetHandler : ActionQualifierHandler(SET) {
@@ -520,8 +554,13 @@ object Falling : ActionQualifierHandler(FALLING) {
 }
 
 data class PipelineData(
-    val network: SFCNetwork, val name: String, val index: Int, val scope: Scope,
-    val finalScan: Boolean, val sfcFlags: Boolean, val maxNeededTokens: TokenAmount
+    val network: SFCNetwork,
+    val name: String,
+    val index: Int,
+    val scope: Scope,
+    val finalScan: Boolean,
+    val sfcFlags: Boolean,
+    val maxNeededTokens: TokenAmount,
 ) {
     val tokenIsBoundedTo1: Boolean = maxNeededTokens is TokenAmount.Bounded && maxNeededTokens.max == 1
     val transitions: Map<MutableSet<SFCStep>, List<SFCTransition>> = network.steps.flatMap { it.outgoing }.distinct()
@@ -538,13 +577,12 @@ data class PipelineData(
             null
         }
         a ?: RecordType(STRUCT_SFC_STEP_NAME)
-        //throw IllegalArgumentException("Could not find $STRUCT_SFC_STEP_NAME in the given scope. See StepStructureTypes in the builtins")
+        // throw IllegalArgumentException("Could not find $STRUCT_SFC_STEP_NAME in the given scope. See StepStructureTypes in the builtins")
     }
-
 
     val stateName = SymbolicReference(if (index <= 0) "_state" else "_${index}_state")
     val enumName =
-        (if (index <= 0) "STATES_$name" else "STATES_$name\$${index}").uppercase(Locale.getDefault())
+        (if (index <= 0) "STATES_$name" else "STATES_$name\$$index").uppercase(Locale.getDefault())
     val stateEnumType =
         createEnumerationTypeForSfc(enumName, network, this::enumStepName)
 
@@ -558,9 +596,9 @@ data class PipelineData(
             .forEach {
                 enumType.addValue(CommonToken(IEC61131Lexer.IDENTIFIER, enumStepName(stepName(it))))
             }
-        //enumType.initialization = IdentifierInitializer(value = enumStepName(network.initialStep!!.name))
-        //scope.dataTypes.register(enumName, enumType)
-        //specialResetStatements += enumName.assignTo(enumType.initialization!!.value!!)
+        // enumType.initialization = IdentifierInitializer(value = enumStepName(network.initialStep!!.name))
+        // scope.dataTypes.register(enumName, enumType)
+        // specialResetStatements += enumName.assignTo(enumType.initialization!!.value!!)
         enumType
     }
 
@@ -570,40 +608,43 @@ data class PipelineData(
                 val qualifier = it.qualifier ?: SFCActionQualifier(NON_STORED)
                 val stepName = stepName(step.name)
                 val actionName = it.actionName.replace('.', '_')
-                if (actions.containsKey(actionName))
+                if (actions.containsKey(actionName)) {
                     actions.getValue(actionName).addActionBlock(qualifier, stepName)
-                else actions[actionName] = ActionInfo(it.actionName, qualifier, stepName)
+                } else {
+                    actions[actionName] = ActionInfo(it.actionName, qualifier, stepName)
+                }
             }
         }
     }
 
     fun enumValue(step: SFCStep) = EnumLit(stateEnumType, enumStepName(stepName(step.name)))
 
-    fun stepName(stepName: String, idx: Int = index, sfcName: String = name): String =
-        if (idx <= 0) stepName else "_${idx}_$stepName"
+    fun stepName(stepName: String, idx: Int = index, sfcName: String = name): String = if (idx <= 0) stepName else "_${idx}_$stepName"
 
-    //0 -> "$sfcName$stepName"
-    //else -> "$sfcName${idx}_$stepName"
+    // 0 -> "$sfcName$stepName"
+    // else -> "$sfcName${idx}_$stepName"
 
-    fun enumStepName(stepName: String) =
-        if (index <= 0) stepName else "_${index}_$stepName"
+    fun enumStepName(stepName: String) = if (index <= 0) stepName else "_${index}_$stepName"
 
-    fun addToScope(name: String, dt: AnyDt, type: Int = 0): VariableDeclaration {
-        return if (!scope.variables.contains(name)) {
-            VariableDeclaration(name, type, dt).also { scope.variables.add(it) }
-        } else scope.variables[name]!!
+    fun addToScope(name: String, dt: AnyDt, type: Int = 0): VariableDeclaration = if (!scope.variables.contains(name)) {
+        VariableDeclaration(name, type, dt).also { scope.variables.add(it) }
+    } else {
+        scope.variables[name]!!
     }
 
     fun addToScope(names: List<String>, dt: AnyDt, type: Int = 0) = names.map { addToScope(it, dt, type) }
 
     fun moduleTON(name: String, input: Expression, pt: Expression) {
         specialResetStatements += InvocationStatement(
-            SymbolicReference(name), mutableListOf(
+            SymbolicReference(name),
+            mutableListOf(
                 InvocationParameter(
                     "IN",
-                    false, LFALSE
-                ), InvocationParameter("PT", false, TimeLit(TimeData()))
-            )
+                    false,
+                    LFALSE,
+                ),
+                InvocationParameter("PT", false, TimeLit(TimeData())),
+            ),
         )
         moduleFB(name, "TON", listOf(Pair("IN", input), Pair("PT", pt)))
     }
@@ -611,7 +652,7 @@ data class PipelineData(
     fun moduleRS(name: String, set: Expression, reset1: Expression) {
         specialResetStatements += InvocationStatement(
             SymbolicReference(name),
-            mutableListOf(InvocationParameter("R", false, LTRUE))
+            mutableListOf(InvocationParameter("R", false, LTRUE)),
         )
         moduleFB(name, "RS", listOf(Pair("SET", set), Pair("RESET1", reset1)))
     }
@@ -619,7 +660,7 @@ data class PipelineData(
     fun moduleTRIG(name: String, clk: Expression, type: String = "R_TRIG") {
         specialResetStatements += InvocationStatement(
             SymbolicReference(name),
-            mutableListOf(InvocationParameter("CLK", false, LFALSE))
+            mutableListOf(InvocationParameter("CLK", false, LFALSE)),
         )
         moduleFB(name, type, listOf(Pair("CLK", clk)))
     }
@@ -628,9 +669,14 @@ data class PipelineData(
         val vd = VariableDeclaration(name, SimpleTypeDeclaration(baseType = RefTo(type)))
         vd.type = VD_EXCLUDE_RESET
         scope.variables.add(vd)
-        stBody.add(InvocationStatement(SymbolicReference(name), parameters.map { (left, right) ->
-            InvocationParameter(left, false, right)
-        }.toMutableList()))
+        stBody.add(
+            InvocationStatement(
+                SymbolicReference(name),
+                parameters.map { (left, right) ->
+                    InvocationParameter(left, false, right)
+                }.toMutableList(),
+            ),
+        )
     }
 
     fun oredAssign(left: SymbolicReference, right: Expression) {
@@ -645,9 +691,7 @@ data class PipelineData(
         stBody.add(AssignmentStatement(left, left and !right))
     }
 
-    fun stateEnumValue(name: String): EnumLit {
-        return EnumLit(stateEnumType, name)
-    }
+    fun stateEnumValue(name: String): EnumLit = EnumLit(stateEnumType, name)
 }
 
 class ActionInfo(var name: String, sfcActionQualifier: SFCActionQualifier, val step: String) {
@@ -669,20 +713,29 @@ class ActionInfo(var name: String, sfcActionQualifier: SFCActionQualifier, val s
 
     fun addActionBlock(sfcActionQualifier: SFCActionQualifier, step: String) {
         actionBlockPairs.add(Pair(sfcActionQualifier, step))
-        if (actionStepsInQualifiers.contains(sfcActionQualifier.qualifier))
+        if (actionStepsInQualifiers.contains(sfcActionQualifier.qualifier)) {
             actionStepsInQualifiers.getValue(sfcActionQualifier.qualifier).add(step)
-        else actionStepsInQualifiers[sfcActionQualifier.qualifier] = mutableSetOf(step)
+        } else {
+            actionStepsInQualifiers[sfcActionQualifier.qualifier] = mutableSetOf(step)
+        }
     }
 }
 
 class TranslationSfcToStOld(
-        network: SFCNetwork,
-        val name: String,
-        val index: Int = 0,
-        val scope: Scope,
-        sfcFlags: Boolean = true)
-    : TranslationSfcToStPipeline(network, name, index, scope, false, sfcFlags,
-        TokenAmount.Bounded(1)) {
+    network: SFCNetwork,
+    val name: String,
+    val index: Int = 0,
+    val scope: Scope,
+    sfcFlags: Boolean = true,
+) : TranslationSfcToStPipeline(
+    network,
+    name,
+    index,
+    scope,
+    false,
+    sfcFlags,
+    TokenAmount.Bounded(1),
+) {
 
     private val transit = "__transit"
 
@@ -692,8 +745,9 @@ class TranslationSfcToStOld(
         pipelineSteps += IntroduceStateEnumVariable
         pipelineSteps += IntroduceTransitVariable()
         pipelineSteps += TheBigStateCase(transit)
-        if (sfcFlags)
+        if (sfcFlags) {
             pipelineSteps += SfcFlagIntroduction
+        }
     }
 
     inner class IntroduceTransitVariable : PipelineStep {
@@ -720,46 +774,51 @@ class TranslationSfcToStOld(
             val el = data.stateEnumValue(n.name)
             case.conditions.add(CaseCondition.Enumeration(el))
             val sl = case.statements
-            //sl.comment("begin(State)")
-            //sl.comment("begin(onEntry)")
+            // sl.comment("begin(State)")
+            // sl.comment("begin(onEntry)")
             n.onEntry?.also {
-                sl.add(Statements.ifthen(
+                sl.add(
+                    Statements.ifthen(
                         SymbolicReference(transit),
-                        InvocationStatement(it)
-                ))
+                        InvocationStatement(it),
+                    ),
+                )
             }
             sl.add(transit assignTo LFALSE)
-            //sl.comment("end(onEntry)")
+            // sl.comment("end(onEntry)")
 
-            //build in active
-            //sl.comment("begin(onActive)")
+            // build in active
+            // sl.comment("begin(onActive)")
             n.onWhile?.also {
                 sl.add(InvocationStatement(it))
             }
-            //sl.comment("end(onActive)")
+            // sl.comment("end(onActive)")
 
-            //sl.comment("begin(transition)")
+            // sl.comment("begin(transition)")
             val transitions = IfStatement()
             val assignExitTrue = transit assignTo LTRUE
 
             n.outgoing.forEach {
                 val assignNextState =
-                        data.stateName assignTo data.stateEnumValue(it.to.first().name)
-                transitions.addGuardedCommand(it.guard,
-                        assignExitTrue + assignNextState)
+                    data.stateName assignTo data.stateEnumValue(it.to.first().name)
+                transitions.addGuardedCommand(
+                    it.guard,
+                    assignExitTrue + assignNextState,
+                )
             }
             sl.add(transitions)
-            //sl.comment(("end(transition)"))
+            // sl.comment(("end(transition)"))
 
-            //sl.comment("begin(onExit)")
+            // sl.comment("begin(onExit)")
             n.onExit?.also { onExit ->
                 val ifExit = Statements.ifthen(
-                        SymbolicReference(transit),
-                        InvocationStatement(onExit))
+                    SymbolicReference(transit),
+                    InvocationStatement(onExit),
+                )
                 sl.add(ifExit)
             }
             // sl.comment("end(onExit)")
-            //sl.comment("end(State)")
+            // sl.comment("end(State)")
             return case
         }
     }
@@ -772,7 +831,8 @@ private operator fun Statement.plus(statement: Statement): StatementList {
     return sl
 }
 
-internal fun createEnumerationTypeForSfc(enumName: String, network: SFCNetwork, enumStepName: (String) -> String) =
-        EnumerateType(enumName, network.steps.map { enumStepName(it.name) }.toMutableList(),
-                enumStepName(network.initialStep!!.name))
-
+internal fun createEnumerationTypeForSfc(enumName: String, network: SFCNetwork, enumStepName: (String) -> String) = EnumerateType(
+    enumName,
+    network.steps.map { enumStepName(it.name) }.toMutableList(),
+    enumStepName(network.initialStep!!.name),
+)

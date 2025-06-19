@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.st.util
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.st.util
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.st.util
 
 /**
  * Created by weigl on 13.06.14.
@@ -30,9 +26,7 @@ package edu.kit.iti.formal.automation.st.util
  */
 data class Tuple<S, T>(val a: S, val b: T) {
     companion object {
-        fun <T, S> make(a: T, b: S): Tuple<T, S> {
-            return Tuple(a, b)
-        }
+        fun <T, S> make(a: T, b: S): Tuple<T, S> = Tuple(a, b)
     }
 }
 
@@ -40,11 +34,9 @@ sealed class Either<L, R> {
     data class Left<L, R>(val l: L) : Either<L, R>()
     data class Right<L, R>(val r: R) : Either<L, R>()
 
-    infix fun <Rp> bind(f: (R) -> (Either<L, Rp>)): Either<L, Rp> {
-        return when (this) {
-            is Either.Left<L, R> -> Left<L, Rp>(this.l)
-            is Either.Right<L, R> -> f(this.r)
-        }
+    infix fun <Rp> bind(f: (R) -> (Either<L, Rp>)): Either<L, Rp> = when (this) {
+        is Either.Left<L, R> -> Left<L, Rp>(this.l)
+        is Either.Right<L, R> -> f(this.r)
     }
 
     infix fun <Rp> seq(e: Either<L, Rp>): Either<L, Rp> = e

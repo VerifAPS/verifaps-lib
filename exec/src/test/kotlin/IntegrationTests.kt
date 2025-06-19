@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -7,14 +25,13 @@ import kotlin.io.path.absolutePathString
 
 val NUXMV_PATH by lazy {
     val file = File(System.getenv("HOME"), "share/nuXmv-2.1.0-linux64/bin/nuXmv")
-    //val file = File(System.getenv("HOME"), "share/nuXmv-2.0.0-Linux/bin/nuXmv")
+    // val file = File(System.getenv("HOME"), "share/nuXmv-2.0.0-Linux/bin/nuXmv")
     if (file.exists()) {
         file.absolutePath
     } else {
         "nuXmv"
     }
 }
-
 
 val GETETA_PATH = Paths.get("build/install/exec/bin/geteta")
     .absolutePathString()
@@ -102,7 +119,6 @@ class GetetaIntegrationTests {
         getetaTester("--row-map", "--cexout", "-t", "cycles_wrong.gtt", "-c", "cycles.st")
             .directory("../geteta/examples/cycles")
             .check()
-
     }
 }
 
@@ -115,11 +131,14 @@ class RetetaIntegrationTests {
     fun counter() {
         retetaTester(
             "--print-augmented-programs",
-            "-t", "table.tt.txt", "-P", "OneCnt.st", "-P", "TwoCnt.st"
+            "-t",
+            "table.tt.txt",
+            "-P",
+            "OneCnt.st",
+            "-P",
+            "TwoCnt.st",
         )
             .directory("../geteta/examples/RTT_counter")
             .check()
-
     }
-
 }

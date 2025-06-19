@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.fbd
 
 import org.jdom2.Element
@@ -26,7 +44,7 @@ class ConnectionPointOut(val element: Element) {
     val globalId: Int? = element.getAttributeValue("globalId")?.toInt()
 
     /** Relative position of the connection pin. Origin is the anchor position of the
-    block.*/
+     block.*/
     val relPosition: Position = Position(element.getChild("relPosition"))
 
     /**
@@ -44,11 +62,10 @@ class ConnectionPointOut(val element: Element) {
  */
 class Connection(val element: Element) {
     /** All positions of the directed connection path. If any positions are given, the
-    list has to contain the first (input pin of the consumer entry) as well as the last (output
-    pin of the producer entry).
+     list has to contain the first (input pin of the consumer entry) as well as the last (output
+     pin of the producer entry).
      */
     val relPosition: Position = Position(element.getChild("relPosition"))
-
 
     val globalId = element.getAttributeValue("globalId")?.toInt()
 
@@ -64,14 +81,12 @@ class Connection(val element: Element) {
      * elements single native output.
      */
     val formalParameter: String? = element.getAttributeValue("formalParameter")
-
 }
 
 class ConnectionPointIn(val element: Element) {
     /** Relative position of the connection pin. Origin is the anchor position of the
-    block.*/
+     block.*/
     val relPosition: Position = Position(element.getChild("relPosition"))
-
 
     /**
      * The operand is a valid iec variable e.g. avar[0] or an iec expression or
@@ -90,7 +105,6 @@ class Position(val element: Element)
 data class RightPowerRail(val element: Element) {
     val position: Position = Position(element.getChild("position"))
     val connectionPointIns = element.getChildren("connectionPointIn").map { ConnectionPointIn(it) }
-
 }
 
 abstract class ThingsOnARail(element: Element) : LDObject(element) {
@@ -108,7 +122,6 @@ abstract class ThingsOnARail(element: Element) : LDObject(element) {
         element.getAttributeValue("storage")?.let { StorageModifierType.valueOf(it) } ?: StorageModifierType.None
 }
 
-
 /**
  * Describes a graphical object representing a boolean variable which can be
  * used as l-value and r-value at the same time
@@ -122,7 +135,7 @@ class Coil(element: Element) : ThingsOnARail(element)
 class Contact(element: Element) : ThingsOnARail(element)
 
 /**Defines the edge detection behaviour of a variable*/
-enum class EdgeModifierType() { None, Falling, Rising }
+enum class EdgeModifierType { None, Falling, Rising }
 
 /** Defines the storage mode (S/R) behaviour of a variable */
 enum class StorageModifierType { None, Set, Reset }

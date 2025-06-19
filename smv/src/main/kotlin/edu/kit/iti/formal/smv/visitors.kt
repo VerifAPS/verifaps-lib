@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
@@ -39,7 +57,6 @@ open class SMVAstDefaultVisitor<T> : SMVAstVisitor<T?> {
     override fun visit(quantified: SQuantified): T? = defaultVisit(quantified)
 }
 
-
 abstract class SMVAstDefaultVisitorNN<T> : SMVAstVisitor<T> {
     protected abstract fun defaultVisit(top: SMVAst): T
     override fun visit(top: SMVAst): T = defaultVisit(top)
@@ -53,7 +70,6 @@ abstract class SMVAstDefaultVisitorNN<T> : SMVAstVisitor<T> {
     override fun visit(func: SFunction): T = defaultVisit(func)
     override fun visit(quantified: SQuantified): T = defaultVisit(quantified)
 }
-
 
 open class SMVAstScanner : SMVAstVisitor<Unit> {
     override fun visit(top: SMVAst) = defaultVisit(top)
@@ -102,8 +118,7 @@ open class SMVAstScanner : SMVAstVisitor<Unit> {
     override fun visit(func: SFunction) = defaultVisit(func)
     override fun visit(quantified: SQuantified) {
         quantified.quantified
-                .forEach { it.accept(this) }
-
+            .forEach { it.accept(this) }
     }
 }
 
@@ -154,36 +169,31 @@ abstract class SMVAstMutableVisitor : SMVAstVisitor<SMVAst> {
         return smvModule
     }
 
-    override fun visit(func: SFunction): SMVExpr {
-        return func
-    }
+    override fun visit(func: SFunction): SMVExpr = func
 
     override fun visit(quantified: SQuantified): SMVExpr {
         quantified.quantified = quantified.quantified
-                .map { it.accept(this) as SMVExpr }
+            .map { it.accept(this) as SMVExpr }
             .toMutableList()
         return quantified
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <E : SMVAst> List<E>.visitAll(): MutableList<E> =
-            map { it.accept(this@SMVAstMutableVisitor) as E }
-                .toMutableList()
+    private fun <E : SMVAst> List<E>.visitAll(): MutableList<E> = map { it.accept(this@SMVAstMutableVisitor) as E }
+        .toMutableList()
 }
 
 class VariableReplacer(val map: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
-    override fun visit(v: SVariable): SMVExpr {
-        return map.getOrDefault(v, v)
-    }
+    override fun visit(v: SVariable): SMVExpr = map.getOrDefault(v, v)
 }
 
 open class ExpressionReplacer(protected val assignments: Map<out SMVExpr, SMVExpr>) : SMVAstMutableVisitor() {
     var changed = false
     protected open fun replace(x: SMVExpr): SMVExpr {
         val a = assignments[x]
-        return if (a == null)
+        return if (a == null) {
             super.visit(x) as SMVExpr
-        else {
+        } else {
             changed = true
             a
         }
@@ -244,15 +254,15 @@ class SMVAstMutableTraversal(val visitor: SMVAstMutableVisitor) : SMVAstMutableV
 */
     override fun visit(func: SFunction): SMVExpr {
         func.arguments =
-                func.arguments.map { it.accept(visitor) as SMVExpr }
-                        .toMutableList()
+            func.arguments.map { it.accept(visitor) as SMVExpr }
+                .toMutableList()
         return func
     }
 
     override fun visit(quantified: SQuantified): SMVExpr {
         quantified.quantified = quantified.quantified
-                .map { it.accept(visitor) as SMVExpr }
-                .toMutableList()
+            .map { it.accept(visitor) as SMVExpr }
+            .toMutableList()
         return quantified
     }
 }
@@ -265,8 +275,11 @@ open class ExpressionReplacerRecur(val assignments: Map<out SMVExpr, SMVExpr>) :
         var a = x
         do {
             val nxt = assignments[a]
-            if (nxt != null) a = nxt
-            else break
+            if (nxt != null) {
+                a = nxt
+            } else {
+                break
+            }
         } while (true)
 
         changed = changed || a != x

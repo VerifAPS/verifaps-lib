@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
@@ -40,13 +58,13 @@ object Sc12f {
             }
         }
 
-        tles.add(0, typeDecls);
+        tles.add(0, typeDecls)
         File("SC12f.st").writer().use {
             it.write(IEC61131Facade.print(tles))
         }
         println(File("SC12f.st").absolutePath + " written!")
 
-        //IEC61131Facade.resolveDataTypes(tles)
+        // IEC61131Facade.resolveDataTypes(tles)
 
         val stles = SymbExFacade.simplify(tles)
         File("SC12f.st0").writer().use {
@@ -54,31 +72,32 @@ object Sc12f {
         }
         println(File("SC12f.st0").absolutePath + " written!")
 
-
         val smv = SymbExFacade.evaluateProgram(stles.get(1) as PouElements)
         File("SC12f.smv").writer().use {
             it.write(smv.toString())
         }
         println(File("SC12f.smv").absolutePath + " written!")
 
-
         val stop = System.currentTimeMillis()
         System.out.printf("// Time: %d ms%n", stop - start)
     }
 
     private fun removeShittySFCVars(scope: Scope) {
-        val s = arrayOf("SFCCurrentStep", "SFCEnableLimit", "SFCError",
-                "SFCErrorAnalyzation", "SFCErrorAnalyzationTable", "SFCErrorPOU",
-                "SFCErrorStep", "SFCInit", "SFCPause", "SFCQuitError", "SFCTip",
-                "SFCTipMode", "SFCTrans")
+        val s = arrayOf(
+            "SFCCurrentStep", "SFCEnableLimit", "SFCError",
+            "SFCErrorAnalyzation", "SFCErrorAnalyzationTable", "SFCErrorPOU",
+            "SFCErrorStep", "SFCInit", "SFCPause", "SFCQuitError", "SFCTip",
+            "SFCTipMode", "SFCTrans",
+        )
         s.forEach { scope.asMap().remove(it) }
     }
 
     private fun translate(fbd: FunctionBlockDeclaration) {
         if (fbd.sfcBody != null) {
-            val ss = SFC2ST("",
-                    fbd.sfcBody?.networks!![0],
-                    fbd.scope
+            val ss = SFC2ST(
+                "",
+                fbd.sfcBody?.networks!![0],
+                fbd.scope,
             )
             fbd.stBody = ss.get()
             typeDecls.add(ss.enumDecl)
@@ -92,9 +111,10 @@ object Sc12f {
 
     private fun translate(name: String, scope: Scope, a: ActionDeclaration) {
         if (a.sfcBody != null) {
-            val ss = SFC2ST(name + "__" + a.name,
-                    a.sfcBody!!.networks[0],
-                    scope
+            val ss = SFC2ST(
+                name + "__" + a.name,
+                a.sfcBody!!.networks[0],
+                scope,
             )
             a.stBody = ss.get()
             typeDecls.add(ss.enumDecl)
@@ -103,9 +123,10 @@ object Sc12f {
 
     private fun translate(pd: ProgramDeclaration) {
         if (pd.sfcBody != null) {
-            val ss = SFC2ST("",
-                    pd.sfcBody?.networks!![0],
-                    pd.scope
+            val ss = SFC2ST(
+                "",
+                pd.sfcBody?.networks!![0],
+                pd.scope,
             )
             pd.stBody = ss.get()
             typeDecls.add(ss.enumDecl)

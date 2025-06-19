@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.visitors
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.visitors
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.datatypes.values.ReferenceValue
 import edu.kit.iti.formal.automation.scope.Scope
@@ -32,7 +28,7 @@ import edu.kit.iti.formal.automation.st.ast.*
  * @author weigl
  * @version $Id: $Id
  */
-open class DefaultVisitor<T>() : DefaultVisitorNN<T?>() {
+open class DefaultVisitor<T> : DefaultVisitorNN<T?>() {
     override fun defaultVisit(obj: Any): T? = null
 }
 
@@ -96,8 +92,8 @@ abstract class DefaultVisitorNN<T> : Visitor<T> {
     override fun visit(referenceValue: ReferenceValue): T = defaultVisit(referenceValue)
     override fun visit(gvlDecl: GlobalVariableListDeclaration): T = defaultVisit(gvlDecl)
     override fun visit(empty: EMPTY_EXPRESSION) = defaultVisit(empty)
-    override fun visit(jump: JumpStatement)  = defaultVisit(jump)
+    override fun visit(jump: JumpStatement) = defaultVisit(jump)
     override fun visit(label: LabelStatement) = defaultVisit(label)
-    override fun visit(namespace: NamespaceDeclaration)= defaultVisit(namespace)
+    override fun visit(namespace: NamespaceDeclaration) = defaultVisit(namespace)
     override fun visit(special: SpecialStatement) = defaultVisit(special)
 }

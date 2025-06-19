@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.viz
 
 import edu.kit.iti.formal.automation.testtables.model.Region
@@ -18,9 +36,11 @@ import java.io.IOException
  * @author Alexander Weigl
  * @version 1 (07.03.18)
  */
-class AutomatonDrawer(val outputFile: File,
-                      val regions: List<Region>,
-                      val automata: TestTableAutomaton) : Runnable {
+class AutomatonDrawer(
+    val outputFile: File,
+    val regions: List<Region>,
+    val automata: TestTableAutomaton,
+) : Runnable {
 
     var runDot: Boolean = false
 
@@ -68,18 +88,18 @@ class AutomatonDrawer(val outputFile: File,
 
     private fun createDot(writer: CodeWriter) {
         writer.print("digraph G {")
-                .increaseIndent()
-                .nl()
-                .println("rankdir=LR;")
+            .increaseIndent()
+            .nl()
+            .println("rankdir=LR;")
 
-        if (useCluster)
+        if (useCluster) {
             regions.forEach { addStates(it, writer) }
-        else
+        } else {
             automata.rowStates.values.flatMap { it }
-                    .joinTo(writer, "\n") {
-                        state(it)
-                    }
-
+                .joinTo(writer, "\n") {
+                    state(it)
+                }
+        }
 
         writer.write(state(automata.stateError) + "\n")
         writer.write(state(automata.stateSentinel) + "\n")
@@ -87,7 +107,6 @@ class AutomatonDrawer(val outputFile: File,
         automata.transitions.joinTo(writer, "\n") { transition(it) }
 
         writer.write("\n}")
-
     }
 
     private fun addStates(region: Region, writer: CodeWriter) {
@@ -99,29 +118,31 @@ class AutomatonDrawer(val outputFile: File,
             }
         }
         writer.nl().print("label=\"group ${region.id} ${region.duration.repr()}\";")
-                .nl().print("color=black; attributes=dotted;")
-                .nl().decreaseIndent().nl().write("}").nl()
+            .nl().print("color=black; attributes=dotted;")
+            .nl().decreaseIndent().nl().write("}").nl()
     }
 
     private fun addStates(row: TableRow, writer: CodeWriter) {
-        if (useClusterForRows)
+        if (useClusterForRows) {
             writer.nl().print("subgraph cluster${row.id} {").increaseIndent()
+        }
 
         automata.getStates(row)?.forEach { writer.nl().print(state(it)) }
 
-        if (useClusterForRows)
+        if (useClusterForRows) {
             writer.nl().print("label=\"row ${row.id} (${row.duration})\";")
-                    .nl().print("color=grey; attributes=dashed;")
-                    .nl().decreaseIndent().nl().write("}").nl()
+                .nl().print("color=grey; attributes=dashed;")
+                .nl().decreaseIndent().nl().write("}").nl()
+        }
     }
 
     private fun transition(t: Transition): String {
         val color =
-                when (t.type) {
-                    TransitionType.ACCEPT -> "green"
-                    TransitionType.FAIL -> "red"
-                    else -> "black"
-                }
+            when (t.type) {
+                TransitionType.ACCEPT -> "green"
+                TransitionType.FAIL -> "red"
+                else -> "black"
+            }
 
         return "\t${t.from.name} -> ${t.to.name} [label=\"${t.type}\",color=$color]"
     }
@@ -131,12 +152,11 @@ class AutomatonDrawer(val outputFile: File,
         return "\t${s.name} [$a];"
     }
 
-
     val tmpFile = File.createTempFile("__" + outputFile.nameWithoutExtension, ".pdf")
 
     private fun doDot(): Boolean {
         val pb = ProcessBuilder("dot", "-Tpdf", "-o", tmpFile.absolutePath, outputFile.absolutePath)
-                .inheritIO()
+            .inheritIO()
         info("Try to run `${pb.command().joinToString(" ")}'.")
         try {
             val rt = pb.start().waitFor()
@@ -150,9 +170,9 @@ class AutomatonDrawer(val outputFile: File,
     private fun doShow(): Boolean {
         try {
             val rt = ProcessBuilder("xdg-open", tmpFile.absolutePath)
-                    .inheritIO()
-                    .start()
-                    .waitFor()
+                .inheritIO()
+                .start()
+                .waitFor()
             return rt == 0
         } catch (e: IOException) {
             error("Could not open the image file ${tmpFile.absoluteFile}: ${e.message}")

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.il
 
 import edu.kit.iti.formal.automation.SymbExFacade
@@ -23,9 +41,8 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Alexander Weigl
  * @version 1 (21.02.19)
  */
-class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000,
-               scope: Scope,
-               val state: SymbolicState = SymbolicState()) : Callable<SymbolicState> {
+class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000, scope: Scope, val state: SymbolicState = SymbolicState()) :
+    Callable<SymbolicState> {
     private val context = IlSymbexContext(scope)
 
     fun initState() {
@@ -59,14 +76,14 @@ class IlSymbex(ilBody: IlBody, maximalSteps: Int = 1000,
                         cond to expr
                     }
                     val ve =
-                            if (states.all { (a, b) -> b == states.first().second })
-                                states.first().second
-                            else {
-                                SCaseExpression().also {
-                                    states.forEach { (a, b) -> it.addCase(a, b) }
-                                    it.addCase(SLiteral.TRUE, v)
-                                }
+                        if (states.all { (_, b) -> b == states.first().second }) {
+                            states.first().second
+                        } else {
+                            SCaseExpression().also {
+                                states.forEach { (a, b) -> it.addCase(a, b) }
+                                it.addCase(SLiteral.TRUE, v)
                             }
+                        }
                     case[v] = ve
                 }
             }
@@ -80,13 +97,14 @@ internal class IlSymbexContext(val scope: Scope) {
     val terminated = arrayListOf<Path>()
     val errorVariable: SVariable = SVariable.bool("PATH_DIVERGED")
     val varCache = java.util.HashMap<String, SVariable>()
-    //var operationMap: OperationMap = DefaultOperationMap()
+
+    // var operationMap: OperationMap = DefaultOperationMap()
     val typeTranslator: TypeTranslator = DefaultTypeTranslator()
     val valueTranslator: ValueTranslator = DefaultValueTranslator()
     var initValueTranslator: InitValueTranslator = DefaultInitValue
 
     fun onFinish(p: Path) {
-        //p.pc = ilBody.size + 1
+        // p.pc = ilBody.size + 1
         terminated += p
     }
 
@@ -94,13 +112,11 @@ internal class IlSymbexContext(val scope: Scope) {
         running += p
     }
 
-    fun translateToSmv(lit: Literal) =
-            valueTranslator.translate(lit)
+    fun translateToSmv(lit: Literal) = valueTranslator.translate(lit)
 
-    fun translateToSmv(ref: SymbolicReference): SVariable =
-            varCache.computeIfAbsent(ref.identifier) {
-                typeTranslator.translate(scope.getVariable(ref))
-            }
+    fun translateToSmv(ref: SymbolicReference): SVariable = varCache.computeIfAbsent(ref.identifier) {
+        typeTranslator.translate(scope.getVariable(ref))
+    }
 
     fun translateToSmv(e: ExprOperand): SBinaryOperator = when (e) {
         ExprOperand.AND -> SBinaryOperator.AND
@@ -124,46 +140,49 @@ internal class IlSymbexContext(val scope: Scope) {
 }
 
 internal data class Path(
-        internal var currentIdx: Int = 0,
-        private var remainingSteps: Int = 0,
-        private val ilBody: IlBody,
-        private val context: IlSymbexContext,
-        private val subMode: Boolean = false,
-        internal val state: SymbolicState = SymbolicState(),
-        private var accumulator: SMVExpr = SLiteral.TRUE,
-        internal var pathCondition: Set<SMVExpr> = hashSetOf()) : Runnable, IlTraversalVisitor() {
+    internal var currentIdx: Int = 0,
+    private var remainingSteps: Int = 0,
+    private val ilBody: IlBody,
+    private val context: IlSymbexContext,
+    private val subMode: Boolean = false,
+    internal val state: SymbolicState = SymbolicState(),
+    private var accumulator: SMVExpr = SLiteral.TRUE,
+    internal var pathCondition: Set<SMVExpr> = hashSetOf(),
+) : IlTraversalVisitor(),
+    Runnable {
     private val remainingJumps = HashMap<Int, Int>()
 
     private val current: IlInstr
         get() = ilBody[currentIdx]
 
     private val ended: Boolean
-        get() = //(current as? RetInstr).type == ReturnOperand.RET||
+        get() = // (current as? RetInstr).type == ReturnOperand.RET||
             currentIdx >= ilBody.size
-
 
     override fun run() {
         while (!ended && remainingSteps > 0) {
-            //execute current state
+            // execute current state
             remainingSteps--
             current.accept(this)
         }
         if (!subMode) {
             if (currentIdx >= ilBody.size) {
                 state.assign(context.errorVariable, context.assignCounter.incrementAndGet(), SLiteral.FALSE)
-            } else
+            } else {
                 if (remainingSteps <= 0) {
                     state[context.errorVariable] = SLiteral.TRUE
                 }
+            }
             context.onFinish(this)
         }
     }
 
     private fun fork(cond: SMVExpr, forkedPC: Int) {
         val other = copy(
-                currentIdx = forkedPC,
-                state = SymbolicState(state), //TODO check for deep copy
-                pathCondition = HashSet(pathCondition) + cond)
+            currentIdx = forkedPC,
+            state = SymbolicState(state), // TODO check for deep copy
+            pathCondition = HashSet(pathCondition) + cond,
+        )
         pathCondition = pathCondition + cond.not()
         context.onFork(other)
     }
@@ -171,18 +190,21 @@ internal data class Path(
     //region instruction handling
     fun load(operand: IlOperand, N: Boolean = false) {
         val loadedValue =
-                when (operand) {
-                    is IlOperand.Variable ->
-                        context.translateToSmv(operand.ref)
-                    is IlOperand.Constant ->
-                        context.translateToSmv(operand.literal)
-                }
+            when (operand) {
+                is IlOperand.Variable ->
+                    context.translateToSmv(operand.ref)
+                is IlOperand.Constant ->
+                    context.translateToSmv(operand.literal)
+            }
         val oldValue = accumulator
 
         if (N) {
             accumulator = SMVFacade.caseexpr(
-                    oldValue.not(), loadedValue,
-                    SLiteral.TRUE, oldValue)
+                oldValue.not(),
+                loadedValue,
+                SLiteral.TRUE,
+                oldValue,
+            )
         } else {
             accumulator = loadedValue
         }
@@ -195,8 +217,11 @@ internal data class Path(
         val varValue = if (N) {
             val oldValue = state[variable]!!
             SMVFacade.caseexpr(
-                    accumulator.not(), SLiteral.FALSE,
-                    SLiteral.TRUE, oldValue)
+                accumulator.not(),
+                SLiteral.FALSE,
+                SLiteral.TRUE,
+                oldValue,
+            )
         } else {
             accumulator
         }
@@ -212,9 +237,12 @@ internal data class Path(
         val variable = context.translateToSmv(ref)
         val oldValue = state[variable]!!
         val varValue =
-                SMVFacade.caseexpr(
-                        accumulator, SLiteral.FALSE,
-                        SLiteral.TRUE, oldValue)
+            SMVFacade.caseexpr(
+                accumulator,
+                SLiteral.FALSE,
+                SLiteral.TRUE,
+                oldValue,
+            )
         state[variable] = varValue
     }
 
@@ -223,23 +251,26 @@ internal data class Path(
         val variable = context.translateToSmv(ref)
         val oldValue = state[variable]!!
         val varValue =
-                SMVFacade.caseexpr(
-                        accumulator, SLiteral.TRUE,
-                        SLiteral.TRUE, oldValue)
+            SMVFacade.caseexpr(
+                accumulator,
+                SLiteral.TRUE,
+                SLiteral.TRUE,
+                oldValue,
+            )
         state[variable] = varValue
     }
 
     fun shortcall(type: SimpleOperand, operand: IlOperand) {
-        //TODO Handle calls
+        // TODO Handle calls
         /*
         val func = (operand as IlOperand.Variable).ref
         val p = arrayListOf(InvocationParameter(type.name, false, accumulator))
         return InvocationStatement(func, p)
-        */
+         */
     }
 
     fun makeCall(call: CallInstr, C: Boolean = false, N: Boolean = false) {
-        //TODO Handle calls
+        // TODO Handle calls
         /*val args = call.parameters.map {
             val e = when (it.right) {
                 is IlOperand.Variable -> it.right.ref
@@ -253,7 +284,7 @@ internal data class Path(
             C -> Statements.ifthen(accumulator, invoke)
             else -> invoke
         }
-        */
+         */
     }
     //endregion
 
@@ -278,7 +309,7 @@ internal data class Path(
         val N = jump.type == JumpOperand.JMPCN
         val pos = ilBody.posMarked(jump.target) ?: throw IllegalStateException("illegal jump position")
 
-        if (C || N) { //TODO check the jump map
+        if (C || N) { // TODO check the jump map
             var cond = accumulator
             if (N) cond = cond.not()
             fork(cond, pos)
@@ -308,7 +339,7 @@ internal data class Path(
 
     override fun visit(funCall: FunctionCallInstr) {
         val decl = (funCall.invoked as? Invoked.Function)
-                ?: throw IllegalStateException("No function resolved for $funCall")
+            ?: throw IllegalStateException("No function resolved for $funCall")
 
         val args = funCall.operands.map {
             when (it) {
@@ -327,18 +358,20 @@ internal data class Path(
     override fun visit(expr: ExprInstr) {
         val sub = expr.instr ?: IlBody()
         expr.operandi?.also {
-            //rewrite
+            // rewrite
             sub.add(0, SimpleInstr(SimpleOperand.LD, it))
             expr.operandi = null
         }
         val operator = context.translateToSmv(expr.operand)
         val left = accumulator
-        val right: SMVExpr = exec(sub) //TODO Deal with side effects!
+        val right: SMVExpr = exec(sub) // TODO Deal with side effects!
         accumulator = left.op(operator, right)
         if (expr.operand == ExprOperand.XORN ||
-                expr.operand == ExprOperand.ORN ||
-                expr.operand == ExprOperand.ANDN)
+            expr.operand == ExprOperand.ORN ||
+            expr.operand == ExprOperand.ANDN
+        ) {
             accumulator = accumulator.not()
+        }
         currentIdx++
     }
 

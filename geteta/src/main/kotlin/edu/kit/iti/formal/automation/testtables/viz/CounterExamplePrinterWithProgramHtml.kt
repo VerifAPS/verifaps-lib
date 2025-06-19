@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.viz
 
 import edu.kit.iti.formal.automation.rvt.ASSIGN_SEPARATOR
@@ -15,6 +33,10 @@ import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import java.io.Writer
 
+const val OKMARK = "✔" // ✔
+const val ERRMARK = "✘"
+const val QMARK = "❓"
+
 class CounterExamplePrinterWithProgramHtml(
     val automaton: TestTableAutomaton,
     val testTable: GeneralizedTestTable,
@@ -22,7 +44,7 @@ class CounterExamplePrinterWithProgramHtml(
     val lineMap: LineMap,
     val program: PouExecutable,
     val stream: Writer,
-    val name: String
+    val name: String,
 ) {
 
     fun print(k: Int) {
@@ -63,7 +85,7 @@ class CounterExamplePrinterWithProgramHtml(
                     .right {
                         width: 50%;                  
                     }
-                    """.trimIndent()
+                        """.trimIndent()
                     }
                 }
             }
@@ -79,17 +101,20 @@ class CounterExamplePrinterWithProgramHtml(
                         div("code") {
                             val sw = object : CodeWriter() {
                                 override fun comment(format: String, vararg args: Any) {
-                                    write("<span class=\"comment\">"); super.comment(format, *args); write("</span>")
+                                    write("<span class=\"comment\">")
+                                    super.comment(format, *args)
+                                    write("</span>")
                                 }
 
                                 override fun keyword(keyword: String): CodeWriter {
-                                    write("<span class=\"keyword\">"); super.keyword(keyword); write("</span>")
+                                    write("<span class=\"keyword\">")
+                                    super.keyword(keyword)
+                                    write("</span>")
                                     return this
                                 }
-
                             }
                             val vt = VisualizeTraceHtml(cex, lineMap, program, sw).also { vt ->
-                                vt.programVariableToSVar = { "code$.${it}" }
+                                vt.programVariableToSVar = { "code$.$it" }
                             }
                             vt.get(k, k + 1)
                             unsafe { +sw.stream.toString() }
@@ -110,10 +135,6 @@ class CounterExamplePrinterWithProgramHtml(
         printVariables(k)
     }
 
-    val OKMARK = "✔" // ✔
-    val ERRMARK = "✘"
-    val QMARK = "❓"
-
     private fun DIV.printVariables(k: Int) {
         ul {
             for (row in testTable.region.flat()) {
@@ -128,8 +149,10 @@ class CounterExamplePrinterWithProgramHtml(
 
                 li {
                     unsafe {
-                        +("$rowActive Row ${row.id} ${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
-                                " ${boolForHuman(k, fwd)} (Time: $times)")
+                        +(
+                            "$rowActive Row ${row.id} ${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
+                                " ${boolForHuman(k, fwd)} (Time: $times)"
+                            )
                     }
                     if (activateStates.isNotEmpty()) {
                         br
@@ -174,31 +197,30 @@ class CounterExamplePrinterWithProgramHtml(
         return m
     }
 
-    private fun isRowActive(k: Int, it: TableRow): List<Int> {
-        return automaton.getStates(it)
-            ?.filter { rs ->
-                cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
-            }
-            ?.map { it.time }
-            ?: listOf()
-    }
+    private fun isRowActive(k: Int, it: TableRow): List<Int> = automaton.getStates(it)
+        ?.filter { rs ->
+            cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
+        }
+        ?.map { it.time }
+        ?: listOf()
 }
 
 class VisualizeTraceHtml(
     val cex: CounterExample,
     val lineMap: LineMap,
     val program: PouExecutable,
-    val stream: CodeWriter
+    val stream: CodeWriter,
 ) {
     var programVariableToSVar: (String) -> String = { it }
 
     fun get(k: Int) = get(k - 1, k)
     fun get(kInput: Int, kState: Int) {
         val tsp = TraceStPrinter(
-            stream, lineMap,
+            stream,
+            lineMap,
             inputValues = cex.states[kInput],
             outputValues = cex.states[kState],
-            programVariableToSVar = programVariableToSVar
+            programVariableToSVar = programVariableToSVar,
         )
         program.accept(tsp)
     }
@@ -209,7 +231,7 @@ private class TraceStPrinter(
     val lineMap: LineMap,
     val inputValues: Map<String, String>,
     val outputValues: Map<String, String>,
-    val programVariableToSVar: (String) -> String
+    val programVariableToSVar: (String) -> String,
 ) : StructuredTextPrinter(sb) {
     val intSuffx = ".*[$ASSIGN_SEPARATOR](\\d+)$".toRegex()
     val pos2Assign =
@@ -226,7 +248,7 @@ private class TraceStPrinter(
             val (p1, p2) = p
             p1 == ifStatement.startPosition && branch.startPosition == p2
         }?.let {
-            //as branch conditions are defined on the old state + input, we need to lookup in the prev. state
+            // as branch conditions are defined on the old state + input, we need to lookup in the prev. state
             sb.comment(" // ${it.key} = ${inputValues[programVariableToSVar(it.key)]}")
         }
     }
@@ -282,17 +304,17 @@ private class TraceStPrinter(
         }
 
         sb.nl().decreaseIndent().appendIdent().keyword("END_CASE").printf(";")
-
     }
 
     override fun visit(ifStatement: IfStatement) {
         for (i in 0 until ifStatement.conditionalBranches.size) {
             sb.nl()
 
-            if (i == 0)
+            if (i == 0) {
                 sb.keyword("IF").space()
-            else
+            } else {
                 sb.keyword("ELSIF").space()
+            }
 
             ifStatement.conditionalBranches[i].condition.accept(this)
 

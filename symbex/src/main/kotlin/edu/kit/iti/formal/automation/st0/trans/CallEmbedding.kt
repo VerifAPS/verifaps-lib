@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
@@ -8,20 +26,23 @@ import edu.kit.iti.formal.automation.st0.MultiCodeTransformation
 import edu.kit.iti.formal.automation.st0.TransformationState
 import java.util.*
 
-val EMBEDDING_BODY_PIPELINE = MultiCodeTransformation(arrayListOf(
+val EMBEDDING_BODY_PIPELINE = MultiCodeTransformation(
+    arrayListOf(
         ActionEmbedder(),
         FBEmbeddParameters(),
         FBAssignments(),
-        FBEmbeddCode()
-))
+        FBEmbeddCode(),
+    ),
+)
 
-
-val EMBEDDING_PIPELINE = MultiCodeTransformation(arrayListOf(
+val EMBEDDING_PIPELINE = MultiCodeTransformation(
+    arrayListOf(
         ActionEmbedder(),
         FBEmbeddVariables(),
         EMBEDDING_BODY_PIPELINE,
-        FBRemoveInstance()
-))
+        FBRemoveInstance(),
+    ),
+)
 
 /**
  * Seperator between identifier.
@@ -39,18 +60,17 @@ class ActionEmbedder : CodeTransformation {
     }
 
     private class ActionEmbedderImpl : AstMutableVisitor() {
-        override fun visit(fbc: InvocationStatement): Statement {
+        override fun visit(invocation: InvocationStatement): Statement {
             try {
-                val ainvoke = fbc.invoked as Invoked.Action
+                val ainvoke = invocation.invoked as Invoked.Action
                 val stmt = StatementList()
-                stmt += CommentStatement.single("Call of action: %s", fbc.callee.identifier)
+                stmt += CommentStatement.single("Call of action: %s", invocation.callee.identifier)
                 stmt.addAll(ainvoke.action.stBody!!)
-                stmt += CommentStatement.single("End of action call: %s", fbc.callee.identifier)
+                stmt += CommentStatement.single("End of action call: %s", invocation.callee.identifier)
                 return stmt
-            } catch (e: ClassCastException) {
-
+            } catch (_: ClassCastException) {
             }
-            return super.visit(fbc)
+            return super.visit(invocation)
         }
     }
 }
@@ -105,10 +125,10 @@ class FBEmbeddParameters : CodeTransformation {
                     }
                 }
 
-                //stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
+                // stmt += (CommentStatement.single("Call of %s", invocation.callee.identifier))
                 stmt += invocation
 
-                //rewrite output variables as trailing assignments.
+                // rewrite output variables as trailing assignments.
                 invocation.outputParameters.forEach { (name, _, expression) ->
                     if (name != null) {
                         val out = invocation.callee.copy(sub = SymbolicReference(name))
@@ -117,9 +137,9 @@ class FBEmbeddParameters : CodeTransformation {
                         throw IllegalStateException("Output parameter in function block call w/o name.")
                     }
                 }
-                //stmt += CommentStatement.single("End of call")
+                // stmt += CommentStatement.single("End of call")
 
-                //clear all parameters
+                // clear all parameters
                 invocation.parameters.clear()
                 return stmt
             }
@@ -146,13 +166,19 @@ class FBAssignments : CodeTransformation {
     }
 }
 
-class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
+class FBEmbeddCode :
+    AstMutableVisitor(),
+    CodeTransformation {
     companion object {
         private val bodyCache = hashMapOf<TransformationState, StatementList>()
-        var renaming: (state: TransformationState, statements: StatementList, prefix: (String) -> String) -> StatementList =
-                ::defaultRenaming
-        fun defaultRenaming(state: TransformationState, statements: StatementList, prefix: (String) -> String)
-                = VariableRenamer(state.scope::isGlobalVariable, statements.clone(), prefix).rename()
+        var renaming: (
+            state: TransformationState,
+            statements: StatementList,
+            prefix: (String) -> String,
+        ) -> StatementList =
+            ::defaultRenaming
+        fun defaultRenaming(state: TransformationState, statements: StatementList, prefix: (String) -> String) =
+            VariableRenamer(state.scope::isGlobalVariable, statements.clone(), prefix).rename()
     }
 
     override fun transform(state: TransformationState): TransformationState {
@@ -162,8 +188,7 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
 
     fun getBody(prefix: String, state: TransformationState): BlockStatement {
         if (state !in bodyCache) {
-            val istate = TransformationState(
-                    state.scope, state.stBody.clone(), SFCImplementation())
+            val istate = TransformationState(state.scope, state.stBody.clone(), SFCImplementation())
             val s = EMBEDDING_BODY_PIPELINE.transform(istate)
             bodyCache[state] = s.stBody
         }
@@ -178,17 +203,17 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
         return block
     }
 
-    private fun rewrite(renameFn: (String) -> String,
-                        scope: Scope,
-                        filter: (VariableDeclaration) -> Boolean): MutableList<SymbolicReference> {
-        return scope.variables.filter(filter)
-                .map { SymbolicReference(renameFn(it.name)) }
-                .toMutableList()
-    }
+    private fun rewrite(
+        renameFn: (String) -> String,
+        scope: Scope,
+        filter: (VariableDeclaration) -> Boolean,
+    ): MutableList<SymbolicReference> = scope.variables.filter(filter)
+        .map { SymbolicReference(renameFn(it.name)) }
+        .toMutableList()
 
     override fun visit(invocation: InvocationStatement): Statement {
         val invoked = invocation.invoked
-                ?: throw IllegalStateException("Invocation was not resolved. Abort. $invocation")
+            ?: throw IllegalStateException("Invocation was not resolved. Abort. $invocation")
 
         if (invoked is Invoked.FunctionBlock) {
             val state = TransformationState(invoked.fb)
@@ -206,12 +231,14 @@ class FBEmbeddCode : CodeTransformation, AstMutableVisitor() {
 
         if (invoked is Invoked.Function) {
             val s = StatementList()
-            //s += CommentStatement.single("Removed function invocation to ${invoked.function.name}")
-            s += CommentStatement.single("TODO for feature: Embedd function body after substitution to cover global effects.")
+            // s += CommentStatement.single("Removed function invocation to ${invoked.function.name}")
+            s +=
+                CommentStatement.single(
+                    "TODO for feature: Embedd function body after substitution to cover global effects.",
+                )
             s.addAll(invoked.function.stBody!!)
             return s
         }
-
 
         return invocation
     }

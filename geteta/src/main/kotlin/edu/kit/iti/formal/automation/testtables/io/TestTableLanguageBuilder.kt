@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.io
-
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
@@ -35,13 +52,16 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
         scope.types.register("BOOLEAN", AnyBit.BOOL)
     }
 
-
     private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
         val idx = current.programRuns.indexOf(it.id.text)
-        if (idx < 0) error("Program run unknown ${it.id.text}")
-        else idx
-    } else it.i().text.toInt()
-
+        if (idx < 0) {
+            error("Program run unknown ${it.id.text}")
+        } else {
+            idx
+        }
+    } else {
+        it.i().text.toInt()
+    }
 
     override fun visitTable(ctx: TestTableLanguageParser.TableContext) {
         current = GeneralizedTestTable()
@@ -60,7 +80,7 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
     override fun visitInheritance_signature(ctx: TestTableLanguageParser.Inheritance_signatureContext) {
         val name = ctx.IDENTIFIER().text
         val gtt = testTables.find { it.name == name }
-                ?: error("Could not find table ${name} to inherit from.")
+            ?: error("Could not find table $name to inherit from.")
         gtt.programVariables.forEach { current.programVariables.add(it.clone()) }
         gtt.constraintVariables.forEach { current.constraintVariables.add(it.copy()) }
     }
@@ -77,8 +97,9 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
         current.programRuns = ctx.run.map { it.text }
         if (current.programRuns.size <= 1) {
             fail(
-                    "The number of program runs are less than 2 for relational table ${current.name}. " +
-                            "Either this is not a relational table, or program runs are missing.")
+                "The number of program runs are less than 2 for relational table ${current.name}. " +
+                    "Either this is not a relational table, or program runs are missing.",
+            )
         }
     }
 
@@ -100,9 +121,9 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
     }
 
     data class VariableModifier(
-            val category: ColumnCategory,
-            val next: Boolean,
-            val state: Boolean
+        val category: ColumnCategory,
+        val next: Boolean,
+        val state: Boolean,
     )
 
     fun visit(ctx: TestTableLanguageParser.Var_modifierContext): VariableModifier {
@@ -169,8 +190,15 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
             vdr != null -> {
                 val newName: String? = vdr.newName?.text
                 val (programRun, realName) = resolveName(vdr.FQ_VARIABLE(), current)
-                val v = ProgramVariable(realName, dt, lt, type,
-                        modifier.state, modifier.next, programRun)
+                val v = ProgramVariable(
+                    realName,
+                    dt,
+                    lt,
+                    type,
+                    modifier.state,
+                    modifier.next,
+                    programRun,
+                )
                 if (newName != null) {
                     v.realName = v.name
                     v.name = newName
@@ -180,17 +208,14 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
         }
     }
 
-    private fun getDataType(symbol: String): AnyDt {
-        return try {
-            scope.resolveDataType(symbol)
-        } catch (e: DataTypeNotDefinedException) {
-            if (symbol.startsWith("ENUM_")) {
-                EnumerateType(symbol.substring("ENUM_".length), arrayListOf(""))
-            } else {
-                throw e
-            }
+    private fun getDataType(symbol: String): AnyDt = try {
+        scope.resolveDataType(symbol)
+    } catch (e: DataTypeNotDefinedException) {
+        if (symbol.startsWith("ENUM_")) {
+            EnumerateType(symbol.substring("ENUM_".length), arrayListOf(""))
+        } else {
+            throw e
         }
-
     }
 
     override fun visitFreeVariable(ctx: TestTableLanguageParser.FreeVariableContext) {
@@ -210,18 +235,24 @@ class TestTableLanguageBuilder(preDefinedTimeConstants: Map<String, Int>) : Test
     }
 }
 
-class RegionVisitor(private val gtt: GeneralizedTestTable,
-                    private val tables: List<GeneralizedTestTable>,
-                    timeConstants: Map<String, Int>) : TestTableLanguageParserBaseVisitor<TableNode>() {
+class RegionVisitor(
+    private val gtt: GeneralizedTestTable,
+    private val tables: List<GeneralizedTestTable>,
+    timeConstants: Map<String, Int>,
+) : TestTableLanguageParserBaseVisitor<TableNode>() {
     private var currentId = 0
     private val timeParser = TimeParser(timeConstants)
 
     private fun getProgramRun(it: TestTableLanguageParser.IntOrIdContext) = if (it.id != null) {
         val idx = gtt.programRuns.indexOf(it.id.text)
-        if (idx < 0) error("Program run unknown ${it.id.text}")
-        else idx
-    } else it.i().text.toInt()
-
+        if (idx < 0) {
+            error("Program run unknown ${it.id.text}")
+        } else {
+            idx
+        }
+    } else {
+        it.i().text.toInt()
+    }
 
     override fun visitGroup(ctx: TestTableLanguageParser.GroupContext): Region {
         if (ctx.goto_().isNotEmpty()) {
@@ -240,12 +271,9 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
         return r
     }
 
-
-    fun rowId(ctx: TestTableLanguageParser.IntOrIdContext?): String =
-            ctx?.id?.text ?: String.format("r%02d", ctx?.idi?.text?.toInt() ?: ++currentId)
+    fun rowId(ctx: TestTableLanguageParser.IntOrIdContext?): String = ctx?.id?.text ?: String.format("r%02d", ctx?.idi?.text?.toInt() ?: ++currentId)
 
     lateinit var currentRow: TableRow
-
 
     override fun visitRow(ctx: TestTableLanguageParser.RowContext): TableRow {
         val id = rowId(ctx.intOrId())
@@ -273,32 +301,33 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
 
         if (ctx.goto_().isNotEmpty()) {
             currentRow.gotos = ctx.goto_().asSequence()
-                    .flatMap { it.trans.asSequence() }
-                    .map { visitGotoTransition(it) }
-                    .toMutableList()
+                .flatMap { it.trans.asSequence() }
+                .map { visitGotoTransition(it) }
+                .toMutableList()
         }
         return currentRow
     }
 
     override fun visitRowInherit(ctx: TestTableLanguageParser.RowInheritContext): TableNode {
         val table = tables.find { ctx.name.text == it.name }
-                ?: error("Could not find table ${ctx.name.text}.")
+            ?: error("Could not find table ${ctx.name.text}.")
 
         val row = table.region.flat().find { it.id == ctx.rowId.text }
-                ?: error("Could not find row ${ctx.rowId.text} in ${table.name}.")
+            ?: error("Could not find row ${ctx.rowId.text} in ${table.name}.")
 
         currentRow.rawFields += row.rawFields
         return currentRow
     }
 
-    private fun visitGotoTransition(ctx: TestTableLanguageParser.GotoTransContext): GotoTransition {
-        return GotoTransition(ctx.tblId.text, rowId(ctx.rowId),
-                when {
-                    ctx.MISS() != null -> GotoTransition.Kind.MISS
-                    ctx.FAIL() != null -> GotoTransition.Kind.FAIL
-                    else -> GotoTransition.Kind.PASS
-                })
-    }
+    private fun visitGotoTransition(ctx: TestTableLanguageParser.GotoTransContext): GotoTransition = GotoTransition(
+        ctx.tblId.text,
+        rowId(ctx.rowId),
+        when {
+            ctx.MISS() != null -> GotoTransition.Kind.MISS
+            ctx.FAIL() != null -> GotoTransition.Kind.FAIL
+            else -> GotoTransition.Kind.PASS
+        },
+    )
 
     override fun visitControlPause(ctx: TestTableLanguageParser.ControlPauseContext): TableNode {
         ctx.intOrId().forEach { it ->
@@ -334,11 +363,14 @@ class RegionVisitor(private val gtt: GeneralizedTestTable,
             val run = getProgramRun(it)
             val backward = ControlCommand.Backward(run, target)
             val conflict = currentRow.controlCommands
-                    .filterIsInstance<ControlCommand.Backward>()
-                    .filter { it.affectedProgramRun == run }
-            if (conflict.isNotEmpty())
-                info("A backward-command already exists in row ${currentRow.id}. " +
-                        "Removing the previous command.")
+                .filterIsInstance<ControlCommand.Backward>()
+                .filter { it.affectedProgramRun == run }
+            if (conflict.isNotEmpty()) {
+                info(
+                    "A backward-command already exists in row ${currentRow.id}. " +
+                        "Removing the previous command.",
+                )
+            }
             currentRow.controlCommands.removeAll(conflict)
             currentRow.controlCommands.add(backward)
         }
@@ -356,7 +388,7 @@ class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserB
         val id = ctx.IDENTIFIER().text!!
 
         return timeConstants[id]
-                ?: error("Error used time constant $id is not given. (no default or command option)")
+            ?: error("Error used time constant $id is not given. (no default or command option)")
     }
 
     override fun visitTimeSingleSided(ctx: TestTableLanguageParser.TimeSingleSidedContext): Duration {
@@ -367,8 +399,11 @@ class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserB
     private fun accept(flags: TestTableLanguageParser.Duration_flagsContext?): DurationModifier {
         if (flags == null) return DurationModifier.NONE
         return if (flags.PFLAG() != null) {
-            if (flags.INPUT() != null) DurationModifier.PFLAG_I
-            else DurationModifier.PFLAG_IO
+            if (flags.INPUT() != null) {
+                DurationModifier.PFLAG_I
+            } else {
+                DurationModifier.PFLAG_IO
+            }
         } else if (flags.INPUT() != null) {
             DurationModifier.HFLAG_I
         } else {
@@ -376,16 +411,13 @@ class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserB
         }
     }
 
-    override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration {
-        return Duration.ClosedInterval(
-                accept(ctx.l),
-                accept(ctx.u),
-                accept(ctx.duration_flags()))
-    }
+    override fun visitTimeClosedInterval(ctx: TestTableLanguageParser.TimeClosedIntervalContext): Duration = Duration.ClosedInterval(
+        accept(ctx.l),
+        accept(ctx.u),
+        accept(ctx.duration_flags()),
+    )
 
-    override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration {
-        return Duration.OpenInterval(accept(ctx.l), accept(ctx.duration_flags()))
-    }
+    override fun visitTimeOpenInterval(ctx: TestTableLanguageParser.TimeOpenIntervalContext): Duration = Duration.OpenInterval(accept(ctx.l), accept(ctx.duration_flags()))
 
     override fun visitTimeFixed(ctx: TestTableLanguageParser.TimeFixedContext): Duration {
         val i = accept(ctx.intOrConst())
@@ -397,10 +429,9 @@ class TimeParser(val timeConstants: Map<String, Int>) : TestTableLanguageParserB
     override fun visitTimeOmega(ctx: TestTableLanguageParser.TimeOmegaContext) = Duration.Omega
 }
 
-internal fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> =
-        resolveName(fqVariable.text, current, Position.start(fqVariable.symbol))
+internal fun resolveName(fqVariable: TerminalNode, current: GeneralizedTestTable): Pair<Int, String> = resolveName(fqVariable.text, current, Position.start(fqVariable.symbol))
 
-//TODO Write tests
+// TODO Write tests
 internal fun resolveName(fqVariable: String, current: GeneralizedTestTable, pos: Position? = null): Pair<Int, String> {
     require(current.options.relational) {
         "Full-qualified variable used in non-relational test table."
@@ -408,9 +439,11 @@ internal fun resolveName(fqVariable: String, current: GeneralizedTestTable, pos:
     val parts = fqVariable.split("|>", "·", "::", limit = 2)
     val name = parts[parts.size - 1]
 
-
-    val runNum = if (parts.size == 1) -1 else
+    val runNum = if (parts.size == 1) {
+        -1
+    } else {
         parts[0].toIntOrNull() ?: current.programRuns.indexOf(parts[0])
+    }
     require(runNum >= 0) {
         "No run is given for variable $name in $pos"
     }

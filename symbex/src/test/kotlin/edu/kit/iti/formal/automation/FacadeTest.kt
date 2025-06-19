@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
@@ -43,14 +39,18 @@ class FacadeTest {
         Assumptions.assumeTrue(null != resource)
         val (toplevels, error) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val func = toplevels[0] as FunctionDeclaration
-        val state = SymbExFacade.evaluateFunction(func,
-                SVariable.create("a").asBool(),
-                SVariable.create("b").asBool(),
-                SVariable.create("c").asBool())
-        //System.out.println(state);
+        val state = SymbExFacade.evaluateFunction(
+            func,
+            SVariable.create("a").asBool(),
+            SVariable.create("b").asBool(),
+            SVariable.create("c").asBool(),
+        )
+        // System.out.println(state);
         Assertions.assertNotEquals(null, state)
-        Assertions.assertEquals("case a : b; TRUE : c; esac".cleanWhitespace(),
-                state.repr().cleanWhitespace())
+        Assertions.assertEquals(
+            "case a : b; TRUE : c; esac".cleanWhitespace(),
+            state.repr().cleanWhitespace(),
+        )
     }
 
     @Test
@@ -60,8 +60,8 @@ class FacadeTest {
         val (toplevels, ok) = IEC61131Facade.fileResolve(CharStreams.fromStream(resource))
         val module = SymbExFacade.evaluateProgram(toplevels[2] as ProgramDeclaration)
         println(module)
-        //System.out.println(state);
-        //Assertions.assertEquals();
+        // System.out.println(state);
+        // Assertions.assertEquals();
     }
 
     @Test
@@ -74,9 +74,8 @@ class FacadeTest {
             for (i in 1..9) {
                 println(ttp.get(i))
             }
-        }catch (e : IOException) {
+        } catch (e: IOException) {
             Assumptions.assumeTrue(e.message?.startsWith("Cannot run program") ?: false)
         }
     }
 }
-

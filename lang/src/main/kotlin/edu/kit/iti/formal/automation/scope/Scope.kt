@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.scope
-
 
 import edu.kit.iti.formal.automation.VariableScope
 import edu.kit.iti.formal.automation.datatypes.*
@@ -22,8 +39,10 @@ import kotlin.collections.ArrayList
  * @author Alexander Weigl
  * @version 1 (13.06.14)
  */
-data class Scope(val variables: VariableScope = VariableScope())
-    : Visitable, Iterable<VariableDeclaration>, Cloneable {
+data class Scope(val variables: VariableScope = VariableScope()) :
+    Visitable,
+    Iterable<VariableDeclaration>,
+    Cloneable {
     override fun iterator(): Iterator<VariableDeclaration> = variables.iterator()
     private val allowedEnumValues = HashMap<String, EnumerateType>()
 
@@ -37,7 +56,6 @@ data class Scope(val variables: VariableScope = VariableScope())
     var interfaces: Namespace<InterfaceDeclaration> = Namespace()
     val actions: Namespace<ActionDeclaration> = Namespace()
     val methods: Namespace<MethodDeclaration> = Namespace()
-
 
     var parent: Scope? = null
         set(parent) {
@@ -61,7 +79,6 @@ data class Scope(val variables: VariableScope = VariableScope())
             field = parent
         }
 
-
     val topLevel: Scope
         get() {
             var s: Scope? = this
@@ -79,7 +96,6 @@ data class Scope(val variables: VariableScope = VariableScope())
             return vars
         }
 
-
     fun getDefinedPous(): List<PouElement> {
         val p = (parent?.getDefinedPous() ?: mutableListOf()).toMutableList()
         p.addAll(programs.values())
@@ -90,12 +106,10 @@ data class Scope(val variables: VariableScope = VariableScope())
         return p
     }
 
-
     fun getVisiblePous(): List<PouElement> {
         val top = (parent?.getVisiblePous() ?: listOf())
         return getDefinedPous() + top
     }
-
 
     constructor(parent: Scope?) : this() {
         this.parent = parent
@@ -105,18 +119,14 @@ data class Scope(val variables: VariableScope = VariableScope())
         variables.forEach { this.add(it) }
     }
 
-    fun asMap(): VariableScope {
-        return variables
-    }
+    fun asMap(): VariableScope = variables
 
     fun add(vardecl: VariableDeclaration) = variables.add(vardecl)
 
     /**
      * {@inheritDoc}
      */
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     fun prefixNames(s: String): Scope {
         val copy = Scope()
@@ -131,17 +141,17 @@ data class Scope(val variables: VariableScope = VariableScope())
     /**
      * {@inheritDoc}
      *
-    override fun toString(): String {
-    val sb = StringBuilder("Scope{")
-    for (vd in variables) {
-    sb.printf(vd.name).printf(":").printf(vd.dataType)
-    if (vd.init != null) sb.printf(" := ").printf(vd.init)
-    sb.printf("},")
-    }
-    sb.delete(sb.length - 1, sb.length)
-    sb.printf("}")
-    return sb.toString()
-    }*/
+     override fun toString(): String {
+     val sb = StringBuilder("Scope{")
+     for (vd in variables) {
+     sb.printf(vd.name).printf(":").printf(vd.dataType)
+     if (vd.init != null) sb.printf(" := ").printf(vd.init)
+     sb.printf("},")
+     }
+     sb.delete(sb.length - 1, sb.length)
+     sb.printf("}")
+     return sb.toString()
+     }*/
 
     @Throws(VariableNotDefinedException::class)
     fun getVariable(reference: SymbolicReference): VariableDeclaration {
@@ -168,33 +178,26 @@ data class Scope(val variables: VariableScope = VariableScope())
         if (s in variables) {
             return variables[s]
         }
-        return if (this.parent != null) this.parent!!.getVariable(s)
-        else throw VariableNotDefinedException(this, s)
+        return if (this.parent != null) {
+            this.parent!!.getVariable(s)
+        } else {
+            throw VariableNotDefinedException(this, s)
+        }
     }
 
+    fun builder(): VariableBuilder = VariableBuilder(variables)
 
-    fun builder(): VariableBuilder {
-        return VariableBuilder(variables)
-    }
+    fun filterByFlags(flags: Int): List<VariableDeclaration> = variables.filter { it.isType(flags) }
 
-    fun filterByFlags(flags: Int): List<VariableDeclaration> {
-        return variables.filter { it.isType(flags) }
-    }
-
-    fun hasVariable(variable: String): Boolean {
-        return variable in variables || this.parent != null && this.parent!!.hasVariable(variable)
-    }
+    fun hasVariable(variable: String): Boolean = variable in variables || this.parent != null && this.parent!!.hasVariable(variable)
 
     fun resolveProgram(key: String) = programs.lookup(key)
     fun resolveFunctionBlock(key: String) = functionBlocks.lookup(key)
     fun resolveFunction(key: String) = functions.lookup(key)
 
-    fun registerProgram(programDeclaration: ProgramDeclaration) =
-        programs.register(programDeclaration.name!!, programDeclaration)
+    fun registerProgram(programDeclaration: ProgramDeclaration) = programs.register(programDeclaration.name!!, programDeclaration)
 
-    fun registerFunction(functionDeclaration: FunctionDeclaration) =
-        functions.register(functionDeclaration.name, functionDeclaration)
-
+    fun registerFunction(functionDeclaration: FunctionDeclaration) = functions.register(functionDeclaration.name, functionDeclaration)
 
     fun registerFunctionBlock(fblock: FunctionBlockDeclaration) = functionBlocks.register(fblock.name, fblock)
 
@@ -211,15 +214,16 @@ data class Scope(val variables: VariableScope = VariableScope())
     internal fun <T : AnyDt?> resolveDataType0(name: String) = resolveDataType(name) as? T
 
     fun resolveDataType(name: String): AnyDt {
-        if (types.containsKey(name))
+        if (types.containsKey(name)) {
             return types[name]!!
+        }
 
         val a = resolveFunctionBlock(name)
         val b = dataTypes.lookup(name)
         val c = resolveClass(name)
         val d = resolveInterface(name)
 
-        //if (a && b || a && c || b && c) {
+        // if (a && b || a && c || b && c) {
         val ambigue = arrayListOf(a, b, c, d)
             .map { if (it != null) 1 else 0 }
             .sum() > 1
@@ -236,47 +240,49 @@ data class Scope(val variables: VariableScope = VariableScope())
             else -> null
         }
         if (q != null) {
-            types[name] = q; return q
+            types[name] = q
+            return q
         }
 
-        //Reference this seems to be the wrong place
-        //if (name.length > 7 && name.substring(0, 7) == "REF_TO ")
+        // Reference this seems to be the wrong place
+        // if (name.length > 7 && name.substring(0, 7) == "REF_TO ")
         //    return ReferenceType(resolveDataType(name.substring(7)))
 
         // Void
-        if (name.equals("VOID", true))
+        if (name.equals("VOID", true)) {
             return VOID
+        }
 
         // Enum
         val enumerateType = resolveEnum(name)
-        if (enumerateType != null)
+        if (enumerateType != null) {
             return enumerateType
+        }
 
-        if (this.parent != null)
+        if (this.parent != null) {
             return this.parent!!.resolveDataType(name)
+        }
 
         throw DataTypeNotDefinedException("Could not find data type for name: $name")
-        //return null;
+        // return null;
     }
 
     fun resolveFunction(invocation: Invocation): FunctionDeclaration? {
         for (fr in functionResolvers) {
             val decl = fr.resolve(invocation, this)
-            if (decl != null)
+            if (decl != null) {
                 return decl
+            }
         }
         return if (this.parent != null) this.parent!!.resolveFunction(invocation) else null
     }
 
     fun resolveMethod(name: String) = methods.lookup(name)
 
-
-    fun registerClass(clazz: ClassDeclaration) =
-        classes.register(clazz.name, clazz)
+    fun registerClass(clazz: ClassDeclaration) = classes.register(clazz.name, clazz)
 
     fun resolveClass(key: String) = classes.lookup(key)
-    fun registerInterface(interfaceDeclaration: InterfaceDeclaration) =
-        interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
+    fun registerInterface(interfaceDeclaration: InterfaceDeclaration) = interfaces.register(interfaceDeclaration.name, interfaceDeclaration)
 
     fun registerMethod(md: MethodDeclaration) = methods.register(md.name, md)
     fun resolveInterface(key: String) = interfaces.lookup(key)
@@ -292,10 +298,7 @@ data class Scope(val variables: VariableScope = VariableScope())
         }
     }
 
-
-    fun isGlobalVariable(variable: SymbolicReference): Boolean {
-        return resolveVariable(variable) != null && topLevel.resolveVariable(variable) === resolveVariable(variable)
-    }
+    fun isGlobalVariable(variable: SymbolicReference): Boolean = resolveVariable(variable) != null && topLevel.resolveVariable(variable) === resolveVariable(variable)
 
     override fun clone(): Scope {
         val gs = Scope(parent)
@@ -307,8 +310,9 @@ data class Scope(val variables: VariableScope = VariableScope())
         gs.functions = Namespace(functions)
         gs.programs = Namespace(programs)
         gs.types = types.clone()
-        for (vd in variables)
+        for (vd in variables) {
             gs.add(vd.clone())
+        }
         return gs
     }
 
@@ -333,17 +337,13 @@ data class Scope(val variables: VariableScope = VariableScope())
         variables.addAll(scope.variables)
     }
 
-
-    fun filterByFlags(vararg flag: Int): List<VariableDeclaration> {
-        return variables.filter { it ->
-            flag.find { f -> it.isType(f) } != null
-        }
+    fun filterByFlags(vararg flag: Int): List<VariableDeclaration> = variables.filter { it ->
+        flag.find { f -> it.isType(f) } != null
     }
 
-    fun resolveEnumByValue(value: String): EnumerateType? =
-        value.uppercase(Locale.getDefault()).let {
-            this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
-        }
+    fun resolveEnumByValue(value: String): EnumerateType? = value.uppercase(Locale.getDefault()).let {
+        this.allowedEnumValues[it] ?: parent?.resolveEnumByValue(it)
+    }
 
     /**
      * Construct a complete map of values to EnumerationType
@@ -353,20 +353,20 @@ data class Scope(val variables: VariableScope = VariableScope())
         return p + allowedEnumValues
     }
 
-
     //region call resolver
     fun resolveInvocation(callee: SymbolicReference): Invoked? {
         val resolvers = listOf(
             this::resolveProgramInvocation,
             this::resolveActionInvocation,
             this::resolveFunctionBlockInvocation,
-            this::resolveFunctionInvocation
-            //,                this::resolveMethodInvocation
+            this::resolveFunctionInvocation,
+            // ,                this::resolveMethodInvocation
         )
 
         val resolved = resolvers.map { it(callee) }.filter { it != null }
-        if (resolved.isEmpty())
+        if (resolved.isEmpty()) {
             return null
+        }
 
         if (resolved.size > 1) {
             warn("Ambiguous call for reference in $callee")
@@ -431,10 +431,9 @@ data class Scope(val variables: VariableScope = VariableScope())
         }
         return null
     }
-    */
+     */
 
     //endregion
-
 
     /**
      * Tries to resolve the scope behind a reference, e.g. a function block or class instance, or a program.
@@ -466,10 +465,11 @@ class Namespace<T>() where T : Identifiable, T : Cloneable {
     private val map: LookupList<T> = ArrayLookupList()
     internal var parent: Supplier<Namespace<T>>? = null
 
-    fun streamAll(): Stream<T> =
-            if (parent?.get() != null)
-                Stream.concat(parent!!.get().streamAll(), map.stream())
-            else map.stream()
+    fun streamAll(): Stream<T> = if (parent?.get() != null) {
+        Stream.concat(parent!!.get().streamAll(), map.stream())
+    } else {
+        map.stream()
+    }
 
     internal constructor(other: Namespace<T>) : this() {
         other.map.forEach { register(it.name, it) }
@@ -482,8 +482,9 @@ class Namespace<T>() where T : Identifiable, T : Cloneable {
     }
 
     internal fun register(key: String, obj: T) {
-        if (key == "")
+        if (key == "") {
             throw IllegalArgumentException("Registering empty string isType not allowed")
+        }
 
         val a = map[key]
         if (a != null) {
@@ -494,8 +495,5 @@ class Namespace<T>() where T : Identifiable, T : Cloneable {
 
     fun containsKey(name: String) = map[name] != null
 
-    fun values(): Collection<T> {
-        return map
-    }
-
+    fun values(): Collection<T> = map
 }

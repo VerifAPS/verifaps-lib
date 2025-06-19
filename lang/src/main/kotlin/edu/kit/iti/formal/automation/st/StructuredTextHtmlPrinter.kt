@@ -1,12 +1,28 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
+@file:Suppress("ktlint:standard:no-empty-file")
+
 package edu.kit.iti.formal.automation.st
 
-import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.DefaultVisitor
 import edu.kit.iti.formal.util.*
 import edu.kit.iti.formal.util.SemanticClasses.*
-import java.io.Writer
-
 
 /**
  * Created by weigla on 15.06.2014.
@@ -201,15 +217,15 @@ import java.io.Writer
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @Override public Object visit(ScalarValue tsScalarValue) {
-     * sb.cliFormat(VALUE).span(tsScalarValue.getDataType().getName())
-     * .printf(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
-     * sb.close().close();
-     * ;
-     * }
-     */
+ * {@inheritDoc}
+ *
+ * @Override public Object visit(ScalarValue tsScalarValue) {
+ * sb.cliFormat(VALUE).span(tsScalarValue.getDataType().getName())
+ * .printf(tsScalarValue.getDataType().repr(tsScalarValue.getValue()));
+ * sb.close().close();
+ * ;
+ * }
+ */
 
 
     override fun visit(expressions: ExpressionList) {
@@ -384,9 +400,9 @@ import java.io.Writer
     }
 
     /**
-     *
-     * clear.
-     */
+ *
+ * clear.
+ */
     fun clear() {
         sb = HTMLCodeWriter()
     }

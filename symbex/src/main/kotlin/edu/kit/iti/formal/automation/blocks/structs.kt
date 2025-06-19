@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.blocks
 
 import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
@@ -13,9 +31,10 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 data class BlockProgram(
-        val blocks: MutableList<Block> = arrayListOf(),
-        val edges: MutableList<Pair<Block, Block>> = arrayListOf(),
-        val scope: Scope = Scope()) {
+    val blocks: MutableList<Block> = arrayListOf(),
+    val edges: MutableList<Pair<Block, Block>> = arrayListOf(),
+    val scope: Scope = Scope(),
+) {
 
     val symbex = SymbolicExecutioner(scope)
 
@@ -106,9 +125,11 @@ data class BlockProgram(
         }
 }
 
-data class Block(var label: String = getRandomLabel(),
-                 var executionCondition: Expression = BooleanLit.LTRUE,
-                 var statements: StatementList = StatementList()) {
+data class Block(
+    var label: String = getRandomLabel(),
+    var executionCondition: Expression = BooleanLit.LTRUE,
+    var statements: StatementList = StatementList(),
+) {
 
     lateinit var ssaExecutionCondition: SMVExpr
     var ssaMutation: Map<SVariable, SMVExpr> = hashMapOf()
@@ -132,15 +153,15 @@ data class Block(var label: String = getRandomLabel(),
 
     fun clone(): Block {
         val b = Block(label, executionCondition.clone(), statements.clone())
-        //b.ssaExecutionCondition = ssaExecutionCondition.clone()
-        //b.ssaMutation = HashMap(ssaMutation)
+        // b.ssaExecutionCondition = ssaExecutionCondition.clone()
+        // b.ssaMutation = HashMap(ssaMutation)
         b.localMutationMap = SymbolicState(localMutationMap)
         return b
     }
 }
 
 val counter = AtomicInteger(10000)
-fun getRandomLabel(): String = String.format("b%05d", counter.getAndIncrement()) //Math.random() * 100000).toInt())
+fun getRandomLabel(): String = String.format("b%05d", counter.getAndIncrement()) // Math.random() * 100000).toInt())
 
 class FindGotoVisitor : AstVisitor<Unit>() {
     override fun defaultVisit(obj: Any) {}

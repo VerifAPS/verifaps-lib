@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.fbd
 
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -11,7 +29,6 @@ import edu.kit.iti.formal.automation.plcopenxml.operatorSymbol
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.HasMetadata
 import edu.kit.iti.formal.util.HasMetadataImpl
-import edu.kit.iti.formal.util.Metadata
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -20,11 +37,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * @author Alexander Weigl
  * @version 1 (10.07.19)
  */
-class FbdBody(val diagrams: ArrayList<FbDiagram> = ArrayList<FbDiagram>())
-    : MutableList<FbDiagram> by diagrams, HasMetadata by HasMetadataImpl() {
-    fun toJson(): String {
-        return om.writeValueAsString(this)
-    }
+class FbdBody(val diagrams: ArrayList<FbDiagram> = ArrayList<FbDiagram>()) :
+    MutableList<FbDiagram> by diagrams,
+    HasMetadata by HasMetadataImpl() {
+    fun toJson(): String = om.writeValueAsString(this)
 
     fun writeDot(out: CodeWriter) {
         out.cblock("digraph G {", "}") {
@@ -41,18 +57,18 @@ class FbdBody(val diagrams: ArrayList<FbDiagram> = ArrayList<FbDiagram>())
         val om = ObjectMapper().also {
             it.configure(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS, true)
             it.enable(SerializationFeature.INDENT_OUTPUT)
-            //it.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY)
+            // it.enableDefaultTyping(ObjectMapper.DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY)
         }
 
         fun fromJson(s: String) = om.readValue<FbdBody>(s, FbdBody::class.java)
     }
 }
 
-
 data class FbDiagram(
-        var label: String? = null,
-        var nodes: MutableList<FbdNode> = ArrayList(),
-        var edges: MutableList<FbdEdge> = ArrayList()) : HasMetadata by HasMetadataImpl() {
+    var label: String? = null,
+    var nodes: MutableList<FbdNode> = ArrayList(),
+    var edges: MutableList<FbdEdge> = ArrayList(),
+) : HasMetadata by HasMetadataImpl() {
 
     fun topsorted(): List<FbdNode> {
         updateExecutionOrder()
@@ -85,7 +101,6 @@ data class FbDiagram(
             }
         } while (!fixpt)
     }
-
 
     fun findSlot(gid: String): Pair<FbdNode, FbdSlot>? {
         val byId = { s: FbdSlot -> gid == s.gid }
@@ -143,46 +158,48 @@ data class FbDiagram(
         }
     }
 
-    fun findOutputForInput(input: FbdInput): Pair<FbdNode, FbdSlot>? {
-        return edges.find { (a, b) -> b == input.gid }
-                ?.let { findSlot(it.from) }
-    }
+    fun findOutputForInput(input: FbdInput): Pair<FbdNode, FbdSlot>? = edges.find { (a, b) -> b == input.gid }
+        ?.let { findSlot(it.from) }
 }
 
-data class FbdEdge(val from: String, val to: String)
-    : HasMetadata by HasMetadataImpl()
+data class FbdEdge(val from: String, val to: String) : HasMetadata by HasMetadataImpl()
 
 interface FbdSlot : HasMetadata {
     val gid: String
     var formalName: String
 }
 
-data class FbdInput(override var formalName: String = "",
-                    var negated: Boolean = false,
-                    var store: Boolean = false,
-                    var reset: Boolean = false) : FbdSlot, HasMetadata by HasMetadataImpl() {
+data class FbdInput(
+    override var formalName: String = "",
+    var negated: Boolean = false,
+    var store: Boolean = false,
+    var reset: Boolean = false,
+) : FbdSlot,
+    HasMetadata by HasMetadataImpl() {
     override var gid: String = counter.incrementAndGet().toString()
 }
 
-class FbdOutput(override var formalName: String = "", var expression: String?)
-    : FbdSlot, HasMetadata by HasMetadataImpl() {
+class FbdOutput(override var formalName: String = "", var expression: String?) :
+    FbdSlot,
+    HasMetadata by HasMetadataImpl() {
     override var gid: String = counter.incrementAndGet().toString()
 }
 
 private val counter = AtomicInteger()
 
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type")
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
 @JsonSubTypes(
-        Type(FbdNode.Jump::class, name = "jmp"),
-        Type(FbdNode.Return::class, name = "ret"),
-        Type(FbdNode.Operator::class, name = "op"),
-        Type(FbdNode.FunctionBlock::class, name = "fbd"),
-        Type(FbdNode.Function::class, name = "func"),
-        Type(FbdNode.Execute::class, name = "exec"),
-        Type(FbdNode.Variable::class, name = "var")
+    Type(FbdNode.Jump::class, name = "jmp"),
+    Type(FbdNode.Return::class, name = "ret"),
+    Type(FbdNode.Operator::class, name = "op"),
+    Type(FbdNode.FunctionBlock::class, name = "fbd"),
+    Type(FbdNode.Function::class, name = "func"),
+    Type(FbdNode.Execute::class, name = "exec"),
+    Type(FbdNode.Variable::class, name = "var"),
 )
 sealed class FbdNode : HasMetadata by HasMetadataImpl() {
     val id: String = counter.getAndIncrement().toString()
@@ -197,7 +214,7 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
     open fun asStructuredText(fbDiagram: FbDiagram, out: CodeWriter) {}
     open fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String = "/* no supported slot */"
 
-    //data class Label(val name: String) : FbdNode()
+    // data class Label(val name: String) : FbdNode()
 
     data class Jump(val target: String) : FbdNode() {
         override fun asStructuredText(fbDiagram: FbDiagram, out: CodeWriter) {
@@ -223,25 +240,24 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
         override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String {
             val symbol = operatorSymbol(op)
             val terms = inputSlots
-                    .mapNotNull { fbd.findOutputForInput(it) }
-                    .joinToString(symbol, "(", ")") { (n, s) ->
-                        n.getOutputValue(fbd, s)
-                    }
+                .mapNotNull { fbd.findOutputForInput(it) }
+                .joinToString(symbol, "(", ")") { (n, s) ->
+                    n.getOutputValue(fbd, s)
+                }
             return terms
         }
     }
 
     data class Function(val functionName: String) : FbdNode() {
         override fun asStructuredText(fbDiagram: FbDiagram, out: CodeWriter) {
-
         }
 
         override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String {
             val terms = inputSlots
-                    .mapNotNull { fbd.findOutputForInput(it) }
-                    .joinToString(", ", "$functionName(", ")") { (n, s) ->
-                        n.getOutputValue(fbd, s)
-                    }
+                .mapNotNull { fbd.findOutputForInput(it) }
+                .joinToString(", ", "$functionName(", ")") { (n, s) ->
+                    n.getOutputValue(fbd, s)
+                }
             return terms
         }
     }
@@ -249,13 +265,11 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
     data class FunctionBlock(val instanceName: String) : FbdNode() {
         override fun asStructuredText(fbDiagram: FbDiagram, out: CodeWriter) {
             val args = inputSlots.mapNotNull { fbDiagram.findOutputForInput(it) }
-                    .joinToString(", ") { (n, s) -> n.getOutputValue(fbDiagram, s) }
+                .joinToString(", ") { (n, s) -> n.getOutputValue(fbDiagram, s) }
             out.nl().write("$instanceName($args);")
         }
 
-        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String {
-            return "$instanceName.${slot.formalName}"
-        }
+        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String = "$instanceName.${slot.formalName}"
     }
 
     data class Execute(var body: String) : FbdNode() {
@@ -267,16 +281,12 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
             }
         }
 
-        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String {
-            return fbd.findOutputForInput(inputSlots.first())?.let { (n, s) ->
-                n.getOutputValue(fbd, s)
-            } ?: "/*error?*/"
-        }
+        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String = fbd.findOutputForInput(inputSlots.first())?.let { (n, s) ->
+            n.getOutputValue(fbd, s)
+        } ?: "/*error?*/"
     }
 
-    data class Variable(val ref: String?,
-                        val store: Boolean = false,
-                        val read: Boolean = false) : FbdNode() {
+    data class Variable(val ref: String?, val store: Boolean = false, val read: Boolean = false) : FbdNode() {
         override fun asStructuredText(fbDiagram: FbDiagram, out: CodeWriter) {
             if (store) {
                 fbDiagram.findOutputForInput(inputSlots.first())?.let { (n, s) ->
@@ -285,13 +295,11 @@ sealed class FbdNode : HasMetadata by HasMetadataImpl() {
             }
         }
 
-        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String {
-            return ref!!
-        }
+        override fun getOutputValue(fbd: FbDiagram, slot: FbdSlot): String = ref!!
         /*    val value = network.getSlot(variable)
         val not = if (variable.negated) "NOT " else ""
         writer.write("$expression := $not $value;");
-    */
+         */
     }
 }
 

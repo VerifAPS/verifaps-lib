@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.monitor
 
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
@@ -28,14 +46,17 @@ object CMonitorGenerator : MonitorGeneration {
     }
 }
 
-private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton,
-                                    val compressState: Boolean = false,
-                                    val useDefines: Boolean = false) : Callable<Monitor> {
+private class CMonitorGeneratorImpl(
+    val gtt: GeneralizedTestTable,
+    val automaton: TestTableAutomaton,
+    val compressState: Boolean = false,
+    val useDefines: Boolean = false,
+) : Callable<Monitor> {
     val monitor = Monitor()
     val stream = StringWriter()
     val writer = CodeWriter(stream)
-    val state_t = "state_${gtt.name.lowercase(Locale.getDefault())}_t"
-    val inout_t = "inout_${gtt.name.lowercase(Locale.getDefault())}_t"
+    val stateT = "state_${gtt.name.lowercase(Locale.getDefault())}_t"
+    val inoutT = "inout_${gtt.name.lowercase(Locale.getDefault())}_t"
 
     val userReset = "FORCE_RST"
     val error = "ERROR"
@@ -47,7 +68,6 @@ private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton
     val sLostSync = "state->$lostSync"
     val sResets = "state->RESETS"
 
-
     override fun call(): Monitor {
         header()
         declareStateType()
@@ -58,10 +78,10 @@ private class CMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton
         return monitor
     }
 
-
     fun header() {
         val asciiTable = GetetaFacade.print(gtt)
-        stream.write("""
+        stream.write(
+            """
 // Generated Monitor for table: ${gtt.name}.
 // Generated at ${Date()}
 
@@ -70,43 +90,41 @@ $asciiTable
 */
 
 #include <stdint.h>
-
-""".trimIndent())
+            """.trimIndent(),
+        )
     }
 
     val commentLine = "\n//" + (("-" * 78) as String) + "\n"
 
     fun declareStateType() {
         writer.nl().write(commentLine)
-                .write("// Structure for internal state of the monitor.")
-                .nl()
+            .write("// Structure for internal state of the monitor.")
+            .nl()
 
-        writer.cblock("struct $state_t {", "}") {
+        writer.cblock("struct $stateT {", "}") {
             writer.print("//global variables").nl()
             gtt.constraintVariables
-                    .joinInto(this, "\n") {
-                        "${it.ctype} ${it.name};\n"
-                    }
+                .joinInto(this, "\n") {
+                    "${it.ctype} ${it.name};\n"
+                }
 
             gtt.constraintVariables
-                    .joinInto(this, "\n") {
-                        "    int8_t ${it.name}_bound" + (if (compressState) " : 1 " else "") + ";"
-                    }
+                .joinInto(this, "\n") {
+                    "    int8_t ${it.name}_bound" + (if (compressState) " : 1 " else "") + ";"
+                }
 
             automaton.rowStates.values.flatMap { it }.joinInto(writer) {
                 "    int8_t ${it.name} " + (if (compressState) " : 1 " else "") + ";"
-
-
             }
         }
     }
 
-    fun declareInoutType(): Unit {
+    fun declareInoutType() {
         writer.nl().write(commentLine)
-                .write("// Structure for the input and output of the monitor.")
-                .nl()
+            .write("// Structure for the input and output of the monitor.")
+            .nl()
 
-        writer.cblock("struct $inout_t {", "}") {
+        writer.cblock("struct $inoutT {", "}") {
             gtt.programVariables.joinInto(writer, "\n") {
                 "${it.ctype} ${it.name};"
             }
@@ -117,23 +135,24 @@ $asciiTable
                     "io->${it.name} = ${it.cInitValue};"
                 }*/
     fun declareInoutFunctions() {
-        writer.write("""
+        writer.write(
+            """
 
 
             /*
              *  ...
              */
-            void init_$inout_t($inout_t* io) {
-                memset(io, 0, sizeof($inout_t));
+            void init_$inoutT($inoutT* io) {
+                memset(io, 0, sizeof($inoutT));
             }
 
 
             /*
              *  ...
              */
-            $inout_t* new_$inout_t() {
-                        $inout_t* io = ($inout_t*) malloc(sizeof($inout_t));
-                        init_$inout_t(io)
+            $inoutT* new_$inoutT() {
+                        $inoutT* io = ($inoutT*) malloc(sizeof($inoutT));
+                        init_$inoutT(io)
                         return io
             }
 
@@ -141,25 +160,26 @@ $asciiTable
             /*
              *  Frees the memory.
              */
-            void free_$inout_t($inout_t* io) {
+            void free_$inoutT($inoutT* io) {
                 free(io);
             }
 
-        """.trimIndent())
+            """.trimIndent(),
+        )
     }
 
     fun declareStateFunctions() {
-
-
-        writer.write("""
+        writer.write(
+            """
 
             /*
-                Function initialize the given $state_t structure with default values.
+                Function initialize the given $stateT structure with default values.
             */
 
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
-        writer.cblock("void init_$state_t($state_t* state) {", "}") {
+        writer.cblock("void init_$stateT($stateT* state) {", "}") {
             gtt.constraintVariables.joinInto(this, "") {
                 nl()
                 write("state->${it.name} = ${it.cInitValue};")
@@ -176,58 +196,63 @@ $asciiTable
             }
         }
 
-
-        writer.write("""
+        writer.write(
+            """
 
 
             /*
              *  Creates a new state for monitor of ${gtt.name}.
              */
 
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
-
-        stream.write("""
-            $state_t* new_$state_t() {
-                $state_t* state = ($state_t*) malloc(sizeof($state_t));
-                init_$state_t(state)
+        stream.write(
+            """
+            $stateT* new_$stateT() {
+                $stateT* state = ($stateT*) malloc(sizeof($stateT));
+                init_$stateT(state)
                 return state
             }
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
-
-        writer.write("""
+        writer.write(
+            """
 
 
             /*
              *  Frees the memory.
              */
 
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
-
-        stream.write("""
-            void free_$state_t($state_t* state) {
+        stream.write(
+            """
+            void free_$stateT($stateT* state) {
                 free(state);
             }
-        """.trimIndent())
-
+            """.trimIndent(),
+        )
     }
 
     fun declareFunUpdateMonitor() {
         declareAuxVariables(false)
         writer.nl().nl()
 
-        writer.write("""
+        writer.write(
+            """
 
 
             /*
              *  Update the internal state of the memory.
              */
 
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
-        writer.cblock("void update_monitor($state_t* state, $inout_t* io) {", "}") {
+        writer.cblock("void update_monitor($stateT* state, $inoutT* io) {", "}") {
             bindFreeVariables()
             writer.write(commentLine)
             declareAuxVariables(true)
@@ -251,8 +276,7 @@ $asciiTable
                         writer.nl()
                         writer.cblock("if(!$boundFlag && $oneOfRowStates) {", "}") {
                             writer.write("${fvar.name} = ${pvar.name};")
-                                    .nl().write("$boundFlag = 1;")
-
+                                .nl().write("$boundFlag = 1;")
                         }
                     }
                 }
@@ -262,22 +286,21 @@ $asciiTable
 
     private fun updateOutput() {
         val noStateOccupied = automaton.rowStates.values.flatMap { it }
-                .map { it.name }
-                .reduce { a: String, b: String -> "$a || $b" }
+            .map { it.name }
+            .reduce { a: String, b: String -> "$a || $b" }
 
         writer.write("$sLostSync = !($noStateOccupied);")
-                .nl()
-                .write("$sError = ($sLostSync && state->${automaton.stateError.name});")
+            .nl()
+            .write("$sError = ($sLostSync && state->${automaton.stateError.name});")
     }
 
     private fun resets() {
         val inputs = automaton.initialStates
-                .map { (it as RowState).row.defInput.name }
-                .reduce { a: String, b: String -> "$a || $b" }
-        writer.cblock("if(${sLostSync} && $inputs) ||| $sUserReset) {", "}") {
-            write("init_$state_t(state);")
-            nl().write("${sResets} += 1;")
-
+            .map { (it as RowState).row.defInput.name }
+            .reduce { a: String, b: String -> "$a || $b" }
+        writer.cblock("if($sLostSync && $inputs) ||| $sUserReset) {", "}") {
+            write("init_$stateT(state);")
+            nl().write("$sResets += 1;")
         }
     }
 
@@ -305,7 +328,7 @@ $asciiTable
                     fromName
             }
         }?.reduce { a, b -> "$a || $b" }
-                ?: BooleanLit.LFALSE
+            ?: BooleanLit.LFALSE
         writer.nl().write("$to = $expr;")
     }
 
@@ -319,17 +342,17 @@ $asciiTable
                 val defProgress = (tr.defProgress.name)
 
                 val progress = tr.outgoing.map { it.defInput.name }
-                        .reduce { acc: String, v: String -> "$acc || $v" }
+                    .reduce { acc: String, v: String -> "$acc || $v" }
 
                 writer.write("int8_t $defInput  = ${tr.inputExpr.values.conjunction().toCExpression()};")
-                        .nl()
-                        .write("int8_t $defOutput  = ${tr.outputExpr.values.conjunction().toCExpression()};")
-                        .nl()
-                        .write("int8_t $defFailed = ($defInput && !$defOutput);")
-                        .nl()
-                        .write("int8_t $defForward = ($defInput && $defOutput);")
-                        .nl()
-                        .write("int8_t $defProgress = (($defInput && $defOutput) && !$progress);")
+                    .nl()
+                    .write("int8_t $defOutput  = ${tr.outputExpr.values.conjunction().toCExpression()};")
+                    .nl()
+                    .write("int8_t $defFailed = ($defInput && !$defOutput);")
+                    .nl()
+                    .write("int8_t $defForward = ($defInput && $defOutput);")
+                    .nl()
+                    .write("int8_t $defProgress = (($defInput && $defOutput) && !$progress);")
             }
         }
 
@@ -342,17 +365,17 @@ $asciiTable
                 val defProgress = (tr.defProgress.name)
 
                 val progress = tr.outgoing.map { it.defInput.name }
-                        .reduce { acc: String, v: String -> "$acc || $v" }
+                    .reduce { acc: String, v: String -> "$acc || $v" }
 
                 writer.write("#define   $defInput  = (${tr.inputExpr.values.conjunction().toCExpression()});")
-                        .nl()
-                        .write("#define $defOutput  = (${tr.outputExpr.values.conjunction().toCExpression()});")
-                        .nl()
-                        .write("#define $defFailed = ($defInput && !$defOutput);")
-                        .nl()
-                        .write("#define $defForward = ($defInput && $defOutput);")
-                        .nl()
-                        .write("#define $defProgress = (($defInput && $defOutput) && !$progress);")
+                    .nl()
+                    .write("#define $defOutput  = (${tr.outputExpr.values.conjunction().toCExpression()});")
+                    .nl()
+                    .write("#define $defFailed = ($defInput && !$defOutput);")
+                    .nl()
+                    .write("#define $defForward = ($defInput && $defOutput);")
+                    .nl()
+                    .write("#define $defProgress = (($defInput && $defOutput) && !$progress);")
             }
         }
     }
@@ -385,7 +408,6 @@ private val Variable.ctype: String
     else -> "$dt is unknown"
 }*/
 
-
 class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
     override fun defaultVisit(top: SMVAst): String = "/*$top not supported*/"
     val variableReplacement = HashMap<String, String>()
@@ -395,11 +417,9 @@ class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
         return rewritingFunction(n)
     }
 
-    override fun visit(ue: SUnaryExpression) =
-            "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
+    override fun visit(ue: SUnaryExpression) = "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
 
-    override fun visit(be: SBinaryExpression) =
-            "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
+    override fun visit(be: SBinaryExpression) = "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
 
     private fun opToC(operator: SBinaryOperator) = when (operator) {
         SBinaryOperator.PLUS -> "+"
@@ -424,12 +444,10 @@ class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
         SBinaryOperator.WORD_CONCAT -> TODO()
     }
 
-    private fun opToC(operator: SUnaryOperator): String {
-        return when (operator) {
-            SUnaryOperator.MINUS -> "-"
-            SUnaryOperator.NEGATE -> "!"
-            else -> "<unknown unary operator>"
-        }
+    private fun opToC(operator: SUnaryOperator): String = when (operator) {
+        SUnaryOperator.MINUS -> "-"
+        SUnaryOperator.NEGATE -> "!"
+        else -> "<unknown unary operator>"
     }
 
     override fun visit(l: SLiteral) = l.value.toString()
@@ -437,7 +455,7 @@ class SmvToCTranslator : SMVAstDefaultVisitorNN<String>() {
     override fun visit(ce: SCaseExpression): String {
         val sb = StringBuilder()
         ce.cases.forEach {
-            sb.append("${it.condition.accept(this)} ? (${it.then.accept(this)}) : ");
+            sb.append("${it.condition.accept(this)} ? (${it.then.accept(this)}) : ")
         }
         sb.append("assert(false)")
         return sb.toString()

@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.st0.trans
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.st0.trans
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.util.AstVisitor
@@ -36,26 +32,23 @@ class ExpressionReplacer(var statements: StatementList) : AstVisitor<Any>() {
 
     override fun defaultVisit(obj: Any) = error("not implemented for $obj")
 
-
-    override fun visit(symbolicReference: SymbolicReference): Any {
-        return if (replacements.containsKey(symbolicReference)) {
-            replacements[symbolicReference]!!
-        } else super.visit(symbolicReference)!!
+    override fun visit(symbolicReference: SymbolicReference): Any = if (replacements.containsKey(symbolicReference)) {
+        replacements[symbolicReference]!!
+    } else {
+        super.visit(symbolicReference)!!
     }
 
-    override fun visit(unaryExpression: UnaryExpression): Any {
-        return if (replacements.containsKey(unaryExpression)) {
-            replacements[unaryExpression]!!
-        } else super.visit(unaryExpression)!!
+    override fun visit(unaryExpression: UnaryExpression): Any = if (replacements.containsKey(unaryExpression)) {
+        replacements[unaryExpression]!!
+    } else {
+        super.visit(unaryExpression)!!
     }
 
-    override fun visit(binaryExpression: BinaryExpression): Any {
-        return if (replacements.containsKey(binaryExpression)) {
-            replacements[binaryExpression]!!
-        } else super.visit(binaryExpression)!!
+    override fun visit(binaryExpression: BinaryExpression): Any = if (replacements.containsKey(binaryExpression)) {
+        replacements[binaryExpression]!!
+    } else {
+        super.visit(binaryExpression)!!
     }
 
-    fun replace(): Collection<Statement> {
-        return statements!!.accept(this) as StatementList
-    }
+    fun replace(): Collection<Statement> = statements!!.accept(this) as StatementList
 }

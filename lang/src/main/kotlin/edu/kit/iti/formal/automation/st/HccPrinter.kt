@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st
 
 import edu.kit.iti.formal.automation.VariableScope
@@ -15,11 +33,13 @@ import java.util.*
 open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false) : StructuredTextPrinter(sb) {
     init {
         if (!noPreamble) {
-            sb.print("""
+            sb.print(
+                """
                 int nondet_int() { int i; return i; }
                 int nondet_bool() { return nondet_int()?0:1; }
                 int nondet_enum() { return nondet_int(); }
-            """.trimIndent())
+                """.trimIndent(),
+            )
         }
     }
 
@@ -28,7 +48,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
     }
 
     override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
-
         super.visit(enumerationTypeDeclaration)
     }
 
@@ -38,7 +57,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
     override fun visit(exitStatement: ExitStatement) {
         sb.printf("break;")
-
     }
 
     override fun visit(binaryExpression: BinaryExpression) {
@@ -75,7 +93,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
     override fun visit(init: IdentifierInitializer) {
         sb.printf("THERE").printf(init.value!!)
-
     }
 
     override fun visit(repeatStatement: RepeatStatement) {
@@ -86,7 +103,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.decreaseIndent().nl().printf("} while ( ")
         repeatStatement.condition.accept(this)
         sb.printf(" )")
-
     }
 
     override fun visit(whileStatement: WhileStatement) {
@@ -105,19 +121,16 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             else -> sb.printf(unaryExpression.operator.symbol)
         }
         unaryExpression.expression.accept(this)
-
     }
 
-
     override fun visit(caseStatement: CaseStatement) {
-
         sb.nl().printf("switch( ")
         caseStatement.expression.accept(this)
         sb.printf(" )").increaseIndent().nl().printf("{").nl()
 
         for (c in caseStatement.cases) {
             c.accept(this)
-            sb.nl() //TODO "break;" ?
+            sb.nl() // TODO "break;" ?
         }
 
         if (caseStatement.elseCase.size > 0) {
@@ -126,9 +139,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         }
 
         sb.nl().decreaseIndent().appendIdent().printf("}")
-
     }
-
 
     override fun visit(programDeclaration: ProgramDeclaration) {
         printComment(programDeclaration.comment)
@@ -148,7 +159,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.decreaseIndent().nl().printf("}").nl().printf("/* end program */").nl()
     }
 
-
     override fun visit(forStatement: ForStatement) {
         sb.nl()
         sb.printf("for( int ").printf(forStatement.variable)
@@ -161,7 +171,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         forStatement.statements.accept(this)
         sb.decreaseIndent().nl()
         sb.printf("}")
-
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) {
@@ -169,8 +178,9 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.printf("/* function ").printf(functionDeclaration.name).printf(" */").nl()
 
         val returnType = functionDeclaration.returnType.identifier
-        if (!(returnType == null || returnType.isEmpty()))
+        if (!(returnType == null || returnType.isEmpty())) {
             sb.printf(returnType.lowercase(Locale.getDefault())).printf(" ${functionDeclaration.name}( ")
+        }
         functionDeclaration.scope.variables.filter { it.isInput || it.isInOut }.forEachIndexed { i, it ->
             if (i != 0) {
                 sb.printf(", ")
@@ -180,22 +190,18 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         }
         sb.printf(" ) {").increaseIndent().nl()
 
-
         val scopeWithoutInput = Scope(functionDeclaration.scope.variables.filter { !it.isInput && !it.isInOut })
 
         scopeWithoutInput.accept(this)
 
-
         printBody(functionDeclaration)
 
-
         val outVars = functionDeclaration.scope.variables.filter { it.isOutput || it.isInOut }
-        if (outVars.isNotEmpty())
+        if (outVars.isNotEmpty()) {
             sb.nl().printf("return ${outVars.first().name};")
-
+        }
 
         sb.decreaseIndent().nl().printf("}").nl().printf("/* end function */").nl().nl()
-
     }
 
     override fun visit(returnStatement: ReturnStatement) {
@@ -206,17 +212,17 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         for (i in 0 until ifStatement.conditionalBranches.size) {
             sb.nl()
 
-            if (i == 0)
+            if (i == 0) {
                 sb.printf("if( ")
-            else
+            } else {
                 sb.printf("} else if( ")
+            }
 
             ifStatement.conditionalBranches[i].condition.accept(this)
 
             sb.printf(" ) {").increaseIndent()
             ifStatement.conditionalBranches[i].statements.accept(this)
             sb.decreaseIndent()
-
         }
 
         if (ifStatement.elseBranch.size > 0) {
@@ -225,7 +231,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             sb.decreaseIndent()
         }
         sb.nl().printf("}")
-
     }
 
     override fun visit(aCase: Case) {
@@ -233,7 +238,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.printf("case ")
         aCase.conditions.joinInto(sb) { it.accept(this) }
         sb.printf(":")
-        sb.block() {
+        sb.block {
             aCase.statements.accept(this@HccPrinter)
         }
     }
@@ -247,9 +252,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             sb.printf("unsigned int")
         } else {
             sb.printf(simpleTypeDeclaration.baseType.identifier!!.lowercase(Locale.getDefault()))
-
         }
-
     }
 
     override fun visit(commentStatement: CommentStatement) {
@@ -276,7 +279,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             is SpecialCommentMeta.HavocComment -> {
                 sb.nl()
                 val haveocName = "nondet_${meta.dataType.name.lowercase(Locale.getDefault())}();"
-                //sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
+                // sb.printf(" ").printf(haveocName).printf(" = _;").nl() //uninitialised Var
                 sb.printf(meta.variable).printf(" = ").printf(haveocName)
             }
             else -> {}
@@ -285,87 +288,95 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
 
     override fun visit(literal: Literal) {
         fun print(prefix: Any?, suffix: Any) = "$suffix"
-        sb.printf(when (literal) {
-            is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
-            is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
-            //TODO maybe print the integer value
-            is EnumLit -> ("${literal.dataType.obj?.name}__${literal.value}")
-            is ToDLit -> {
-                val (h, m, s, ms) = literal.value
-                print(literal.dataType().name, "$h:$m:$s.$ms")
-            }
-            is DateLit -> {
-                val (y, m, d) = literal.value
-                print(literal.dataType().name, "$y-$m-$d")
-            }
-            is DateAndTimeLit -> {
-                val (y, mo, d) = literal.value.date
-                val (h, m, s, ms) = literal.value.tod
-                print(literal.dataType().name, "$y-$mo-$d-$h:$m:$s.$ms")
-            }
-            is StringLit -> {
-                if (literal.dataType() is IECString.WSTRING) "\"${literal.value}\""
-                else "'${literal.value}'"
-            }
-            is NullLit -> "null"
-            is TimeLit -> {
-                print(literal.dataType().name, "${literal.value.milliseconds}ms")
-            }
-            is BooleanLit -> {
-                if (literal == BooleanLit.LTRUE) {
-                    "1"
-                } else {
-                    "0"
+        sb.printf(
+            when (literal) {
+                is IntegerLit -> print(literal.dataType.obj?.name, literal.value.abs())
+                is RealLit -> print(literal.dataType.obj?.name, literal.value.abs())
+                // TODO maybe print the integer value
+                is EnumLit -> ("${literal.dataType.obj?.name}__${literal.value}")
+                is ToDLit -> {
+                    val (h, m, s, ms) = literal.value
+                    print(literal.dataType().name, "$h:$m:$s.$ms")
                 }
-            }
-            is BitLit -> {
-                print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
-            }
-            is UnindentifiedLit -> literal.value
-        })
+                is DateLit -> {
+                    val (y, m, d) = literal.value
+                    print(literal.dataType().name, "$y-$m-$d")
+                }
+                is DateAndTimeLit -> {
+                    val (y, mo, d) = literal.value.date
+                    val (h, m, s, ms) = literal.value.tod
+                    print(literal.dataType().name, "$y-$mo-$d-$h:$m:$s.$ms")
+                }
+                is StringLit -> {
+                    if (literal.dataType() is IECString.WSTRING) {
+                        "\"${literal.value}\""
+                    } else {
+                        "'${literal.value}'"
+                    }
+                }
+                is NullLit -> "null"
+                is TimeLit -> {
+                    print(literal.dataType().name, "${literal.value.milliseconds}ms")
+                }
+                is BooleanLit -> {
+                    if (literal == BooleanLit.LTRUE) {
+                        "1"
+                    } else {
+                        "0"
+                    }
+                }
+                is BitLit -> {
+                    print(literal.dataType.obj?.name, "2#" + literal.value.toString(2))
+                }
+                is UnindentifiedLit -> literal.value
+            },
+        )
     }
 
     override fun visit(localScope: Scope) {
-        if (localScope.topLevel != localScope)
+        if (localScope.topLevel != localScope) {
             visitVariables(localScope.topLevel.variables)
+        }
         val variables = VariableScope(localScope.variables)
         visitVariables(variables)
     }
 
     private fun visitVariables(variables: VariableScope) {
         variables.groupBy { it.type }
-                .forEach { (type, v) ->
-                    val vars = v.toMutableList()
-                    vars.sortWith(compareBy { it.name })
+            .forEach { (type, v) ->
+                val vars = v.toMutableList()
+                vars.sortWith(compareBy { it.name })
 
-                    sb.nl().printf("/* VAR")
+                sb.nl().printf("/* VAR")
 
-                    if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
-                        sb.printf("_INOUT")
-                    } else {
-                        when {
-                            VariableDeclaration.INPUT and type != 0 -> sb.printf("_INPUT")
-                            VariableDeclaration.OUTPUT and type != 0 -> sb.printf("_OUTPUT")
-                            VariableDeclaration.EXTERNAL and type != 0 -> sb.printf("_EXTERNAL")
-                            VariableDeclaration.GLOBAL and type != 0 -> sb.printf("_GLOBAL")
-                            VariableDeclaration.TEMP and type != 0 -> sb.printf("_TEMP")
-                        }
+                if (VariableDeclaration.INPUT and type >= VariableDeclaration.INOUT) {
+                    sb.printf("_INOUT")
+                } else {
+                    when {
+                        VariableDeclaration.INPUT and type != 0 -> sb.printf("_INPUT")
+                        VariableDeclaration.OUTPUT and type != 0 -> sb.printf("_OUTPUT")
+                        VariableDeclaration.EXTERNAL and type != 0 -> sb.printf("_EXTERNAL")
+                        VariableDeclaration.GLOBAL and type != 0 -> sb.printf("_GLOBAL")
+                        VariableDeclaration.TEMP and type != 0 -> sb.printf("_TEMP")
                     }
-                    sb.printf(" ")
-                    if (VariableDeclaration.CONSTANT and type != 0)
-                        sb.printf("CONSTANT ")
-                    if (VariableDeclaration.RETAIN and type != 0)
-                        sb.printf("RETAIN ")
-                    sb.printf("*/")
-                    //sb.printf(type)
-
-                    sb.increaseIndent()
-                    for (vd in vars) {
-                        print(vd)
-                    }
-                    sb.decreaseIndent().nl().printf("/* END_VAR */")
-                    sb.nl()
                 }
+                sb.printf(" ")
+                if (VariableDeclaration.CONSTANT and type != 0) {
+                    sb.printf("CONSTANT ")
+                }
+                if (VariableDeclaration.RETAIN and type != 0) {
+                    sb.printf("RETAIN ")
+                }
+                sb.printf("*/")
+                // sb.printf(type)
+
+                sb.increaseIndent()
+                for (vd in vars) {
+                    print(vd)
+                }
+                sb.decreaseIndent().nl().printf("/* END_VAR */")
+                sb.nl()
+            }
     }
 
     override fun print(vd: VariableDeclaration) {
@@ -387,9 +398,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
                         }
                     }
                     is EnumerateType -> {
-                        sb.printf("${dt.name}__${v}")
-
-
+                        sb.printf("${dt.name}__$v")
                     }
                     else -> sb.printf(v.toString())
                 }
@@ -402,7 +411,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.printf(";")
     }
 
-    //copied
+    // copied
     private fun variableDataType(vd: VariableDeclaration) {
         val dt = vd.dataType
         if (variableDeclarationUseDataType && dt != null) {
@@ -416,10 +425,9 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         sb.nl().write("goto ${jump.target};")
     }
 
-
 // private functions
 
-    //copied
+    // copied
     private fun printBody(a: HasBody) {
         val stBody = a.stBody
         val sfcBody = a.sfcBody
@@ -435,7 +443,7 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
         }
     }
 
-    //adapted
+    // adapted
     private fun printComment(comment: String) {
         if (comment.isNotBlank()) {
             sb.printf("/*")
@@ -443,8 +451,6 @@ open class HccPrinter(sb: CodeWriter = CodeWriter(), noPreamble: Boolean = false
             sb.printf("*/").nl()
         }
     }
-
-
 }
 
 object SpecialCommentFactory {

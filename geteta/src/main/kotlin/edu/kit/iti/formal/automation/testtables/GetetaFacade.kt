@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables
-
 
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyDt
@@ -56,21 +73,27 @@ public object GetetaFacade {
 
     fun createParser(input: String) = createParser(CharStreams.fromString(input))
 
-    fun parseCell(cell: String, enableRelational: Boolean = true) =
-            createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
+    fun parseCell(cell: String, enableRelational: Boolean = true) = createParser(cell).also { it.relational = enableRelational }.cellEOF()!!
 
     fun exprToSMV(cell: String, column: SVariable, programRun: Int, vars: ParseContext): SMVExpr = exprToSMV(parseCell(cell, vars.relational).cell(), column, programRun, vars)
 
-    fun exprToSMV(cell: TestTableLanguageParser.CellContext, column: SVariable,
-                  programRun: Int, vars: ParseContext): SMVExpr {
+    fun exprToSMV(
+        cell: TestTableLanguageParser.CellContext,
+        column: SVariable,
+        programRun: Int,
+        vars: ParseContext,
+    ): SMVExpr {
         val ev = TblLanguageToSmv(column, programRun, vars)
         val expr = cell.accept(ev)
         debug("parsed: ${cell.text} to $expr")
         return expr
     }
 
-    fun exprToSMV(u: TestTableLanguageParser.CellContext,
-                  pv: ProjectionVariable, vc: ParseContext): SMVExpr {
+    fun exprToSMV(
+        u: TestTableLanguageParser.CellContext,
+        pv: ProjectionVariable,
+        vc: ParseContext,
+    ): SMVExpr {
         require(pv.arity != 0) { "Arity of column function is zero. Column ${pv.name}" }
 
         if (pv.arity > 1) {
@@ -83,8 +106,9 @@ public object GetetaFacade {
                             "Arity mismatch in implicit function call $varName in column ${pv.name} "
                         }
                         fd.call(pv.argumentDefinitions)
-                    } else
+                    } else {
                         throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
+                    }
                 }
                 is TestTableLanguageParser.CdontcareContext -> SLiteral.TRUE
                 else -> throw IllegalStateException("Multi-arity column header only supported with user-defined functions")
@@ -95,8 +119,10 @@ public object GetetaFacade {
     }
 
     fun parseDuration(duration: String, timeConstants: Map<String, Int> = hashMapOf()): Duration {
-        if (duration == "wait")//old attributes
+        if (duration == "wait") {
+            // old attributes
             return Duration.OpenInterval(0)
+        }
         val parser = createParser(duration)
         val p = parser.time()
         parser.errorReporter.throwException()
@@ -104,14 +130,10 @@ public object GetetaFacade {
     }
 
     @Deprecated("use external/internalVariable")
-    fun asSMVVariable(column: Variable): SVariable {
-        return SVariable(column.name, getSMVDataType(column.dataType))
-    }
+    fun asSMVVariable(column: Variable): SVariable = SVariable(column.name, getSMVDataType(column.dataType))
 
-    private fun getSMVDataType(dataType: AnyDt): SMVType {
-        return DefaultTypeTranslator.INSTANCE.translate(dataType)
-                ?: error("Data type $dataType is not supported by DataTypeTranslator")
-    }
+    private fun getSMVDataType(dataType: AnyDt): SMVType = DefaultTypeTranslator.INSTANCE.translate(dataType)
+        ?: error("Data type $dataType is not supported by DataTypeTranslator")
 
     val DEFAULT_COMPARISON_FUNCTIONS: Map<String, SmvFunctionDefinition> by lazy {
         val map = HashMap<String, SmvFunctionDefinition>()
@@ -138,54 +160,61 @@ public object GetetaFacade {
     fun parseTableDSL(input: File, timeConstants: Map<String, Int> = hashMapOf()) = parseTableDSL(CharStreams.fromFileName(input.absolutePath), timeConstants)
 
     @JvmStatic
-    fun parseTableDSL(input: CharStream,
-                      timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
+    fun parseTableDSL(
+        input: CharStream,
+        timeConstants: Map<String, Int> = hashMapOf(),
+    ): List<GeneralizedTestTable> {
         val parser = createParser(input)
         return parseTableDSL(parser.file(), timeConstants)
     }
 
     @JvmStatic
-    fun parseTableDSL(ctx: TestTableLanguageParser.FileContext,
-                      timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
+    fun parseTableDSL(
+        ctx: TestTableLanguageParser.FileContext,
+        timeConstants: Map<String, Int> = hashMapOf(),
+    ): List<GeneralizedTestTable> {
         val ttlb = TestTableLanguageBuilder(preDefinedTimeConstants = timeConstants)
         ctx.accept(ttlb)
         return ttlb.testTables
     }
 
     @JvmStatic
-    fun exprsToSMV(vc: ParseContext,
-                   constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>)
-            : Map<String, SMVExpr> = constraints.map { (t, u) ->
+    fun exprsToSMV(
+        vc: ParseContext,
+        constraints: Map<ColumnVariable, TestTableLanguageParser.CellContext>,
+    ): Map<String, SMVExpr> = constraints.map { (t, u) ->
         if (t is ProgramVariable) {
-            val n = t.internalVariable(vc.programRuns)//"${vc.programRuns[t.programRun]}${t.name}"
+            val n = t.internalVariable(vc.programRuns) // "${vc.programRuns[t.programRun]}${t.name}"
             n.name to exprToSMV(u, vc.getSMVVariable(t.programRun, t.name), t.programRun, vc)
         } else {
             t.name to exprToSMV(u, t as ProjectionVariable, vc)
         }
     }.toMap()
 
+    @JvmStatic
+    fun getHistoryName(variable: SVariable, cycles: Int): String = getHistoryName(variable) + "._$" + cycles
 
     @JvmStatic
-    fun getHistoryName(variable: SVariable, cycles: Int): String {
-        return getHistoryName(variable) + "._$" + cycles
-    }
+    fun getHistoryName(variable: SVariable): String = variable.name + "__history"
 
     @JvmStatic
-    fun getHistoryName(variable: SVariable): String {
-        return variable.name + "__history"
-    }
-
-    @JvmStatic
-    fun runNuXMV(nuXmvPath: String, folder: String,
-                 modules: List<SMVModule>,
-                 vt: VerificationTechnique): NuXMVOutput {
+    fun runNuXMV(
+        nuXmvPath: String,
+        folder: String,
+        modules: List<SMVModule>,
+        vt: VerificationTechnique,
+    ): NuXMVOutput {
         val adapter = createNuXMVProcess(folder, modules, nuXmvPath, vt)
         return adapter.call()
     }
 
     @JvmStatic
-    fun createNuXMVProcess(folder: String, modules: List<SMVModule>,
-                           nuXmvPath: String, vt: VerificationTechnique): NuXMVProcess {
+    fun createNuXMVProcess(
+        folder: String,
+        modules: List<SMVModule>,
+        nuXmvPath: String,
+        vt: VerificationTechnique,
+    ): NuXMVProcess {
         val outputFolder = File(folder)
         outputFolder.mkdirs()
         val moduleFile = File(outputFolder, "modules.smv")
@@ -205,19 +234,21 @@ public object GetetaFacade {
     @JvmStatic
     fun createSuperEnum(scopes: List<Scope>): EnumType {
         val allowedValues =
-                scopes.flatMap { scope ->
-                    scope.dataTypes.values()
-                            .filter { it is EnumerationTypeDeclaration }
-                            .map { it as EnumerationTypeDeclaration }
-                            .flatMap { it.allowedValues.map { it.text } }
-                }
+            scopes.flatMap { scope ->
+                scope.dataTypes.values()
+                    .filter { it is EnumerationTypeDeclaration }
+                    .map { it as EnumerationTypeDeclaration }
+                    .flatMap { it.allowedValues.map { it.text } }
+            }
         return EnumType(allowedValues)
     }
 
     @JvmStatic
-    fun generateInterface(name: String = "anonym",
-                          scope: Scope = Scope.defaultScope(),
-                          includeState: Boolean = true): String {
+    fun generateInterface(
+        name: String = "anonym",
+        scope: Scope = Scope.defaultScope(),
+        includeState: Boolean = true,
+    ): String {
         val s = StringBuilder()
         s.append("table $name {\n")
         scope.filter { it.isInput }.forEach {
@@ -243,26 +274,25 @@ public object GetetaFacade {
     }
 
     @JvmStatic
-    fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> {
-        return parseTableDSL(file, timeConstants)
-    }
+    fun readTables(file: File, timeConstants: Map<String, Int> = hashMapOf()): List<GeneralizedTestTable> = parseTableDSL(file, timeConstants)
 
     @JvmStatic
-    fun constructTable(table: GeneralizedTestTable) =
-            AutomatonBuilderPipeline(table).transform()
+    fun constructTable(table: GeneralizedTestTable) = AutomatonBuilderPipeline(table).transform()
 
     @JvmStatic
-    fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) =
-            constructSMV(constructTable(table), superEnum)
+    fun constructSMV(table: GeneralizedTestTable, superEnum: EnumType) = constructSMV(constructTable(table), superEnum)
 
     @JvmStatic
-    fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) =
-            SmvConstructionPipeline(automaton, superEnum).transform()
+    fun constructSMV(automaton: AutomataTransformerState, superEnum: EnumType) = SmvConstructionPipeline(automaton, superEnum).transform()
 
     @JvmStatic
     fun analyzeCounterExample(automaton: TestTableAutomaton, testTable: GeneralizedTestTable, counterExample: CounterExample): MutableList<Mapping> {
-        val analyzer = CounterExampleAnalyzer(automaton, testTable, counterExample,
-                "_${testTable.name}")
+        val analyzer = CounterExampleAnalyzer(
+            automaton,
+            testTable,
+            counterExample,
+            "_${testTable.name}",
+        )
         analyzer.run()
         return analyzer.rowMapping
     }
@@ -278,7 +308,7 @@ public object GetetaFacade {
     @JvmStatic
     fun functionToSmv(fd: FunctionDeclaration): SmvFunctionDefinition {
         val parameters = fd.scope.variables.filter { it.isInput }
-                .map { DefaultTypeTranslator.INSTANCE.translate(it) }
+            .map { DefaultTypeTranslator.INSTANCE.translate(it) }
         val body = SymbExFacade.evaluateFunction(fd, parameters)
         return SmvFunctionDefinition(body, parameters)
     }
@@ -290,7 +320,6 @@ public object GetetaFacade {
         return expr.accept(visitor)
     }
 
-
     @JvmStatic
     fun meshTables(tables: List<SMVConstructionModel>): TestTableAutomaton {
         val automaton = TestTableAutomaton()
@@ -299,35 +328,36 @@ public object GetetaFacade {
 
         val jumpMap = HashMap<Pair<String, String>, AutomatonState>()
 
-        //add all transition and rename the states to make them useable
+        // add all transition and rename the states to make them useable
         for (it in tables) {
             val a = it.automaton
             val tblName = it.testTable.name
             for ((row, states) in a.rowStates) {
                 jumpMap[tblName to row.id] = states.first()
 
-                //rename state id and row id
+                // rename state id and row id
                 states.forEach { it.name = "${tblName}${TABLE_SEP}${it.name}" }
                 row.id = "${tblName}${TABLE_SEP}${row.id}"
                 automaton.rowStates[row] = states
             }
             a.transitions.forEach { t ->
-                val trans = t.copy( //rewrite the sentinel and error transitions
-                        from = when (t.from) {
-                            a.stateError -> automaton.stateError
-                            a.stateSentinel -> automaton.stateSentinel
-                            else -> t.from
-                        },
-                        to = when (t.to) {
-                            a.stateError -> automaton.stateError
-                            a.stateSentinel -> automaton.stateSentinel
-                            else -> t.to
-                        })
+                val trans = t.copy( // rewrite the sentinel and error transitions
+                    from = when (t.from) {
+                        a.stateError -> automaton.stateError
+                        a.stateSentinel -> automaton.stateSentinel
+                        else -> t.from
+                    },
+                    to = when (t.to) {
+                        a.stateError -> automaton.stateError
+                        a.stateSentinel -> automaton.stateSentinel
+                        else -> t.to
+                    },
+                )
                 automaton.transitions.add(trans)
             }
         }
 
-        //remove transition, which goes to the sentinel with \pass, if there is a goto-pass command
+        // remove transition, which goes to the sentinel with \pass, if there is a goto-pass command
         automaton.rowStates.filter { (a, _) ->
             a.gotos.any { it.kind == GotoTransition.Kind.PASS }
         }.forEach { (_, u) ->
@@ -335,15 +365,13 @@ public object GetetaFacade {
             automaton.transitions.removeIf { it.from in u && it.to == automaton.stateSentinel }
         }
 
-        fun findTarget(gt: GotoTransition) =
-                when {
-                    gt.tableName == "eog" -> automaton.stateSentinel
-                    gt.tableName == "err" -> automaton.stateError
-                    else -> jumpMap[gt.tableName to gt.rowId]
-                } ?: error("Could not find the table row ${gt.rowId} in table ${gt.tableName}.")
+        fun findTarget(gt: GotoTransition) = when {
+            gt.tableName == "eog" -> automaton.stateSentinel
+            gt.tableName == "err" -> automaton.stateError
+            else -> jumpMap[gt.tableName to gt.rowId]
+        } ?: error("Could not find the table row ${gt.rowId} in table ${gt.tableName}.")
 
-
-        //add goto commands into the table
+        // add goto commands into the table
         for (it in tables) {
             for ((row, states) in it.automaton.rowStates) {
                 for (goto in row.gotos) {
@@ -352,10 +380,11 @@ public object GetetaFacade {
                         if (s.optional) {
                             val type = when (goto.kind) {
                                 GotoTransition.Kind.PASS ->
-                                    if (s.progressFlag)
+                                    if (s.progressFlag) {
                                         TransitionType.ACCEPT_PROGRESS
-                                    else
+                                    } else {
                                         TransitionType.ACCEPT
+                                    }
                                 GotoTransition.Kind.MISS -> TransitionType.MISS
                                 GotoTransition.Kind.FAIL -> TransitionType.FAIL
                             }
@@ -381,16 +410,18 @@ public object GetetaFacade {
         gtts.forEach {
             it.programVariables.forEach { v ->
                 val c = gtt.programVariables.find { it.name == v.name }
-                if (c == null) gtt.programVariables.add(v)
-                else {
+                if (c == null) {
+                    gtt.programVariables.add(v)
+                } else {
                     require(c.logicType == v.logicType) { "Data type clash for variable: $c and $v" }
                 }
             }
 
             it.constraintVariables.forEach { cv ->
                 val c = gtt.programVariables.find { it.name == cv.name }
-                if (c == null) gtt.constraintVariables.add(cv)
-                else {
+                if (c == null) {
+                    gtt.constraintVariables.add(cv)
+                } else {
                     fail("Clash of contraints variables: $cv ")
                 }
             }

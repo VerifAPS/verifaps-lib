@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -52,26 +70,30 @@ class SynthesisApp : CliktCommand(name = "ttsynth") {
     override fun helpEpilog(context: Context) = "ttsynth -- Program Synthesis from Test Tables."
     override fun help(context: Context) = "Synthesizes a program for each for each given file"
 
-
     private val tableFiles by argument("FILE", help = "Test table DSL file")
-            .file(mustExist = true, canBeDir = false, mustBeReadable = true)
-            .multiple(required = true)
+        .file(mustExist = true, canBeDir = false, mustBeReadable = true)
+        .multiple(required = true)
 
     private val outputFolder by option("-o", "--output-dir", help = "Output directory")
-            .file(mustExist = true, canBeDir = false, mustBeReadable = true)
-            .defaultLazy { Paths.get("").toAbsolutePath().toFile() }
+        .file(mustExist = true, canBeDir = false, mustBeReadable = true)
+        .defaultLazy { Paths.get("").toAbsolutePath().toFile() }
 
-    private val pythonExecutable by option("--python", help = "Path to python with omega",
-            envvar = "PYTHON").default("python")
+    private val pythonExecutable by option(
+        "--python",
+        help = "Path to python with omega",
+        envvar = "PYTHON",
+    ).default("python")
 
     private val optimizations by option("-O", "--optimization-level", help = "Optimization level")
-            .choice(enumValues<OptimizationLevel>().associateBy { it.ordinal.toString() })
-            .default(OptimizationLevel.SIMPLE)
+        .choice(enumValues<OptimizationLevel>().associateBy { it.ordinal.toString() })
+        .default(OptimizationLevel.SIMPLE)
 
-    private val outputFunctionStrategy by option("--row-selection-strategy",
-            help = "Strategy for choosing output function when multiple rows are active")
-            .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.lowercase(Locale.getDefault()) })
-            .default(OutputFunctionStrategy.ASSUME_ORTHOGONAL)
+    private val outputFunctionStrategy by option(
+        "--row-selection-strategy",
+        help = "Strategy for choosing output function when multiple rows are active",
+    )
+        .choice(enumValues<OutputFunctionStrategy>().associateBy { it.name.lowercase(Locale.getDefault()) })
+        .default(OutputFunctionStrategy.ASSUME_ORTHOGONAL)
 
     override fun run() {
         // TODO: implement rest, set default to CHOOSE_FIRST
@@ -83,12 +105,16 @@ class SynthesisApp : CliktCommand(name = "ttsynth") {
 
         tableFiles.forEach { tableFile ->
             val programName = tableFile.name.split('.')[0]
-            val headerFile = File(outputFolder, "${programName}.h")
-            val moduleFile = File(outputFolder, "${programName}.cpp")
+            val headerFile = File(outputFolder, "$programName.h")
+            val moduleFile = File(outputFolder, "$programName.cpp")
 
             info("Parsing DSL file: ${tableFile.absolutePath}")
             val synthesizer = ProgramSynthesizer(
-                    programName, tableFile, outputFunctionStrategy, optimizations, expressionSynthesizer
+                programName,
+                tableFile,
+                outputFunctionStrategy,
+                optimizations,
+                expressionSynthesizer,
             )
 
             info("Generating header file: ${headerFile.absolutePath}")
@@ -100,12 +126,10 @@ class SynthesisApp : CliktCommand(name = "ttsynth") {
     }
 }
 
-
 enum class OptimizationLevel(val optimizeAssignments: Boolean) {
     NONE(false),
-    SIMPLE(true);
+    SIMPLE(true),
 }
-
 
 /**
  * Strategy for computing the output function in nondeterministic cases.
@@ -115,42 +139,59 @@ enum class OutputFunctionStrategy {
      * Always choose the output function of the first active row of each table.
      */
     CHOOSE_FIRST,
+
     /**
      * Always choose the output function of the last active row of each table.
      */
     CHOOSE_LAST,
+
     /**
      * Always choose the output function of a random active row of each table.
      */
     CHOOSE_RANDOM,
+
     /**
      * Assume all output functions of all rows in all tables that can be active at the same time are orthogonal (set
      * different outputs) and execute them all in order.
      */
     ASSUME_ORTHOGONAL,
+
     /**
      * Combine as many output functions as possible. When conflicts are detected, prefer satisfying earlier rows.
      */
     COMBINE_PREFER_FIRST,
+
     /**
      * Combine as many output functions as possible. When conflicts are detected, prefer satisfying later rows.
      */
-    COMBINE_PREFER_LAST;
+    COMBINE_PREFER_LAST,
 }
 
-
-class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
-                         private val strategy: OutputFunctionStrategy,
-                         private val optimizations: OptimizationLevel,
-                         private val synthesizer: ExpressionSynthesizer) {
-    constructor(name: String, tableDslFile: File, strategy: OutputFunctionStrategy, optimizations: OptimizationLevel,
-                synthesizer: ExpressionSynthesizer) :
-            this(name, GetetaFacade.readTables(tableDslFile), strategy, optimizations, synthesizer)
+class ProgramSynthesizer(
+    val name: String,
+    tables: List<GeneralizedTestTable>,
+    private val strategy: OutputFunctionStrategy,
+    private val optimizations: OptimizationLevel,
+    private val synthesizer: ExpressionSynthesizer,
+) {
+    constructor(
+        name: String,
+        tableDslFile: File,
+        strategy: OutputFunctionStrategy,
+        optimizations: OptimizationLevel,
+        synthesizer: ExpressionSynthesizer,
+    ) :
+        this(name, GetetaFacade.readTables(tableDslFile), strategy, optimizations, synthesizer)
 
     @Suppress("Unused") // meant for unit tests
-    constructor(name: String, tableDsl: String, strategy: OutputFunctionStrategy, optimizations: OptimizationLevel,
-                synthesizer: ExpressionSynthesizer) :
-            this(name, GetetaFacade.parseTableDSL(tableDsl), strategy, optimizations, synthesizer)
+    constructor(
+        name: String,
+        tableDsl: String,
+        strategy: OutputFunctionStrategy,
+        optimizations: OptimizationLevel,
+        synthesizer: ExpressionSynthesizer,
+    ) :
+        this(name, GetetaFacade.parseTableDSL(tableDsl), strategy, optimizations, synthesizer)
 
     companion object {
         private val HISTORY_VAR_REGEX = Regex("""^code\$(.+)__history._\$([0-9]+)$""")
@@ -162,9 +203,11 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     private val referenceVariables = linkedMapOf<String, SMVType>() // inputs and outputs referenced in references
     private val references = mutableMapOf<String, SMVType>() // the concrete references to historical values
     private var maxLookBack = 0
+
     // maps SVariable names to names for temporary variables / struct member names
     private val variableNames = mutableMapOf<String, String>()
     private val translator = SmvToCTranslator()
+
     // indexed by table
     private val automata = mutableListOf<TestTableAutomaton>()
     private val states = mutableListOf<List<RowState>>()
@@ -184,13 +227,15 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         require(tables.none { it.functions.isNotEmpty() }) {
             "Functions are currently unsupported"
         }
-        require(tables.none { table ->
-            table.programVariables.any { variable ->
-                variable.name.startsWith(ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX)
-            }
-        }) {
+        require(
+            tables.none { table ->
+                table.programVariables.any { variable ->
+                    variable.name.startsWith(ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX)
+                }
+            },
+        ) {
             "Variable names must not start with the prefix ${ExpressionSynthesizer.TEMPORARY_VARIABLE_PREFIX}, which " +
-                    "is reserved for temporary variables"
+                "is reserved for temporary variables"
         }
 
         // extract context information
@@ -236,8 +281,8 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                 val (variableName, lookBehind) = match.destructured
                 if (references.containsKey(sVariableName)) return@references
                 references[sVariableName] = variables.getValue(variableName).logicType
-                translator.variableReplacement[sVariableName] = "var_history.get_value(${lookBehind}).${variableName}"
-                variableNames[sVariableName] = "__history_${variableName}_${lookBehind}"
+                translator.variableReplacement[sVariableName] = "var_history.get_value($lookBehind).$variableName"
+                variableNames[sVariableName] = "__history_${variableName}_$lookBehind"
             }
 
             val automaton = GetetaFacade.constructTable(table).automaton
@@ -247,8 +292,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
     }
 
-    fun generateHeader(): String {
-        return """
+    fun generateHeader(): String = """
             #pragma once
 
             #include <array>
@@ -344,12 +388,10 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     void update_history(const input_type& input, const output_type& output);
                 };
             }
-        """.trimIndent()
-    }
+    """.trimIndent()
 
-    fun generateModule(): String {
-        return """
-            #include "${name}.h"
+    fun generateModule(): String = """
+            #include "$name.h"
             
             #include <limits>
             #include <type_traits>
@@ -419,71 +461,67 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
                     });
                 }
             }
-        """.trimIndent()
+    """.trimIndent()
+
+    private fun generateStructMembers(vars: Map<String, SMVType>): Iterable<String> = vars.map { (name, type) ->
+        "${generateCppDataType(type)} ${variableNames.getValue(name)};"
     }
 
-    private fun generateStructMembers(vars: Map<String, SMVType>): Iterable<String> =
-            vars.map { (name, type) ->
-                "${generateCppDataType(type)} ${variableNames.getValue(name)};"
+    private fun generateOutputEqualityComparison() = if (outputs.keys.isEmpty()) {
+        "true"
+    } else {
+        outputs.keys.map { variableNames.getValue(it) }.joinToString(" && ") { "$it == other.$it" }
+    }
+
+    private fun generateInitialStates(): Iterable<String> = states.foldIndexed(listOf()) { index, acc, rowStates ->
+        val automaton = automata[index]
+        val initialState = rowStates.map { automaton.initialStates.contains(it) }
+        // initial state as string, bits reversed to match bitset constructor order
+        val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
+        acc + """static constexpr std::string_view INITIAL_STATE_$index = "$stateDescription";"""
+    }
+
+    private fun generateStateVariables(): Iterable<String> = (0 until automata.size).map { index ->
+        "std::bitset<INITIAL_STATE_$index.size()> state_$index{INITIAL_STATE_$index.data()};"
+    }
+
+    private fun generateStatusInitializerContents(): String = (0 until automata.size).joinToString(", ") {
+        "state_$it.any() ? table_status::ACTIVE : table_status::INACTIVE"
+    }
+
+    private fun generateStateChecks(): Iterable<String> = states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
+        lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
+            val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
+            require(!inputCheckExpr.contains("output.")) {
+                "Referring to output variables in assumptions is unsupported"
             }
+            acc + "if (state_$tableIndex[$rowIndex] and not ($inputCheckExpr)) {" +
+                "    state_$tableIndex[$rowIndex] = false;" +
+                "}"
+        }
+    } + (0 until automata.size).flatMap { index ->
+        listOf(
+            "if (state_$index.none() && status[$index] == table_status::ACTIVE) {",
+            "    status[$index] = table_status::INACTIVE;",
+            "}",
+        )
+    }
 
-    private fun generateOutputEqualityComparison() =
-            if (outputs.keys.isEmpty()) "true" else {
-                outputs.keys.map { variableNames.getValue(it) }.joinToString(" && ") { "$it == other.$it" }
-            }
+    private fun generateOutputFunctions(): Iterable<String> = states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
+        val memoizedOutputFunctions = mutableMapOf<TableRow, List<String>>()
 
-    private fun generateInitialStates(): Iterable<String> =
-            states.foldIndexed(listOf()) { index, acc, rowStates ->
-                val automaton = automata[index]
-                val initialState = rowStates.map { automaton.initialStates.contains(it) }
-                // initial state as string, bits reversed to match bitset constructor order
-                val stateDescription = initialState.asReversed().joinToString("") { if (it) "1" else "0" }
-                acc + """static constexpr std::string_view INITIAL_STATE_$index = "$stateDescription";"""
-            }
+        lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
+            val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
+            val outputFunctions = memoizedOutputFunctions.getOrPut(
+                rowState.row,
+                { generateOutputFunctions(rowState.row.outputExpr) },
+            )
 
-    private fun generateStateVariables(): Iterable<String> =
-            (0 until automata.size).map { index ->
-                "std::bitset<INITIAL_STATE_${index}.size()> state_${index}{INITIAL_STATE_${index}.data()};"
-            }
-
-    private fun generateStatusInitializerContents(): String =
-            (0 until automata.size).joinToString(", ") {
-                "state_${it}.any() ? table_status::ACTIVE : table_status::INACTIVE"
-            }
-
-    private fun generateStateChecks(): Iterable<String> =
-            states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
-                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
-                    require(!inputCheckExpr.contains("output.")) {
-                        "Referring to output variables in assumptions is unsupported"
-                    }
-                    acc + "if (state_${tableIndex}[${rowIndex}] and not (${inputCheckExpr})) {" +
-                            "    state_${tableIndex}[${rowIndex}] = false;" +
-                            "}"
-                }
-            } + (0 until automata.size).flatMap { index ->
-                listOf(
-                        "if (state_${index}.none() && status[${index}] == table_status::ACTIVE) {",
-                        "    status[${index}] = table_status::INACTIVE;",
-                        "}"
-                )
-            }
-
-    private fun generateOutputFunctions(): Iterable<String> =
-            states.foldIndexed(listOf()) { tableIndex, lines, rowStates ->
-                val memoizedOutputFunctions = mutableMapOf<TableRow, List<String>>()
-
-                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, acc, rowState ->
-                    val inputCheckExpr = generateCheckExpression(rowState.row.inputExpr)
-                    val outputFunctions = memoizedOutputFunctions.getOrPut(rowState.row,
-                            { generateOutputFunctions(rowState.row.outputExpr) })
-
-                    acc + "if (state_${tableIndex}[${rowIndex}] and (${inputCheckExpr})) {" +
-                            outputFunctions.map { line -> "    $line" } +
-                            "}"
-                }
-            }
+            acc + "if (state_$tableIndex[$rowIndex] and ($inputCheckExpr)) {" +
+                outputFunctions.map { line -> "    $line" } +
+                "}"
+        }
+    }
 
     // TODO: support "one BDD per whole row", "one BDD per state combination" and "big BDD" modes
     //       prerequisite for the second one: we need a way to signal unsatisfiability and a fallback mechanism
@@ -499,20 +537,19 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         }
         val bitmapDependencies = variableDependencies.filterKeys { needsConversionToBitmap.getValue(it) }
 
-
         // all input/history variables we need for at least one bitmap expression need to be converted once
         val conversions = bitmapDependencies.values.flatten().toSet()
-                .filter { (_, isOutput) -> !isOutput }
-                .map { (v, _) ->
-                    "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
-                }
+            .filter { (_, isOutput) -> !isOutput }
+            .map { (v, _) ->
+                "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
+            }
         // non-bitmap output variables need to be converted before their first usage in a bitmap expression
         val outputConversions = mutableMapOf<String, List<String>>()
         val convertedOutputs = mutableSetOf<String>()
         bitmapDependencies.forEach { (variable, dependencies) ->
             val outputDependencies = dependencies.filter { (_, isOutput) -> isOutput }.map { (dep, _) -> dep }.toSet()
             val newConversions = (outputDependencies - convertedOutputs)
-                    .filter { !needsConversionToBitmap.getValue(it) }
+                .filter { !needsConversionToBitmap.getValue(it) }
             outputConversions[variable] = newConversions.map { v ->
                 "auto ${variableNames.getValue(v)} = to_bitset(${translator.variableReplacement.getValue(v)});"
             }
@@ -522,7 +559,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         // figure out dependencies between the different outputs and sort topologically
         val outputDependencies = variableDependencies.values.foldIndexed(listOf<Pair<Int, Int>>()) { i, acc, deps ->
             acc + deps.filter { (_, isOutput) -> isOutput }
-                    .map { (outputVariable, _) -> Pair(variableDependencies.keys.indexOf(outputVariable), i) }
+                .map { (outputVariable, _) -> Pair(variableDependencies.keys.indexOf(outputVariable), i) }
         }
         val sortedOutputs = requireNotNull(topologicalSort(variableDependencies.keys.toList(), outputDependencies)) {
             "Circular output dependencies are unsupported"
@@ -538,64 +575,64 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
             } else {
                 val variables = variableDependencies.getValue(resultVariable).map { (v, _) -> v } + resultVariable
                 outputConversions.getValue(resultVariable) +
-                        "auto $name = std::bitset<bit_size_v<decltype(output.$name)>>();" +
-                        generateAssignments(expr, listOf(resultVariable), variables, context) +
-                        "from_bitset(${name}, output.$name);"
+                    "auto $name = std::bitset<bit_size_v<decltype(output.$name)>>();" +
+                    generateAssignments(expr, listOf(resultVariable), variables, context) +
+                    "from_bitset($name, output.$name);"
             }
         }
 
         return conversions + outputCalculations
     }
 
-    private fun generateAssignments(expr: SMVExpr, resultVariables: Iterable<String>, variables: Iterable<String>,
-                                    context: ExpressionSynthesizer.CppContext): Iterable<String> =
-            synthesizer.synthesize(
-                    expr,
-                    resultVariables,
-                    variables.map { it to generateCppDataType(inputs[it] ?: outputs[it] ?: references.getValue(it)) }
-                            .toMap(),
-                    context
-            ) ?: throw IllegalArgumentException("Unsatisfiable formula: ${expr.repr()}")
+    private fun generateAssignments(
+        expr: SMVExpr,
+        resultVariables: Iterable<String>,
+        variables: Iterable<String>,
+        context: ExpressionSynthesizer.CppContext,
+    ): Iterable<String> = synthesizer.synthesize(
+        expr,
+        resultVariables,
+        variables.map { it to generateCppDataType(inputs[it] ?: outputs[it] ?: references.getValue(it)) }
+            .toMap(),
+        context,
+    ) ?: throw IllegalArgumentException("Unsatisfiable formula: ${expr.repr()}")
 
-    private fun generateStateProgression(): Iterable<String> =
-            (0 until automata.size).map { index ->
-                "std::bitset<INITIAL_STATE_${index}.size()> new_state_${index}{};"
-            } + states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
-                lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, tableLines, rowState ->
-                    val outputCheckExpr = generateCheckExpression(rowState.row.outputExpr)
-                    val outgoingTransitions = automata[tableIndex].getOutgoingTransition(rowState)
-                    val successors = states.foldIndexed(listOf<Pair<Int, Int>>()) { successorTable, acc, rowStates ->
-                        acc + rowStates.mapIndexed { successorRow, successorCandidate ->
-                            val successor = Pair(successorTable, successorRow)
-                            Pair(successor, outgoingTransitions.any { it.to == successorCandidate })
-                        }.filter { (_, isSuccessor) -> isSuccessor }.map { (s, _) -> s }
-                    }
-                    var stateUpdates = successors.map { (table, row) -> "new_state_${table}[$row] = true;" }
-                    if (outgoingTransitions.any { it.to == automata[tableIndex].stateSentinel }) {
-                        stateUpdates = stateUpdates + "status[${tableIndex}] = table_status::ACTIVE_COMPLETED;"
-                    }
-                    tableLines + "if (state_${tableIndex}[${rowIndex}] and (${outputCheckExpr})) {" +
-                            stateUpdates.map { line -> "    $line" } +
-                            "}"
-                }
-            } + (0 until automata.size).flatMap { index ->
-                listOf(
-                        "state_${index} = new_state_${index};",
-                        "if (state_${index}.none()) {",
-                        "    if (status[${index}] == table_status::ACTIVE_COMPLETED) {",
-                        "        status[${index}] = table_status::COMPLETED;",
-                        "    } else if (status[${index}] == table_status::ACTIVE) {",
-                        "        status[${index}] = table_status::ERROR;",
-                        "    }",
-                        "}"
-                )
+    private fun generateStateProgression(): Iterable<String> = (0 until automata.size).map { index ->
+        "std::bitset<INITIAL_STATE_$index.size()> new_state_$index{};"
+    } + states.foldIndexed(listOf<String>()) { tableIndex, lines, rowStates ->
+        lines + rowStates.foldIndexed(listOf<String>()) { rowIndex, tableLines, rowState ->
+            val outputCheckExpr = generateCheckExpression(rowState.row.outputExpr)
+            val outgoingTransitions = automata[tableIndex].getOutgoingTransition(rowState)
+            val successors = states.foldIndexed(listOf<Pair<Int, Int>>()) { successorTable, acc, rowStates ->
+                acc + rowStates.mapIndexed { successorRow, successorCandidate ->
+                    val successor = Pair(successorTable, successorRow)
+                    Pair(successor, outgoingTransitions.any { it.to == successorCandidate })
+                }.filter { (_, isSuccessor) -> isSuccessor }.map { (s, _) -> s }
             }
+            var stateUpdates = successors.map { (table, row) -> "new_state_$table[$row] = true;" }
+            if (outgoingTransitions.any { it.to == automata[tableIndex].stateSentinel }) {
+                stateUpdates = stateUpdates + "status[$tableIndex] = table_status::ACTIVE_COMPLETED;"
+            }
+            tableLines + "if (state_$tableIndex[$rowIndex] and ($outputCheckExpr)) {" +
+                stateUpdates.map { line -> "    $line" } +
+                "}"
+        }
+    } + (0 until automata.size).flatMap { index ->
+        listOf(
+            "state_$index = new_state_$index;",
+            "if (state_$index.none()) {",
+            "    if (status[$index] == table_status::ACTIVE_COMPLETED) {",
+            "        status[$index] = table_status::COMPLETED;",
+            "    } else if (status[$index] == table_status::ACTIVE) {",
+            "        status[$index] = table_status::ERROR;",
+            "    }",
+            "}",
+        )
+    }
 
-    private fun generateHistoryValues(): Iterable<String> =
-            referenceVariables.keys.map { "${translator.variableReplacement.getValue(it)}," }
+    private fun generateHistoryValues(): Iterable<String> = referenceVariables.keys.map { "${translator.variableReplacement.getValue(it)}," }
 
-    private fun generateCheckExpression(expressions: Map<String, SMVExpr>) =
-            if (expressions.isEmpty()) "true" else expressions.values.joinToString(" and ") { it.accept(translator) }
+    private fun generateCheckExpression(expressions: Map<String, SMVExpr>) = if (expressions.isEmpty()) "true" else expressions.values.joinToString(" and ") { it.accept(translator) }
 
     private fun generateCppDataType(type: SMVType): CppType = when (type) {
         is SMVTypes.BOOLEAN -> CppType.BOOL
@@ -609,9 +646,7 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
         else -> throw IllegalArgumentException("Data types other than bool and int are currently unsupported")
     }
 
-    private fun indentLines(iter: Iterable<String>, indent: Int): String =
-            iter.joinToString(separator = "\n" + " ".repeat(indent))
-
+    private fun indentLines(iter: Iterable<String>, indent: Int): String = iter.joinToString(separator = "\n" + " ".repeat(indent))
 
     /**
      * Accumulates values from all SVariables in the expression
@@ -621,38 +656,30 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
         abstract override fun visit(v: SVariable): Set<T>
 
-        final override fun visit(be: SBinaryExpression): Set<T> =
-                be.left.accept(this) + be.right.accept(this)
+        final override fun visit(be: SBinaryExpression): Set<T> = be.left.accept(this) + be.right.accept(this)
 
         final override fun visit(ue: SUnaryExpression): Set<T> = ue.expr.accept(this)
 
         final override fun visit(a: SAssignment): Set<T> = a.target.accept(this) + a.expr.accept(this)
 
-        final override fun visit(ce: SCaseExpression): Set<T> =
-                ce.cases.fold(setOf()) { set, case ->
-                    set + case.condition.accept(this) + case.then.accept(this)
-                }
+        final override fun visit(ce: SCaseExpression): Set<T> = ce.cases.fold(setOf()) { set, case ->
+            set + case.condition.accept(this) + case.then.accept(this)
+        }
     }
-
 
     /**
      * Extracts SVariables matching the given pattern from an expression
      */
     private class SVariableCollector(private val pattern: Regex) : SVariableVisitor<Pair<String, MatchResult>>() {
-        override fun visit(v: SVariable): Set<Pair<String, MatchResult>> =
-                pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
+        override fun visit(v: SVariable): Set<Pair<String, MatchResult>> = pattern.find(v.name)?.let { match -> setOf(Pair(v.name, match)) } ?: setOf()
     }
-
 
     /**
      * Extracts the dependencies to output variables (other than self) and other variables from an expression
      */
-    private class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String)
-        : SVariableVisitor<Pair<String, Boolean>>() {
-        override fun visit(v: SVariable): Set<Pair<String, Boolean>> =
-                if (v.name == self) setOf() else setOf(Pair(v.name, outputVariables.contains(v.name)))
+    private class OutputExpressionDependencyVisitor(private val outputVariables: Set<String>, private val self: String) : SVariableVisitor<Pair<String, Boolean>>() {
+        override fun visit(v: SVariable): Set<Pair<String, Boolean>> = if (v.name == self) setOf() else setOf(Pair(v.name, outputVariables.contains(v.name)))
     }
-
 
     /**
      * Translates SMV expressions to C++ expressions
@@ -664,12 +691,12 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
 
         override fun visit(v: SVariable): String = variableReplacement[v.name] ?: v.name
 
-        override fun visit(ue: SUnaryExpression) = when(ue.dataType) {
+        override fun visit(ue: SUnaryExpression) = when (ue.dataType) {
             is SMVWordType -> "(${generateCppDataType(ue.dataType!!)}) "
             else -> ""
         } + "(${opToC(ue.operator)} ${ue.expr.accept(this)})"
 
-        override fun visit(be: SBinaryExpression) = when(be.dataType) {
+        override fun visit(be: SBinaryExpression) = when (be.dataType) {
             is SMVWordType -> "(${generateCppDataType(be.dataType!!)}) "
             else -> ""
         } + "(${be.left.accept(this)} ${opToC(be.operator)} ${be.right.accept(this)})"
@@ -709,7 +736,6 @@ class ProgramSynthesizer(val name: String, tables: List<GeneralizedTestTable>,
     }
 }
 
-
 class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
 
     companion object {
@@ -718,23 +744,27 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         private const val SYNTHESIS_SCRIPT_UNSAT_MARKER = "<unsatisfiable>"
     }
 
-    fun synthesize(formula: SMVExpr, resultVariables: Iterable<String>, variables: Map<String, CppType>,
-                   context: CppContext): List<String>? =
-            callOmega(
-                    formula.accept(SmvToOmegaTranslator(context.variableNameMap)),
-                    resultVariables.map { context.variableNameMap.getValue(it) },
-                    variables.map { (variable, type) ->
-                        "${context.variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
-                    }
-            )?.let { assignments -> context.translateIteAssignments(assignments, variables) }
+    fun synthesize(
+        formula: SMVExpr,
+        resultVariables: Iterable<String>,
+        variables: Map<String, CppType>,
+        context: CppContext,
+    ): List<String>? = callOmega(
+        formula.accept(SmvToOmegaTranslator(context.variableNameMap)),
+        resultVariables.map { context.variableNameMap.getValue(it) },
+        variables.map { (variable, type) ->
+            "${context.variableNameMap.getValue(variable)}${cppToOmegaType(type)}"
+        },
+    )?.let { assignments -> context.translateIteAssignments(assignments, variables) }
 
     inner class CppContext(val variableNameMap: Map<String, String>) {
         private var temporaryVariableCounter = 0
 
         fun translateIteAssignments(iteAssignments: Iterable<String>, variables: Map<String, CppType>): List<String> {
             val translator = IteToCppTranslator(
-                    variables.mapKeys { (k, _) -> variableNameMap.getValue(k) },
-                    TEMPORARY_VARIABLE_PREFIX, temporaryVariableCounter
+                variables.mapKeys { (k, _) -> variableNameMap.getValue(k) },
+                TEMPORARY_VARIABLE_PREFIX,
+                temporaryVariableCounter,
             )
             val assignments = iteAssignments.map { expression ->
                 val parser = IteLanguageParser(CommonTokenStream(IteLanguageLexer(CharStreams.fromString(expression))))
@@ -759,17 +789,16 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         CppType.UINT64 -> "[0,${Long.MAX_VALUE.toBigInteger() * 2.toBigInteger() + 1.toBigInteger()}]"
     }
 
-    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>)
-            : Iterable<String>? {
+    private fun callOmega(formula: String, resultVariables: List<String>, variableDefinitions: List<String>): Iterable<String>? {
         val arguments = listOf(pythonExecutable, "-") +
-                resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
-                formula + variableDefinitions
+            resultVariables.flatMap { resultVariable -> listOf("--result", resultVariable) } +
+            formula + variableDefinitions
         val outputFile = kotlin.io.path.createTempFile()
         val process = ProcessBuilder(arguments)
-                .redirectInput(ProcessBuilder.Redirect.PIPE)
-                .redirectOutput(outputFile.toFile())
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
+            .redirectInput(ProcessBuilder.Redirect.PIPE)
+            .redirectOutput(outputFile.toFile())
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .start()
 
         process.outputStream.use { stdin ->
             javaClass.getResourceAsStream(SYNTHESIS_SCRIPT_RESOURCE_PATH).use { script ->
@@ -784,7 +813,8 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
                 for (line in reader.readLines()) {
                     // silence warnings about omega using its Python backend
                     if (line == "`omega.symbolic.symbolic` failed to import `dd.cudd`." ||
-                            line == "Will use `dd.autoref`.") {
+                        line == "Will use `dd.autoref`."
+                    ) {
                         debug("Expression synthesis script wrote to stderr: $line")
                     } else {
                         error("Expression synthesis script wrote to stderr: $line")
@@ -797,24 +827,21 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
             if (exitCode == 1 && outputFile.readText().startsWith(SYNTHESIS_SCRIPT_UNSAT_MARKER)) {
                 return null
             }
-            fail("Synthesis via omega failed (formula: ${formula})")
+            fail("Synthesis via omega failed (formula: $formula)")
         }
 
         return outputFile.readLines().dropLastWhile { it.isEmpty() }
     }
 
-
     /**
      * Translates SMV expressions to expressions the omega library understands
      */
-    private class SmvToOmegaTranslator(private val variableNameMap: Map<String, String>) :
-            SMVAstDefaultVisitorNN<String>() {
+    private class SmvToOmegaTranslator(private val variableNameMap: Map<String, String>) : SMVAstDefaultVisitorNN<String>() {
         override fun defaultVisit(top: SMVAst): String = throw IllegalArgumentException("unsupported expression $top")
 
         override fun visit(v: SVariable): String = variableNameMap.getValue(v.name)
 
-        override fun visit(be: SBinaryExpression): String =
-                "(${be.left.accept(this)} ${opToOmega(be.operator, be.left.dataType)} ${be.right.accept(this)})"
+        override fun visit(be: SBinaryExpression): String = "(${be.left.accept(this)} ${opToOmega(be.operator, be.left.dataType)} ${be.right.accept(this)})"
 
         private fun opToOmega(op: SBinaryOperator, type: SMVType?): String = when (type) {
             SMVTypes.BOOLEAN -> when (op) {
@@ -842,8 +869,7 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
             else -> throw IllegalArgumentException("unsupported expression type $type")
         }
 
-        override fun visit(ue: SUnaryExpression): String =
-                "(${opToOmega(ue.operator, ue.expr.dataType)} ${ue.expr.accept(this)})"
+        override fun visit(ue: SUnaryExpression): String = "(${opToOmega(ue.operator, ue.expr.dataType)} ${ue.expr.accept(this)})"
 
         private fun opToOmega(op: SUnaryOperator, type: SMVType?): String = when (type) {
             SMVTypes.BOOLEAN -> when (op) {
@@ -874,39 +900,35 @@ class ExpressionSynthesizer(private val pythonExecutable: String = "python") {
         }.append(")".repeat(ce.cases.size)).toString()
     }
 
-    private class IteToCppTranslator(private val variableContext: Map<String, CppType>,
-                                     private val cacheVarPrefix: String, private val initialCacheVarSuffix: Int) :
-            IteLanguageBaseVisitor<String>() {
+    private class IteToCppTranslator(
+        private val variableContext: Map<String, CppType>,
+        private val cacheVarPrefix: String,
+        private val initialCacheVarSuffix: Int,
+    ) : IteLanguageBaseVisitor<String>() {
         private val iteExprCache = linkedMapOf<String, String>() // preserving insertion order is crucial
 
-        fun getVariableDeclarations(): List<String> =
-                iteExprCache.map { (expr, varName) -> "bool $varName = $expr;" }
+        fun getVariableDeclarations(): List<String> = iteExprCache.map { (expr, varName) -> "bool $varName = $expr;" }
 
-        override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String =
-                "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
+        override fun visitAssignment(ctx: IteLanguageParser.AssignmentContext): String = "${ctx.identifier().accept(this)} = ${ctx.expr().accept(this)}"
 
-        override fun visitExpr(ctx: IteLanguageParser.ExprContext): String =
-            ctx.iteExpr()?.accept(this)
-                ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
-                ?: ctx.identifier()?.accept(this)
-                ?: ctx.BOOLEAN()?.text?.lowercase(Locale.getDefault())
-                ?: ctx.INTEGER()!!.text
+        override fun visitExpr(ctx: IteLanguageParser.ExprContext): String = ctx.iteExpr()?.accept(this)
+            ?: ctx.expr()?.let { "(not ${it.accept(this)})" }
+            ?: ctx.identifier()?.accept(this)
+            ?: ctx.BOOLEAN()?.text?.lowercase(Locale.getDefault())
+            ?: ctx.INTEGER()!!.text
 
-        override fun visitIteExpr(ctx: IteLanguageParser.IteExprContext): String =
-                iteExprCache.getOrPut(
-                        "(${ctx.expr(0).accept(this)}) ? (${ctx.expr(1).accept(this)}) : ${ctx.expr(2).accept(this)}",
-                        { "${cacheVarPrefix}_${initialCacheVarSuffix + iteExprCache.size}" }
-                )
+        override fun visitIteExpr(ctx: IteLanguageParser.IteExprContext): String = iteExprCache.getOrPut(
+            "(${ctx.expr(0).accept(this)}) ? (${ctx.expr(1).accept(this)}) : ${ctx.expr(2).accept(this)}",
+            { "${cacheVarPrefix}_${initialCacheVarSuffix + iteExprCache.size}" },
+        )
 
-        override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String =
-                if (variableContext.containsKey(ctx.text) && variableContext[ctx.text] == CppType.BOOL) {
-                    "${ctx.text}[0]"
-                } else { // identifier must refer to a specific bit
-                    "${ctx.text.substringBeforeLast('_')}[${ctx.text.substringAfterLast('_')}]"
-                }
+        override fun visitIdentifier(ctx: IteLanguageParser.IdentifierContext): String = if (variableContext.containsKey(ctx.text) && variableContext[ctx.text] == CppType.BOOL) {
+            "${ctx.text}[0]"
+        } else { // identifier must refer to a specific bit
+            "${ctx.text.substringBeforeLast('_')}[${ctx.text.substringAfterLast('_')}]"
+        }
     }
 }
-
 
 /**
  * Supported C++ variable types
@@ -920,20 +942,18 @@ enum class CppType(private val cppName: String) {
     INT8("std::int8_t"),
     INT16("std::int16_t"),
     INT32("std::int32_t"),
-    INT64("std::int64_t");
+    INT64("std::int64_t"),
+    ;
 
     override fun toString(): String = cppName
 }
 
-
 /**
  * Checks if a SMVExpr is a value assignment to a SVariable and returns the corresponding expression.
  */
-private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? =
-        (this as? SBinaryExpression)?.takeIf { operator == SBinaryOperator.EQUAL }?.run {
-            right.takeIf { left is SVariable } ?: left.takeIf { right is SVariable }
-        }
-
+private fun SMVExpr.getSingleAssignmentExpr(): SMVExpr? = (this as? SBinaryExpression)?.takeIf { operator == SBinaryOperator.EQUAL }?.run {
+    right.takeIf { left is SVariable } ?: left.takeIf { right is SVariable }
+}
 
 /**
  * Returns a new, topologically sorted vertex list or null if the graph is not acyclic

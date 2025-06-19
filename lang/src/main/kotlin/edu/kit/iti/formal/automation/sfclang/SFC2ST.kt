@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.sfclang
 
 /*-
@@ -50,10 +68,10 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
     override fun get(): StatementList {
         extractStates()
         addVariables()
-        //actionAnalyses();
+        // actionAnalyses();
         addNonStoredVariablesReset() // all non-stored assignments are reseted
 
-        //code
+        // code
         if (isSfcReset) {
             embeddSFCReset()
         }
@@ -63,18 +81,18 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
     }
 
     private fun actionAnalyses() {
-        //System.out.printlnstream()(name);
+        // System.out.printlnstream()(name);
         val actionMap = hashMapOf<String, MutableSet<SFCActionQualifier.Qualifier>>()
         network.steps
-                .flatMap { it.events }
-                .filter { scope.hasVariable(it.actionName) }
-                .forEach {
-                    actionMap.compute(it.actionName) { key, set ->
-                        val s = if (set != null) set else hashSetOf()
-                        s.add(it.qualifier!!.qualifier)
-                        s
-                    }
+            .flatMap { it.events }
+            .filter { scope.hasVariable(it.actionName) }
+            .forEach {
+                actionMap.compute(it.actionName) { key, set ->
+                    val s = if (set != null) set else hashSetOf()
+                    s.add(it.qualifier!!.qualifier)
+                    s
                 }
+            }
         println(actionMap)
 
         /*network.getSteps().stream().flatMap(s -> s.getOutgoing().stream())
@@ -83,19 +101,21 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
                 .forEach(t -> System.out.format("%s => %s%n",
                         t.getFrom().stream().map(s->s.getName()).collect(Collectors.joining(",")),
                         t.getTo().stream().map(s->s.getName()).collect(Collectors.joining(","))));
-        */
+         */
     }
 
     private fun addNonStoredVariablesReset() {
-        network!!.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
-                .filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
-                .filter { aa -> scope!!.hasVariable(aa.actionName) }
-                .forEach { aa ->
-                    stBody.add(AssignmentStatement(
-                            SymbolicReference(aa.actionName),
-                            BooleanLit.LFALSE
-                    ))
-                }
+        network.steps.stream().flatMap<SFCStep.AssociatedAction> { s -> s.events.stream() }
+            .filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
+            .filter { aa -> scope.hasVariable(aa.actionName) }
+            .forEach { aa ->
+                stBody.add(
+                    AssignmentStatement(
+                        SymbolicReference(aa.actionName),
+                        BooleanLit.LFALSE,
+                    ),
+                )
+            }
     }
 
     private fun createBigCase() {
@@ -103,15 +123,14 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
         statement.expression = SymbolicReference(stateVariable)
         stBody.add(statement)
 
-        for (step in network!!.steps) {
-            val _case = Case()
-            val cc = CaseCondition.Enumeration(
-                    EnumLit(enumDecl.name, step.name))
-            _case.conditions = arrayListOf(cc)
-            statement.addCase(_case)
-            val sl = _case.statements
+        for (step in network.steps) {
+            val cases = Case()
+            val cc = CaseCondition.Enumeration(EnumLit(enumDecl.name, step.name))
+            cases.conditions = arrayListOf(cc)
+            statement.addCase(cases)
+            val sl = cases.statements
 
-            //transit
+            // transit
             var checkForTransit = IfStatement()
             val p1 = StatementList()
             checkForTransit.addGuardedCommand(SymbolicReference(transitVariable), p1)
@@ -127,36 +146,40 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
 
             // S+N, R
             step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.SET || aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.NON_STORED }
-                    .forEach { aa ->
-                        if (scope!!.hasVariable(aa.actionName)) {
-                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LTRUE))
-                        } else {
-                            sl.add(InvocationStatement(aa.actionName))
-                        }
+                .forEach { aa ->
+                    if (scope.hasVariable(aa.actionName)) {
+                        sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LTRUE))
+                    } else {
+                        sl.add(InvocationStatement(aa.actionName))
                     }
+                }
             step.events.stream().filter { aa -> aa.qualifier!!.qualifier == SFCActionQualifier.Qualifier.OVERRIDING_RESET }
-                    .forEach { aa ->
-                        if (scope!!.hasVariable(aa.actionName)) {
-                            sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LFALSE))
-                        } else {
-                            //Not handled!
-                        }
+                .forEach { aa ->
+                    if (scope.hasVariable(aa.actionName)) {
+                        sl.add(AssignmentStatement(SymbolicReference(aa.actionName), BooleanLit.LFALSE))
+                    } else {
+                        // Not handled!
                     }
+                }
 
             // outgoing transition
             step.outgoing.sortWith(SFCTransition.PriorityComparison())
             step.outgoing.forEach { t ->
-                val _ifguard = IfStatement()
+                val ifguard = IfStatement()
                 val then = StatementList()
                 then.add(AssignmentStatement(SymbolicReference(transitVariable), BooleanLit.LTRUE))
-                then.add(AssignmentStatement(SymbolicReference(stateVariable),
-                        EnumLit(enumDecl.name, t.to!!.iterator().next().name)))
-                //TODO assert t.getTo().size() == 1
-                _ifguard.addGuardedCommand(t.guard, then)
-                sl.add(_ifguard)
+                then.add(
+                    AssignmentStatement(
+                        SymbolicReference(stateVariable),
+                        EnumLit(enumDecl.name, t.to.iterator().next().name),
+                    ),
+                )
+                // TODO assert t.getTo().size() == 1
+                ifguard.addGuardedCommand(t.guard, then)
+                sl.add(ifguard)
             }
 
-            //transit
+            // transit
             checkForTransit = IfStatement()
             val p0 = StatementList()
             checkForTransit.addGuardedCommand(SymbolicReference(transitVariable), p0)
@@ -168,26 +191,10 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
         }
     }
 
-    private fun addActions(list: StatementList,
-                           events: List<SFCStep.AssociatedAction>,
-                           vararg qualifiers: SFCActionQualifier.Qualifier) {
-        /*        EnumSet q = EnumSet.of(qualifiers[0], qualifiers);
-        for (SFCStep.AssociatedAction aa : events) {
-            if (q.contains(aa.getQualifier())) {
-                if (scope.hasVariable(aa.getActionName())) {
-                    //switch ()
-
-
-                }
-            }
-        }*/
-    }
-
     private fun embeddSFCReset() {
-        //todo add SFCReset:bool to scope
-        //todo add IF SFCReset THEN _state = <init>
+        // todo add SFCReset:bool to scope
+        // todo add IF SFCReset THEN _state = <init>
     }
-
 
     private fun addVariables() {
         stateVariable = "_" + name + "_state"
@@ -195,10 +202,14 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
 
         val vdState = VariableDeclaration(stateVariable!!, 0, enumDecl)
         enumDecl.initialization = IdentifierInitializer(null, network.initialStep!!.name)
-        val vdTransit = VariableDeclaration(transitVariable!!, 0,
-                SimpleTypeDeclaration(baseType = RefTo(AnyBit.BOOL),
-                        initialization = BooleanLit.LFALSE
-                ))
+        val vdTransit = VariableDeclaration(
+            transitVariable!!,
+            0,
+            SimpleTypeDeclaration(
+                baseType = RefTo(AnyBit.BOOL),
+                initialization = BooleanLit.LFALSE,
+            ),
+        )
         vdTransit.initValue = FALSE
         vdTransit.dataType = AnyBit.BOOL
 
@@ -207,14 +218,13 @@ class SFC2ST(private val name: String, val network: SFCNetwork, val scope: Scope
     }
 
     private fun extractStates() {
-        enumDecl.name = name!! + "_states_t"
-        enumDecl.allowedValues.add(
-                CommonToken(IEC61131Lexer.IDENTIFIER, network!!.initialStep!!.name))
+        enumDecl.name = name + "_states_t"
+        enumDecl.allowedValues.add(CommonToken(IEC61131Lexer.IDENTIFIER, network.initialStep!!.name))
         for (step in network.steps) {
-            if (network.initialStep === step)
+            if (network.initialStep === step) {
                 continue
-            enumDecl.allowedValues.add(
-                    CommonToken(IEC61131Lexer.IDENTIFIER, step.name))
+            }
+            enumDecl.allowedValues.add(CommonToken(IEC61131Lexer.IDENTIFIER, step.name))
         }
     }
 }

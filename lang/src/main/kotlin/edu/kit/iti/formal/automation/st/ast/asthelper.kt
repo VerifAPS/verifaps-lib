@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st.ast
 
 import edu.kit.iti.formal.automation.VariableScope
@@ -11,9 +29,7 @@ import java.util.*
  * @version 1 (20.06.19)
  */
 
-
-
-//Helpers
+// Helpers
 fun <T : Expression> Iterable<T>.disjunction() = reduce { a: Expression, b: Expression -> a or b }
 
 fun <T : Expression> Iterable<T>.conjunction() = reduce { a: Expression, b: Expression -> a and b }
@@ -22,7 +38,6 @@ fun <T : Expression> Iterable<T>.substract() = reduce { a: Expression, b: Expres
 fun <T : Expression> Iterable<T>.product() = reduce { a: Expression, b: Expression -> a times b }
 fun <T : Expression> Iterable<T>.division() = reduce { a: Expression, b: Expression -> a div b }
 //endregion
-
 
 /**
  * Get the return type of an invocation.
@@ -39,7 +54,6 @@ val Invoked?.returnType: AnyDt?
         }
     }
 
-
 /**
  * Creates an array access expression
  */
@@ -48,7 +62,6 @@ operator fun SymbolicReference.get(it: Iterable<Int>): SymbolicReference {
     return this.copy(subscripts = ExpressionList(exprs.toMutableList()))
 }
 
-
 operator fun SymbolicReference.get(fieldName: String): SymbolicReference = copy(sub = SymbolicReference(fieldName))
 operator fun SymbolicReference.get(it: IntArray) = this[it.toList()]
 
@@ -56,23 +69,24 @@ infix fun SymbolicReference.assignTo(init: Expression?) = AssignmentStatement(th
 
 infix fun String.assignTo(expr: Expression) = AssignmentStatement(SymbolicReference(this), expr)
 
-infix fun String.assignTo(expr: String) =
-        AssignmentStatement(SymbolicReference(this), SymbolicReference(expr))
+infix fun String.assignTo(expr: String) = AssignmentStatement(SymbolicReference(this), SymbolicReference(expr))
 
 //region oo
 val InterfaceDeclaration.definedMethods: List<Pair<HasMethods, MethodDeclaration>>
     get() {
         val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
         for (iface in allInterfaces) {
-            for (it in iface.methods)
+            for (it in iface.methods) {
                 seq.add(iface to it)
+            }
         }
         return seq
     }
 
 infix fun MethodDeclaration.sameSignature(other: MethodDeclaration): Boolean {
-    if (name != other.name)
+    if (name != other.name) {
         return false
+    }
 
     val input1 = scope.variables.filter { it.isInput }
     val input2 = scope.variables.filter { it.isInput }
@@ -92,7 +106,7 @@ infix fun MethodDeclaration.sameSignature(other: MethodDeclaration): Boolean {
 infix fun MethodDeclaration.isCompatibleTo(parent: MethodDeclaration): Boolean {
     if (name != parent.name) return false // equal name
 
-    //return type
+    // return type
     if (returnType.obj!!.isAssignableTo(parent.returnType.obj!!)) {
         return false
     }
@@ -110,8 +124,9 @@ val ClassDeclaration.declaredMethods: Collection<Pair<HasMethods, MethodDeclarat
     get() {
         val seq = LinkedList(definedMethods)
         for (iface in allInterfaces) {
-            for (it in iface.methods)
+            for (it in iface.methods) {
                 seq.add(iface to it)
+            }
         }
         return seq
     }
@@ -123,8 +138,9 @@ val ClassDeclaration.definedMethods: Collection<Pair<HasMethods, MethodDeclarati
     get() {
         val seq = arrayListOf<Pair<HasMethods, MethodDeclaration>>()
         for (iface in parents) {
-            for (it in iface.methods)
+            for (it in iface.methods) {
                 seq.add(iface to it)
+            }
         }
         return seq
     }
@@ -135,7 +151,7 @@ val ClassDeclaration.parents: List<ClassDeclaration>
         val seq = arrayListOf<ClassDeclaration>()
         while (c != null) {
             seq.add(c)
-            c = parent.obj;
+            c = parent.obj
             if (c in seq) break
         }
         return seq
@@ -144,9 +160,19 @@ val ClassDeclaration.parents: List<ClassDeclaration>
 val ClassDeclaration.allInterfaces: List<InterfaceDeclaration>
     get() {
         val seq = arrayListOf<InterfaceDeclaration>()
-        interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
+        interfaces.forEach {
+            it.obj?.let {
+                seq.add(it)
+                seq.addAll(it.allInterfaces)
+            }
+        }
         parents.forEach { c ->
-            c.interfaces.forEach { it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) } }
+            c.interfaces.forEach {
+                it.obj?.let {
+                    seq.add(it)
+                    seq.addAll(it.allInterfaces)
+                }
+            }
         }
         return seq
     }
@@ -155,7 +181,10 @@ val InterfaceDeclaration.allInterfaces: List<InterfaceDeclaration>
     get() {
         val seq = arrayListOf<InterfaceDeclaration>()
         interfaces.forEach {
-            it.obj?.let { seq.add(it); seq.addAll(it.allInterfaces) }
+            it.obj?.let {
+                seq.add(it)
+                seq.addAll(it.allInterfaces)
+            }
         }
         return seq
     }
@@ -167,18 +196,16 @@ val FunctionBlockDeclaration.hasParent
 
 val ClassDeclaration.effectiveVariables: VariableScope
     get() {
-        val variables = if(hasParent) parent.obj!!.effectiveVariables else VariableScope()
+        val variables = if (hasParent) parent.obj!!.effectiveVariables else VariableScope()
         variables.addAll(scope.variables)
         return variables
     }
 
 val FunctionBlockDeclaration.effectiveVariables: VariableScope
     get() {
-        val variables = if(hasParent) parent.obj!!.effectiveVariables else VariableScope()
+        val variables = if (hasParent) parent.obj!!.effectiveVariables else VariableScope()
         variables.addAll(scope.variables)
         return variables
     }
-
-
 
 //endregion

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.automation.ASSERTION_PREFIX
@@ -26,9 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.HashMap
 import kotlin.math.max
 
-
-class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap())
-    : MutableMap<Int, Pair<String, Position>> by map {
+class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap()) : MutableMap<Int, Pair<String, Position>> by map {
     val branchMap = TreeMap<String, Pair<Position, Position>>()
     fun markAsBranchCondition(identifier: String, ifLine: Position, branchLine: Position) {
         branchMap[identifier] = ifLine to branchLine
@@ -43,8 +59,9 @@ class LineMap(private val map: HashMap<Int, Pair<String, Position>> = HashMap())
  * 2020-03-10 weigl: add branch conditions for cases
  */
 open class SymbolicExecutioner(
-        var scope: Scope = Scope.defaultScope(),
-        val useDefinitions: Boolean = true) : DefaultVisitor<SMVExpr>() {
+    var scope: Scope = Scope.defaultScope(),
+    val useDefinitions: Boolean = true,
+) : DefaultVisitor<SMVExpr>() {
     override fun defaultVisit(obj: Any) = throw IllegalStateException("Symbolic Executioner does not handle $obj")
 
     private val varCache = HashMap<String, SVariable>()
@@ -61,13 +78,9 @@ open class SymbolicExecutioner(
         push(SymbolicState(globalState))
     }
 
-    fun peek(): SymbolicState {
-        return state.peek()
-    }
+    fun peek(): SymbolicState = state.peek()
 
-    fun pop(): SymbolicState {
-        return state.pop()
-    }
+    fun pop(): SymbolicState = state.pop()
     //endregion
 
     @JvmOverloads
@@ -81,7 +94,6 @@ open class SymbolicExecutioner(
         } catch (e: NullPointerException) {
             throw UnknownDatatype("Datatype not given/inferred for variable $vd ${vd.dataType}", e)
         }
-
     }
 
     fun lift(vd: SymbolicReference): SVariable {
@@ -99,8 +111,9 @@ open class SymbolicExecutioner(
                 return lift(scope.getVariable(vd))
             } catch (e: Exception) {
                 throw UnknownVariableException(
-                        "Variable access to not declared variable: ${IEC61131Facade.print(vd)}." +
-                                " Line: ${vd.startPosition}")
+                    "Variable access to not declared variable: ${IEC61131Facade.print(vd)}." +
+                        " Line: ${vd.startPosition}",
+                )
             }
         }
     }
@@ -110,7 +123,7 @@ open class SymbolicExecutioner(
         val left = binaryExpression.leftExpr.accept(this)!!
         val right = binaryExpression.rightExpr.accept(this)!!
         return this.operationMap
-                .translateBinaryOperator(left, binaryExpression.operator, right)
+            .translateBinaryOperator(left, binaryExpression.operator, right)
     }
 
     override fun visit(u: UnaryExpression): SMVExpr {
@@ -120,7 +133,7 @@ open class SymbolicExecutioner(
 
     override fun visit(symbolicReference: SymbolicReference): SMVExpr {
         return peek()[lift(symbolicReference)]
-                ?: throw IllegalStateException("Could not resolve access to '${symbolicReference.toHuman()}'.")
+            ?: throw IllegalStateException("Could not resolve access to '${symbolicReference.toHuman()}'.")
         /* Enum already be resoled
         if (symbolicReference.dataType is EnumerateType && (symbolicReference.dataType as EnumerateType)
                         .allowedValues.contains(symbolicReference.identifier))
@@ -133,17 +146,15 @@ open class SymbolicExecutioner(
     //endregion
 
     //region visitors
-    override fun visit(literal: Literal): SLiteral {
-        return this.valueTranslator.translate(literal)
-    }
+    override fun visit(literal: Literal): SLiteral = this.valueTranslator.translate(literal)
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = visit(functionBlockDeclaration as PouExecutable)
     override fun visit(programDeclaration: ProgramDeclaration) = visit(programDeclaration as PouExecutable)
     fun visit(exec: PouExecutable): SMVExpr? {
         exec.findAttributePragma("smv_body")?.let {
             val smvBody = SmvBody(it)
-            //TODO do not execute body use value of smvBody instead
-            //TODO allow introduction of new smv input variables
+            // TODO do not execute body use value of smvBody instead
+            // TODO allow introduction of new smv input variables
         }
 
         scope = exec.scope
@@ -173,7 +184,7 @@ open class SymbolicExecutioner(
 
     override fun visit(statements: StatementList): SCaseExpression? {
         for (s in statements) {
-            if (s is ExitStatement || s is ReturnStatement) { //TODO throw exception to handle everything
+            if (s is ExitStatement || s is ReturnStatement) { // TODO throw exception to handle everything
                 return null
             }
             s.accept(this)
@@ -182,7 +193,7 @@ open class SymbolicExecutioner(
     }
 
     override fun visit(invocation: Invocation): SMVExpr? {
-        //val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
+        // val fd = scope.resolveFunction(invocation) ?: throw FunctionUndefinedException(invocation)
         val inv = when (val i = invocation.invoked) {
             is Action -> i.action
             is Program -> i.program
@@ -201,8 +212,7 @@ open class SymbolicExecutioner(
         val scope = (inv as? HasScope)?.scope!!
         val fName = (inv as Identifiable).name
 
-
-        //initialize data structure
+        // initialize data structure
         val calleeState = SymbolicState(globalState)
         val callerState = peek()
 
@@ -216,17 +226,16 @@ open class SymbolicExecutioner(
 
         //region local variables (declaration and initialization)
         for (vd in scope.variables) {
-            //if (!calleeState.containsKey(vd.getName())) {
+            // if (!calleeState.containsKey(vd.getName())) {
             val expr = this.valueTranslator.translate(vd.initValue!!)
-            calleeState.assign(lift(vd), assignmentCounter.incrementAndGet(), expr) //TODO maintain map?
-            //}
+            calleeState.assign(lift(vd), assignmentCounter.incrementAndGet(), expr) // TODO maintain map?
+            // }
         }
         //endregion
 
         //region transfer variables
         val parameters = invocation.parameters
-        val inputVars = scope.filterByFlags(
-                VariableDeclaration.INPUT or VariableDeclaration.INOUT)
+        val inputVars = scope.filterByFlags(VariableDeclaration.INPUT or VariableDeclaration.INOUT)
 
         require(parameters.size == inputVars.size) {
             "Inappropriate number of parameters. ${parameters.size} given, but ${inputVars.size} expected."
@@ -239,9 +248,11 @@ open class SymbolicExecutioner(
             }
             if (parameter.name == null) {
                 // name from definition, in order of declaration, expression from caller site
-                calleeState.assign(lift(inputVars[i]),
-                        assignmentCounter.incrementAndGet(),
-                        parameter.expression.accept(this)!!)
+                calleeState.assign(
+                    lift(inputVars[i]),
+                    assignmentCounter.incrementAndGet(),
+                    parameter.expression.accept(this)!!,
+                )
             } else {
                 val o = inputVars.stream().filter { iv -> iv.name == parameter.name }.findAny()
                 if (o.isPresent) {
@@ -252,29 +263,30 @@ open class SymbolicExecutioner(
         }
 
         for (outputVar in scope.filterByFlags(VariableDeclaration.OUTPUT)) {
-            calleeState.assign(lift(outputVar), assignmentCounter.incrementAndGet(),
-                    this.valueTranslator.translate(
-                            this.initValueTranslator.getInit(outputVar.dataType!!)))
+            calleeState.assign(
+                lift(outputVar),
+                assignmentCounter.incrementAndGet(),
+                this.valueTranslator.translate(this.initValueTranslator.getInit(outputVar.dataType!!)),
+            )
         }
         //endregion
 
         //region execution of body
         val returnState =
-                if (stBody != null) {
-                    push(calleeState)
-                    stBody.accept(this)
-                    pop()
-                } else if (ilBody != null) {
-                    val ilsymbex = IlSymbex(ilBody, scope = scope, state = calleeState)
-                    ilsymbex.call()
-                } else {
-                    throw IllegalStateException("No executable body found for $fName")
-                }
+            if (stBody != null) {
+                push(calleeState)
+                stBody.accept(this)
+                pop()
+            } else if (ilBody != null) {
+                val ilsymbex = IlSymbex(ilBody, scope = scope, state = calleeState)
+                ilsymbex.call()
+            } else {
+                throw IllegalStateException("No executable body found for $fName")
+            }
 
         // Update output variables
         val outputParameters = invocation.outputParameters
-        val outputVars = scope.filterByFlags(
-                VariableDeclaration.OUTPUT, VariableDeclaration.INOUT)
+        val outputVars = scope.filterByFlags(VariableDeclaration.OUTPUT, VariableDeclaration.INOUT)
 
         for (parameter in outputParameters) {
             val o = outputVars.find { fName == parameter.name }
@@ -308,15 +320,18 @@ open class SymbolicExecutioner(
             push()
             statements.accept(this)
             branchStates.addBranch(condition, pop())
-            assignIBC(iln, condition1.startPosition,
-                    branchConditionDefinitions and condition);
+            assignIBC(
+                iln,
+                condition1.startPosition,
+                branchConditionDefinitions and condition,
+            )
             branchConditionDefinitions = branchConditionDefinitions and condition.not()
         }
 
         push()
         ifStatement.elseBranch.accept(this)
         branchStates.addBranch(SLiteral.TRUE, pop())
-        assignIBC(iln, ifStatement.elseBranch.startPosition, branchConditionDefinitions);
+        assignIBC(iln, ifStatement.elseBranch.startPosition, branchConditionDefinitions)
 
         val cur = peek()
         val combined = branchStates.asCompressed(ifStatement.endPosition)
@@ -326,8 +341,11 @@ open class SymbolicExecutioner(
     }
 
     private fun assignIBC(ifLine: Position, branchLine: Position, condition: SMVExpr) {
-        val identifier = String.format("bc_%03d_%03d_", ifLine.lineNumber,
-                max(0, branchLine.lineNumber))
+        val identifier = String.format(
+            "bc_%03d_%03d_",
+            ifLine.lineNumber,
+            max(0, branchLine.lineNumber),
+        )
         val key = SVariable(identifier, SMVTypes.BOOLEAN)
         peek().auxiliaryDefinitions[key] = condition
         lineNumberMap.markAsBranchCondition(identifier, ifLine, branchLine)
@@ -338,7 +356,7 @@ open class SymbolicExecutioner(
         var branchCondition: SMVExpr = SLiteral.TRUE
         for (gs in caseStatement.cases) {
             val condition = buildCondition(caseStatement.expression, gs)
-            assignIBC(caseStatement.startPosition, gs.startPosition, branchCondition and condition);
+            assignIBC(caseStatement.startPosition, gs.startPosition, branchCondition and condition)
             branchCondition = branchCondition and condition.not()
             push()
             gs.statements.accept(this)
@@ -346,8 +364,11 @@ open class SymbolicExecutioner(
         }
 
         if (caseStatement.elseCase.isNotEmpty()) {
-            assignIBC(caseStatement.startPosition, caseStatement.elseCase.startPosition,
-                    branchCondition)
+            assignIBC(
+                caseStatement.startPosition,
+                caseStatement.elseCase.startPosition,
+                branchCondition,
+            )
             push()
             caseStatement.elseCase.accept(this)
             branchStates.addBranch(SLiteral.TRUE, pop())
@@ -361,9 +382,9 @@ open class SymbolicExecutioner(
     private fun buildCondition(e: Expression, c: Case): SMVExpr {
         caseExpression = e
         return c.conditions
-                .map { a -> a.accept(this) }
-                .map { it!! }
-                .reduce(SMVFacade.reducerKt(SBinaryOperator.OR))
+            .map { a -> a.accept(this) }
+            .map { it!! }
+            .reduce(SMVFacade.reducerKt(SBinaryOperator.OR))
     }
 
     override fun visit(r: CaseCondition.Range): SMVExpr {
@@ -381,13 +402,12 @@ open class SymbolicExecutioner(
     override fun visit(e: CaseCondition.Enumeration): SMVExpr {
         val be = BinaryExpression(caseExpression!!, Operators.EQUALS, e.start)
         return be.accept(this)!!
-        //TODO rework case conditions
+        // TODO rework case conditions
     }
 
-    //ignore
+    // ignore
     override fun visit(commentStatement: CommentStatement) = null
     //endregion
-
 
     val lineNumberMap = LineMap()
     val assignmentCounter = AtomicInteger(-1)
@@ -421,8 +441,9 @@ open class SymbolicExecutioner(
             val postfix = String.format("%s%05d", ASSIGN_SEPARATOR, cnt)
             sv.push(u.compress(), postfix)
 
-            if (sv is SymbolicVariableTracing)
+            if (sv is SymbolicVariableTracing) {
                 defines[t]?.let { sv.values.putAll(it) }
+            }
             sb.variables[t] = sv
         }
         return sb
@@ -457,7 +478,7 @@ open class SymbolicExecutioner(
                     val v = lift(ref)
                     val uniqueInput = SVariable(HAVOC_PREFIX + name + "_" + index, v.dataType!!)
                     peek().assign(v, cnt, uniqueInput)
-                    peek().auxiliaryDefinitions[uniqueInput] = SLiteral.TRUE;
+                    peek().auxiliaryDefinitions[uniqueInput] = SLiteral.TRUE
                 }
             }
         }
@@ -474,8 +495,9 @@ class SymbolicBranches {
     fun addBranch(condition: SMVExpr, state: SymbolicState) {
         for ((key, value) in state.variables) {
             getVariable(key).add(condition, value.value)
-            if (value is SymbolicVariableTracing)
+            if (value is SymbolicVariableTracing) {
                 getDefines(key).putAll(value.values)
+            }
         }
         this.auxiliary.putAll(state.auxiliaryDefinitions)
     }

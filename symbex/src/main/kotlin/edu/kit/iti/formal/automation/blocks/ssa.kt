@@ -1,10 +1,27 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.blocks
 
 import edu.kit.iti.formal.automation.IEC61131Facade
 import edu.kit.iti.formal.automation.SymbExFacade
 import edu.kit.iti.formal.automation.datatypes.AnyBit
 import edu.kit.iti.formal.automation.datatypes.values.FALSE
-import edu.kit.iti.formal.automation.rvt.SymbolicExecutioner
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.smv.ast.SCaseExpression
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -26,7 +43,7 @@ fun BlockProgram.ssa() {
 private fun BlockProgram.prepareSSA() {
     this.blocks.forEach {
         symbex.push()
-        val program = ProgramDeclaration(scope=scope, stBody = it.statements)
+        val program = ProgramDeclaration(scope = scope, stBody = it.statements)
         IEC61131Facade.resolveDataTypes(PouElements.singleton(program))
         program.accept(symbex)
         val sstate = symbex.pop()
@@ -34,8 +51,8 @@ private fun BlockProgram.prepareSSA() {
     }
 }
 
+private const val ERROR_FLAG = "__ERROR__"
 private fun BlockProgram.ensureErrorFlag() {
-    val ERROR_FLAG = "__ERROR__"
     if (ERROR_FLAG !in scope.variables) {
         val vd = VariableDeclaration(ERROR_FLAG, VariableDeclaration.LOCAL, AnyBit.BOOL)
         vd.initValue = FALSE
@@ -46,10 +63,11 @@ private fun BlockProgram.ensureErrorFlag() {
 fun BlockProgram.unrollLoops(k: Int = 1) {
     while (true) {
         val loop = findCycle()
-        if (loop != null)
+        if (loop != null) {
             unrollLoop(loop, k)
-        else
+        } else {
             break
+        }
     }
 }
 
@@ -74,7 +92,8 @@ fun BlockProgram.unrollLoop(loop: List<Block>, k: Int) {
         val replacement = loop.zip(copy).toMap()
         edges.forEach { (from, to) ->
             when {
-                from == loopEnd && to == loopStart -> { /* skip */
+                from == loopEnd && to == loopStart -> {
+                    /* skip */
                 }
                 from in loop && to in loop -> {
                     val newFrom = replacement[from]!!
@@ -85,7 +104,7 @@ fun BlockProgram.unrollLoop(loop: List<Block>, k: Int) {
                     val newFrom = replacement[from]!!
                     newProgram.edges += newFrom to to
                 }
-                //Jump into the loop is not allowed
+                // Jump into the loop is not allowed
                 // or should it go to the first iteration?
             }
         }
@@ -99,9 +118,11 @@ fun BlockProgram.unrollLoop(loop: List<Block>, k: Int) {
 
         lastBlock = copy.last()
     }
-    val errorBlock = Block("unsuff_bounds_$loopId",
-            loopStart.executionCondition,
-            StatementList("__ERROR__" assignTo BooleanLit.LTRUE))
+    val errorBlock = Block(
+        "unsuff_bounds_$loopId",
+        loopStart.executionCondition,
+        StatementList("__ERROR__" assignTo BooleanLit.LTRUE),
+    )
     newProgram.blocks += errorBlock
     newProgram.edges += lastBlock to errorBlock
     newProgram.edges += errorBlock to endBlock
@@ -125,12 +146,12 @@ private fun BlockProgram.ssaTopsort() {
     val blocks = topsorted()
     blocks.forEach {
         val incoming = incomingEdges(it)
-                .map { (from, _) -> from }
-                .toList()
+            .map { (from, _) -> from }
+            .toList()
 
-        //1. Update execution condition.
-        //2. Update state
-        if (incoming.isEmpty()) { //No incoming edge. The terms stands for itself.
+        // 1. Update execution condition.
+        // 2. Update state
+        if (incoming.isEmpty()) { // No incoming edge. The terms stand for itself.
             it.ssaExecutionCondition = SymbExFacade.evaluateExpression(it.executionCondition, scope)
             it.ssaMutation = HashMap(it.localMutationMap)
         } else {
@@ -145,19 +166,17 @@ private fun BlockProgram.ssaTopsort() {
     }
 }
 
-private fun calcIncomingSymbolicState(incoming: List<Block>): Map<SVariable, SMVExpr> {
-    return if (incoming.size == 1) {
-        incoming.first().ssaMutation.toMutableMap()
-    } else {
-        val c = HashMap<SVariable, SCaseExpression>()
-        incoming.forEach { b ->
-            val exc = b.ssaExecutionCondition
-            val incomingSSA = b.ssaMutation
-            incomingSSA.forEach { t, u ->
-                val case = c.computeIfAbsent(t) { SCaseExpression() } as SCaseExpression
-                case.add(exc, u)
-            }
+private fun calcIncomingSymbolicState(incoming: List<Block>): Map<SVariable, SMVExpr> = if (incoming.size == 1) {
+    incoming.first().ssaMutation.toMutableMap()
+} else {
+    val c = HashMap<SVariable, SCaseExpression>()
+    incoming.forEach { b ->
+        val exc = b.ssaExecutionCondition
+        val incomingSSA = b.ssaMutation
+        incomingSSA.forEach { t, u ->
+            val case = c.computeIfAbsent(t) { SCaseExpression() }
+            case.add(exc, u)
         }
-        c.map { (t, u) -> t to u.compress() }.toMap().toMutableMap()
     }
+    c.map { (t, u) -> t to u.compress() }.toMap().toMutableMap()
 }

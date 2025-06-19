@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.model
 
 import edu.kit.iti.formal.automation.datatypes.AnyDt
@@ -20,7 +38,6 @@ import kotlin.collections.HashMap
 import kotlin.math.abs
 import kotlin.math.min
 
-
 enum class ColumnCategory { ASSUME, ASSERT }
 
 sealed class Variable : Identifiable {
@@ -28,10 +45,9 @@ sealed class Variable : Identifiable {
     abstract var dataType: AnyDt
     abstract var logicType: SMVType
 
-    open fun externalVariable(programRunNames: List<String>, tableName: String) :SVariable
-            = internalVariable(programRunNames).inModule(tableName) as SVariable
+    open fun externalVariable(programRunNames: List<String>, tableName: String): SVariable = internalVariable(programRunNames).inModule(tableName) as SVariable
 
-    open fun internalVariable(programRunNames: List<String>):SVariable = SVariable(name, logicType)
+    open fun internalVariable(programRunNames: List<String>): SVariable = SVariable(name, logicType)
 }
 
 abstract class ColumnVariable(open var category: ColumnCategory = ColumnCategory.ASSUME) : Variable() {
@@ -58,7 +74,8 @@ data class ProgramVariable(
     override var category: ColumnCategory = ColumnCategory.ASSUME,
     var isState: Boolean = false,
     var isNext: Boolean = false,
-    var programRun: Int = 0) : ColumnVariable(category) {
+    var programRun: Int = 0,
+) : ColumnVariable(category) {
 
     override val humanCategory: String
         get() {
@@ -68,11 +85,10 @@ data class ProgramVariable(
                 isNext && isState && category == ColumnCategory.ASSUME -> "state' assume"
                 isNext && isState && category == ColumnCategory.ASSERT -> "state' assert"
                 isNext && !isState && category == ColumnCategory.ASSERT -> "output"
-                //!isNext && isState && category == ColumnCategory.ASSUME -> "input"
+                // !isNext && isState && category == ColumnCategory.ASSUME -> "input"
                 else -> ""
             }
         }
-
 
     override fun respondTo(name: String, run: Int?) = name == this.name && (run == null || programRun == run)
     override fun clone() = copy()
@@ -82,8 +98,7 @@ data class ProgramVariable(
     /**
      *
      */
-    override fun externalVariable(programRunNames: List<String>, tableName: String) =
-        SVariable("${programRunNames[programRun]}.$realName", logicType)
+    override fun externalVariable(programRunNames: List<String>, tableName: String) = SVariable("${programRunNames[programRun]}.$realName", logicType)
 
     /**
      *
@@ -95,16 +110,16 @@ data class ConstraintVariable(
     override var name: String,
     override var dataType: AnyDt,
     override var logicType: SMVType,
-    var constraint: TestTableLanguageParser.CellContext? = null)
-    : Variable()
+    var constraint: TestTableLanguageParser.CellContext? = null,
+) : Variable()
 
 data class ProjectionVariable(
     override var name: String,
     override var dataType: AnyDt,
     override var logicType: SMVType,
     override var category: ColumnCategory = ColumnCategory.ASSUME,
-    var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf())
-    : ColumnVariable(category) {
+    var constraint: MutableList<TestTableLanguageParser.ExprContext> = arrayListOf(),
+) : ColumnVariable(category) {
 
     val arity: Int
         get() = constraint.size
@@ -112,16 +127,13 @@ data class ProjectionVariable(
     val argumentDefinitions: List<SVariable>
         get() = (0 until arity).map { SVariable("${name}_$it") }
 
-
     override fun respondTo(name: String, run: Int?) = name == this.name
     override fun clone() = copy()
-
 
     /**
      *
      */
-    override fun externalVariable(programRunNames: List<String>, tableName: String) =
-        SVariable("$tableName.$name", logicType)
+    override fun externalVariable(programRunNames: List<String>, tableName: String) = SVariable("$tableName.$name", logicType)
 
     /**
      *
@@ -144,23 +156,22 @@ class ParseContext(
     val vars: MutableMap<Variable, SVariable> = hashMapOf(),
     val refs: MutableMap<SVariable, Int> = hashMapOf(),
     val functions: MutableMap<String, SmvFunctionDefinition> = hashMapOf(),
-    val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf()) {
+    val fillers: MutableMap<ColumnVariable, TestTableLanguageParser.CellContext> = hashMapOf(),
+) {
 
     fun isVariable(v: String) = v in this
-    fun getSMVVariable(v: Variable) =
-        vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
+    fun getSMVVariable(v: Variable) = vars.computeIfAbsent(v) { v.internalVariable(programRuns) }
 
-    fun getReference(variable: SVariable, cycles: Int): SVariable =
-        when {
-            cycles == 0 -> variable
-            cycles > 0 -> throw IllegalArgumentException("no future references are allowed.")
-            else -> {
-                val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
-                val ref = SVariable(newName, variable.dataType!!)
-                refs[variable] = min(refs.getOrDefault(variable, cycles), cycles)
-                ref
-            }
+    fun getReference(variable: SVariable, cycles: Int): SVariable = when {
+        cycles == 0 -> variable
+        cycles > 0 -> throw IllegalArgumentException("no future references are allowed.")
+        else -> {
+            val newName = GetetaFacade.getHistoryName(variable, abs(cycles))
+            val ref = SVariable(newName, variable.dataType!!)
+            refs[variable] = min(refs.getOrDefault(variable, cycles), cycles)
+            ref
         }
+    }
 
     operator fun contains(varText: String) = vars.keys.any { it.name == varText }
 
@@ -170,20 +181,21 @@ class ParseContext(
             return getSMVVariable(globalVar)
         }
 
-        val va = if (programRun != null)
+        val va = if (programRun != null) {
             vars.keys.find { it.name == v && (it as? ProgramVariable)?.programRun == programRun }
-                ?: throw IllegalArgumentException("Could not find a variable for $programRun|>$v in signature. " +
-                        "Signature is ${vars.keys.joinToString { it.name }}")
-        else
+                ?: throw IllegalArgumentException(
+                    "Could not find a variable for $programRun|>$v in signature. " +
+                        "Signature is ${vars.keys.joinToString { it.name }}",
+                )
+        } else {
             vars.keys.find { it.name == v }
                 ?: throw IllegalArgumentException("Could not find a variable for $v in signature.")
+        }
 
         return getSMVVariable(va)
     }
 
-    fun getFunction(varName: String?): SmvFunctionDefinition? {
-        return functions[varName] ?: findDefaultFunction(varName)
-    }
+    fun getFunction(varName: String?): SmvFunctionDefinition? = functions[varName] ?: findDefaultFunction(varName)
 
     private fun findDefaultFunction(varName: String?): SmvFunctionDefinition? {
         if (varName == null) return null
@@ -200,7 +212,7 @@ class GeneralizedTestTable(
     var properties: MutableMap<String, String> = HashMap(),
     var region: Region = Region(0),
     val functions: LookupList<FunctionDeclaration> = ArrayLookupList(),
-    var programRuns: List<String> = arrayListOf()
+    var programRuns: List<String> = arrayListOf(),
 ) {
     val options: TableOptions by lazy {
         TableOptions(properties)
@@ -250,7 +262,7 @@ class GeneralizedTestTable(
         properties[key] = value
     }
 
-    val DEFAULT_CELL_CONTENT = "-"
+    val defaultCellContent = "-"
 
     fun generateSmvExpression(): ParseContext {
         region.flat().forEach {
@@ -266,7 +278,7 @@ class GeneralizedTestTable(
         }
         programVariables.forEach {
             vc.getSMVVariable(it)
-            vc.fillers[it] = GetetaFacade.parseCell(DEFAULT_CELL_CONTENT).cell()
+            vc.fillers[it] = GetetaFacade.parseCell(defaultCellContent).cell()
         }
 
         functions.forEach { fd ->
@@ -311,7 +323,8 @@ enum class DurationModifier {
     PFLAG_IO,
     HFLAG_IO,
     PFLAG_I,
-    HFLAG_I;
+    HFLAG_I,
+    ;
 
     fun repr(): String = when (this) {
         NONE -> ""
@@ -328,7 +341,6 @@ enum class DurationModifier {
         PFLAG_I -> "\\progressinput"
         HFLAG_I -> "\\holdinput"
     }
-
 }
 
 sealed class Duration {
@@ -408,21 +420,17 @@ sealed class Duration {
     abstract operator fun contains(cycles: Int): Boolean
 }
 
+fun Duration.repr(): String = when (this) {
+    is Duration.ClosedInterval -> "[$lower, $upper]"
+    Duration.Omega -> "omega"
+    is Duration.OpenInterval -> ">=$lower"
+}
 
-fun Duration.repr(): String =
-    when (this) {
-        is Duration.ClosedInterval -> "[$lower, $upper]"
-        Duration.Omega -> "omega"
-        is Duration.OpenInterval -> ">=$lower"
-    }
-
-fun Duration.isOptional(time: Int): Boolean =
-    when (this) {
-        is Duration.ClosedInterval -> lower <= time
-        Duration.Omega -> false
-        is Duration.OpenInterval -> lower <= time
-    }
-
+fun Duration.isOptional(time: Int): Boolean = when (this) {
+    is Duration.ClosedInterval -> lower <= time
+    Duration.Omega -> false
+    is Duration.OpenInterval -> lower <= time
+}
 
 sealed class TableNode(open var id: String, var duration: Duration = Duration.ClosedInterval(1, 1)) {
     var gotos: MutableList<GotoTransition> = arrayListOf()
@@ -434,14 +442,19 @@ sealed class TableNode(open var id: String, var duration: Duration = Duration.Cl
     abstract fun visit(visitor: (TableNode) -> Unit)
 }
 
-data class Region(override var id: String,
-                  var children: MutableList<TableNode> = arrayListOf()) : TableNode(id) {
+data class Region(
+    override var id: String,
+    var children: MutableList<TableNode> = arrayListOf(),
+) : TableNode(id) {
     constructor(id: Int) : this("$id")
 
     override fun count(): Int = this.children.sumOf { it.count() }
     override fun flat(): List<TableRow> = this.children.flatMap { a -> a.flat() }
     override fun depth() = 1 + (this.children.maxByOrNull { it.depth() }?.depth() ?: 0)
-    override fun clone(): TableNode = copy().also { it.id = id; it.duration = duration }
+    override fun clone(): TableNode = copy().also {
+        it.id = id
+        it.duration = duration
+    }
     override fun visit(visitor: (TableNode) -> Unit) {
         visitor(this)
         children.forEach { it.visit(visitor) }
@@ -451,7 +464,7 @@ data class Region(override var id: String,
 data class GotoTransition(
     var tableName: String,
     var rowId: String,
-    var kind: Kind = Kind.PASS
+    var kind: Kind = Kind.PASS,
 ) {
     enum class Kind { PASS, MISS, FAIL }
 }
@@ -508,7 +521,6 @@ data class TableRow(override var id: String) : TableNode(id) {
         get() = controlCommands.filterIsInstance<ControlCommand.Backward>()
             .map { it.jumpToRow }
 
-
     /*override val automataStates: MutableList<AutomatonState> = ArrayList()
         get() {
             if (field.isEmpty()) {
@@ -528,7 +540,7 @@ data class TableRow(override var id: String) : TableNode(id) {
             assert(field.size != 0)
             return field
         }
-    */
+     */
 
     var isInitialReachable: Boolean = false
     var isEndState: Boolean = false
@@ -574,7 +586,7 @@ data class TableRow(override var id: String) : TableNode(id) {
     override fun visit(visitor: (TableNode) -> Unit) = visitor(this)
 }
 
-sealed class ControlCommand() {
+sealed class ControlCommand {
     abstract val affectedProgramRun: Int
 
     data class Backward(override var affectedProgramRun: Int, var jumpToRow: String) : ControlCommand()
@@ -582,20 +594,18 @@ sealed class ControlCommand() {
     data class Play(override var affectedProgramRun: Int) : ControlCommand()
 }
 
-
 fun TableRow.getUsedGlobalVariables(gtt: GeneralizedTestTable): List<ConstraintVariable> {
-    fun contains(cv: ConstraintVariable, ctx: TestTableLanguageParser.CellContext?): Boolean {
-        return if (ctx != null) {
-            var found = false
-            ctx.accept(object : TestTableLanguageParserBaseVisitor<Unit>() {
-                override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) {
-                    if (ctx.name.text == cv.name) found = true
-                    super.visitVariable(ctx)
-                }
-            })
-            found
-        } else
-            false
+    fun contains(cv: ConstraintVariable, ctx: TestTableLanguageParser.CellContext?): Boolean = if (ctx != null) {
+        var found = false
+        ctx.accept(object : TestTableLanguageParserBaseVisitor<Unit>() {
+            override fun visitVariable(ctx: TestTableLanguageParser.VariableContext) {
+                if (ctx.name.text == cv.name) found = true
+                super.visitVariable(ctx)
+            }
+        })
+        found
+    } else {
+        false
     }
 
     val seq = rawFields.values

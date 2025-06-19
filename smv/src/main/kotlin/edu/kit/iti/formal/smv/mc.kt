@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.util.info
@@ -6,21 +24,49 @@ import java.io.File
 import java.io.StringReader
 import java.util.concurrent.Callable
 
-
 /**
  * This enum contains possible commands sequences for nuXmv reachability checking.
  * @author Alexander Weigl
  * @version 1 (11.09.17)
  */
 enum class NuXMVInvariantsCommand(vararg val commands: String) {
-    IC3("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
-            "build_boolean_model", "check_invar_ic3", "quit"),
-    LTL("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
-            "build_model", "check_ltlspec", "quit"),
-    INVAR("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
-            "build_model", "check_invar", "quit"),
-    BMC("read_model", "flatten_hierarchy", "show_vars", "encode_variables",
-            "build_boolean_model", "bmc_setup", "check_invar_bmc -a een-sorensson", "quit")
+    IC3(
+        "read_model",
+        "flatten_hierarchy",
+        "show_vars",
+        "encode_variables",
+        "build_boolean_model",
+        "check_invar_ic3",
+        "quit",
+    ),
+    LTL(
+        "read_model",
+        "flatten_hierarchy",
+        "show_vars",
+        "encode_variables",
+        "build_model",
+        "check_ltlspec",
+        "quit",
+    ),
+    INVAR(
+        "read_model",
+        "flatten_hierarchy",
+        "show_vars",
+        "encode_variables",
+        "build_model",
+        "check_invar",
+        "quit",
+    ),
+    BMC(
+        "read_model",
+        "flatten_hierarchy",
+        "show_vars",
+        "encode_variables",
+        "build_boolean_model",
+        "bmc_setup",
+        "check_invar_bmc -a een-sorensson",
+        "quit",
+    ),
 }
 
 /**
@@ -28,14 +74,14 @@ enum class NuXMVInvariantsCommand(vararg val commands: String) {
  * Currently, it sets the TRACE plugin to XML output.
  */
 val PREAMBLE = listOf(
-        "set default_trace_plugin 6"
+    "set default_trace_plugin 6",
 )
 
 /**
  * This array is a list of commands we need to set for every nuXmv instance.
  */
 val POSTAMBLE = listOf(
-        "quit"
+    "quit",
 )
 
 typealias NuXMVOutputParser = (txt: String) -> NuXMVOutput
@@ -43,24 +89,24 @@ typealias NuXMVOutputParser = (txt: String) -> NuXMVOutput
 /**
  * @author Alexander Weigl
  */
-class ProcessRunner(val commandLine: Array<String>,
-                    val stdin: File,
-                    var workingDirectory: File = File("."),
-                    var stdoutFile: File = File(workingDirectory, "stdout.log")
+class ProcessRunner(
+    val commandLine: Array<String>,
+    val stdin: File,
+    var workingDirectory: File = File("."),
+    var stdoutFile: File = File(workingDirectory, "stdout.log"),
 ) : Callable<String> {
 
     override fun call(): String {
         val pb = ProcessBuilder(*commandLine)
-                //.redirectError(stderrFile)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .directory(workingDirectory)
-                .redirectErrorStream(true)
-                .redirectOutput(stdoutFile)
-                .redirectInput(stdin)
+            // .redirectError(stderrFile)
+            .redirectError(ProcessBuilder.Redirect.PIPE)
+            .directory(workingDirectory)
+            .redirectErrorStream(true)
+            .redirectOutput(stdoutFile)
+            .redirectInput(stdin)
         val process = pb.start()
         // destroy the sub-process, if java is killed
-        Runtime.getRuntime().addShutdownHook(
-                Thread { if (process.isAlive) process.destroyForcibly() })
+        Runtime.getRuntime().addShutdownHook(Thread { if (process.isAlive) process.destroyForcibly() })
         process.waitFor()
 
         return stdoutFile.bufferedReader().readText()
@@ -84,10 +130,12 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
             info(commands.joinToString(" "))
             info("nuXmv working dir=\"$workingDirectory\"")
             info("nuXmv: results=\"$outputFile\"")
-            val pr = ProcessRunner(commands,
-                    commandFile,
-                    workingDirectory,
-                    outputFile)
+            val pr = ProcessRunner(
+                commands,
+                commandFile,
+                workingDirectory,
+                outputFile,
+            )
             val output = pr.call()
             val result = outputParser(output)
             return result
@@ -99,7 +147,7 @@ class NuXMVProcess(var moduleFile: File, val commandFile: File) : Callable<NuXMV
 }
 
 val COMMAND_FILE = "commands.xmv"
-//val commandFile = writeNuxmvCommandFile(commands, File(workingDirectory, NuXMVProcess.COMMAND_FILE))
+// val commandFile = writeNuxmvCommandFile(commands, File(workingDirectory, NuXMVProcess.COMMAND_FILE))
 
 fun writeNuxmvCommandFile(commands: Array<String>, f: File): File {
     f.bufferedWriter().use { fw ->
@@ -108,26 +156,23 @@ fun writeNuxmvCommandFile(commands: Array<String>, f: File): File {
     return f
 }
 
-
 /**
  *
  */
 data class CounterExample(
-        var type: Int = 0,
-        var id: Int = 0,
-        var desc: String = "",
-        val inputVariables: MutableSet<String> = hashSetOf(),
-        val states: MutableList<MutableMap<String, String>> = arrayListOf()
+    var type: Int = 0,
+    var id: Int = 0,
+    var desc: String = "",
+    val inputVariables: MutableSet<String> = hashSetOf(),
+    val states: MutableList<MutableMap<String, String>> = arrayListOf(),
 ) {
-    operator fun get(cycle: Int, name: String): String? =
-            try {
-                states[cycle][name]
-            } catch (e: IndexOutOfBoundsException) {
-                null
-            }
+    operator fun get(cycle: Int, name: String): String? = try {
+        states[cycle][name]
+    } catch (e: IndexOutOfBoundsException) {
+        null
+    }
 
     val stateSize: Int get() = states.size
-
 
     companion object {
         fun load(text: String): CounterExample {
@@ -178,16 +223,15 @@ sealed class NuXMVOutput {
 fun parseXmlOutput(text: String): NuXMVOutput {
     val lines = text.split('\n')
     val errorLinePredicate = { it: String ->
-        //empirical
-        it.contains("error") //<-- critical
-                || it.contains("syntax error")
-                || it.contains("TYPE ERROR")
-                || it.contains("undefined")
-                || it.contains("too few actual parameters")
-                || it.contains("aborting")
-                || it.contains("multiple declaration of identifier")
-
-
+        // empirical
+        it.contains("error") ||
+            // <-- critical
+            it.contains("syntax error") ||
+            it.contains("TYPE ERROR") ||
+            it.contains("undefined") ||
+            it.contains("too few actual parameters") ||
+            it.contains("aborting") ||
+            it.contains("multiple declaration of identifier")
     }
 
     if (errorLinePredicate(text)) {
@@ -201,7 +245,7 @@ fun parseXmlOutput(text: String): NuXMVOutput {
     if (idxCex != -1) {
         val closing = lines.lastIndexOf("</counter-example>")
         val xml = lines.slice(idxCex..closing)
-                .joinToString("\n")
+            .joinToString("\n")
         return NuXMVOutput.Cex(CounterExample.load(xml))
     }
     return NuXMVOutput.Verified
@@ -211,19 +255,18 @@ fun parseXmlOutput(text: String): NuXMVOutput {
  */
 fun getNuXmvVersion(command: String): String {
     val builder = ProcessBuilder(command)
-            .redirectErrorStream(true)
+        .redirectErrorStream(true)
     val process = builder.start()
-    //val stdin = process.outputStream
+    // val stdin = process.outputStream
     val stdout = process.inputStream
 
-    //stdin.bufferedWriter().write("quit\n")
+    // stdin.bufferedWriter().write("quit\n")
     val lines = stdout.bufferedReader().readLines()
     return getNuXmvVersion(lines)
 }
 
 fun getNuXmvVersion(lines: List<String>): String {
-    //*** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
+    // *** This is nuXmv 1.1.1 (compiled on Wed Jun  1 10:18:42 2016)
     val l = lines[0]
     return l.substringAfter("This is").substringBefore('(')
 }
-

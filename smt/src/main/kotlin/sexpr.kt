@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smt
 
 import org.antlr.v4.runtime.CharStream
@@ -43,7 +61,7 @@ object SExprFacade {
                 line: Int,
                 charPositionInLine: Int,
                 msg: String?,
-                e: RecognitionException?
+                e: RecognitionException?,
             ) {
                 super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e)
                 throw IllegalArgumentException("Syntax error at line $line:$charPositionInLine $msg")
@@ -66,7 +84,7 @@ object SExprFacade {
                 is String -> SSymbol(it)
                 is Int -> SNumber(BigInteger.valueOf(it.toLong()))
                 is Collection<*> -> sexpr(it)
-                //is Float -> SNumber(it)
+                // is Float -> SNumber(it)
                 else -> {
                     SSymbol("${it.javaClass} not supported")
                 }
@@ -77,6 +95,5 @@ object SExprFacade {
 
     fun fnapply(name: String, args: List<SExpr>) = SList(name).also { it.addAll(args) }
 
-    fun notEquals(left: SExpr, right: SExpr): SExpr =
-        SList("not", SList("=", left, right))
+    fun notEquals(left: SExpr, right: SExpr): SExpr = SList("not", SList("=", left, right))
 }

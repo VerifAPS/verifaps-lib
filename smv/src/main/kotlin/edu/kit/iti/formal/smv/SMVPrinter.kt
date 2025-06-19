@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
@@ -10,10 +28,7 @@ import java.io.FileWriter
 class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     val sort = true
 
-    override fun visit(top: SMVAst) {
-        throw IllegalArgumentException("not implemented for $top")
-    }
-
+    override fun visit(top: SMVAst): Unit = throw IllegalArgumentException("not implemented for $top")
 
     override fun visit(be: SBinaryExpression) {
         val pleft = precedence(be.left)
@@ -40,11 +55,14 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
             return expr.operator.precedence()
         }
 
-        return if (expr is SLiteral || expr is SVariable
-                || expr is SFunction) {
+        return if (expr is SLiteral ||
+            expr is SVariable ||
+            expr is SFunction
+        ) {
             -1
-        } else 1000
-
+        } else {
+            1000
+        }
     }
 
     override fun visit(ue: SUnaryExpression) {
@@ -125,7 +143,6 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         }
     }
 
-
     private fun printDefinition(assignments: List<SAssignment>) {
         stream.printf("DEFINE").increaseIndent()
 
@@ -165,8 +182,9 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         stream.print('(')
         func.arguments.forEachIndexed { i, e ->
             e.accept(this)
-            if (i + 1 < func.arguments.size)
+            if (i + 1 < func.arguments.size) {
                 stream.print(", ")
+            }
         }
         stream.print(')')
     }
@@ -194,8 +212,11 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
 
     private fun printVariables(type: String, v: List<SVariable>) {
         val vars =
-                if (sort) v.sorted()
-                else v
+            if (sort) {
+                v.sorted()
+            } else {
+                v
+            }
 
         if (vars.isNotEmpty()) {
             stream.print(type).increaseIndent()
@@ -212,7 +233,6 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
         }
     }
 
-
     override fun visit(v: SVariable) = printQuoted(v.name)
 
     fun printQuoted(name: String) {
@@ -220,17 +240,18 @@ class SMVPrinter(val stream: CodeWriter = CodeWriter()) : SMVAstVisitor<Unit> {
     }
 
     companion object {
-        private val RESERVED_KEYWORDS = hashSetOf("A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
-                "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
-                "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max")
+        private val RESERVED_KEYWORDS = hashSetOf(
+            "A", "E", "F", "G", "INIT", "MODULE", "case", "easc",
+            "next", "init", "TRUE", "FALSE", "in", "mod", "union", "process", "AU", "EU", "U", "V", "S",
+            "T", "EG", "EX", "EF", "AG", "AX", "AF", "X", "Y", "Z", "H", "O", "min", "max",
+        )
 
         private val regex by lazy {
             val rk = RESERVED_KEYWORDS.joinToString("|", "(", ")")
             "(?<![a-zA-Z\$_])($rk)(?![a-zA-Z\$_])".toRegex()
         }
 
-
-        fun quoted(name: String) :String {
+        fun quoted(name: String): String {
             /*return regex.replace(name) {
                 "\"${it.value}\""
             }*/

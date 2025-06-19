@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smt
 
 /**
@@ -34,15 +52,16 @@ interface CliSmtSolver : SmtSolver {
 }
 
 class CliSmtSolverImpl(
-        val smtFile: File = File.createTempFile("verifaps_", ".smt2"),
-        val command: Array<String>) : CliSmtSolver {
+    val smtFile: File = File.createTempFile("verifaps_", ".smt2"),
+    val command: Array<String>,
+) : CliSmtSolver {
     val out = smtFile.bufferedWriter()
     var smtOut: Reader? = null
 
     companion object {
         fun getZ3(): CliSmtSolverImpl {
             val z3 = findProgram("z3")
-                    ?: throw IllegalStateException("Could not find z3 in \$PATH.")
+                ?: throw IllegalStateException("Could not find z3 in \$PATH.")
             return CliSmtSolverImpl(command = arrayOf(z3.absolutePath, "-smt2"))
         }
     }
@@ -60,7 +79,7 @@ class CliSmtSolverImpl(
     override fun run(timeout: Long, unit: TimeUnit) {
         out.close()
         val pb = ProcessBuilder(*command, smtFile.absolutePath)
-                .redirectErrorStream(true)
+            .redirectErrorStream(true)
 
         val process = pb.start()
 
@@ -94,10 +113,11 @@ class TeeSolverCLI(val writeTo: Writer, val solver: InteractiveSmtSolver) : Inte
     override fun start() = solver.start()
 }
 
-//taken from stvs and modified
+// taken from stvs and modified
 class InteractiveSmtSolverImpl(
-        var timeout: Long = 10,
-        var command: Array<String> = arrayOf("z3", "-in", "-smt2")) : InteractiveSmtSolver {
+    var timeout: Long = 10,
+    var command: Array<String> = arrayOf("z3", "-in", "-smt2"),
+) : InteractiveSmtSolver {
 
     var process: Process? = null
     var smtIn: Writer? = null
@@ -106,10 +126,9 @@ class InteractiveSmtSolverImpl(
     companion object {
         fun getZ3(): InteractiveSmtSolverImpl {
             val z3 = findProgram("z3")
-                    ?: throw IllegalStateException("Could not find z3 in \$PATH.")
+                ?: throw IllegalStateException("Could not find z3 in \$PATH.")
             return InteractiveSmtSolverImpl(command = arrayOf(z3.absolutePath, "-in", "-smt2"))
         }
-
     }
 
     override fun dispose() {
@@ -153,14 +172,17 @@ class InteractiveSmtSolverImpl(
 internal fun readFirstSexpr(reader: Reader): String {
     val readSexpr = StringBuilder()
     var c: Int
-    //consume whitespaces
+    // consume whitespaces
     do {
         c = reader.read()
-        if (Character.isWhitespace(c)) continue
-        else break
+        if (Character.isWhitespace(c)) {
+            continue
+        } else {
+            break
+        }
     } while (true)
 
-    //End of stream, no further reading necessary
+    // End of stream, no further reading necessary
     if (c == -1) return ""
 
     when {

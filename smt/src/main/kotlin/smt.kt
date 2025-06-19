@@ -1,8 +1,25 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smt
 
 import kotlinx.coroutines.coroutineScope
 import java.math.BigInteger
-
 
 object SmtFacade {
 
@@ -26,7 +43,13 @@ object SmtFacade {
         val offset = byteLength - number.size
         val out = IntArray(byteLength) {
             val p = it - offset
-            val b = if (p >= 0) number[p].toInt() else if (neg) 255 else 0
+            val b = if (p >= 0) {
+                number[p].toInt()
+            } else if (neg) {
+                255
+            } else {
+                0
+            }
             if (b < 0) b + 256 else b
         }
 
@@ -84,9 +107,10 @@ object SmtFacade {
 }
 
 enum class SmtAnswer {
-    SAT, UNSAT, UNKNOWN
+    SAT,
+    UNSAT,
+    UNKNOWN,
 }
-
 
 /**
  *
@@ -104,7 +128,7 @@ abstract class SAtom : SExpr() {
 }
 
 data class SString(var value: String) : SAtom() {
-    override fun toString() = "\"$value\"";
+    override fun toString() = "\"$value\""
 }
 
 data class SNumber(var num: BigInteger) : SAtom() {
@@ -125,7 +149,9 @@ data class SSymbol(var text: String) : SAtom() {
     override fun toString() = if (text.any { Character.isWhitespace(it) }) "|$text|" else text
 }
 
-data class SList(val list: ArrayList<SExpr> = ArrayList()) : MutableList<SExpr> by list, SExpr() {
+data class SList(val list: ArrayList<SExpr> = ArrayList()) :
+    SExpr(),
+    MutableList<SExpr> by list {
     constructor(list: List<SExpr>) : this(ArrayList(list))
     constructor(vararg args: SExpr) : this() {
         args.forEach { add(it) }

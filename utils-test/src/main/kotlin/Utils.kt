@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 import java.io.File
 import java.io.IOException
 import java.net.URISyntaxException
@@ -7,7 +25,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.stream.Collectors
-
 
 /**
  *
@@ -27,7 +44,6 @@ object LoadHelp {
         val file = File(f.file)
         return file.listFiles() ?: arrayOf()
     }*/
-
 
     /**
      * List directory contents for a resource folder. Not recursive.
@@ -62,17 +78,17 @@ object LoadHelp {
 
         if (dirURL!!.protocol.equals("jar")) {
             /* A JAR path */
-            //strip out only the JAR file
+            // strip out only the JAR file
             var jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
-            if(jarPath.startsWith("/C:"))
+            if (jarPath.startsWith("/C:")) {
                 jarPath = jarPath.substring(1)
+            }
             val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
             val dir = fs.getPath(path)
             return Files.list(dir).collect(Collectors.toList())
         }
         throw UnsupportedOperationException("Cannot list files for URL $dirURL")
     }
-
 
     fun getResource(path: String, clazz: Class<*> = LoadHelp::class.java): Path? {
         val dirURL = clazz.classLoader.getResource(path)
@@ -84,17 +100,17 @@ object LoadHelp {
 
         if (dirURL.protocol.equals("jar")) {
             /* A JAR path */
-            //strip out only the JAR file
+            // strip out only the JAR file
             var jarPath = dirURL.path.substring(5, dirURL.path.indexOf("!"))
-            if(jarPath.startsWith("/C:"))
+            if (jarPath.startsWith("/C:")) {
                 jarPath = jarPath.substring(1)
+            }
             val fs = FileSystems.newFileSystem(Paths.get(jarPath), javaClass.classLoader)
             val dir = fs.getPath(path)
             return dir
         }
         throw UnsupportedOperationException("Cannot list files for URL $dirURL")
     }
-
 
     fun getPrograms() = getResources("edu/kit/iti/formal/automation/st/programs")
     fun getStatements() = getResources("edu/kit/iti/formal/automation/st/statements")
@@ -117,8 +133,9 @@ object TestUtils {
 
         ve.bufferedReader().use { stream ->
             stream.forEachLine {
-                if (!it.startsWith("#"))
+                if (!it.startsWith("#")) {
                     validExpression.add(it)
+                }
             }
         }
 
@@ -126,7 +143,5 @@ object TestUtils {
         return validExpression
     }
 
-    fun asParameters(cases: Array<String>): List<Array<Any>> {
-        return cases.map { arrayOf(it as Any) }
-    }
+    fun asParameters(cases: Array<String>): List<Array<Any>> = cases.map { arrayOf(it as Any) }
 }

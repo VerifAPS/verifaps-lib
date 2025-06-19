@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.datatypes.values
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.datatypes.values
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.sfclang.split
 import java.util.regex.Pattern
@@ -32,12 +28,15 @@ import java.util.regex.Pattern
  * @author weigl
  * @version $Id: $Id
  */
-data class TimeofDayData(var hours: Int = 0, var minutes: Int = 0,
-                         var seconds: Int = 0, var millieseconds: Int = 0) {
+data class TimeofDayData(
+    var hours: Int = 0,
+    var minutes: Int = 0,
+    var seconds: Int = 0,
+    var millieseconds: Int = 0,
+) {
     companion object {
         fun parse(tod: String): TimeofDayData {
-            val pattern = Pattern.compile(
-                    "(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?")
+            val pattern = Pattern.compile("(?<hour>\\d?\\d):(?<min>\\d?\\d)(:(?<sec>\\d?\\d))?(.(?<ms>\\d+))?")
             val s = split(tod)
             val matcher = pattern.matcher(s.value!!)
             val parseInt = { key: String ->

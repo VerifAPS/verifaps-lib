@@ -1,14 +1,27 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.print
 
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.ast.FunctionDeclaration
 import edu.kit.iti.formal.automation.testtables.model.*
-import edu.kit.iti.formal.automation.testtables.rtt.pauseVariableTT
-import edu.kit.iti.formal.automation.testtables.rtt.resetVariableTT
-import edu.kit.iti.formal.automation.testtables.rtt.setVariableTT
-import edu.kit.iti.formal.smv.SMVTypes
 import edu.kit.iti.formal.smv.ast.SLiteral
-import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.CodeWriter
 
@@ -19,7 +32,8 @@ import edu.kit.iti.formal.util.CodeWriter
  */
 class DSLTablePrinter(val stream: CodeWriter) {
     lateinit var gtt: GeneralizedTestTable
-    //lateinit var controlFields: List<String>
+
+    // lateinit var controlFields: List<String>
     fun print(gtt: GeneralizedTestTable) {
         this.gtt = gtt
 
@@ -52,41 +66,46 @@ class DSLTablePrinter(val stream: CodeWriter) {
     }
 
     fun print(v: ProjectionVariable) {
-        if (v.category == ColumnCategory.ASSUME)
+        if (v.category == ColumnCategory.ASSUME) {
             stream.print("assume ")
-        else
+        } else {
             stream.print("assert ")
-
+        }
     }
 
     fun print(v: ProgramVariable) {
         stream.nl().printf("column ")
         if (v.isState) {
             stream.print("state ")
-            if (v.category == ColumnCategory.ASSUME)
+            if (v.category == ColumnCategory.ASSUME) {
                 stream.print("assume ")
-            else
+            } else {
                 stream.print("assert ")
-            if (v.isNext)
+            }
+            if (v.isNext) {
                 stream.print("next")
+            }
         } else {
-            if (v.category == ColumnCategory.ASSERT)
-                if (v.isNext)
+            if (v.category == ColumnCategory.ASSERT) {
+                if (v.isNext) {
                     stream.print("output ")
-                else
+                } else {
                     stream.print("assert ")
-            else
-                if (v.isNext)
+                }
+            } else {
+                if (v.isNext) {
                     stream.print("assume next")
-                else
+                } else {
                     stream.print("input")
+                }
+            }
         }
 
         if (v.realName == v.name) {
             stream.printf(v.name).printf(" : ").print(v.dataType)
         } else {
             stream.printf(v.realName).printf(" : ").print(v.dataType).printf(" as ")
-                    .printf(v.name)
+                .printf(v.name)
         }
     }
 
@@ -122,12 +141,13 @@ class DSLTablePrinter(val stream: CodeWriter) {
                 stream.printf("{").increaseIndent()
                 val play = (gtt.programRuns.indices) - r.pauseProgramRuns.toSet()
                 stream.nl().printf("\\play: %s", play.joinToString(", "))
-                if (r.pauseProgramRuns.isNotEmpty())
+                if (r.pauseProgramRuns.isNotEmpty()) {
                     stream.nl().printf("\\pause: %s", r.pauseProgramRuns.joinToString(", "))
+                }
                 r.controlCommands.filterIsInstance<ControlCommand.Backward>()
-                        .forEach {
-                            stream.nl().printf("\\backward(%s): %s", it.jumpToRow, it.affectedProgramRun)
-                        }
+                    .forEach {
+                        stream.nl().printf("\\backward(%s): %s", it.jumpToRow, it.affectedProgramRun)
+                    }
 
                 /*controlFields.forEach { it ->
                     stream.nl().printf("// $it: ${r.inputExpr[it]?.repr()}")
@@ -154,12 +174,13 @@ class DSLTablePrinter(val stream: CodeWriter) {
         }
     }
 
-    fun print(d: Duration) = stream.write(when (d) {
-        is Duration.Omega -> "omega"
-        is Duration.ClosedInterval -> "[${d.lower}, ${d.upper}]" + d.modifier.repr()
-        is Duration.OpenInterval -> ">= ${d.lower}" + d.modifier.repr()
-    })
-
+    fun print(d: Duration) = stream.write(
+        when (d) {
+            is Duration.Omega -> "omega"
+            is Duration.ClosedInterval -> "[${d.lower}, ${d.upper}]" + d.modifier.repr()
+            is Duration.OpenInterval -> ">= ${d.lower}" + d.modifier.repr()
+        },
+    )
 
     fun print(fs: FunctionDeclaration) {
         val stp = StructuredTextPrinter()

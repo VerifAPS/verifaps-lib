@@ -1,24 +1,22 @@
-/*
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.algorithms
-
 
 import edu.kit.iti.formal.automation.testtables.model.Duration
 import edu.kit.iti.formal.automation.testtables.model.Region
@@ -58,14 +56,15 @@ class StateReachability(root: Region) {
         val startSet = hashSetOf(startSentinel)
         val endRows = initTable(startSet, root)
         endRows.forEach {
-            if (it.duration !is Duration.Omega)
+            if (it.duration !is Duration.Omega) {
                 it.outgoing.add(endSentinel)
+            }
         }
 
-        //addRegions(root)
+        // addRegions(root)
         fixpoint()
         maintainIncomning()
-        //maintainAutomata()
+        // maintainAutomata()
         isInitialReachable()
     }
 
@@ -124,20 +123,20 @@ private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
         var changed = true
         while (changed) { // as long we have changes
             changed = false
-            //for each row
+            // for each row
             for (state in flatList) {
                 val oldSize = state.outgoing.size
                 val reached = HashSet<TableRow>(flatList.size)
-                //foreach reachable state
+                // foreach reachable state
                 for (reachable in state.outgoing) {
                     // if reachable state is isSkippable, add their reachable state list
                     if (reachable.duration.isSkippable) {
                         reached.addAll(reachable.outgoing)
                     }
                 }
-                //add to the outgoing
+                // add to the outgoing
                 state.outgoing.addAll(reached)
-                //check for size
+                // check for size
                 changed = changed || state.outgoing.size != oldSize
             }
         }
@@ -152,10 +151,10 @@ private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
         if (r.duration.isRepeatable) {
             val flat = r.flat()
             flat[r.children.size - 1].outgoing
-                    .add(flat[0])
+                .add(flat[0])
         }
 
-        //Regions can be isSkippable
+        // Regions can be isSkippable
         r.children.forEach {
             if (it is Region) addRegions(it)
         }
@@ -166,7 +165,7 @@ private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
      * 1. i-th row can reach (i+1)-th row,
      *    except it is within an group with omega duration.
      * 2. End of the region, to beginning of a region.
-    except it is within an group with omega duration.
+     except it is within an group with omega duration.
      * 3. Abort on \omega!
      */
     private fun initTable(lastRows: Set<TableRow>, region: Region): MutableSet<TableRow> {
@@ -192,13 +191,12 @@ private fun connect(a: TableRow.AutomatonState, b: TableRow.AutomatonState) {
                     }
                     lastRows.addAll(lr)
                 }
-
             }
             if (tn.duration is Duration.Omega) {
                 lastRows.clear()
             }
         }
-        if(region.duration is Duration.Omega) lastRows.clear()
+        if (region.duration is Duration.Omega) lastRows.clear()
         return lastRows
     }
 

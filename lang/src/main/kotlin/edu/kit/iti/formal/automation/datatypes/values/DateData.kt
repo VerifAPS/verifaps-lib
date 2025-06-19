@@ -1,17 +1,37 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.sfclang.split
 
-data class DateData(var year: Int = 0,
-                    var month: Int = 0,
-                    var day: Int = 0) {
+data class DateData(
+    var year: Int = 0,
+    var month: Int = 0,
+    var day: Int = 0,
+) {
     companion object {
         fun parse(str: String): DateData {
             val pattern = Regex("(?<year>\\d\\d\\d\\d)-(?<month>\\d?\\d)-(?<day>\\d?\\d)")
             val (_, _, value) = split(str)
             val matcher = pattern.matchEntire(value)
-                    ?: throw IllegalArgumentException("given string isType not a time of day value")
-            val (_,year, month, day) = matcher.groupValues
+                ?: throw IllegalArgumentException("given string isType not a time of day value")
+            val (_, year, month, day) = matcher.groupValues
             return DateData(year.toInt(), month.toInt(), day.toInt())
         }
     }

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.experimental
 
 import edu.kit.iti.formal.automation.datatypes.*
@@ -26,22 +44,21 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
     fun export(pous: PouElements): String {
         cw.write("package $packageName;\n")
         cw.write("// Header").nl()
-        cw.cblock("public class $rootClass {", "}")
-        {
+        cw.cblock("public class $rootClass {", "}") {
             val predicate: (PouElement) -> Boolean = { it is GlobalVariableListDeclaration }
             pous.filter(predicate)
-                    .map { it as HasScope }
-                    //TODO Make them static!
-                    .forEach { it.scope.accept(JavaExportVisitorImpl()) }
+                .map { it as HasScope }
+                // TODO Make them static!
+                .forEach { it.scope.accept(JavaExportVisitorImpl()) }
 
             pous.filter { it !is GlobalVariableListDeclaration }
-                    .forEach { it.accept(JavaExportVisitorImpl()) }
+                .forEach { it.accept(JavaExportVisitorImpl()) }
 
             cw.nl().cblock("public static void main(String[] args) {", "}") {
                 pous.filter { it is ProgramDeclaration }
-                        .forEach {
-                            cw.nl().write("${it.name}.call();")
-                        }
+                    .forEach {
+                        cw.nl().write("${it.name}.call();")
+                    }
             }
         }
         return sw.toString()
@@ -77,7 +94,6 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
             }
         }
 
-
         override fun visit(programDeclaration: ProgramDeclaration) {
             val name = programDeclaration.name
             cw.nl().cblock("public static class $name {", "}") {
@@ -93,15 +109,15 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
             val rt = iecToJavaType(functionDeclaration.returnType.obj!!)
 
             val inp = functionDeclaration.scope.filter { it.isInput }
-                    .joinToString(", ") { iecToJavaType(it.dataType!!) + " " + it.name }
+                .joinToString(", ") { iecToJavaType(it.dataType!!) + " " + it.name }
 
             val initOut = functionDeclaration.returnType
 
             cw.nl().cblock("public $rt  ${functionDeclaration.name}($inp) {", "}") {
                 functionDeclaration.scope.filter { !it.isInput }
-                        .forEach {
-                            cw.write(variableDecl(it)).nl()
-                        }
+                    .forEach {
+                        cw.write(variableDecl(it)).nl()
+                    }
                 functionDeclaration.stBody?.also { translateSt(it, functionDeclaration.scope) }
                 cw.nl().write("return ${functionDeclaration.name};")
             }
@@ -110,7 +126,7 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
         override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) {
             cw.nl().cblock("public static class ${functionBlockDeclaration.name} {", "}") {
                 val scope = functionBlockDeclaration.scope.sortedBy { it.name }
-                visit(functionBlockDeclaration.scope) //vars are global
+                visit(functionBlockDeclaration.scope) // vars are global
                 val ctorArgs = scope.joinToString { iecToJavaType(it.dataType!!) + "  " + it.name }
                 cw.nl().cblock("public ${functionBlockDeclaration.name}($ctorArgs) {", "}") {
                     scope.forEach {
@@ -142,25 +158,24 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
             val rt = iecToJavaType(method.returnType.obj!!)
 
             val inp = method.scope.filter { it.isInput }
-                    .joinToString(", ") { iecToJavaType(it.dataType!!) + " " + it.name }
+                .joinToString(", ") { iecToJavaType(it.dataType!!) + " " + it.name }
 
             val initOut = method.returnType
 
             cw.cblock("public $rt  ${method.name}($inp) {", "}") {
                 method.scope.filter { !it.isInput }
-                        .forEach {
-                            cw.write(variableDecl(it)).nl()
-                        }
+                    .forEach {
+                        cw.write(variableDecl(it)).nl()
+                    }
                 method.stBody?.also { translateSt(it, method.scope) }
                 cw.nl().write("return ${method.name};")
             }
         }
 
-
         override fun visit(enumerationTypeDeclaration: EnumerationTypeDeclaration) {
             cw.nl().cblock("public enum ${enumerationTypeDeclaration.name} {", "}") {
                 val v = enumerationTypeDeclaration.allowedValues
-                        .joinToString(", ", "", ";") { it.text.uppercase(Locale.getDefault()) }
+                    .joinToString(", ", "", ";") { it.text.uppercase(Locale.getDefault()) }
                 cw.write(v)
             }
             cw.nl()
@@ -180,7 +195,7 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
                 "new ${dt.name}($args)"
             }
             is TimeData -> v.milliseconds.toString() + "/* milliseconds */"
-            else -> v.toString();
+            else -> v.toString()
         }
     }
 
@@ -190,7 +205,6 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
             val init = translateValue(it)
             "$dt ${vd.name} = $init;"
         } ?: "$dt ${vd.name};"
-
     }
 
     private fun translateSt(list: StatementList, scope: Scope) {
@@ -226,7 +240,8 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
                 val expdt = assignmentStatement.location.dataType(scope)
                 val gotdt = assignmentStatement.location.dataType(scope)
                 /*if (gotdt == expdt) ""
-                else*/ "(${iecToJavaType(expdt)})"
+                else*/
+                "(${iecToJavaType(expdt)})"
             } catch (e: Exception) {
                 "/* no cast found ${e.message}*/"
             }
@@ -291,8 +306,10 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
             cw.nl().write("$c.call();").nl()
             invocation.outputParameters.forEach {
                 val sr = it.expression as SymbolicReference
-                val t = AssignmentStatement(sr,
-                        invocation.callee.copy(sub=SymbolicReference(it.name)))
+                val t = AssignmentStatement(
+                    sr,
+                    invocation.callee.copy(sub = SymbolicReference(it.name)),
+                )
                 t.accept(this)
             }
         }
@@ -327,61 +344,55 @@ class JavaExportVisitor(val packageName: String, val rootClass: String) {
         }
     }
 
-    private fun translateExpr(expression: Expression): String {
-        return expression.accept(JavaExportExprImpl)
-    }
+    private fun translateExpr(expression: Expression): String = expression.accept(JavaExportExprImpl)
 
     object JavaExportExprImpl : AstVisitorWithScope<String>() {
         override fun defaultVisit(obj: Any) = "/* Unsupported construct: $obj */"
 
-        override fun visit(unaryExpression: UnaryExpression): String {
-            return translateOp(unaryExpression.operator) +
-                    "(" + unaryExpression.expression.accept(this) + ")"
-        }
+        override fun visit(unaryExpression: UnaryExpression): String = translateOp(unaryExpression.operator) +
+            "(" + unaryExpression.expression.accept(this) + ")"
 
-        private fun translateOp(operator: Operator): String {
-            return when (operator) {
-                Operators.ADD -> "+"
-                Operators.AND -> "&&"
-                Operators.MINUS -> "-"
-                Operators.DIV -> "/"
-                Operators.EQUALS -> "=="
-                Operators.NOT_EQUALS -> "!="
-                Operators.LESS_EQUALS -> "<="
-                Operators.LESS_THAN -> "<"
-                Operators.GREATER_EQUALS -> ">="
-                Operators.GREATER_THAN -> ">"
-                Operators.MULT -> "*"
-                Operators.OR -> "||"
-                Operators.POWER -> throw java.lang.IllegalStateException("power not supported yet")
-                Operators.SUB -> "-"
-                Operators.NOT -> "!"
-                else -> operator.toString()
-            }
+        private fun translateOp(operator: Operator): String = when (operator) {
+            Operators.ADD -> "+"
+            Operators.AND -> "&&"
+            Operators.MINUS -> "-"
+            Operators.DIV -> "/"
+            Operators.EQUALS -> "=="
+            Operators.NOT_EQUALS -> "!="
+            Operators.LESS_EQUALS -> "<="
+            Operators.LESS_THAN -> "<"
+            Operators.GREATER_EQUALS -> ">="
+            Operators.GREATER_THAN -> ">"
+            Operators.MULT -> "*"
+            Operators.OR -> "||"
+            Operators.POWER -> throw java.lang.IllegalStateException("power not supported yet")
+            Operators.SUB -> "-"
+            Operators.NOT -> "!"
+            else -> operator.toString()
         }
 
         override fun visit(symbolicReference: SymbolicReference): String {
-            val array = (if (symbolicReference.isArrayAccess)
-                "[" + symbolicReference.subscripts?.accept(this) + "]"
-            else "")
+            val array = (
+                if (symbolicReference.isArrayAccess) {
+                    "[" + symbolicReference.subscripts?.accept(this) + "]"
+                } else {
+                    ""
+                }
+                )
             val sub = symbolicReference.sub?.let { "." + it.accept(this) } ?: ""
             return symbolicReference.identifier + array + sub
         }
 
-        override fun visit(binaryExpression: BinaryExpression): String {
-            return ("(" + binaryExpression.leftExpr.accept(this) + " " +
-                    translateOp(binaryExpression.operator) + " " +
-                    binaryExpression.rightExpr.accept(this) + ")")
-        }
+        override fun visit(binaryExpression: BinaryExpression): String = (
+            "(" + binaryExpression.leftExpr.accept(this) + " " +
+                translateOp(binaryExpression.operator) + " " +
+                binaryExpression.rightExpr.accept(this) + ")"
+            )
 
-        override fun visit(expressions: ExpressionList): String {
-            return expressions.joinToString(", ") { it.accept(this) }
-        }
+        override fun visit(expressions: ExpressionList): String = expressions.joinToString(", ") { it.accept(this) }
 
-        override fun visit(invocation: Invocation): String {
-            return invocation.callee.accept(this) + "(" +
-                    invocation.parameters.joinToString(", ") { it.expression.accept(this) } + ")"
-        }
+        override fun visit(invocation: Invocation): String = invocation.callee.accept(this) + "(" +
+            invocation.parameters.joinToString(", ") { it.expression.accept(this) } + ")"
 
         override fun visit(literal: Literal): String {
             val td = literal.asValue()?.value

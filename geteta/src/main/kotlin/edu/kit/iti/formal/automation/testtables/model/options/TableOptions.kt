@@ -1,22 +1,21 @@
-/*
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.model.options
 
 import edu.kit.iti.formal.automation.testtables.model.VerificationTechnique
@@ -33,32 +32,37 @@ class AnyConverter<T>(val _to: (T) -> String, val _from: (String) -> T) : String
     override fun to(t: T): String = _to(t)
 }
 
-
 object IntConverter : StringConverter<Int> {
     override fun from(s: String) = s.toInt()
     override fun to(t: Int): String = t.toString()
 }
 
-object strConverter : StringConverter<String> {
+object StrConverter : StringConverter<String> {
     override fun from(s: String) = s
     override fun to(t: String): String = t
 }
 
-object booleanConverter : StringConverter<Boolean> {
+object BooleanConverter : StringConverter<Boolean> {
     override fun from(s: String) = "true".equals(s, true)
     override fun to(t: Boolean): String = t.toString()
 }
 
 open class Options(
-        val namespace: String,
-        val properties: MutableMap<String, String>) {
+    val namespace: String,
+    val properties: MutableMap<String, String>,
+) {
 
-    inner class MapperN<T>(private val default: T?=null,
-                          private val conv: StringConverter<T>) {
+    inner class MapperN<T>(
+        private val default: T? = null,
+        private val conv: StringConverter<T>,
+    ) {
         operator fun setValue(obj: Options, property: KProperty<*>, value: T?) {
             val n = namespace + (if (namespace.isBlank()) "" else ".") + property.name
-            if(value==null) obj.properties.remove(n)
-            else obj.properties[n] = conv.to(value)
+            if (value == null) {
+                obj.properties.remove(n)
+            } else {
+                obj.properties[n] = conv.to(value)
+            }
         }
 
         operator fun getValue(obj: Options, property: KProperty<*>): T? {
@@ -67,8 +71,10 @@ open class Options(
         }
     }
 
-    inner class Mapper<T>(private val default: T,
-                          private val conv: StringConverter<T>) {
+    inner class Mapper<T>(
+        private val default: T,
+        private val conv: StringConverter<T>,
+    ) {
         operator fun setValue(obj: Options, property: KProperty<*>, value: T) {
             val n = namespace + (if (namespace.isBlank()) "" else ".") + property.name
             obj.properties[n] = conv.to(value)
@@ -81,27 +87,27 @@ open class Options(
     }
 
     protected val integer = MapperN(null, IntConverter)
-    protected val string = MapperN(null, strConverter)
-    protected val boolean = MapperN(null, booleanConverter)
+    protected val string = MapperN(null, StrConverter)
+    protected val boolean = MapperN(null, BooleanConverter)
     protected fun integer(default: Int) = Mapper(default, IntConverter)
-    protected fun string(default: String) = Mapper(default, strConverter)
-    protected fun boolean(default:Boolean) = Mapper(default, booleanConverter)
+    protected fun string(default: String) = Mapper(default, StrConverter)
+    protected fun boolean(default: Boolean) = Mapper(default, BooleanConverter)
 
-    protected fun <T> any(default: T,
-                          to: (T) -> String,
-                          from: (String) -> T) = Mapper(default, AnyConverter(to, from))
+    protected fun <T> any(
+        default: T,
+        to: (T) -> String,
+        from: (String) -> T,
+    ) = Mapper(default, AnyConverter(to, from))
 }
-
-
 
 /**
  * Created by weigl on 16.12.16.
  */
 class TableOptions(properties: MutableMap<String, String>) : Options("", properties) {
-    var mode: Mode  by any(Mode.CONFORMANCE, Mode::toString, Mode::valueOf)
+    var mode: Mode by any(Mode.CONFORMANCE, Mode::toString, Mode::valueOf)
 
     val verificationTechnique: VerificationTechnique
-            by properties.convert(VerificationTechnique.IC3) { VerificationTechnique.valueOf(it) }
+        by properties.convert(VerificationTechnique.IC3) { VerificationTechnique.valueOf(it) }
 
     var cycles: ConcreteTableOptions = ConcreteTableOptions(properties)
     var dataTypeOptions = DataTypeOptions(properties)
@@ -125,9 +131,11 @@ fun <R, T> Map<String, String>.convert(default: T, func: (String) -> T): ReadWri
         override fun getValue(thisRef: R, property: KProperty<*>): T {
             if (overwritten != null) return overwritten!!
             val v = this@convert[property.name]
-            return if (v == null) return default
-            else func(v)
+            return if (v == null) {
+                return default
+            } else {
+                func(v)
+            }
         }
     }
 }
-

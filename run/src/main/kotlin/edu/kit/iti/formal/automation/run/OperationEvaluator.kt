@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.datatypes.AnyBit
@@ -16,14 +34,11 @@ import java.math.BigInteger
  * If Operation if illegal, an error will be thrown
  */
 object OperationEvaluator {
-    fun add(leftValue: EValue, rightValue: EValue): EValue {
-        return when {
-            leftValue is VAnyReal || rightValue is VAnyReal -> add(toReal(leftValue), toReal(rightValue))
-            leftValue is VAnyInt && rightValue is VAnyInt -> add(leftValue, rightValue)
-            else -> throw TypeMissmatchException("must be numbers")
-        }
+    fun add(leftValue: EValue, rightValue: EValue): EValue = when {
+        leftValue is VAnyReal || rightValue is VAnyReal -> add(toReal(leftValue), toReal(rightValue))
+        leftValue is VAnyInt && rightValue is VAnyInt -> add(leftValue, rightValue)
+        else -> throw TypeMissmatchException("must be numbers")
     }
-
 
     /**
      * normalize the Expression's Value to its DataType
@@ -31,10 +46,10 @@ object OperationEvaluator {
     public fun normalizeInt(value: VAnyInt): VAnyInt {
         val (type, v) = value
         if (type.isValid(v)) return value
-        //if negative and unsigned -> offset value into positive region
+        // if negative and unsigned -> offset value into positive region
         val mask = BigInteger.valueOf(2).pow(type.bitLength).subtract(BigInteger.valueOf(1))
         if (!type.isSigned && value.value < BigInteger.ZERO) {
-            return VAnyInt(type, -v) //TODO not correct overflow
+            return VAnyInt(type, -v) // TODO not correct overflow
         }
         var newValue = value.value
         while (newValue > type.upperBound) {
@@ -46,8 +61,12 @@ object OperationEvaluator {
     private fun add(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt {
         val promotedType = leftValue.dataType promoteWith rightValue.dataType
         if (promotedType is AnyInt) {
-            return normalizeInt(VAnyInt(promotedType,
-                    leftValue.value.add(rightValue.value)))
+            return normalizeInt(
+                VAnyInt(
+                    promotedType,
+                    leftValue.value.add(rightValue.value),
+                ),
+            )
         }
         TODO("choose correct datatype and modulo the addition")
     }
@@ -57,21 +76,15 @@ object OperationEvaluator {
         if (promotedType is AnyReal) {
             return VAnyReal(promotedType, leftValue.value)
         }
-        throw TypeMissmatchException("could not promote '${leftValue.value}+${rightValue.value}' to appropriate type");
+        throw TypeMissmatchException("could not promote '${leftValue.value}+${rightValue.value}' to appropriate type")
     }
 
-
-    fun multiply(leftValue: EValue, rightValue: EValue): EValue {
-        return when {
-            leftValue is VAnyInt && rightValue is VAnyInt -> multiply(leftValue, rightValue)
-            else -> TODO("implement other data type")
-        }
+    fun multiply(leftValue: EValue, rightValue: EValue): EValue = when {
+        leftValue is VAnyInt && rightValue is VAnyInt -> multiply(leftValue, rightValue)
+        else -> TODO("implement other data type")
     }
 
-    fun multiply(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt {
-        return normalizeInt(VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value)))
-    }
-
+    fun multiply(leftValue: VAnyInt, rightValue: VAnyInt): VAnyInt = normalizeInt(VAnyInt(leftValue.dataType, leftValue.value.multiply(rightValue.value)))
 
     fun not(eValue: EValue): EValue {
         if (eValue is VBool) {
@@ -84,22 +97,21 @@ object OperationEvaluator {
     fun negate(eValue: EValue): EValue = when (eValue) {
         is VAnyInt ->
             normalizeInt(
-                    VAnyInt(
-                            eValue.dataType.asSigned(),
-                            eValue.value.negate()
-                    ))
+                VAnyInt(
+                    eValue.dataType.asSigned(),
+                    eValue.value.negate(),
+                ),
+            )
         is VAnyReal -> VAnyReal(eValue.dataType, eValue.value.negate())
         else -> throw TypeMissmatchException("must be a number")
     }
 
     fun equalValues(leftValue: EValue, rightValue: EValue): EValue {
-        //TODO promote types for equals comparison and make compare data types
+        // TODO promote types for equals comparison and make compare data types
         return VBool(AnyBit.BOOL, leftValue.value == rightValue.value)
     }
 
-    fun notEquals(leftValue: EValue, rightValue: EValue): EValue {
-        return not(equalValues(leftValue, rightValue))
-    }
+    fun notEquals(leftValue: EValue, rightValue: EValue): EValue = not(equalValues(leftValue, rightValue))
 
     fun and(leftValue: EValue, rightValue: EValue): VBool {
         if (leftValue is VBool && rightValue is VBool) {
@@ -109,93 +121,71 @@ object OperationEvaluator {
         }
     }
 
-    private fun greaterThan(leftValue: VAnyInt, rightValue: VAnyInt) =
-            VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
+    private fun greaterThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
 
-    private fun greaterThan(leftValue: VAnyReal, rightValue: VAnyReal) =
-            VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
+    private fun greaterThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value > rightValue.value)
 
-    fun greaterThan(leftValue: EValue, rightValue: EValue): VBool {
-        return when {
-            leftValue is VAnyReal || rightValue is VAnyReal -> greaterThan(toReal(leftValue), toReal(rightValue))
-            leftValue is VAnyInt && rightValue is VAnyInt -> greaterThan(leftValue, rightValue)
-            else -> throw TypeMissmatchException("must be a number")
-        }
+    fun greaterThan(leftValue: EValue, rightValue: EValue): VBool = when {
+        leftValue is VAnyReal || rightValue is VAnyReal -> greaterThan(toReal(leftValue), toReal(rightValue))
+        leftValue is VAnyInt && rightValue is VAnyInt -> greaterThan(leftValue, rightValue)
+        else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun greaterThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) =
-            VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+    private fun greaterThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
 
-    private fun greaterThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) =
-            VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
+    private fun greaterThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value >= rightValue.value)
 
-    fun greaterThanOrEquals(leftValue: EValue, rightValue: EValue): VBool {
-        return when {
-            leftValue is VAnyReal || rightValue is VAnyReal -> greaterThanOrEquals(toReal(leftValue), toReal(rightValue))
-            leftValue is VAnyInt && rightValue is VAnyInt -> greaterThanOrEquals(leftValue, rightValue)
-            else -> throw TypeMissmatchException("must be a number")
-        }
+    fun greaterThanOrEquals(leftValue: EValue, rightValue: EValue): VBool = when {
+        leftValue is VAnyReal || rightValue is VAnyReal -> greaterThanOrEquals(toReal(leftValue), toReal(rightValue))
+        leftValue is VAnyInt && rightValue is VAnyInt -> greaterThanOrEquals(leftValue, rightValue)
+        else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun lessThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) =
-            VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+    private fun lessThanOrEquals(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
 
-    private fun lessThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) =
-            VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
+    private fun lessThanOrEquals(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value <= rightValue.value)
 
-    fun lessThanOrEquals(leftValue: EValue, rightValue: EValue): VBool {
-        return when {
-            leftValue is VAnyReal || rightValue is VAnyReal -> lessThanOrEquals(toReal(leftValue), toReal(rightValue))
-            leftValue is VAnyInt && rightValue is VAnyInt -> lessThanOrEquals(leftValue, rightValue)
-            else -> throw TypeMissmatchException("must be a number")
-        }
+    fun lessThanOrEquals(leftValue: EValue, rightValue: EValue): VBool = when {
+        leftValue is VAnyReal || rightValue is VAnyReal -> lessThanOrEquals(toReal(leftValue), toReal(rightValue))
+        leftValue is VAnyInt && rightValue is VAnyInt -> lessThanOrEquals(leftValue, rightValue)
+        else -> throw TypeMissmatchException("must be a number")
     }
 
-    private fun lessThan(leftValue: VAnyInt, rightValue: VAnyInt) =
-            VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+    private fun lessThan(leftValue: VAnyInt, rightValue: VAnyInt) = VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
 
-    private fun lessThan(leftValue: VAnyReal, rightValue: VAnyReal) =
-            VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
+    private fun lessThan(leftValue: VAnyReal, rightValue: VAnyReal) = VBool(AnyBit.BOOL, leftValue.value < rightValue.value)
 
-
-    fun lessThan(leftValue: EValue, rightValue: EValue): VBool {
-        return when {
-            leftValue is VAnyReal || rightValue is VAnyReal -> lessThan(toReal(leftValue), toReal(rightValue))
-            leftValue is VAnyInt && rightValue is VAnyInt -> lessThan(leftValue, rightValue)
-            else -> throw TypeMissmatchException("must be a number")
-        }
+    fun lessThan(leftValue: EValue, rightValue: EValue): VBool = when {
+        leftValue is VAnyReal || rightValue is VAnyReal -> lessThan(toReal(leftValue), toReal(rightValue))
+        leftValue is VAnyInt && rightValue is VAnyInt -> lessThan(leftValue, rightValue)
+        else -> throw TypeMissmatchException("must be a number")
     }
 
     private fun toReal(eValue: EValue): VAnyReal {
         val content = eValue.value
-        return VAnyReal(AnyReal.REAL, when (content) {
-            is BigInteger -> BigDecimal(content)
-            is BigDecimal -> content
-            else -> throw TypeMissmatchException("cannot be a real number")
-        })
+        return VAnyReal(
+            AnyReal.REAL,
+            when (content) {
+                is BigInteger -> BigDecimal(content)
+                is BigDecimal -> content
+                else -> throw TypeMissmatchException("cannot be a real number")
+            },
+        )
     }
 
-    fun subtract(leftValue: EValue, rightValue: EValue): EValue {
-        return add(leftValue, negate(rightValue))
+    fun subtract(leftValue: EValue, rightValue: EValue): EValue = add(leftValue, negate(rightValue))
+
+    fun modulo(leftValue: VAnyInt, rightValue: VAnyInt) = VAnyInt(leftValue.dataType, leftValue.value.mod(rightValue.value))
+
+    fun modulo(leftValue: EValue, rightValue: EValue): EValue = when {
+        leftValue is VAnyInt && rightValue is VAnyInt -> modulo(leftValue, rightValue)
+        else -> throw TypeMissmatchException("modulo expects both to be int")
     }
 
-    fun modulo(leftValue: VAnyInt, rightValue: VAnyInt) =
-            VAnyInt(leftValue.dataType, leftValue.value.mod(rightValue.value))
+    fun or(leftValue: VBool, rightValue: VBool) = VBool(leftValue.dataType, leftValue.value || rightValue.value)
 
-    fun modulo(leftValue: EValue, rightValue: EValue): EValue {
-        return when {
-            leftValue is VAnyInt && rightValue is VAnyInt -> modulo(leftValue, rightValue)
-            else -> throw TypeMissmatchException("modulo expects both to be int")
-        }
-    }
-
-    fun or(leftValue: VBool, rightValue: VBool) =
-            VBool(leftValue.dataType, leftValue.value || rightValue.value)
-
-    fun or(leftValue: EValue, rightValue: EValue): EValue {
-        return when {
-            leftValue is VBool && rightValue is VBool -> or(leftValue, rightValue)
-            else -> throw TypeMissmatchException("or expects booleans")
-        }
+    fun or(leftValue: EValue, rightValue: EValue): EValue = when {
+        leftValue is VBool && rightValue is VBool -> or(leftValue, rightValue)
+        else -> throw TypeMissmatchException("or expects booleans")
     }
 }

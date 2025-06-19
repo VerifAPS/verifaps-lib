@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.il
 
 import edu.kit.iti.formal.automation.operators.BinaryOperator
@@ -6,7 +24,6 @@ import edu.kit.iti.formal.automation.st.Cloneable
 import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.ParserRuleContext
 import java.io.Serializable
-
 
 interface IlVisitable {
     fun <T> accept(visitor: IlVisitor<T>): T
@@ -21,8 +38,8 @@ interface IlVisitor<T> {
     fun visit(constant: IlOperand.Constant): T
     fun visit(jump: JumpInstr): T
     fun visit(call: CallInstr): T
-    abstract fun visit(param: IlParameter): T
-    abstract fun visit(ret: RetInstr): T
+    fun visit(param: IlParameter): T
+    fun visit(ret: RetInstr): T
 }
 
 abstract class IlBaseVisitor<T> : IlVisitor<T> {
@@ -65,26 +82,27 @@ abstract class IlTraversalVisitor : IlBaseVisitor<Unit>() {
     override fun visit(param: IlParameter) = param.right.accept(this)
 }
 
-
 /**
  *
  * @author Alexander Weigl
  * @version 1 (20.02.19)
  */
-sealed class IlAst : IlVisitable, Cloneable, Serializable, HasRuleContext {
+sealed class IlAst :
+    IlVisitable,
+    Cloneable,
+    Serializable,
+    HasRuleContext {
     override var ruleContext: ParserRuleContext? = null
 }
 
-data class IlBody(private val seq: MutableList<IlInstr> = arrayListOf())
-    : MutableList<IlInstr> by seq, IlAst() {
+data class IlBody(private val seq: MutableList<IlInstr> = arrayListOf()) :
+    IlAst(),
+    MutableList<IlInstr> by seq {
     override fun clone() = copy()
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
-    fun findMarked(jump: String): IlInstr? {
-        return find { it.labelled?.let { it == jump } ?: false }
-    }
+    fun findMarked(jump: String): IlInstr? = find { it.labelled?.let { it == jump } ?: false }
 
-    fun posMarked(jump: String): Int? =
-            findMarked(jump)?.let{ indexOf(it) }
+    fun posMarked(jump: String): Int? = findMarked(jump)?.let { indexOf(it) }
 }
 
 abstract class IlInstr : IlAst() {
@@ -111,16 +129,19 @@ sealed class IlOperand : IlAst() {
     }
 }
 
-
-data class ExprInstr(var operand: ExprOperand,
-                     var operandi: IlOperand? = null,
-                     var instr: IlBody?) : IlInstr() {
+data class ExprInstr(
+    var operand: ExprOperand,
+    var operandi: IlOperand? = null,
+    var instr: IlBody?,
+) : IlInstr() {
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
     override fun clone(): IlInstr = copy()
 }
 
-data class FunctionCallInstr(var function: SymbolicReference,
-                             var operands: MutableList<IlOperand> = arrayListOf()) : IlInstr() {
+data class FunctionCallInstr(
+    var function: SymbolicReference,
+    var operands: MutableList<IlOperand> = arrayListOf(),
+) : IlInstr() {
     var invoked: Invoked? = null
 
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
@@ -134,52 +155,89 @@ data class FunctionBlockCall() : IlInstr() {
 }
 */
 
-
-
 data class JumpInstr(var type: JumpOperand, var target: String) : IlInstr() {
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
     override fun clone(): IlInstr = copy()
 }
-
 
 data class RetInstr(var type: ReturnOperand) : IlInstr() {
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
     override fun clone(): IlInstr = copy()
 }
 
-data class CallInstr(var type: CallOperand,
-                     var ref: SymbolicReference,
-                     var parameters: MutableList<IlParameter> = arrayListOf()) : IlInstr() {
+data class CallInstr(
+    var type: CallOperand,
+    var ref: SymbolicReference,
+    var parameters: MutableList<IlParameter> = arrayListOf(),
+) : IlInstr() {
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
     override fun clone(): IlInstr = copy()
 }
 
-data class IlParameter(val negated: Boolean = false, val input: Boolean = true,
-                       val left: String = ANONYM, val right: IlOperand) : IlAst() {
+data class IlParameter(
+    val negated: Boolean = false,
+    val input: Boolean = true,
+    val left: String = ANONYM,
+    val right: IlOperand,
+) : IlAst() {
     override fun <T> accept(visitor: IlVisitor<T>): T = visitor.visit(this)
     override fun clone() = copy(right = right.clone())
 }
 
-
 enum class CallOperand {
-    CAL, CALC, CALCN, IMPLICIT_CALLED
+    CAL,
+    CALC,
+    CALCN,
+    IMPLICIT_CALLED,
 }
 
 enum class JumpOperand {
-    JMP, JMPC, JMPCN
+    JMP,
+    JMPC,
+    JMPCN,
 }
 
 enum class ReturnOperand {
-    RET, RETC, RETCN
+    RET,
+    RETC,
+    RETCN,
 }
 
 enum class SimpleOperand(val symbol: String = "") {
-    LD, LDN, ST, STN, STQ("ST?"), NOT, S, R, S1, R1, CLK, CU, CD, PV, IN, PT
+    LD,
+    LDN,
+    ST,
+    STN,
+    STQ("ST?"),
+    NOT,
+    S,
+    R,
+    S1,
+    R1,
+    CLK,
+    CU,
+    CD,
+    PV,
+    IN,
+    PT,
 }
 
 enum class ExprOperand(val stOperator: BinaryOperator?, val altName: String? = null) {
-    AND(Operators.AND, "&"), OR(Operators.OR), XOR(Operators.XOR), ANDN(null, "&N"),
-    ORN(null), XORN(null), ADD(Operators.ADD), SUB(Operators.SUB), MUL(Operators.MULT),
-    DIV(Operators.DIV), MOD(Operators.MOD), GT(Operators.GREATER_THAN), GE(Operators.GREATER_EQUALS),
-    EQ(Operators.EQUALS), LT(Operators.LESS_THAN), LE(Operators.LESS_EQUALS), NE(Operators.NOT_EQUALS);
+    AND(Operators.AND, "&"),
+    OR(Operators.OR),
+    XOR(Operators.XOR),
+    ANDN(null, "&N"),
+    ORN(null),
+    XORN(null),
+    ADD(Operators.ADD),
+    SUB(Operators.SUB),
+    MUL(Operators.MULT),
+    DIV(Operators.DIV),
+    MOD(Operators.MOD),
+    GT(Operators.GREATER_THAN),
+    GE(Operators.GREATER_EQUALS),
+    EQ(Operators.EQUALS),
+    LT(Operators.LESS_THAN),
+    LE(Operators.LESS_EQUALS),
+    NE(Operators.NOT_EQUALS),
 }

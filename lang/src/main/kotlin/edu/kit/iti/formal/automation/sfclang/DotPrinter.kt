@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.sfclang
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.sfclang
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.sfclang
 
 import edu.kit.iti.formal.automation.st.ast.SFCImplementation
 import edu.kit.iti.formal.automation.st.ast.SFCNetwork
@@ -47,7 +43,6 @@ class DotPrinter : AstVisitor<Unit>() {
         decl.networks.forEach { n -> visit(n) }
         cw.decreaseIndent()
         cw.nl().printf("}")
-        
     }
 
     override fun visit(n: SFCNetwork) {
@@ -56,9 +51,7 @@ class DotPrinter : AstVisitor<Unit>() {
         n.steps.forEach { s -> s.accept(this) }
         cw.decreaseIndent()
         cw.nl().printf("}")
-        
     }
-
 
     /**
      * {@inheritDoc}
@@ -66,7 +59,6 @@ class DotPrinter : AstVisitor<Unit>() {
     override fun visit(decl: SFCStep) {
         cw.nl().printf(decl.name)
         cw.printf(" [label=\"" + decl.name + "\", shape=rectangle]")
-        
     }
 
     /**
@@ -74,10 +66,10 @@ class DotPrinter : AstVisitor<Unit>() {
      */
     override fun visit(decl: SFCTransition) {
         for (from in decl.from!!) {
-            for (to in decl.to!!)
+            for (to in decl.to!!) {
                 cw.nl().print(from).printf(" -> ").print(to).printf(";")
+            }
         }
-        
     }
 
     companion object {
@@ -88,5 +80,4 @@ class DotPrinter : AstVisitor<Unit>() {
             return p.cw.toString()
         }
     }
-
 }

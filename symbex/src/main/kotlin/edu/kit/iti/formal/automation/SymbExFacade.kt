@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.cpp.TranslateToCpp
@@ -32,27 +50,23 @@ const val ASSERTION_PREFIX = "__assert_"
  */
 const val ASSUMPTION_PREFIX = "__assume_"
 
-
 /**
  *
  */
 const val HAVOC_PREFIX = "__havoc_"
-
 
 /**
  * @author Alexander Weigl
  * @version 2 (12.12.16)
  */
 object SymbExFacade {
-    fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr {
-        return evaluateFunction(decl, listOf(*args))
-    }
+    fun evaluateFunction(decl: FunctionDeclaration, vararg args: SMVExpr): SMVExpr = evaluateFunction(decl, listOf(*args))
 
     fun evaluateFunction(decl: FunctionDeclaration, ts: List<SMVExpr>): SMVExpr {
         val se = SymbolicExecutioner()
-        //<name>(i1,i2,i2,...)
+        // <name>(i1,i2,i2,...)
         for ((i, vd) in decl.scope
-                .filterByFlags(VariableDeclaration.INPUT).withIndex()) {
+            .filterByFlags(VariableDeclaration.INPUT).withIndex()) {
             se.assign(vd, ts[i])
         }
         se.visit(decl as PouExecutable)
@@ -61,14 +75,13 @@ object SymbExFacade {
         return v
     }
 
-    fun getDefaultSimplifier(): SimplifierPipelineST0 =
-            SimplifierPipelineST0()
-                    .addGlobalVariableListEmbedding()
-                    .addCallEmbedding()
-                    .addLoopUnwinding()
-                    .addArrayEmbedding()
-                    .addStructEmbedding()
-                    .addTimerToCounter()
+    fun getDefaultSimplifier(): SimplifierPipelineST0 = SimplifierPipelineST0()
+        .addGlobalVariableListEmbedding()
+        .addCallEmbedding()
+        .addLoopUnwinding()
+        .addArrayEmbedding()
+        .addStructEmbedding()
+        .addTimerToCounter()
 
     fun simplify(exec: PouExecutable): PouExecutable {
         val stSimplifier = getDefaultSimplifier()
@@ -79,8 +92,8 @@ object SymbExFacade {
         val stSimplifier = getDefaultSimplifier()
         val p = PouElements()
         elements.filterIsInstance<PouExecutable>()
-                .map(stSimplifier::transform)
-                .forEach { p.add(it) }
+            .map(stSimplifier::transform)
+            .forEach { p.add(it) }
         return p
     }
 
@@ -137,13 +150,14 @@ object SymbExFacade {
     @JvmOverloads
     fun evaluateProgram(elements: PouElements, skipSimplify: Boolean = false): SMVModule {
         val a = if (skipSimplify) elements else simplify(elements)
-        return evaluateProgram(a.findFirstProgram()
-                ?: throw IllegalStateException("Could not find any program in the given set of POUs"), skipSimplify)
+        return evaluateProgram(
+            a.findFirstProgram()
+                ?: throw IllegalStateException("Could not find any program in the given set of POUs"),
+            skipSimplify,
+        )
     }
 
-    fun asSVariable(vd: VariableDeclaration): SVariable {
-        return DefaultTypeTranslator().translate(vd)
-    }
+    fun asSVariable(vd: VariableDeclaration): SVariable = DefaultTypeTranslator().translate(vd)
 
     fun evaluateStatements(seq: StatementList, scope: Scope, useDefinitions: Boolean = true): SymbolicState {
         val program = ProgramDeclaration(scope = scope, stBody = seq)
@@ -165,7 +179,6 @@ object SymbExFacade {
         ssa.forEach { (t, u) -> ss[t] = u }
         return evaluateExpression(ss, exc, scope)
     }
-
 
     fun evaluateExpression(expr: Expression, scope: Scope): SMVExpr {
         val symbex = SymbolicExecutioner(scope)
@@ -192,9 +205,11 @@ object SymbExFacade {
     }
 
     @JvmStatic
-    fun execute(program: PouExecutable,
-                skipSimplify: Boolean = false,
-                cycles: Int = 10): VisualizeTrace {
+    fun execute(
+        program: PouExecutable,
+        skipSimplify: Boolean = false,
+        cycles: Int = 10,
+    ): VisualizeTrace {
         val (lineMap, mod) = evaluateProgramWithLineMap(program, skipSimplify)
 
         mod.name = "main"
@@ -213,15 +228,16 @@ object SymbExFacade {
         writeNuxmvCommandFile(NuXMVInvariantsCommand.BMC.commands as Array<String>, commandFile)
         val p = NuXMVProcess(tmpFile, commandFile)
         val nuXmv = findProgram("nuXmv")
-        if (nuXmv != null)
+        if (nuXmv != null) {
             p.executablePath = nuXmv.absolutePath
-        else
+        } else {
             System.getenv("NUXMV")?.let {
                 p.executablePath = System.getenv("NUXMV")
             }
+        }
 
-        //use BMC because of the complete trace
-        //p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
+        // use BMC because of the complete trace
+        // p.commands = NuXMVInvariantsCommand.BMC.commands as Array<String>
         val output = p.call()
         if (output is NuXMVOutput.Cex) {
             val cex = output.counterExample
@@ -241,4 +257,3 @@ object SymbExFacade {
         return m
     }
 }
-

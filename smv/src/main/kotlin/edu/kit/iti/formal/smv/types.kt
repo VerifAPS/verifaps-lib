@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv
 
 import edu.kit.iti.formal.smv.ast.*
@@ -21,8 +39,9 @@ interface SMVType {
 }
 
 data class SMVWordType(
-        val signed: Boolean,
-        val width: Int) : SMVType {
+    val signed: Boolean,
+    val width: Int,
+) : SMVType {
 
     override fun valueOf(str: String) = SWordLiteral(read(str), this)
 
@@ -36,28 +55,30 @@ data class SMVWordType(
         return BigInteger.ZERO
     }
 
-    override fun repr(): String {
-        return String.format("%s word[%d]",
-                if (signed) "signed"
-                else "unsigned", width)
-    }
+    override fun repr(): String = String.format(
+        "%s word[%d]",
+        if (signed) {
+            "signed"
+        } else {
+            "unsigned"
+        },
+        width,
+    )
 
-    override fun allowedValue(obj: Any): Boolean {
-        return obj is BigInteger
-    }
+    override fun allowedValue(obj: Any): Boolean = obj is BigInteger
 
-    override fun format(value: Any): String {
-        return when (value) {
-            is BigInteger ->
-                String.format("%s0%sd%d_%s",
-                        if (value.signum() < 0) "-" else "",
-                        if (signed) "s" else "u",
-                        width,
-                        value.abs().toString())
-            is Long -> format(BigInteger.valueOf(value))
-            is Int -> format(BigInteger.valueOf(value.toLong()))
-            else -> error("not implemented for ${value.javaClass}")
-        }
+    override fun format(value: Any): String = when (value) {
+        is BigInteger ->
+            String.format(
+                "%s0%sd%d_%s",
+                if (value.signum() < 0) "-" else "",
+                if (signed) "s" else "u",
+                width,
+                value.abs().toString(),
+            )
+        is Long -> format(BigInteger.valueOf(value))
+        is Int -> format(BigInteger.valueOf(value.toLong()))
+        else -> error("not implemented for ${value.javaClass}")
     }
 }
 
@@ -89,45 +110,34 @@ object SMVTypes {
     }
 
     @JvmStatic
-    fun infer(list: List<SMVType>): SMVType? {
-        return if (list.stream().allMatch { a -> a == list[0] }) list[0] else null
-    }
-
+    fun infer(list: List<SMVType>): SMVType? = if (list.stream().allMatch { a -> a == list[0] }) list[0] else null
 
     @JvmStatic
-    fun infer(op: SBinaryOperator, a: SMVType?, b: SMVType?): SMVType? {
-        return when (op) {
-            SBinaryOperator.AND -> BOOLEAN
-            SBinaryOperator.OR -> BOOLEAN
-            SBinaryOperator.LESS_THAN -> BOOLEAN
-            SBinaryOperator.LESS_EQUAL -> BOOLEAN
-            SBinaryOperator.GREATER_THAN -> BOOLEAN
-            SBinaryOperator.GREATER_EQUAL -> BOOLEAN
-            SBinaryOperator.XOR -> BOOLEAN
-            SBinaryOperator.XNOR -> BOOLEAN
-            SBinaryOperator.EQUAL -> BOOLEAN
-            SBinaryOperator.IMPL -> BOOLEAN
-            SBinaryOperator.EQUIV -> BOOLEAN
-            SBinaryOperator.NOT_EQUAL -> BOOLEAN
-            SBinaryOperator.WORD_CONCAT -> TODO()
-            else -> infer(a, b)
-        }
+    fun infer(op: SBinaryOperator, a: SMVType?, b: SMVType?): SMVType? = when (op) {
+        SBinaryOperator.AND -> BOOLEAN
+        SBinaryOperator.OR -> BOOLEAN
+        SBinaryOperator.LESS_THAN -> BOOLEAN
+        SBinaryOperator.LESS_EQUAL -> BOOLEAN
+        SBinaryOperator.GREATER_THAN -> BOOLEAN
+        SBinaryOperator.GREATER_EQUAL -> BOOLEAN
+        SBinaryOperator.XOR -> BOOLEAN
+        SBinaryOperator.XNOR -> BOOLEAN
+        SBinaryOperator.EQUAL -> BOOLEAN
+        SBinaryOperator.IMPL -> BOOLEAN
+        SBinaryOperator.EQUIV -> BOOLEAN
+        SBinaryOperator.NOT_EQUAL -> BOOLEAN
+        SBinaryOperator.WORD_CONCAT -> TODO()
+        else -> infer(a, b)
     }
 
     @JvmStatic
-    fun infer(a: SMVType?, b: SMVType?): SMVType? {
-        return if (a == b) a else null
-    }
+    fun infer(a: SMVType?, b: SMVType?): SMVType? = if (a == b) a else null
 
     @JvmStatic
-    fun unsigned(i: Int): SMVWordType {
-        return SMVWordType(false, i)
-    }
+    fun unsigned(i: Int): SMVWordType = SMVWordType(false, i)
 
     @JvmStatic
-    fun signed(i: Int): SMVWordType {
-        return SMVWordType(true, i)
-    }
+    fun signed(i: Int): SMVWordType = SMVWordType(true, i)
 }
 
 data class EnumType(var values: List<String>) : SMVType {
@@ -144,14 +154,16 @@ data class EnumType(var values: List<String>) : SMVType {
         return SEnumLiteral(str, this)
     }
 
-    override fun toString(): String {
-        return if (values.isEmpty()) "{}"
-        else
-            values.joinToString(", ", "{", "}") { format(it) }
+    override fun toString(): String = if (values.isEmpty()) {
+        "{}"
+    } else {
+        values.joinToString(", ", "{", "}") { format(it) }
     }
 }
 
-data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>
+data class ModuleType(
+    val moduleName: String,
+    val parameters: List<SMVExpr>,
 ) : SMVType {
     override fun format(value: Any): String = error("not implemented")
     override fun read(str: String): Any = error("not implemented")
@@ -161,18 +173,17 @@ data class ModuleType(val moduleName: String, val parameters: List<SMVExpr>
     override fun allowedValue(obj: Any): Boolean = obj is String
 
     constructor(name: String, vararg variables: SVariable) :
-            this(name, Arrays.asList<SVariable>(*variables))
+        this(name, Arrays.asList<SVariable>(*variables))
 
     override fun toString(): String {
         val params = if (parameters.isNotEmpty()) {
             parameters.joinToString(", ") { it.repr() }
-        } else ""
-        return "${moduleName}($params)"
-
+        } else {
+            ""
+        }
+        return "$moduleName($params)"
     }
 }
-
-
 
 /**
  * @author Alexander Weigl

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.smv.parser
 
 /*-
@@ -46,8 +64,7 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
     override fun visitModule(ctx: SMVParser.ModuleContext): SMVModule {
         val module = SMVModule(ctx.name.text)
         ctx.params.forEach { fpctx ->
-            module.moduleParameters.add(
-                    SVariable.create(fpctx.getText()).with(null))
+            module.moduleParameters.add(SVariable.create(fpctx.getText()).with(null))
         }
 
         lastModule = module
@@ -63,24 +80,21 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitVariableDeclaration(ctx: SMVParser.VariableDeclarationContext): Any {
         ctx.varBody().forEach { varBody ->
-            lastModule!!.stateVars.add(
-                    varBody.accept(this) as SVariable)
+            lastModule!!.stateVars.add(varBody.accept(this) as SVariable)
         }
         return lastModule!!.stateVars
     }
 
     override fun visitIVariableDeclaration(ctx: SMVParser.IVariableDeclarationContext): Any {
         ctx.varBody().forEach { varBody ->
-            lastModule!!.inputVars.add(
-                    varBody.accept(this) as SVariable)
+            lastModule!!.inputVars.add(varBody.accept(this) as SVariable)
         }
         return lastModule!!.stateVars
     }
 
     override fun visitFrozenVariableDeclaration(ctx: SMVParser.FrozenVariableDeclarationContext): Any {
         ctx.varBody().forEach { varBody ->
-            lastModule!!.frozenVars.add(
-                    varBody.accept(this) as SVariable)
+            lastModule!!.frozenVars.add(varBody.accept(this) as SVariable)
         }
         return lastModule!!.stateVars
     }
@@ -93,94 +107,82 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitDefineBody(ctx: SMVParser.DefineBodyContext): Any? {
         lastModule!!.definitions.add(
-                SAssignment(SVariable.create(ctx.`var`.getText()).with(null),
-                        ctx.expr().accept(this) as SMVExpr))
+            SAssignment(
+                SVariable.create(ctx.`var`.getText()).with(null),
+                ctx.expr().accept(this) as SMVExpr,
+            ),
+        )
         return null
     }
 
-    override fun visitConstantsDeclaration(ctx: SMVParser.ConstantsDeclarationContext): Any {
-        throw IllegalStateException("not supported")
-    }
+    override fun visitConstantsDeclaration(ctx: SMVParser.ConstantsDeclarationContext): Any = throw IllegalStateException("not supported")
 
-    override fun visitVarBodyAssign(ctx: SMVParser.VarBodyAssignContext): Any {
-        return super.visitVarBodyAssign(ctx)
-    }
+    override fun visitVarBodyAssign(ctx: SMVParser.VarBodyAssignContext): Any = super.visitVarBodyAssign(ctx)
 
     override fun visitInitBody(ctx: SMVParser.InitBodyContext): Any? {
         lastModule!!.initAssignments.add(
-                SAssignment(
-                        SVariable.create(ctx.`var`.getText()).with(null),
-                        ctx.expr().accept(this) as SMVExpr
-                ))
+            SAssignment(
+                SVariable.create(ctx.`var`.getText()).with(null),
+                ctx.expr().accept(this) as SMVExpr,
+            ),
+        )
         return null
     }
 
     override fun visitNextBody(ctx: SMVParser.NextBodyContext): Any? {
         lastModule!!.nextAssignments.add(
-                SAssignment(
-                        SVariable.create(ctx.`var`.getText()).with(null),
-                        ctx.expr().accept(this) as SMVExpr
-                ))
+            SAssignment(
+                SVariable.create(ctx.`var`.getText()).with(null),
+                ctx.expr().accept(this) as SMVExpr,
+            ),
+        )
         return null
     }
 
-    override fun visitFairnessConstraint(ctx: SMVParser.FairnessConstraintContext): Any {
-        return super.visitFairnessConstraint(ctx)
-    }
+    override fun visitFairnessConstraint(ctx: SMVParser.FairnessConstraintContext): Any = super.visitFairnessConstraint(ctx)
 
-    override fun visitPslSpecification(ctx: SMVParser.PslSpecificationContext): Any {
-        return super.visitPslSpecification(ctx)
-    }
+    override fun visitPslSpecification(ctx: SMVParser.PslSpecificationContext): Any = super.visitPslSpecification(ctx)
 
     override fun visitInvarSpecification(ctx: SMVParser.InvarSpecificationContext): Any? {
         lastModule!!.invariantSpecs.add(
-                ctx.expr().accept(this) as SMVExpr
+            ctx.expr().accept(this) as SMVExpr,
         )
         return null
     }
 
     override fun visitCtlSpecification(ctx: SMVParser.CtlSpecificationContext): Any? {
         lastModule!!.ctlSpec.add(
-                ctx.expr().accept(this) as SMVExpr
+            ctx.expr().accept(this) as SMVExpr,
         )
         return null
     }
 
-    override fun visitIsaDeclaration(ctx: SMVParser.IsaDeclarationContext): Any {
-        return super.visitIsaDeclaration(ctx)
-    }
+    override fun visitIsaDeclaration(ctx: SMVParser.IsaDeclarationContext): Any = super.visitIsaDeclaration(ctx)
 
     override fun visitLtlSpecification(ctx: SMVParser.LtlSpecificationContext): Any? {
         lastModule!!.ltlSpec.add(ctx.expr().accept(this) as SMVExpr)
         return null
     }
 
-
-    override fun visitType(ctx: SMVParser.TypeContext): SMVType {
-        return if (ctx.moduleType() != null) {
-            ctx.moduleType().accept(this) as SMVType
-        } else {
-            ctx.simpleType().accept(this) as SMVType
-        }
+    override fun visitType(ctx: SMVParser.TypeContext): SMVType = if (ctx.moduleType() != null) {
+        ctx.moduleType().accept(this) as SMVType
+    } else {
+        ctx.simpleType().accept(this) as SMVType
     }
 
-    override fun visitBooleanType(ctx: SMVParser.BooleanTypeContext): SMVType {
-        return SMVTypes.BOOLEAN
-    }
+    override fun visitBooleanType(ctx: SMVParser.BooleanTypeContext): SMVType = SMVTypes.BOOLEAN
 
-    override fun visitWordType(ctx: SMVParser.WordTypeContext): Any {
-        return super.visitWordType(ctx)
-    }
+    override fun visitWordType(ctx: SMVParser.WordTypeContext): Any = super.visitWordType(ctx)
 
-    override fun visitSignedType(ctx: SMVParser.SignedTypeContext): Any {
-        return SMVWordType(true,
-                Integer.parseInt(ctx.bits.getText()))
-    }
+    override fun visitSignedType(ctx: SMVParser.SignedTypeContext): Any = SMVWordType(
+        true,
+        Integer.parseInt(ctx.bits.getText()),
+    )
 
-    override fun visitUnsignedType(ctx: SMVParser.UnsignedTypeContext): Any {
-        return SMVWordType(false,
-                Integer.parseInt(ctx.bits.getText()))
-    }
+    override fun visitUnsignedType(ctx: SMVParser.UnsignedTypeContext): Any = SMVWordType(
+        false,
+        Integer.parseInt(ctx.bits.getText()),
+    )
 
     override fun visitEnumType(ctx: SMVParser.EnumTypeContext): Any {
         val ids = ctx.expr().map { it.getText() }
@@ -199,34 +201,34 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitModuleTypeSimple(ctx: SMVParser.ModuleTypeSimpleContext): Any {
         val parameters: List<SMVExpr> = ctx.stateExpr()
-                .map({ se -> se.accept(this) as SMVExpr })
+            .map({ se -> se.accept(this) as SMVExpr })
         return ModuleType(ctx.mod.text, parameters)
     }
 
     override fun visitStateExpr(ctx: SMVParser.StateExprContext): SMVExpr {
         if (ctx.unaryop != null) {
             return SUnaryExpression(
-                    if (ctx.unaryop.getText().equals("!"))
-                        SUnaryOperator.NEGATE
-                    else
-                        SUnaryOperator.MINUS,
-                    ctx.stateExpr(0).accept(this) as SMVExpr
+                if (ctx.unaryop.getText().equals("!")) {
+                    SUnaryOperator.NEGATE
+                } else {
+                    SUnaryOperator.MINUS
+                },
+                ctx.stateExpr(0).accept(this) as SMVExpr,
             )
         }
 
         return if (ctx.terminalAtom() != null) {
             ctx.terminalAtom().accept(this) as SMVExpr
-        } else SBinaryExpression(
+        } else {
+            SBinaryExpression(
                 ctx.stateExpr(0).accept(this) as SMVExpr,
                 SBinaryOperator.findBySymbol(ctx.op.getText())!!,
-                ctx.stateExpr(1).accept(this) as SMVExpr
-        )
-
+                ctx.stateExpr(1).accept(this) as SMVExpr,
+            )
+        }
     }
 
-    override fun visitParen(ctx: SMVParser.ParenContext): SMVExpr {
-        return ctx.stateExpr().accept(this) as SMVExpr
-    }
+    override fun visitParen(ctx: SMVParser.ParenContext): SMVExpr = ctx.stateExpr().accept(this) as SMVExpr
 
     override fun visitSetExpr(ctx: SMVParser.SetExprContext): Any {
         throw IllegalStateException("not supported")
@@ -243,7 +245,7 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
 
     override fun visitRangeExpr(ctx: SMVParser.RangeExprContext): Any {
         throw IllegalStateException("not supported")
-        //return super.visitRangeExpr(ctx);
+        // return super.visitRangeExpr(ctx);
     }
 
     override fun visitCasesExpr(ctx: SMVParser.CasesExprContext): Any {
@@ -256,70 +258,43 @@ class SMVTransformToAST : SMVBaseVisitor<Any>() {
         return e
     }
 
+    override fun visitTrueExpr(ctx: SMVParser.TrueExprContext): SLiteral = SLiteral.TRUE
 
-    override fun visitTrueExpr(ctx: SMVParser.TrueExprContext): SLiteral {
-        return SLiteral.TRUE
-    }
+    override fun visitFalseExpr(ctx: SMVParser.FalseExprContext): SLiteral = SLiteral.FALSE
 
-    override fun visitFalseExpr(ctx: SMVParser.FalseExprContext): SLiteral {
-        return SLiteral.FALSE
-    }
+    override fun visitModuleTypeProcess(ctx: SMVParser.ModuleTypeProcessContext): Any = throw IllegalStateException("not supported")
 
-    override fun visitModuleTypeProcess(ctx: SMVParser.ModuleTypeProcessContext): Any {
-        throw IllegalStateException("not supported")
-    }
+    override fun visitTemporalBinExpr(ctx: SMVParser.TemporalBinExprContext): Any = SQuantified(
+        STemporalOperator.valueOf(ctx.op),
+        ctx.left.accept(this) as SMVExpr,
+        ctx.right.accept(this) as SMVExpr,
+    )
 
-    override fun visitTemporalBinExpr(ctx: SMVParser.TemporalBinExprContext): Any {
-        return SQuantified(STemporalOperator.valueOf(ctx.op),
-                ctx.left.accept(this) as SMVExpr,
-                ctx.right.accept(this) as SMVExpr)
-    }
+    override fun visitTemporalUnaryExpr(ctx: SMVParser.TemporalUnaryExprContext): Any = SQuantified(
+        STemporalOperator.valueOf(ctx.op),
+        ctx.expr().accept(this) as SMVExpr,
+    )
 
-    override fun visitTemporalUnaryExpr(ctx: SMVParser.TemporalUnaryExprContext): Any {
-        return SQuantified(
-                STemporalOperator.valueOf(ctx.op),
-                ctx.expr().accept(this) as SMVExpr
-        )
-    }
-
-    override fun visitTemporalParen(ctx: SMVParser.TemporalParenContext): SMVExpr {
-        return ctx.expr().accept(this) as SMVExpr
-    }
+    override fun visitTemporalParen(ctx: SMVParser.TemporalParenContext): SMVExpr = ctx.expr().accept(this) as SMVExpr
 
     override fun visitFunctionExpr(ctx: SMVParser.FunctionExprContext): SMVExpr {
         val exprs = getSMVExprs(ctx)
         return SFunction(ctx.func.text, exprs)
     }
 
-    private fun getSMVExprs(ctx: SMVParser.FunctionExprContext): List<SMVExpr> {
-        return ctx.stateExpr().map { it.accept(this) as SMVExpr }
-    }
+    private fun getSMVExprs(ctx: SMVParser.FunctionExprContext): List<SMVExpr> = ctx.stateExpr().map { it.accept(this) as SMVExpr }
 
-    override fun visitCasesExprAtom(ctx: SMVParser.CasesExprAtomContext): Any {
-        return super.visitCasesExprAtom(ctx)
-    }
+    override fun visitCasesExprAtom(ctx: SMVParser.CasesExprAtomContext): Any = super.visitCasesExprAtom(ctx)
 
-    override fun visitVariableAccess(ctx: SMVParser.VariableAccessContext): Any {
-        return SVariable.create(ctx.getText()).with(null)
-    }
+    override fun visitVariableAccess(ctx: SMVParser.VariableAccessContext): Any = SVariable.create(ctx.getText()).with(null)
 
-    override fun visitArrayAccess(ctx: SMVParser.ArrayAccessContext): Any {
-        throw IllegalStateException("not supported")
-    }
+    override fun visitArrayAccess(ctx: SMVParser.ArrayAccessContext): Any = throw IllegalStateException("not supported")
 
-    override fun visitVariableDotted(ctx: SMVParser.VariableDottedContext): Any {
-        throw IllegalStateException("not supported")
-    }
+    override fun visitVariableDotted(ctx: SMVParser.VariableDottedContext): Any = throw IllegalStateException("not supported")
 
-    override fun visitIntegerLiteral(ctx: SMVParser.IntegerLiteralContext): Any {
-        return SIntegerLiteral(BigInteger(ctx.value.getText()))
-    }
+    override fun visitIntegerLiteral(ctx: SMVParser.IntegerLiteralContext): Any = SIntegerLiteral(BigInteger(ctx.value.getText()))
 
-    override fun visitFloatLiteral(ctx: SMVParser.FloatLiteralContext): Any {
-        return SFloatLiteral(BigDecimal(ctx.value.getText()))
-    }
+    override fun visitFloatLiteral(ctx: SMVParser.FloatLiteralContext): Any = SFloatLiteral(BigDecimal(ctx.value.getText()))
 
-    override fun visitCaseBranch(ctx: SMVParser.CaseBranchContext): Any {
-        return super.visitCaseBranch(ctx)
-    }
+    override fun visitCaseBranch(ctx: SMVParser.CaseBranchContext): Any = super.visitCaseBranch(ctx)
 }

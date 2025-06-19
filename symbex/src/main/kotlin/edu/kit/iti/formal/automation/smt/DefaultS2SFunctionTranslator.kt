@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.smt
 
 /*-
@@ -47,8 +65,11 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
         val lookup = when (typeLeft) {
             is SMVWordType -> {
                 val (signed) = typeLeft
-                if (signed) bvsOperators
-                else bvuOperators
+                if (signed) {
+                    bvsOperators
+                } else {
+                    bvuOperators
+                }
             }
             is EnumType -> bvuOperators
             SMVTypes.INT -> arithOperators
@@ -67,8 +88,7 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
         }
     }
 
-    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr
-            = TODO("translation of various functions")
+    override fun translateOperator(func: SFunction, args: List<SExpr>): SExpr = TODO("translation of various functions")
 
     companion object {
         internal var logicalOperators: MutableMap<SBinaryOperator, String> = EnumMap(SBinaryOperator::class.java)
@@ -119,7 +139,7 @@ class DefaultS2SFunctionTranslator : S2SFunctionTranslator {
             arithOperators[SBinaryOperator.DIV] = "div"
             arithOperators[SBinaryOperator.XOR] = "xor"
             arithOperators[SBinaryOperator.EQUAL] = "="
-            //arithOperators[SBinaryOperator.XNOR] = ""
+            // arithOperators[SBinaryOperator.XNOR] = ""
             arithOperators[SBinaryOperator.MINUS] = "-"
             arithOperators[SBinaryOperator.MOD] = "mod"
             arithOperators[SBinaryOperator.GREATER_EQUAL] = ">="

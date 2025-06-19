@@ -1,9 +1,7 @@
-/*
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2018 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -17,9 +15,7 @@
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.oo
 
 /*
@@ -27,5 +23,4 @@ package edu.kit.iti.formal.automation.oo
  *
  * @author Augusto Modanese
  */
-object OOIEC61131Facade {
-}
+object OOIEC61131Facade

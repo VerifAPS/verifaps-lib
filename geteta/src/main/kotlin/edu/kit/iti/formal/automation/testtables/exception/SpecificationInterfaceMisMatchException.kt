@@ -1,28 +1,27 @@
-/*
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.exception
-
 
 import edu.kit.iti.formal.smv.ast.SMVModule
 import edu.kit.iti.formal.smv.ast.SVariable
 import java.util.*
+import kotlin.math.min
 
 /**
  * @author Alexander Weigl
@@ -38,18 +37,21 @@ class SpecificationInterfaceMisMatchException : GetetaException {
     constructor(cause: Throwable) : super(cause)
 
     protected constructor(
-        message: String, cause: Throwable,
+        message: String,
+        cause: Throwable,
         enableSuppression: Boolean,
-        writableStackTrace: Boolean
+        writableStackTrace: Boolean,
     ) : super(message, cause, enableSuppression, writableStackTrace)
 
     constructor(code: SMVModule, v: SVariable) :
-            super(
-                String.format(
-                    "Could not find variable '%s' in module: %s. Candidates would be: %s",
-                    v.name, code.name, candidates(v.name, code)
-                )
-            )
+        super(
+            String.format(
+                "Could not find variable '%s' in module: %s. Candidates would be: %s",
+                v.name,
+                code.name,
+                candidates(v.name, code),
+            ),
+        )
 
     companion object {
 
@@ -62,7 +64,7 @@ class SpecificationInterfaceMisMatchException : GetetaException {
 
         private fun candidates(name: String, code: List<String>): Collection<String> {
             val heap = PriorityQueue(
-                LevensteinCaseInsensitiveComparator(name)
+                LevensteinCaseInsensitiveComparator(name),
             )
             heap.addAll(code)
             return heap
@@ -76,7 +78,6 @@ class SpecificationInterfaceMisMatchException : GetetaException {
                 this.reference = name.lowercase(Locale.getDefault())
             }
 
-
             override fun compare(o1: String, o2: String): Int {
                 val level1 = getLevenstheinToRef(o1)
                 val level2 = getLevenstheinToRef(o2)
@@ -88,7 +89,7 @@ class SpecificationInterfaceMisMatchException : GetetaException {
                 return computed.computeIfAbsent(k) { s ->
                     levenshteinDistance(
                         reference,
-                        s
+                        s,
                     )
                 }
             }
@@ -124,12 +125,12 @@ class SpecificationInterfaceMisMatchException : GetetaException {
                         val match = if (lhs[i - 1] == rhs[j - 1]) 0 else 1
 
                         // computing cost for each transformation
-                        val cost_replace = cost[i - 1] + match
-                        val cost_insert = cost[i] + 1
-                        val cost_delete = newcost[i - 1] + 1
+                        val costReplace = cost[i - 1] + match
+                        val costInsert = cost[i] + 1
+                        val costDelete = newcost[i - 1] + 1
 
                         // fwdprogress minimum cost
-                        newcost[i] = Math.min(Math.min(cost_insert, cost_delete), cost_replace)
+                        newcost[i] = min(min(costInsert, costDelete), costReplace)
                     }
 
                     // swap cost/newcost arrays

@@ -13,19 +13,34 @@ plugins {
 // version and style are optional
 spotless {
     kotlin {
-        licenseHeader("""
+        licenseHeader(
+            """
             |/* *****************************************************************
             | * This file belongs to verifaps-lib (https://verifaps.github.io).
             | * SPDX-License-Header: GPL-3.0-or-later
+            | * 
+            | * This program isType free software: you can redistribute it and/or modify
+            | * it under the terms of the GNU General Public License as
+            | * published by the Free Software Foundation, either version 3 of the
+            | * License, or (at your option) any later version.
+            | *
+            | * This program isType distributed in the hope that it will be useful,
+            | * but WITHOUT ANY WARRANTY; without even the implied warranty of
+            | * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+            | * GNU General Public License for more details.
+            | *
+            | * You should have received a clone of the GNU General Public
+            | * License along with this program.  If not, see
+            | * <http://www.gnu.org/licenses/gpl-3.0.html>.
             | * *****************************************************************/
-        """.trimMargin())
+            |
+            """.trimMargin(),
+        )
         // or licenseHeaderFile
-        //ktfmt("0.55").kotlinlangStyle()
-        ktlint()
-
+        // ktfmt("0.55").kotlinlangStyle()
+        ktlint("1.6.0").setEditorConfigPath("$rootDir/.editorconfig")
     }
 }
-
 
 repositories {
     mavenCentral()
@@ -39,7 +54,7 @@ dependencies {
 
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    //implementation( "org.jetbrains", name: "annotations", version: "26.0.2"
+    // implementation( "org.jetbrains", name: "annotations", version: "26.0.2"
 
     testImplementation("com.google.truth:truth:1.4.4")
 
@@ -48,7 +63,6 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
-
 
 kotlin {
     // Use a specific Java version to make it easier to work in different environments.
@@ -69,8 +83,8 @@ tasks.withType<Test>().configureEach {
 
         events(
             TestLogEvent.FAILED,
-            //TestLogEvent.PASSED,
-            //TestLogEvent.SKIPPED
+            // TestLogEvent.PASSED,
+            // TestLogEvent.SKIPPED
         )
 
         error.showStandardStreams = true
@@ -96,7 +110,6 @@ tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 }
 
-
 tasks.getByName<Jar>("jar") {
     manifest {
         attributes(
@@ -108,7 +121,7 @@ tasks.getByName<Jar>("jar") {
 }
 
 val sourcesJar = tasks.register<Jar>("sourcesJar") {
-    from(sourceSets.main)//.allJava
+    from(sourceSets.main) // .allJava
     archiveClassifier = "sources"
 }
 
@@ -123,14 +136,14 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/verifaps/verifaps-lib")
             credentials {
-                //username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                //password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+                // username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                // password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
             }
         }
     }
     publications {
         create<MavenPublication>("gpr") {
-            //TODO from(components.java)
+            // TODO from(components.java)
             artifact(sourcesJar)
             artifact(javadocJar)
             pom {
@@ -166,7 +179,6 @@ if (project.plugins.hasPlugin("antlr")) {
         val antlr = configurations.getByName("antlr")
         antlr(libs.findLibrary("antlr").get())
     }
-
 
     val ggs = tasks["generateGrammarSource"]
     val gtgs = tasks["generateTestGrammarSource"]

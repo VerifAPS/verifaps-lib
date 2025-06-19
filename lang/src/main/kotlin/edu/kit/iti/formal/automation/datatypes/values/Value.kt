@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.datatypes.values
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.datatypes.values
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.datatypes.values
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.st.ast.*
@@ -35,7 +31,9 @@ import java.util.*
  * @version $Id: $Id
  */
 sealed class Value<T : AnyDt, S : Any>(
-        val dataType: T, val value: S) {
+    val dataType: T,
+    val value: S,
+) {
 
     operator fun component1() = dataType
     operator fun component2() = value
@@ -56,13 +54,10 @@ sealed class Value<T : AnyDt, S : Any>(
         return result
     }
 
-    override fun toString(): String {
-        return "Value{$dataType}($value)"
-    }
+    override fun toString(): String = "Value{$dataType}($value)"
 
     open fun assignTo(ref: SymbolicReference): StatementList? = null
 }
-
 
 class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
     constructor(dt: AnyInt, v: Long) : this(dt, BigInteger.valueOf(v))
@@ -70,17 +65,14 @@ class VAnyInt(dt: AnyInt, v: BigInteger) : Value<AnyInt, BigInteger>(dt, v) {
     override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo IntegerLit(dataType, value))
 }
 
-class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>)
-    : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v) {
-}
+class VClass(dt: ClassDataType, v: Map<String, Value<*, *>>) : Value<ClassDataType, Map<String, Value<*, *>>>(dt, v)
 
 class VAnyReal(dt: AnyReal, v: BigDecimal) : Value<AnyReal, BigDecimal>(dt, v) {
     override fun assignTo(ref: SymbolicReference): StatementList? = StatementList(ref assignTo RealLit(dataType, value))
 }
 
 class VAnyBit(dt: AnyBit, v: Bits) : Value<AnyBit, Bits>(dt, v) {
-    override fun assignTo(ref: SymbolicReference) =
-            StatementList(ref assignTo BitLit(dataType, value.register))
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo BitLit(dataType, value.register))
 }
 
 class VBool(dt: AnyBit.BOOL, v: Boolean) : Value<AnyBit.BOOL, Boolean>(dt, v) {
@@ -91,8 +83,7 @@ val TRUE = VBool(AnyBit.BOOL, true)
 val FALSE = VBool(AnyBit.BOOL, false)
 
 class VIECString(dt: IECString, v: String) : Value<IECString, String>(dt, v) {
-    override fun assignTo(ref: SymbolicReference) =
-            StatementList(ref assignTo StringLit(dataType, value))
+    override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo StringLit(dataType, value))
 }
 
 class VDate(dt: AnyDate.DATE, v: DateData) : Value<AnyDate.DATE, DateData>(dt, v) {
@@ -105,7 +96,6 @@ class VTime(dt: TimeType, v: TimeData) : Value<TimeType, TimeData>(dt, v) {
 
 class VDateAndTime(dt: AnyDate.DATE_AND_TIME, v: DateAndTimeData) : Value<AnyDate.DATE_AND_TIME, DateAndTimeData>(dt, v) {
     override fun assignTo(ref: SymbolicReference) = StatementList(ref assignTo DateAndTimeLit(value))
-
 }
 
 class VTimeOfDay(dt: AnyDate.TIME_OF_DAY, v: TimeofDayData) : Value<AnyDate.TIME_OF_DAY, TimeofDayData>(dt, v) {
@@ -121,8 +111,10 @@ class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(d
         get() {
             return dataType.fields.map {
                 val specificValue = value.fieldValues[it.name]
-                it.name to (specificValue ?: it.initValue
-                ?: throw IllegalStateException("value it not determined for record value: field '${it.name}'"))
+                it.name to (
+                    specificValue ?: it.initValue
+                        ?: throw IllegalStateException("value it not determined for record value: field '${it.name}'")
+                    )
             }
         }
 
@@ -136,7 +128,6 @@ class VStruct(dt: RecordType, v: RecordValue) : Value<RecordType, RecordValue>(d
         return seq
     }
 }
-
 
 class VArray(dt: ArrayType, v: MultiDimArrayValue) : Value<ArrayType, MultiDimArrayValue>(dt, v) {
     override fun assignTo(ref: SymbolicReference): StatementList? {

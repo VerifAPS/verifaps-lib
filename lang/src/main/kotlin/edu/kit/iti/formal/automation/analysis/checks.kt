@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -24,15 +42,12 @@ fun getCheckers(reporter: Reporter) = listOf(CheckForTypes(reporter), CheckForLi
  * Similarity is defined via degree of levensthein of the low-case strings.
  * Percentage of changed characters.
  */
-fun variableSimilarity(expected: String, defined: String): Double =
-    dlevenshtein(expected.lowercase(Locale.getDefault()), defined.lowercase(Locale.getDefault())).toDouble() / expected.length
+fun variableSimilarity(expected: String, defined: String): Double = dlevenshtein(expected.lowercase(Locale.getDefault()), defined.lowercase(Locale.getDefault())).toDouble() / expected.length
 
-fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) =
-        this.map { it to variableSimilarity(reference, it) }
-                .sortedByDescending { it.second }
-                .filter { it.second > threshold }
-                .map { it.first }
-
+fun Iterable<String>.similarCandidates(reference: String, threshold: Double = .9) = this.map { it to variableSimilarity(reference, it) }
+    .sortedByDescending { it.second }
+    .filter { it.second > threshold }
+    .map { it.first }
 
 class CheckForLiterals(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun defaultVisit(obj: Any) {}
@@ -56,14 +71,18 @@ class CheckForLiterals(private val reporter: Reporter) : AstVisitorWithScope<Uni
     private fun check(literal: EnumLit) {
         val dt = literal.dataType.obj
         if (dt == null) {
-            reporter.report(literal,
-                    "Could not find enumeration type '${literal.dataType.identifier}' for this literal",
-                    DATATYPE_NOT_FOUND)
+            reporter.report(
+                literal,
+                "Could not find enumeration type '${literal.dataType.identifier}' for this literal",
+                DATATYPE_NOT_FOUND,
+            )
         } else {
             if (literal.value !in dt.allowedValues.keys) {
-                reporter.report(literal,
-                        "Value ${literal.value} not allowed in the enumeration type '$dt'. ",
-                        DATATYPE_NOT_FOUND) {
+                reporter.report(
+                    literal,
+                    "Value ${literal.value} not allowed in the enumeration type '$dt'. ",
+                    DATATYPE_NOT_FOUND,
+                ) {
                     candidates.addAll(dt.allowedValues.keys.similarCandidates(literal.value))
                 }
             }
@@ -115,19 +134,22 @@ class CheckForLiterals(private val reporter: Reporter) : AstVisitorWithScope<Uni
     private fun check(literal: RealLit) {}
 
     private fun check(literal: StringLit) {
-        //TODO check for not defined escape characters
+        // TODO check for not defined escape characters
     }
 
     private fun check(literal: IntegerLit) {
         val value = literal.value
         val dt = literal.dataType(scope)
         if (!dt.isValid(value)) {
-            reporter.report(literal, "The given integer literal is not in range for the specified data type: $dt",
-                    LITERAL_RANGE_EXCEEDED, WARN)
+            reporter.report(
+                literal,
+                "The given integer literal is not in range for the specified data type: $dt",
+                LITERAL_RANGE_EXCEEDED,
+                WARN,
+            )
         }
     }
 }
-
 
 class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun defaultVisit(obj: Any) {}
@@ -137,33 +159,40 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
             scope.getVariable(symbolicReference.identifier)
         } catch (e: VariableNotDefinedException) {
             val candidates = scope.allVisibleVariables.map { it.name }
-                    .similarCandidates(symbolicReference.identifier)
-                    .joinToString(", ")
+                .similarCandidates(symbolicReference.identifier)
+                .joinToString(", ")
 
-            reporter.report(symbolicReference,
-                    "Could not find variable ${symbolicReference.identifier}. " +
-                            "Possible candidates are: $candidates",
-                    VARIABLE_NOT_RESOLVED)
+            reporter.report(
+                symbolicReference,
+                "Could not find variable ${symbolicReference.identifier}. " +
+                    "Possible candidates are: $candidates",
+                VARIABLE_NOT_RESOLVED,
+            )
         }
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) {
         if (!functionDeclaration.returnType.isIdentified) {
-            reporter.report(functionDeclaration,
-                    "Return type with name '${functionDeclaration.returnType.identifier}' for function DECLARATION ${functionDeclaration.name} not found.",
-                    TYPE_RESOLVE)
+            reporter.report(
+                functionDeclaration,
+                "Return type with name '${functionDeclaration.returnType.identifier}' for function DECLARATION ${functionDeclaration.name} not found.",
+                TYPE_RESOLVE,
+            )
         }
         super.visit(functionDeclaration)
     }
 
     override fun visit(invocation: InvocationStatement) {
-        invocation.invoked ?: reporter.report(invocation,
-                "Invocation unresolved: ${invocation.callee}.",
-                INVOCATION_RESOLVE, WARN)
+        invocation.invoked ?: reporter.report(
+            invocation,
+            "Invocation unresolved: ${invocation.callee}.",
+            INVOCATION_RESOLVE,
+            WARN,
+        )
 
         if (invocation.invoked != null) {
-            //TODO check for recursive call
-            //reporter.report(invocation, "Invocation unresolved: ${invocation.callee}.",
+            // TODO check for recursive call
+            // reporter.report(invocation, "Invocation unresolved: ${invocation.callee}.",
             //        INVOCATION_RESOLVE, WARN)
         }
 
@@ -173,15 +202,21 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
             val dtIn = invocation.invoked?.findInputVariable(it.name)
 
             if (dtIn == null) {
-                reporter.report(it,
-                        "Could not resolve data type for input variable: ${it.name}.",
-                        VARIABLE_NOT_RESOLVED, ERROR)
+                reporter.report(
+                    it,
+                    "Could not resolve data type for input variable: ${it.name}.",
+                    VARIABLE_NOT_RESOLVED,
+                    ERROR,
+                )
             } else {
                 if (dt != null) {
                     if (!dt.isAssignableTo(dtIn)) {
-                        reporter.report(it,
-                                "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
-                                VARIABLE_NOT_RESOLVED, ERROR)
+                        reporter.report(
+                            it,
+                            "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
+                            VARIABLE_NOT_RESOLVED,
+                            ERROR,
+                        )
                     }
                 }
             }
@@ -197,15 +232,21 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
                 val dtIn = invocation.invoked?.findInputVariable(it.name)
 
                 if (dtIn == null) {
-                    reporter.report(it,
-                            "Could not resolve data type for input variable: ${it.name}.",
-                            VARIABLE_NOT_RESOLVED, ERROR)
+                    reporter.report(
+                        it,
+                        "Could not resolve data type for input variable: ${it.name}.",
+                        VARIABLE_NOT_RESOLVED,
+                        ERROR,
+                    )
                 } else {
                     if (dt != null) {
                         if (!dt.isAssignableTo(dtIn)) {
-                            reporter.report(it,
-                                    "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
-                                    VARIABLE_NOT_RESOLVED, ERROR)
+                            reporter.report(
+                                it,
+                                "Type mismatch ($dt <= $dtIn)  for expression ${it.expression.toHuman()} and parameter ${it.name}.",
+                                VARIABLE_NOT_RESOLVED,
+                                ERROR,
+                            )
                         }
                     }
                 }
@@ -217,40 +258,52 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
         val fd = scope.resolveFunction(invocation)
         if (fd == null) {
             val invoc = IEC61131Facade.print(invocation)
-            reporter.report(invocation,
-                    "Invocation $invoc could not resolved.",
-                    FUNCTION_RESOLVE)
+            reporter.report(
+                invocation,
+                "Invocation $invoc could not resolved.",
+                FUNCTION_RESOLVE,
+            )
         } else {
             val expectedTypes = fd.scope.variables.filter { it.isInput }
             val exprTypes = invocation.parameters.map {
                 try {
-                    //val scope = invocation.invoked?.getCalleeScope()!!
+                    // val scope = invocation.invoked?.getCalleeScope()!!
                     it.expression.dataType(scope)
                 } catch (e: VariableNotDefinedException) {
-                    reporter.report(e.reference!!, "Variable ${e.reference.toHuman()} could not be found in scope.",
-                            VARIABLE_NOT_RESOLVED)
+                    reporter.report(
+                        e.reference!!,
+                        "Variable ${e.reference.toHuman()} could not be found in scope.",
+                        VARIABLE_NOT_RESOLVED,
+                    )
                     null
                 } catch (e: DataTypeNotResolvedException) {
-                    reporter.report(e.expr, "Datatype of ${e.expr.toHuman()} could not be derived.",
-                            TYPE_RESOLVE)
+                    reporter.report(
+                        e.expr,
+                        "Datatype of ${e.expr.toHuman()} could not be derived.",
+                        TYPE_RESOLVE,
+                    )
                     null
                 }
             }
 
             if (expectedTypes.size != exprTypes.size) {
                 val invoc = IEC61131Facade.print(invocation)
-                reporter.report(invocation,
-                        "Exptected function arguments ${expectedTypes.size}, but only ${exprTypes.size} given in function call: $invoc.",
-                        ReportCategory.FUNCTIION_ARGUMENTS_MISMATCH)
+                reporter.report(
+                    invocation,
+                    "Exptected function arguments ${expectedTypes.size}, but only ${exprTypes.size} given in function call: $invoc.",
+                    ReportCategory.FUNCTIION_ARGUMENTS_MISMATCH,
+                )
             } else {
                 expectedTypes.zip(exprTypes).forEach { (vd, def) ->
                     val exp = vd.dataType
                     if (exp != null) {
                         val c = def?.isAssignableTo(exp) ?: false
                         if (!c) {
-                            reporter.report(invocation,
-                                    "Type mismatch for argument ${vd.name}: exptected ${exp} but got ${def}",
-                                    ReportCategory.FUNCTION_CALL_TYPE_MISMATCH)
+                            reporter.report(
+                                invocation,
+                                "Type mismatch for argument ${vd.name}: exptected $exp but got $def",
+                                ReportCategory.FUNCTION_CALL_TYPE_MISMATCH,
+                            )
                         }
                     }
                 }
@@ -260,14 +313,18 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
 
     override fun visit(variableDeclaration: VariableDeclaration) {
         variableDeclaration.initValue
-                ?: reporter.report(variableDeclaration.token,
-                        "Could not determine initial value for variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
-                        ReportCategory.INIT_VALUE)
+            ?: reporter.report(
+                variableDeclaration.token,
+                "Could not determine initial value for variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
+                ReportCategory.INIT_VALUE,
+            )
 
         variableDeclaration.dataType
-                ?: reporter.report(variableDeclaration.token,
-                        "Could not determine data type of variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
-                        ReportCategory.TYPE_RESOLVE)
+            ?: reporter.report(
+                variableDeclaration.token,
+                "Could not determine data type of variable: ${variableDeclaration.name} with ${variableDeclaration.typeDeclaration.toHuman()}",
+                ReportCategory.TYPE_RESOLVE,
+            )
     }
 
     override fun visit(assignmentStatement: AssignmentStatement) {
@@ -276,13 +333,19 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
         try {
             val vd = scope.getVariable(assignmentStatement.location)
             if (vd.isInput || vd.isConstant) {
-                reporter.report(assignmentStatement.location, "Variable not writable",
-                        PERMISSION, WARN)
+                reporter.report(
+                    assignmentStatement.location,
+                    "Variable not writable",
+                    PERMISSION,
+                    WARN,
+                )
             }
         } catch (e: VariableNotDefinedException) {
-            reporter.report(assignmentStatement.location,
-                    "Could not resolve ${assignmentStatement.location.toHuman()}.",
-                    VARIABLE_NOT_RESOLVED)
+            reporter.report(
+                assignmentStatement.location,
+                "Could not resolve ${assignmentStatement.location.toHuman()}.",
+                VARIABLE_NOT_RESOLVED,
+            )
         }
 
         val lhsType = inferDataTypeOrNull(assignmentStatement.location, scope)
@@ -290,9 +353,11 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
 
         if (lhsType != null && rhsType != null) {
             if (!rhsType.isAssignableTo(lhsType)) {
-                reporter.report(assignmentStatement,
-                        "Assignment type conflict between $rhsType and $lhsType",
-                        ASSIGNMENT_TYPE_CONFLICT)
+                reporter.report(
+                    assignmentStatement,
+                    "Assignment type conflict between $rhsType and $lhsType",
+                    ASSIGNMENT_TYPE_CONFLICT,
+                )
             }
         }
     }
@@ -301,24 +366,25 @@ class CheckForTypes(private val reporter: Reporter) : AstVisitorWithScope<Unit>(
         super.visit(forStatement)
     }
 
-    private fun inferDataTypeOrNull(expr: Expression, s: Scope = scope): AnyDt? {
-        return try {
-            expr.dataType(s)
-        } catch (e: VariableNotDefinedException) {
-            reporter.report(e.reference!!,
-                    "Could not resolve variable: ${e.reference.toHuman()}",
-                    VARIABLE_NOT_RESOLVED)
-            null
-        } catch (e: DataTypeNotResolvedException) {
-            reporter.report(expr, e.message!!, INFER)
-            null
-        }
+    private fun inferDataTypeOrNull(expr: Expression, s: Scope = scope): AnyDt? = try {
+        expr.dataType(s)
+    } catch (e: VariableNotDefinedException) {
+        reporter.report(
+            e.reference!!,
+            "Could not resolve variable: ${e.reference.toHuman()}",
+            VARIABLE_NOT_RESOLVED,
+        )
+        null
+    } catch (e: DataTypeNotResolvedException) {
+        reporter.report(expr, e.message!!, INFER)
+        null
     }
 }
 
-private fun Invoked?.findInputVariable(name: String?): AnyDt? {
-    return if (name == null) null
-    else when (this) {
+private fun Invoked?.findInputVariable(name: String?): AnyDt? = if (name == null) {
+    null
+} else {
+    when (this) {
         is Invoked.Program -> this.program.scope.variables[name]?.dataType
         is Invoked.FunctionBlock -> this.fb.scope.variables[name]?.dataType
         is Invoked.Function -> this.function.scope.variables[name]?.dataType
@@ -337,8 +403,11 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun visit(interfaceDeclaration: InterfaceDeclaration) {
         interfaze = interfaceDeclaration
         interfaceDeclaration.interfaces.forEach {
-            it.obj ?: reporter.report(interfaceDeclaration, "Could not resolve interface ${it.identifier}.",
-                    ReportCategory.INTERFACE_NOT_RESOLVED)
+            it.obj ?: reporter.report(
+                interfaceDeclaration,
+                "Could not resolve interface ${it.identifier}.",
+                ReportCategory.INTERFACE_NOT_RESOLVED,
+            )
         }
     }
 
@@ -346,24 +415,32 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
         this.clazz = clazz
 
         clazz.interfaces.forEach {
-            it.obj ?: reporter.report(clazz, "Could not resolve interface ${it.identifier}.",
-                    ReportCategory.INTERFACE_NOT_RESOLVED)
+            it.obj ?: reporter.report(
+                clazz,
+                "Could not resolve interface ${it.identifier}.",
+                ReportCategory.INTERFACE_NOT_RESOLVED,
+            )
         }
 
-        if (clazz.parent.obj == null && clazz.parent.identifier != null)
-            reporter.report(clazz, "Could not resolve parent class ${clazz.parent.identifier}.",
-                    ReportCategory.CLASS_NOT_RESOLVED)
-
+        if (clazz.parent.obj == null && clazz.parent.identifier != null) {
+            reporter.report(
+                clazz,
+                "Could not resolve parent class ${clazz.parent.identifier}.",
+                ReportCategory.CLASS_NOT_RESOLVED,
+            )
+        }
 
         val declM = clazz.declaredMethods
         val defM = clazz.definedMethods
         for ((where, declared) in declM) {
             if (!defM.any { it.second sameSignature declared }) {
-                reporter.report(clazz,
-                        "Declared method ${declared.toHuman()} in ${where.toHuman()} " +
-                                "is not defined in ${clazz.toHuman()}.",
-                        ReportCategory.METHOD_NOT_DEFINED,
-                        ERROR)
+                reporter.report(
+                    clazz,
+                    "Declared method ${declared.toHuman()} in ${where.toHuman()} " +
+                        "is not defined in ${clazz.toHuman()}.",
+                    ReportCategory.METHOD_NOT_DEFINED,
+                    ERROR,
+                )
             }
         }
     }
@@ -371,11 +448,15 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
     override fun visit(method: MethodDeclaration) {
         if (method.isOverride && method.overrides == null) {
             val candidates =
-                    (if (clazz != null)
+                (
+                    if (clazz != null) {
                         (clazz!!.declaredMethods + clazz!!.definedMethods)
-                    else interfaze!!.definedMethods)
-                            .filter { (_, m) -> m.name == method.name }
-                            .joinToString { (w, m) -> "${w.name}.${m.name}" }
+                    } else {
+                        interfaze!!.definedMethods
+                    }
+                    )
+                    .filter { (_, m) -> m.name == method.name }
+                    .joinToString { (w, m) -> "${w.name}.${m.name}" }
             reporter.report(method, "Method is declared as override, but does not override any method. Candidates are: $candidates")
         }
 
@@ -408,7 +489,8 @@ class CheckForOO(private val reporter: Reporter) : AstVisitorWithScope<Unit>() {
 }
 
 enum class ReportCategory {
-    UNKNOWN, INFER,
+    UNKNOWN,
+    INFER,
     DATATYPE_NOT_FOUND,
     LITERAL_UNKNOWN,
     LITERAL_RANGE_EXCEEDED,
@@ -426,28 +508,27 @@ enum class ReportCategory {
     INTERFACE_NOT_RESOLVED,
     CLASS_NOT_RESOLVED,
     METHOD_HAS_BODY,
-    SYNTAX
-
+    SYNTAX,
 }
 
 enum class ReportLevel {
-    INFO, WARN, ERROR
+    INFO,
+    WARN,
+    ERROR,
 }
 
 /**
  *
  */
-fun Any?.toHuman(): String =
-        when (this) {
-            null -> "null"
-            is SymbolicReference -> IEC61131Facade.print(this)
-            is ClassDeclaration -> "class '$name'"
-            is InterfaceDeclaration -> "interface '$name'"
-            is MethodDeclaration -> "method '${parent?.name}.$name'"
-            is Identifiable -> this.name
-            else -> toString()
-        }
-
+fun Any?.toHuman(): String = when (this) {
+    null -> "null"
+    is SymbolicReference -> IEC61131Facade.print(this)
+    is ClassDeclaration -> "class '$name'"
+    is InterfaceDeclaration -> "interface '$name'"
+    is MethodDeclaration -> "method '${parent?.name}.$name'"
+    is Identifiable -> this.name
+    else -> toString()
+}
 
 class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
     fun getCaller(): String {
@@ -470,8 +551,13 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
         return rm
     }
 
-    fun report(node: Top?, msg: String, cat: ReportCategory = UNKNOWN,
-               lvl: ReportLevel = ERROR, init: ReporterMessage.() -> Unit = {}) = report {
+    fun report(
+        node: Top?,
+        msg: String,
+        cat: ReportCategory = UNKNOWN,
+        lvl: ReportLevel = ERROR,
+        init: ReporterMessage.() -> Unit = {},
+    ) = report {
         position(node)
         message = msg
         category = cat
@@ -480,8 +566,13 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
         init(this)
     }
 
-    fun report(node: Token?, msg: String, cat: ReportCategory,
-               lvl: ReportLevel = ERROR, init: ReporterMessage.() -> Unit = {}) = report {
+    fun report(
+        node: Token?,
+        msg: String,
+        cat: ReportCategory,
+        lvl: ReportLevel = ERROR,
+        init: ReporterMessage.() -> Unit = {},
+    ) = report {
         position(node)
         message = msg
         category = cat
@@ -491,16 +582,16 @@ class Reporter(val messages: MutableList<ReporterMessage> = ArrayList()) {
     }
 }
 
-
 data class ReporterMessage(
-        var sourceName: String = "",
-        var message: String = "",
-        var start: Position = Position(),
-        var end: Position = Position(),
-        var category: ReportCategory = UNKNOWN,
-        var level: ReportLevel = ERROR,
-        var candidates: MutableList<String> = arrayListOf(),
-        var checkerId: String = "") {
+    var sourceName: String = "",
+    var message: String = "",
+    var start: Position = Position(),
+    var end: Position = Position(),
+    var category: ReportCategory = UNKNOWN,
+    var level: ReportLevel = ERROR,
+    var candidates: MutableList<String> = arrayListOf(),
+    var checkerId: String = "",
+) {
 
     val length: Int
         get() = end.offset - start.offset + 1
@@ -523,21 +614,21 @@ data class ReporterMessage(
     val endOffset
         get() = end.offset
 
-    fun toHuman() =
-            "[$level] $sourceName:$startLine:$startOffsetInLine $message [$category] ($checkerId)"
+    fun toHuman() = "[$level] $sourceName:$startLine:$startOffsetInLine $message [$category] ($checkerId)"
 
     fun toJson() = toMap().toJson()
 
-    fun toMap() =
-            mapOf("level" to level,
-                    "file" to sourceName,
-                    "startLine" to startLine,
-                    "startOffsetInLine" to startOffsetInLine,
-                    "endLine" to endLine,
-                    "endOffsetInLine" to endOffsetInLine,
-                    "message" to message,
-                    "checkerId" to checkerId,
-                    "category" to category)
+    fun toMap() = mapOf(
+        "level" to level,
+        "file" to sourceName,
+        "startLine" to startLine,
+        "startOffsetInLine" to startOffsetInLine,
+        "endLine" to endLine,
+        "endOffsetInLine" to endOffsetInLine,
+        "message" to message,
+        "checkerId" to checkerId,
+        "category" to category,
+    )
 
     fun position(node: Token?) {
         sourceName = node?.tokenSource?.sourceName ?: ""
@@ -568,12 +659,10 @@ data class ReporterMessage(
     }
 }
 
-
-fun <V> Map<String, V>.toJson(): String =
-        this.entries.joinToString(", ", "{", "}") { (k, v) ->
-            val a = when (v) {
-                is String -> "\"${v.replace("\"", "\\\"")}\""
-                else -> v.toString()
-            }
-            "\"$k\" : $a"
-        }
+fun <V> Map<String, V>.toJson(): String = this.entries.joinToString(", ", "{", "}") { (k, v) ->
+    val a = when (v) {
+        is String -> "\"${v.replace("\"", "\\\"")}\""
+        else -> v.toString()
+    }
+    "\"$k\" : $a"
+}

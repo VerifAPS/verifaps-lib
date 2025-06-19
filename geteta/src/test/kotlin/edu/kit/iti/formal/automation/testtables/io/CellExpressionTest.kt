@@ -1,29 +1,27 @@
-/**
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl></weigl>@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
- * <http:></http:>//www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.io
-
 
 import edu.kit.iti.formal.automation.datatypes.INT
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
-import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ColumnCategory
+import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.ParseContext
 import edu.kit.iti.formal.automation.testtables.model.ProgramVariable
 import edu.kit.iti.formal.smv.SMVTypes
@@ -37,10 +35,8 @@ import org.junit.jupiter.api.TestFactory
  */
 object CellExpressionTest {
     @TestFactory
-    fun createExpressionTests(): List<DynamicTest> {
-        return CASES.map { (a, b) ->
-            DynamicTest.dynamicTest(a) { parse(a, b) }
-        }
+    fun createExpressionTests(): List<DynamicTest> = CASES.map { (a, b) ->
+        DynamicTest.dynamicTest(a) { parse(a, b) }
     }
 
     private val gtt: GeneralizedTestTable
@@ -73,34 +69,37 @@ object CellExpressionTest {
         return gtt
     }
 
-    private fun iovar(name: String, io: String, run: Int) =
-            ProgramVariable(name, INT, SMVTypes.signed(16),
-                    if (io == "input") ColumnCategory.ASSUME else ColumnCategory.ASSERT,
-                    programRun = run)
+    private fun iovar(name: String, io: String, run: Int) = ProgramVariable(
+        name,
+        INT,
+        SMVTypes.signed(16),
+        if (io == "input") ColumnCategory.ASSUME else ColumnCategory.ASSERT,
+        programRun = run,
+    )
 
     val CASES = arrayOf(
-            "|>" to "_1\$Q = Q",
-            ">2" to "Q > 0sd16_2",
-            "<52152343243214234" to "Q < 0sd16_52152343243214234",
-            "!=6" to "Q != 0sd16_6",
-            "<>-16134" to "Q != -0sd16_16134",
-            "-243261" to "-0sd16_243261 = Q",
-            "a" to "_0\$a = Q",
-            "a+b" to "_0\$a + _0\$b",
-            "(a)+(((b+c)+d))/2" to "_0\$a + (_0\$b + _0\$c + _0\$d) / 0sd16_2",
-            "convert(a,2)" to "convert(_0\$a, 0sd16_2)",
-            "TRUE" to "TRUE = Q",
-            "true" to "TRUE = Q",
-            "false" to "FALSE = Q",
-            "FALSE" to "FALSE = Q",
-            "a[-5]" to "_0\$a__history._\$5 = Q",
-            "[2+2, 6]" to "0sd16_2 + 0sd16_2 <= Q & Q <= 0sd16_6",
-            "[-61+2, -61]" to "-0sd16_61 + 0sd16_2 <= Q & Q <= -0sd16_61",
-            "0|>a" to "_0\$a = Q",
-            "|>a" to "_1\$a = Q",
-            "0::a + |>a" to "_0\$a + _1\$a",
-            "|>" to "_1\$Q = Q"
-            // "::" to "_1\$Q = Q", :: is also a guard in if statements
-            //"·" to "_1\$Q = Q" · detected as error char? unicode support?!
+        "|>" to "_1\$Q = Q",
+        ">2" to "Q > 0sd16_2",
+        "<52152343243214234" to "Q < 0sd16_52152343243214234",
+        "!=6" to "Q != 0sd16_6",
+        "<>-16134" to "Q != -0sd16_16134",
+        "-243261" to "-0sd16_243261 = Q",
+        "a" to "_0\$a = Q",
+        "a+b" to "_0\$a + _0\$b",
+        "(a)+(((b+c)+d))/2" to "_0\$a + (_0\$b + _0\$c + _0\$d) / 0sd16_2",
+        "convert(a,2)" to "convert(_0\$a, 0sd16_2)",
+        "TRUE" to "TRUE = Q",
+        "true" to "TRUE = Q",
+        "false" to "FALSE = Q",
+        "FALSE" to "FALSE = Q",
+        "a[-5]" to "_0\$a__history._\$5 = Q",
+        "[2+2, 6]" to "0sd16_2 + 0sd16_2 <= Q & Q <= 0sd16_6",
+        "[-61+2, -61]" to "-0sd16_61 + 0sd16_2 <= Q & Q <= -0sd16_61",
+        "0|>a" to "_0\$a = Q",
+        "|>a" to "_1\$a = Q",
+        "0::a + |>a" to "_0\$a + _1\$a",
+        "|>" to "_1\$Q = Q",
+        // "::" to "_1\$Q = Q", :: is also a guard in if statements
+        // "·" to "_1\$Q = Q" · detected as error char? unicode support?!
     )
 }

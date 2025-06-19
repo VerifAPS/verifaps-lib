@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.analysis
 
 import edu.kit.iti.formal.automation.VariableScope
@@ -35,43 +53,41 @@ class UnfoldState {
     }
 
     fun declare(name: String, value: Value<*, *>) {
-        value.dataType.accept(
-                object : DataTypeVisitorNN<Unit> {
-                    override fun defaultVisit(obj: Any) {
-                        state[name] = value
-                    }
+        value.dataType.accept(object : DataTypeVisitorNN<Unit> {
+            override fun defaultVisit(obj: Any) {
+                state[name] = value
+            }
 
-                    override fun visit(arrayType: ArrayType) {
-                        val arrayValue = value.value as MultiDimArrayValue
-                        for (idx in arrayType.allIndices()) {
-                            val n = idx.joinToString(",", "$name[", "]")
-                            val v = arrayValue[idx]
-                            declare(n, v)
-                            decls[n] = VariableDeclaration().also { it.dataType = value.dataType; it.initValue = v }
-                        }
+            override fun visit(arrayType: ArrayType) {
+                val arrayValue = value.value as MultiDimArrayValue
+                for (idx in arrayType.allIndices()) {
+                    val n = idx.joinToString(",", "$name[", "]")
+                    val v = arrayValue[idx]
+                    declare(n, v)
+                    decls[n] = VariableDeclaration().also {
+                        it.dataType = value.dataType
+                        it.initValue = v
                     }
+                }
+            }
 
-                    override fun visit(recordType: RecordType) {
-                        for (idx in recordType.fields) {
-                            addScope(recordType.fields, name)
-                        }
-                    }
+            override fun visit(recordType: RecordType) {
+                for (idx in recordType.fields) {
+                    addScope(recordType.fields, name)
+                }
+            }
 
+            override fun visit(classDataType: ClassDataType) {
+                if (classDataType is ClassDataType.ClassDt) {
+                    addScope(classDataType.clazz.effectiveVariables, name)
+                }
+            }
 
-                    override fun visit(classDataType: ClassDataType) {
-                        if (classDataType is ClassDataType.ClassDt) {
-                            addScope(classDataType.clazz.effectiveVariables, name)
-                        }
-                    }
-
-                    override fun visit(functionBlockDataType: FunctionBlockDataType) {
-                        addScope(functionBlockDataType.functionBlock.effectiveVariables, name)
-                    }
-                })
+            override fun visit(functionBlockDataType: FunctionBlockDataType) {
+                addScope(functionBlockDataType.functionBlock.effectiveVariables, name)
+            }
+        })
     }
 }
 
-fun UnfoldState.classInstances() : Map<String, VariableDeclaration> {
-    return decls
-}
-
+fun UnfoldState.classInstances(): Map<String, VariableDeclaration> = decls

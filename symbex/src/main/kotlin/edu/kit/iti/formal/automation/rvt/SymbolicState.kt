@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.rvt
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.rvt
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.rvt
 
 import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.SMVAstVisitor
@@ -41,7 +37,6 @@ interface SymbolicVariable {
     fun push(value: SMVExpr, postfix: String)
     fun clone(): SymbolicVariable
 }
-
 
 /**
  * A symbolic variable represents a variable in the program.
@@ -67,15 +62,13 @@ data class SymbolicVariableTracing(override val variable: SVariable) : SymbolicV
     }
 }
 
-data class SymbolicVariableSimple(override val variable: SVariable,
-                                  override var value: SMVExpr = variable) : SymbolicVariable {
+data class SymbolicVariableSimple(override val variable: SVariable, override var value: SMVExpr = variable) : SymbolicVariable {
     override fun push(value: SMVExpr, postfix: String) {
         this.value = value
     }
 
     override fun clone(): SymbolicVariable = copy()
 }
-
 
 /**
  * Represents a symbolic state: a list of variable to expressions.
@@ -86,8 +79,9 @@ data class SymbolicVariableSimple(override val variable: SVariable,
  *
  */
 data class SymbolicState(
-        val variables: HashMap<SVariable, SymbolicVariable> = HashMap(),
-        val useDefinitions: Boolean = true) : MutableMap<SVariable, SMVExpr> {
+    val variables: HashMap<SVariable, SymbolicVariable> = HashMap(),
+    val useDefinitions: Boolean = true,
+) : MutableMap<SVariable, SMVExpr> {
 
     val auxiliaryDefinitions: HashMap<SVariable, SMVExpr> = HashMap()
 
@@ -102,15 +96,12 @@ data class SymbolicState(
     override val size: Int
         get() = variables.size
 
-    fun getCurrentValues(): Sequence<SMVExpr> =
-            variables.values.asSequence().map { it.value }
+    fun getCurrentValues(): Sequence<SMVExpr> = variables.values.asSequence().map { it.value }
 
     override fun containsKey(key: SVariable): Boolean = key in variables
-    override fun containsValue(value: SMVExpr): Boolean =
-            getCurrentValues().any { it == value }
+    override fun containsValue(value: SMVExpr): Boolean = getCurrentValues().any { it == value }
 
-    override fun get(key: SVariable): SMVExpr? =
-            variables[key]?.value
+    override fun get(key: SVariable): SMVExpr? = variables[key]?.value
 
     override fun isEmpty(): Boolean = variables.isEmpty()
 
@@ -122,9 +113,7 @@ data class SymbolicState(
                 override val value: SMVExpr
                     get() = b.value
 
-                override fun setValue(newValue: SMVExpr): SMVExpr {
-                    return value
-                }
+                override fun setValue(newValue: SMVExpr): SMVExpr = value
             }
         }.toMutableSet()
 
@@ -145,8 +134,11 @@ data class SymbolicState(
     }
 
     fun ensureVariable(key: SVariable) = variables.computeIfAbsent(key) {
-        if (useDefinitions) SymbolicVariableTracing(key)
-        else SymbolicVariableSimple(key)
+        if (useDefinitions) {
+            SymbolicVariableTracing(key)
+        } else {
+            SymbolicVariableSimple(key)
+        }
     }
 
     override fun putAll(from: Map<out SVariable, SMVExpr>) {
@@ -197,4 +189,3 @@ data class SymbolicState(
         return defs
     }
 }
-

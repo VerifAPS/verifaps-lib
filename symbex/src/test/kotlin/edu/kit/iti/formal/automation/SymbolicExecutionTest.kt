@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import com.google.common.truth.Truth.assertThat
@@ -16,13 +34,14 @@ import org.junit.jupiter.api.fail
 private val Map<SVariable, SymbolicVariable>.stringified: Map<String, String>
     get() =
         asSequence()
-                .flatMap { (a, b) ->
-                    if (b is SymbolicVariableTracing)
-                        b.values.entries.asSequence().map { (a, b) -> a.repr() to b.repr() }
-                    else
-                        listOf(a.repr() to b.value.repr()).asSequence()
+            .flatMap { (a, b) ->
+                if (b is SymbolicVariableTracing) {
+                    b.values.entries.asSequence().map { (a, b) -> a.repr() to b.repr() }
+                } else {
+                    listOf(a.repr() to b.value.repr()).asSequence()
                 }
-                .toMap()
+            }
+            .toMap()
 
 /*private val SymbolicState.definitions: Map<String, String>
     get() = variables.flatMap { (_, b) ->
@@ -35,8 +54,8 @@ private val Map<SVariable, SymbolicVariable>.stringified: Map<String, String>
 
 private val Map<SVariable, SMVExpr>.stringifed: Map<String, String>
     get() = asSequence()
-            .map { (a, b) -> a.name to b.repr() }
-            .toMap()
+        .map { (a, b) -> a.name to b.repr() }
+        .toMap()
 
 /**
  * @author Alexander Weigl
@@ -45,15 +64,15 @@ private val Map<SVariable, SMVExpr>.stringifed: Map<String, String>
  */
 class SymbolicExecutionTest {
     val scope = arrayOf("a", "b", "c", "d", "e", "f", "o")
-            .map { VariableDeclaration(it, 0, INT) }
-            .let { Scope(it) }
+        .map { VariableDeclaration(it, 0, INT) }
+        .let { Scope(it) }
 
     @Test
     fun simpleTest() {
         val statments = "a := 2;" +
-                "c := 3;" +
-                "c := a+c;" +
-                "b := 2*a+c;"
+            "c := 3;" +
+            "c := a+c;" +
+            "b := 2*a+c;"
         val state = executeStatements(statments)
         val defs = state.variables.stringified
         val states = state.stringifed
@@ -92,9 +111,9 @@ class SymbolicExecutionTest {
     @Test
     fun simpleTestNoDefs() {
         val statments = "a := 2;" +
-                "c := 3;" +
-                "c := a+c;" +
-                "b := 2*a+c;"
+            "c := 3;" +
+            "c := a+c;" +
+            "b := 2*a+c;"
         val state = executeStatements(statments, false)
         val defs = state.variables.stringified
         val states = state.stringifed
@@ -168,12 +187,11 @@ class SymbolicExecutionTest {
     @Test
     fun simpleIfWithoutElse() {
         val list = "a := 1; c:= a; b:=b; IF a = 2 THEN b := 2; c := 1;END_IF;"
-        val state = executeStatements(list);
+        val state = executeStatements(list)
         val defs = state.variables
         val states = state.stringifed
         defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
         states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
-
     }
 
     @Test
@@ -204,9 +222,8 @@ class SymbolicExecutionTest {
         val state = executeStatements(list)
         val defs = state.variables.stringified
         val states = state.stringifed
-        //defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
-        //states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
-
+        // defs.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
+        // states.forEach { t, u -> println("containsEntry(\"$t\", \"${u.toString().replace("\n", "\\n")}\")") }
 
         assertThat(defs).run {
             containsEntry("a$00000", "a")
@@ -268,10 +285,9 @@ class SymbolicExecutionTest {
             containsEntry("f", "f$00047")
             containsEntry("o", "o$00048")
         }
-        //val uf = state.unfolded().stringifed
-        //println(uf)
+        // val uf = state.unfolded().stringifed
+        // println(uf)
     }
-
 
     @Test
     fun simpleAssignmentTest() {
@@ -307,7 +323,7 @@ class SymbolicExecutionTest {
         }
     }
 
-    private fun executeStatements(statements: String, useDefs: Boolean=true): SymbolicState {
+    private fun executeStatements(statements: String, useDefs: Boolean = true): SymbolicState {
         val list = IEC61131Facade.statements(statements)
         IEC61131Facade.resolveDataTypes(elements = *arrayOf(list))
         return SymbExFacade.evaluateStatements(list, scope, useDefs)

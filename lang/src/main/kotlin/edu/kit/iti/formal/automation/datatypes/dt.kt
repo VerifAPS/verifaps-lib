@@ -1,18 +1,33 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.datatypes
 
-import edu.kit.iti.formal.automation.VariableScope
+import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.datatypes.values.*
-import edu.kit.iti.formal.automation.st.Identifiable
+import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.ast.*
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
 import kotlin.math.ceil
 import kotlin.math.ln
-
 
 sealed class AnyDt(override var name: String = "ANY") : Identifiable {
 
@@ -34,7 +49,6 @@ sealed class AnyDt(override var name: String = "ANY") : Identifiable {
     companion object {
         val ANONYM_DATATYPE = "ANONYM"
     }
-
 }
 
 object VOID : AnyDt("VOID") {
@@ -51,9 +65,7 @@ object VOID : AnyDt("VOID") {
 open class AnyNum : AnyDt("ANY_NUM") {
 
     /** {@inheritDoc}  */
-    override fun repr(obj: Any): String {
-        throw IllegalStateException("No repr for AnyNum")
-    }
+    override fun repr(obj: Any): String = throw IllegalStateException("No repr for AnyNum")
 
     /** {@inheritDoc}  */
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
@@ -70,7 +82,6 @@ abstract class AnyReal : AnyNum() {
     }
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
-
 
     object REAL : AnyReal() {
         init {
@@ -89,7 +100,6 @@ abstract class AnyReal : AnyNum() {
     }
 }
 
-
 /**
  * Created by weigl on 10.06.14.
  *
@@ -100,22 +110,26 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     override fun repr(obj: Any): String {
-        if (obj is Bits)
-            if (obj.register > 0)
+        if (obj is Bits) {
+            if (obj.register > 0) {
                 return (name.uppercase(Locale.getDefault()) + "#2#" + java.lang.Long.toBinaryString(obj.register))
+            }
+        }
         return ""
     }
 
     object BOOL : AnyBit(1) {
         override fun repr(obj: Any): String {
             if (obj is Bits) {
-                if (obj.register > 0)
+                if (obj.register > 0) {
                     return "TRUE"
+                }
             }
 
             if (obj is Boolean) {
-                if (obj)
+                if (obj) {
                     return "TRUE"
+                }
             }
             return "FALSE"
         }
@@ -141,11 +155,15 @@ abstract class AnyBit(var bitLength: Int = 0) : AnyDt() {
     }
 
     companion object {
-        val DATATYPES = Arrays.asList(AnyBit.BYTE,
-                AnyBit.LWORD, AnyBit.WORD, AnyBit.DWORD, AnyBit.BOOL)
+        val DATATYPES = Arrays.asList(
+            AnyBit.BYTE,
+            AnyBit.LWORD,
+            AnyBit.WORD,
+            AnyBit.DWORD,
+            AnyBit.BOOL,
+        )
     }
 }
-
 
 /**
  *
@@ -159,50 +177,65 @@ abstract class AnyDate(name: String = "ANY_DATE") : AnyDt(name) {
 
         override fun repr(obj: Any): String {
             val dt = obj as DateData
-            return String.format("DATE#%4d-%2d-%2d",
-                    dt.year, dt.month, dt.day)
+            return String.format(
+                "DATE#%4d-%2d-%2d",
+                dt.year,
+                dt.month,
+                dt.day,
+            )
         }
 
-        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
     }
 
     object TIME_OF_DAY : AnyDate("TIME_OF_DAY") {
         override fun repr(obj: Any): String {
             val dt = obj as TimeofDayData
-            return String.format("TOD#%2d:%2d:%2d.%3d",
-                    dt.hours, dt.minutes, dt.seconds, dt.millieseconds)
+            return String.format(
+                "TOD#%2d:%2d:%2d.%3d",
+                dt.hours,
+                dt.minutes,
+                dt.seconds,
+                dt.millieseconds,
+            )
         }
 
-        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
     }
 
     object DATE_AND_TIME : AnyDate("DATE_AND_TIME") {
         override fun repr(obj: Any): String {
             val dt = obj as DateAndTimeData
-            return String.format("DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
-                    dt.year, dt.month, dt.day, dt.hours, dt.minutes, dt.seconds, dt.millieSeconds)
+            return String.format(
+                "DT#%4d-%2d-%2d-%2d:%2d:%2d.%3d",
+                dt.year,
+                dt.month,
+                dt.day,
+                dt.hours,
+                dt.minutes,
+                dt.seconds,
+                dt.millieSeconds,
+            )
         }
 
         override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
     }
 }
 
-
-class ArrayType(name: String, val fieldType: AnyDt,
-                var ranges: MutableList<Range> = ArrayList()) : AnyDt(name) {
-    constructor(fieldType: AnyDt, ranges: List<Range>)
-            : this(ANONYM_DATATYPE, fieldType, ranges.toMutableList())
+class ArrayType(
+    name: String,
+    val fieldType: AnyDt,
+    var ranges: MutableList<Range> = ArrayList(),
+) : AnyDt(name) {
+    constructor(fieldType: AnyDt, ranges: List<Range>) :
+        this(ANONYM_DATATYPE, fieldType, ranges.toMutableList())
 
     /*
     constructor(arrayTypeDeclaration: ArrayTypeDeclaration) {
         fieldType = arrayTypeDeclaration.baseType
         ranges = arrayTypeDeclaration.ranges
     }
-    */
+     */
 
     override fun repr(obj: Any): String {
         val ary = obj as MultiDimArrayValue
@@ -211,19 +244,16 @@ class ArrayType(name: String, val fieldType: AnyDt,
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
-    fun allIndices() =
-            ranges.map { it.toIntRange() }.expand()
+    fun allIndices() = ranges.map { it.toIntRange() }.expand()
 
     fun dimSize(d: Int): Int = ranges[d].stopValue
 
-
-    override fun reprDecl(): String {
-        return if (isAnonym())
-            ranges.joinToString(", ", " ARRAY[", "] of ${fieldType.reprDecl()}") {
-                "${it.startValue}..${it.stopValue}"
-            }
-        else
-            name
+    override fun reprDecl(): String = if (isAnonym()) {
+        ranges.joinToString(", ", " ARRAY[", "] of ${fieldType.reprDecl()}") {
+            "${it.startValue}..${it.stopValue}"
+        }
+    } else {
+        name
     }
 }
 
@@ -236,8 +266,9 @@ fun List<IntRange>.expand(): Array<IntArray> {
 
     val factorRight = IntArray(size) { 0 }
     factorRight[size - 1] = 1
-    for (i in (size - 2) downTo 0)
+    for (i in (size - 2) downTo 0) {
         factorRight[i] = factorRight[i + 1] * span[i + 1]
+    }
 
     val arrays = Array(amount) { IntArray(this.size) { -1 } }
 
@@ -269,8 +300,7 @@ sealed class ClassDataType(name: String) : AnyDt(name) {
     class ClassDt(val clazz: ClassDeclaration) : ClassDataType(clazz.name)
     class InterfaceDt(val clazz: InterfaceDeclaration) : ClassDataType(clazz.name)
 
-    override fun repr(obj: Any) =
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun repr(obj: Any) = TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
 
     /* override var fields: Scope
          get() = Scope(OOUtils.getEffectiveScope(clazz).parallelStream()
@@ -279,13 +309,10 @@ sealed class ClassDataType(name: String) : AnyDt(name) {
          set(value: Scope) {
              super.fields = value
          }
- */
+     */
 
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
-
 
 abstract class IECString : AnyDt() {
     object WSTRING : IECString() {
@@ -302,19 +329,19 @@ abstract class IECString : AnyDt() {
     companion object {
         /**
          * Interprets escape chars in IEC strings.
-        Escape Sequences
-        The dollar sign ($) is used as an escape character to insert any character code into a string.
+         Escape Sequences
+         The dollar sign ($) is used as an escape character to insert any character code into a string.
 
-        Sequence	Usage	Description
-        $$	Both	Dollar sign ($) character
-        $'	Single	Apostrophe (') character
-        $"	Double	Double quotation mark (") character
-        $L	Both	Line feed (U+000A) character
-        $N	Both	Line feed (U+000A) character
-        $R	Both	Carriage return (U+000D) character
-        $T	Both	Horizontal tab (U+0009) character
-        $nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
-        $nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
+         Sequence	Usage	Description
+         $$	Both	Dollar sign ($) character
+         $'	Single	Apostrophe (') character
+         $"	Double	Double quotation mark (") character
+         $L	Both	Line feed (U+000A) character
+         $N	Both	Line feed (U+000A) character
+         $R	Both	Carriage return (U+000D) character
+         $T	Both	Horizontal tab (U+0009) character
+         $nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
+         $nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
          */
         fun interpret(str: String): String = when {
             str.startsWith("'") -> interpret(str.trim('\''), false)
@@ -339,19 +366,18 @@ abstract class IECString : AnyDt() {
                     "T" -> "\t"
                     else -> {
                         val v = m.group(1)
-                        //$nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
-                        //$nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
+                        // $nn	Single	Single byte character, where nn is the two digit hexadecimal value of the character
+                        // $nnnn	Double	Double byte character, where nnnn is the four digit hexadecimal value of the character
                         v.toInt().toChar().toString()
                     }
                 }
-                m.appendReplacement(sb, replacement);
+                m.appendReplacement(sb, replacement)
             }
-            m.appendTail(sb);
+            m.appendTail(sb)
             return sb.toString()
         }
     }
 }
-
 
 /**
  * Created by weigl on 25.11.16.
@@ -360,13 +386,9 @@ abstract class IECString : AnyDt() {
  * @version $Id: $Id
  */
 data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : AnyDt() {
-    override fun repr(obj: Any): String {
-        return this.functionBlock!!.name
-    }
+    override fun repr(obj: Any): String = this.functionBlock!!.name
 
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     fun asRecord(): RecordType {
         val rt = RecordType(functionBlock.name, functionBlock.scope.variables)
@@ -378,14 +400,15 @@ data class FunctionBlockDataType(var functionBlock: FunctionBlockDeclaration) : 
         set(value) {}
 }
 
-
 /**
  * Created by weigl on 10.06.14.
  *
  * @author weigl
  */
-class EnumerateType(name: String = "ENUM",
-                    var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap()) : AnyDt(name) {
+class EnumerateType(
+    name: String = "ENUM",
+    var allowedValues: LinkedHashMap<String, Int> = LinkedHashMap(),
+) : AnyDt(name) {
     lateinit var defValue: String
 
     val bitlength: Int
@@ -394,8 +417,9 @@ class EnumerateType(name: String = "ENUM",
         }
 
     constructor(
-        name: String, allowedValues: MutableList<String>,
-        defValue: String = allowedValues[0]
+        name: String,
+        allowedValues: MutableList<String>,
+        defValue: String = allowedValues[0],
     ) : this(name) {
         allowedValues.forEachIndexed { index, s -> this.allowedValues[s] = index }
         this.defValue = defValue
@@ -409,9 +433,7 @@ class EnumerateType(name: String = "ENUM",
         defValue = etd.allowedValues[0].text.uppercase(Locale.getDefault())
     }
 
-    override fun repr(obj: Any): String {
-        return "$name#$obj"
-    }
+    override fun repr(obj: Any): String = "$name#$obj"
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 
@@ -449,7 +471,6 @@ class EnumerateType(name: String = "ENUM",
 
         return keys.subList(s, e + 1)
     }
-
 }
 
 open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) : AnyNum() {
@@ -459,34 +480,31 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
 
     open val upperBound: BigInteger
         get() =
-            if (isSigned)
+            if (isSigned) {
                 BigInteger.ONE.shiftLeft(bitLength - 1).subtract(BigInteger.ONE)
-            else
+            } else {
                 BigInteger.ONE.shiftLeft(bitLength).subtract(BigInteger.ONE)
+            }
 
     open val lowerBound: BigInteger
         get() {
-            if (!isSigned)
+            if (!isSigned) {
                 return BigInteger.ZERO
-            else
+            } else {
                 return BigInteger.ONE.shiftLeft(bitLength - 1).negate()
+            }
         }
 
     constructor(bitLength: kotlin.Int) : this(bitLength, true)
 
-
-    override fun repr(obj: Any): String {
-        return javaClass.getSimpleName().uppercase(Locale.getDefault()) + "#" + obj
-    }
+    override fun repr(obj: Any): String = javaClass.getSimpleName().uppercase(Locale.getDefault()) + "#" + obj
 
     open fun next(): AnyInt? = null
 
     open fun asUnsigned() = if (isSigned) AnyInt(bitLength, false) else this
     open fun asSigned() = if (isSigned) this else AnyInt(bitLength, true)
 
-    open fun isValid(value: BigInteger): Boolean {
-        return value in lowerBound..upperBound
-    }
+    open fun isValid(value: BigInteger): Boolean = value in lowerBound..upperBound
 
     override fun equals(o: Any?): Boolean {
         if (this === o) return true
@@ -495,7 +513,6 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
         val anyInt = o as AnyInt?
 
         return if (bitLength != anyInt!!.bitLength) false else isSigned == anyInt.isSigned
-
     }
 
     override fun hashCode(): kotlin.Int {
@@ -504,38 +521,40 @@ open class AnyInt(var bitLength: kotlin.Int = 0, var isSigned: Boolean = false) 
         return result
     }
 
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     override fun toString(): String = name
 
     companion object {
         fun getDataTypeFor(number: Int, unsigned: Boolean): AnyInt {
             val values: Array<AnyInt>
-            if (unsigned)
+            if (unsigned) {
                 values = arrayOf(USINT, UINT, ULINT, UDINT)
-            else
+            } else {
                 values = arrayOf(SINT, INT, LINT, DINT)
+            }
 
             val bits = Math.ceil(Math.log(number.toDouble()) / Math.log(2.0)).toInt()
 
             for (candidate in values) {
-                if (candidate.bitLength >= bits)
+                if (candidate.bitLength >= bits) {
                     return candidate
+                }
             }
 
-            if (bits < 0)
+            if (bits < 0) {
                 return if (unsigned) USINT else SINT
+            }
 
             /*for (AnyInt bit : values)
             if (bit.getBitLength() >= bits)
                 return bit;*/
 
-            return if (unsigned)
+            return if (unsigned) {
                 AnyInt(bits, false)
-            else
+            } else {
                 AnyInt(bits, true)
+            }
         }
     }
 }
@@ -546,45 +565,35 @@ object UDINT : AnyInt(32, false) {
     override fun next() = ULINT
     override fun asUnsigned() = this
     override fun asSigned() = LINT
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object ULINT : AnyInt(64, false) {
     override fun next() = null
     override fun asSigned() = LINT
     override fun asUnsigned() = this
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object UINT : AnyInt(16, false) {
     override fun next() = UDINT
     override fun asUnsigned() = this
     override fun asSigned() = DINT
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object USINT : AnyInt(8, false) {
     override fun asUnsigned() = this
     override fun next() = UINT
     override fun asSigned() = SINT
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object INT : AnyInt(16) {
     override fun next() = DINT
     override fun asUnsigned() = UINT
     override fun asSigned() = this
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object LINT : AnyInt(64) {
@@ -592,18 +601,14 @@ object LINT : AnyInt(64) {
 
     override fun asSigned() = this
     override fun asUnsigned() = ULINT
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object SINT : AnyInt(8) {
     override fun next() = INT
     override fun asSigned() = this
     override fun asUnsigned() = USINT
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
 
 object DINT : AnyInt(32) {
@@ -612,11 +617,8 @@ object DINT : AnyInt(32) {
     override fun asSigned() = this
     override fun asUnsigned() = UDINT
 
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }
-
 
 /**
  * Created by weigl on 10.06.14.
@@ -625,10 +627,11 @@ object DINT : AnyInt(32) {
  * @version $Id: $Id
  */
 data class RangeType(
-        var bottom: BigInteger = BigInteger.ZERO,
-        var top: BigInteger = BigInteger.ZERO,
-        var default: BigInteger = bottom,
-        var base: AnyInt = INT) : AnyInt(base.bitLength, base.isSigned) {
+    var bottom: BigInteger = BigInteger.ZERO,
+    var top: BigInteger = BigInteger.ZERO,
+    var default: BigInteger = bottom,
+    var base: AnyInt = INT,
+) : AnyInt(base.bitLength, base.isSigned) {
 
     override val upperBound: BigInteger
         get() = top
@@ -641,7 +644,7 @@ data class RangeType(
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 }
 
-//TODO as object
+// TODO as object
 class TimeType : AnyDt("TIME") {
 
     /** {@inheritDoc}  */
@@ -664,9 +667,7 @@ class TimeType : AnyDt("TIME") {
     }
 
     /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     companion object {
         /** Constant `TIME_TYPE`  */
@@ -685,21 +686,15 @@ internal class StringTimeBuilder {
     }
 }
 
-
 data class ReferenceDt(val refTo: AnyDt) : AnyDt("REF TO $refTo") {
-    override fun repr(obj: Any): String {
-        throw IllegalStateException("No repr for ReferenceDt")
-    }
+    override fun repr(obj: Any): String = throw IllegalStateException("No repr for ReferenceDt")
 
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 
     companion object {
         val ANY_REF = ReferenceDt(VOID)
     }
 }
-
 
 /**
  * Created by weigl on 10.06.14.
@@ -713,14 +708,13 @@ data class RecordType(override var name: String = ANONYM_DATATYPE, val fields: V
     override fun repr(obj: Any): String {
         val record = obj as RecordValue
         return record.fieldValues.entries
-                .joinToString(", ", "(", ")") { (k, v) ->
-                    k + ":=" + v.dataType.repr(v.value)
-                }
+            .joinToString(", ", "(", ")") { (k, v) ->
+                k + ":=" + v.dataType.repr(v.value)
+            }
     }
 
     override fun <T> accept(visitor: DataTypeVisitorNN<T>) = visitor.visit(this)
 }
-
 
 /**
  * Created by weigl on 01.08.16.
@@ -731,19 +725,11 @@ data class RecordType(override var name: String = ANONYM_DATATYPE, val fields: V
 class PointerType(var of: AnyDt) : AnyDt() {
 
     /** {@inheritDoc}  */
-    override fun toString(): String {
-        return of.toString() + "^"
-    }
-
+    override fun toString(): String = of.toString() + "^"
 
     /** {@inheritDoc}  */
-    override fun repr(obj: Any): String {
-        return "n/a"
-    }
-
+    override fun repr(obj: Any): String = "n/a"
 
     /** {@inheritDoc}  */
-    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: DataTypeVisitorNN<T>): T = visitor.visit(this)
 }

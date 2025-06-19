@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.blocks
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -76,15 +94,14 @@ fun truncateUnreachableBlocks(blocks: BlockProgram, start: Block = blocks.startB
  */
 fun patch(into: BlockProgram, substituted: Block, substitute: BlockProgram) {
     val outgoing = into.outgoingEdges(substituted).toList()
-    //val incoming = into.incomingEdges(substituted)
+    // val incoming = into.incomingEdges(substituted)
 
     substituted.statements.clear()
 
-
     into.addAll(substitute)
-    //into.blocks.remove(substituted)
+    // into.blocks.remove(substituted)
     into.edges.removeAll(outgoing)
-    //into.edges.removeAll(incoming)
+    // into.edges.removeAll(incoming)
 
     val sb = substitute.startBlock
     val eb = substitute.endBlock
@@ -111,9 +128,10 @@ fun splitGoto(it: Block): BlockProgram {
 /** Searches for blocks, that do not contain any statments and merges the path condition with the outgoing */
 fun removeEmptyBlocks(bp: BlockProgram) {
     val empty = bp.blocks.filter {
-        it.statements.isEmpty()
-                && it != bp.startBlock && it != bp.endBlock
-                && it.executionCondition == BooleanLit.LTRUE
+        it.statements.isEmpty() &&
+            it != bp.startBlock &&
+            it != bp.endBlock &&
+            it.executionCondition == BooleanLit.LTRUE
     }
 
     for (b in empty) {
@@ -149,9 +167,7 @@ fun redrawGotoEdges(bp: BlockProgram) {
  *
  */
 class GotoSplitter : AstVisitor<BlockProgram>() {
-    override fun defaultVisit(obj: Any): BlockProgram {
-        throw IllegalStateException("$obj not supported by ${this.javaClass}")
-    }
+    override fun defaultVisit(obj: Any): BlockProgram = throw IllegalStateException("$obj not supported by ${this.javaClass}")
 
     override fun visit(statements: StatementList): BlockProgram {
         val bp = BlockProgram()
@@ -172,10 +188,10 @@ class GotoSplitter : AstVisitor<BlockProgram>() {
                     val subbp = it.accept(this)
                     bp.addAll(subbp)
 
-                    //from last block to new start block
+                    // from last block to new start block
                     bp.edges += (b to subbp.startBlock)
 
-                    //new output block, is connected with sub program output.
+                    // new output block, is connected with sub program output.
                     b = Block()
                     bp.blocks.add(b)
                     bp.edges += (subbp.endBlock to b)
@@ -217,7 +233,6 @@ class GotoSplitter : AstVisitor<BlockProgram>() {
         bp.endBlock = endBlock
         return bp
     }
-
 }
 
 /**
@@ -234,10 +249,11 @@ fun writeDotFile(blocks: BlockProgram): String = StringBuilder().run {
             "$v = $e"
         }
         val label = listOf(
-                it.label,
-                IEC61131Facade.print(it.executionCondition),
-                IEC61131Facade.print(it.statements).replace("\n", "\\n"),
-                ssa).joinToString(" | ")
+            it.label,
+            IEC61131Facade.print(it.executionCondition),
+            IEC61131Facade.print(it.statements).replace("\n", "\\n"),
+            ssa,
+        ).joinToString(" | ")
 
         append("${it.label.escape()} [label=\"{$label}\",shape=\"record\"];\n")
     }

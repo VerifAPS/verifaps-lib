@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.fx
 
 import edu.kit.iti.formal.fxutils.group
@@ -78,7 +96,7 @@ class IdeStyle : Stylesheet() {
         }
 
         separator {
-            //fill =
+            // fill =
         }
 
         structural {
@@ -91,7 +109,7 @@ class IdeStyle : Stylesheet() {
         }
 
         identifier {
-            //fill = c(" #b58900")
+            // fill = c(" #b58900")
         }
 
         fancyIdentifier {
@@ -117,18 +135,16 @@ class IdeStyle : Stylesheet() {
     }
 }
 
-
 class IdeFx : App(IdeView::class, IdeStyle::class) {
     init {
-        //reloadStylesheetsOnFocus()
-        //dumpStylesheets()
-
+        // reloadStylesheetsOnFocus()
+        // dumpStylesheets()
     }
 
     override fun start(stage: Stage) {
         super.start(stage)
-        //val theme = TransitTheme(stage.scene, Style.LIGHT);
-        //theme.reApplyTheme()
+        // val theme = TransitTheme(stage.scene, Style.LIGHT);
+        // theme.reApplyTheme()
     }
 }
 
@@ -183,7 +199,6 @@ class IdeView : View("VERIFAPS IDE") {
 
     val currentEditor = SimpleObjectProperty<Editor>(this, "currentEditor", null)
 
-
     //region controllers
     val menu = IdeMenu(this)
     val fileNavigator = FileNavigator(this)
@@ -223,7 +238,7 @@ class IdeView : View("VERIFAPS IDE") {
 
     init {
         center.items.addAll(editorTabPanes)
-        //if (appData.lastNavigatorPath.value != null)
+        // if (appData.lastNavigatorPath.value != null)
         //    fileNavigator.rootFile.value = Paths.get(appData.lastNavigatorPath.value)
         subscribe<StatusMessage> { publishMessage(it.text, it.graphic) }
         Platform.runLater {
@@ -236,9 +251,7 @@ class IdeView : View("VERIFAPS IDE") {
         statusBar.graphic = graphic
     }
 
-    private fun createEditorTabPane(): TabPane {
-        return TabPane()
-    }
+    private fun createEditorTabPane(): TabPane = TabPane()
 
     fun createCodeEditor() {
         addEditorTab(Editor())
@@ -255,14 +268,13 @@ class IdeView : View("VERIFAPS IDE") {
         editor.root.requestFocus()
     }
 
-    fun saveAs(editor: Editor? = currentEditor.value) =
-        editor?.also {
-            val fileChooser = FileChooser()
-            fileChooser.showSaveDialog(currentWindow)?.let { new ->
-                editor.filenameProperty.value = new
-                save(editor)
-            }
+    fun saveAs(editor: Editor? = currentEditor.value) = editor?.also {
+        val fileChooser = FileChooser()
+        fileChooser.showSaveDialog(currentWindow)?.let { new ->
+            editor.filenameProperty.value = new
+            save(editor)
         }
+    }
 
     fun save(editor: Editor? = currentEditor.value) {
         editor?.also { editor ->
@@ -278,7 +290,6 @@ class IdeView : View("VERIFAPS IDE") {
             open(file)
         }
     }
-
 
     fun open(f: File) {
         if (f !in recentFiles) {
@@ -296,7 +307,10 @@ class IdeView : View("VERIFAPS IDE") {
         if (tabPane != null) {
             val tabIndex = editorTabPanes.indexOf(tabPane)
             if (tabPane == editorTabPanes.last()) {
-                TabPane().also { editorTabPanes.add(it); center.items.add(it) }
+                TabPane().also {
+                    editorTabPanes.add(it)
+                    center.items.add(it)
+                }
             }
             val target = editorTabPanes[tabIndex + 1]
             val tab = tabPane.tabs.find { it.content == editor.root }!!
@@ -368,7 +382,7 @@ class IdeMenu(val ide: IdeView) : View() {
                     group("File") {
                         item("New", "ctrl-n", null, event = ide::createCodeEditor)
                         item("Open", "ctrl-o", "fas-folder-open", event = ide::open)
-                        //val recentFiles = item("Recent files")
+                        // val recentFiles = item("Recent files")
                         item("Save", "ctrl-s", "far-save", event = ide::save)
                         item("Save As...", "ctrl-shift-s", "fas-save", event = ide::saveAs)
                         item("Close", null, null, event = ide::close)

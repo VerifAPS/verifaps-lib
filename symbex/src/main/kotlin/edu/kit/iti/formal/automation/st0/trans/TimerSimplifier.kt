@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.st0.trans
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.st0.trans
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.datatypes.TimeType
 import edu.kit.iti.formal.automation.datatypes.UINT
@@ -41,21 +37,22 @@ class TimerSimplifier(val cycleTime: Long = DEFAULT_CYCLE_TIME) : MultiCodeTrans
         transformations += TimeLiteralToCounter()
     }
 
-    inner class TimeLiteralToCounter : AstMutableVisitor(), CodeTransformation {
+    inner class TimeLiteralToCounter :
+        AstMutableVisitor(),
+        CodeTransformation {
         override fun transform(state: TransformationState): TransformationState {
             state.stBody = state.stBody.accept(this) as StatementList
             state.scope = state.scope.accept(this) as Scope
             return state
         }
 
-
         override fun visit(vd: VariableDeclaration): VariableDeclaration {
             if (vd.dataType === TimeType.TIME_TYPE) {
                 val newVariable = VariableDeclaration(vd.name, vd.type, UINT)
                 val cycles = (vd.init as TimeLit?)
                 val sd = SimpleTypeDeclaration(
-                        baseType = RefTo(UINT),
-                        initialization = translate(cycles)
+                    baseType = RefTo(UINT),
+                    initialization = translate(cycles),
                 )
                 newVariable.typeDeclaration = sd
                 return newVariable
@@ -63,11 +60,10 @@ class TimerSimplifier(val cycleTime: Long = DEFAULT_CYCLE_TIME) : MultiCodeTrans
             return super.visit(vd)
         }
 
-        override fun visit(literal: Literal) =
-                when (literal) {
-                    is TimeLit -> translate(literal)
-                    else -> super.visit(literal)
-                }
+        override fun visit(literal: Literal) = when (literal) {
+            is TimeLit -> translate(literal)
+            else -> super.visit(literal)
+        }
 
         private fun translate(literal: TimeLit?): IntegerLit {
             if (literal == null) {

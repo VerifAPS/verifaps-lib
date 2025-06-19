@@ -1,30 +1,52 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.monitor
 
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
 
 data class MonitorGenerationOptions(
-        val includes : List<String> = listOf()
+    val includes: List<String> = listOf(),
 )
 
 interface MonitorGeneration {
     val key: String
-    fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton,
-                 options : MonitorGenerationOptions = MonitorGenerationOptions()): Monitor
+    fun generate(
+        gtt: GeneralizedTestTable,
+        automaton: TestTableAutomaton,
+        options: MonitorGenerationOptions = MonitorGenerationOptions(),
+    ): Monitor
 }
 
 interface CombinedMonitorGeneration {
     val key: String
     fun generate(
-            name : String,
-            input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor
+        name: String,
+        input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
+    ): Monitor
 }
 
 data class Monitor(
-        var name: String = "",
-        var body: String = "",
-        var types: String = "",
-        var preamble: String = "",
-        var postamble: String = "",
-        var static: Boolean = true
+    var name: String = "",
+    var body: String = "",
+    var types: String = "",
+    var preamble: String = "",
+    var postamble: String = "",
+    var static: Boolean = true,
 )

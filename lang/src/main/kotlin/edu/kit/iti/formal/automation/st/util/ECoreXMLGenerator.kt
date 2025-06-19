@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.st.util
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.st.util
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.st.util
 
 import edu.kit.iti.formal.automation.st.ast.*
 
@@ -39,7 +35,9 @@ class ECoreXMLGenerator
  * @param clazzes a [java.lang.Class] object.
  */
 @SafeVarargs
-constructor(vararg clazzes: Class<out Top>) {
+constructor(
+    vararg clazzes: Class<out Top>,
+) {
 
     private val clazzes: Array<Class<out Top>>
 
@@ -60,17 +58,20 @@ constructor(vararg clazzes: Class<out Top>) {
 
             for (f in c.declaredFields) {
                 val type = f.type
-                //System.err.println(f.getType());
+                // System.err.println(f.getType());
 
-                if (type == String::class.java)
+                if (type == String::class.java) {
                     System.out.format(
-                            "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString\" />%n",
-                            f.name)
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString\" />%n",
+                        f.name,
+                    )
+                }
 
                 if (type == Boolean::class.java) {
                     System.out.format(
-                            "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean\" />%n",
-                            f.name)
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EAttribute\" name=\"%s\" lowerBound=\"1\" " + "eType=\"ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean\" />%n",
+                        f.name,
+                    )
                 }
 
                 if (type == Int::class.java) {
@@ -83,16 +84,15 @@ constructor(vararg clazzes: Class<out Top>) {
 
                 if (Top::class.java!!.isAssignableFrom(type)) {
                     System.out.format(
-                            "\t<eStructuralFeatures xsi:type=\"ecore:EReference\" name=\"%s\" upperBound=\"-1\" eType=\"#//%s\" />%n",
-                            f.name, type.simpleName)
-
+                        "\t<eStructuralFeatures xsi:type=\"ecore:EReference\" name=\"%s\" upperBound=\"-1\" eType=\"#//%s\" />%n",
+                        f.name,
+                        type.simpleName,
+                    )
                 }
-
             }
 
             System.out.format("</eClassifiers>%n")
         }
-
     }
 
     companion object {
@@ -105,14 +105,15 @@ constructor(vararg clazzes: Class<out Top>) {
          */
         @JvmStatic
         fun main(args: Array<String>) {
-            ECoreXMLGenerator(Top::class.java, AssignmentStatement::class.java, BinaryExpression::class.java, CaseCondition::class.java,
-                    CaseStatement::class.java, CommentStatement::class.java, ConfigurationDeclaration::class.java, Deref::class.java,
-                    DirectVariable::class.java, ExitStatement::class.java, Expression::class.java, ExpressionList::class.java, ForStatement::class.java,
-                    FunctionBlockDeclaration::class.java, Invocation::class.java, InvocationStatement::class.java, GuardedStatement::class.java,
-                    Location::class.java, Reference::class.java, RepeatStatement::class.java, ResourceDeclaration::class.java,
-                    ReturnStatement::class.java, Statement::class.java, SymbolicReference::class.java, //HasScope::class.java,
-                    UnaryExpression::class.java, IfStatement::class.java, WhileStatement::class.java).run()
+            ECoreXMLGenerator(
+                Top::class.java, AssignmentStatement::class.java, BinaryExpression::class.java, CaseCondition::class.java,
+                CaseStatement::class.java, CommentStatement::class.java, ConfigurationDeclaration::class.java, Deref::class.java,
+                DirectVariable::class.java, ExitStatement::class.java, Expression::class.java, ExpressionList::class.java, ForStatement::class.java,
+                FunctionBlockDeclaration::class.java, Invocation::class.java, InvocationStatement::class.java, GuardedStatement::class.java,
+                Location::class.java, Reference::class.java, RepeatStatement::class.java, ResourceDeclaration::class.java,
+                ReturnStatement::class.java, Statement::class.java, SymbolicReference::class.java, // HasScope::class.java,
+                UnaryExpression::class.java, IfStatement::class.java, WhileStatement::class.java,
+            ).run()
         }
     }
-
 }

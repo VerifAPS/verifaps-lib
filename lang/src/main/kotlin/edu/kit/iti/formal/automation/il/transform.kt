@@ -1,8 +1,26 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.il
 
-import edu.kit.iti.formal.automation.VariableScope
-import edu.kit.iti.formal.automation.operators.Operators
-import edu.kit.iti.formal.automation.st.Statements
+import edu.kit.iti.formal.automation.*
+import edu.kit.iti.formal.automation.operators.*
+import edu.kit.iti.formal.automation.st.*
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.st.ast.BooleanLit.Companion.LFALSE
 import edu.kit.iti.formal.automation.st.ast.BooleanLit.Companion.LTRUE
@@ -31,14 +49,18 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
      * JMP{C,N}
      */
     fun jump(jump: String, C: Boolean = false, N: Boolean = false): Statement {
-        //val pos = ilBody.posMarked(jump)
+        // val pos = ilBody.posMarked(jump)
         return when {
             N -> Statements.ifthen(
-                    accumulator.top.not(),
-                    JumpStatement(jump))
+                accumulator.top.not(),
+                JumpStatement(jump),
+            )
+
             C -> Statements.ifthen(
-                    accumulator.top,
-                    JumpStatement(jump))
+                accumulator.top,
+                JumpStatement(jump),
+            )
+
             else -> JumpStatement(jump)
         }
     }
@@ -47,20 +69,24 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
         override fun defaultVisit(top: IlAst) {}
         override fun visit(ret: RetInstr) {
             label(ret)
-            append(when (ret.type) {
-                ReturnOperand.RET -> factory.ret()
-                ReturnOperand.RETC -> factory.ret(C = true)
-                ReturnOperand.RETCN -> factory.ret(N = true)
-            })
+            append(
+                when (ret.type) {
+                    ReturnOperand.RET -> factory.ret()
+                    ReturnOperand.RETC -> factory.ret(C = true)
+                    ReturnOperand.RETCN -> factory.ret(N = true)
+                },
+            )
         }
 
         override fun visit(j: JumpInstr) {
             label(j)
-            append(when (j.type) {
-                JumpOperand.JMP -> jump(j.target)
-                JumpOperand.JMPC -> jump(j.target, C = true)
-                JumpOperand.JMPCN -> jump(j.target, N = true)
-            })
+            append(
+                when (j.type) {
+                    JumpOperand.JMP -> jump(j.target)
+                    JumpOperand.JMPC -> jump(j.target, C = true)
+                    JumpOperand.JMPCN -> jump(j.target, N = true)
+                },
+            )
         }
 
         override fun visit(simple: SimpleInstr) {
@@ -71,23 +97,15 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
                 SimpleOperand.LDN -> factory.load(simple.operand!!, N = true)
                 else ->
                     append(
-                            when (simple.type) {
-                                SimpleOperand.ST -> factory.store(simple.operand!!)
-                                SimpleOperand.STN -> factory.store(simple.operand!!, N = true)
-                                SimpleOperand.STQ -> factory.store(simple.operand!!, test = true)
-                                SimpleOperand.S -> factory.set(simple.operand!!)
-                                SimpleOperand.R -> factory.reset(simple.operand!!)
-                                else /*
-                SimpleOperand.S1 -> shortcall("S1")
-                SimpleOperand.R1 -> ()
-                SimpleOperand.CLK ->TODO()
-                SimpleOperand.CU -> ()
-                SimpleOperand.CD -> ODO()
-                SimpleOperand.PV -> ()
-                SimpleOperand.IN -> ()
-                SimpleOperand.PT -> */ ->
-                                    factory.shortcall(simple.type, simple.operand!!)
-                            }
+                        when (simple.type) {
+                            SimpleOperand.ST -> factory.store(simple.operand!!)
+                            SimpleOperand.STN -> factory.store(simple.operand!!, N = true)
+                            SimpleOperand.STQ -> factory.store(simple.operand!!, test = true)
+                            SimpleOperand.S -> factory.set(simple.operand!!)
+                            SimpleOperand.R -> factory.reset(simple.operand!!)
+                            else ->
+                                factory.shortcall(simple.type, simple.operand!!)
+                        },
                     )
             }
         }
@@ -98,14 +116,16 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
 
         override fun visit(funCall: FunctionCallInstr) {
             label(funCall)
-            val inv = Invocation(funCall.function,
-                    funCall.operands.map {
-                        val e = when (it) {
-                            is IlOperand.Variable -> it.ref
-                            is IlOperand.Constant -> it.literal
-                        }
-                        InvocationParameter(e)
-                    }.toMutableList())
+            val inv = Invocation(
+                funCall.function,
+                funCall.operands.map {
+                    val e = when (it) {
+                        is IlOperand.Variable -> it.ref
+                        is IlOperand.Constant -> it.literal
+                    }
+                    InvocationParameter(e)
+                }.toMutableList(),
+            )
             accumulator.push(inv)
         }
 
@@ -126,10 +146,13 @@ class Il2St(val ilBody: IlBody) : Callable<Pair<VariableScope, StatementList>> {
                 when (e.operand) {
                     ExprOperand.XORN ->
                         accumulator.push(BinaryExpression(left, Operators.XOR, right).not())
+
                     ExprOperand.ORN ->
                         accumulator.push(left.or(right).not())
+
                     ExprOperand.ANDN ->
                         accumulator.push(left.and(right).not())
+
                     else -> throw IllegalStateException()
                 }
             }
@@ -163,16 +186,18 @@ class IlStatementFactory(val accumulator: Accumulator) {
     /**
      * RET, RETC, RETN
      */
-    fun ret(C: Boolean = false, N: Boolean = false): Statement {
-        return when {
-            N -> Statements.ifthen(
-                    accumulator.top.not(),
-                    ReturnStatement())
-            C -> Statements.ifthen(
-                    accumulator.top,
-                    ReturnStatement())
-            else -> ReturnStatement()
-        }
+    fun ret(C: Boolean = false, N: Boolean = false): Statement = when {
+        N -> Statements.ifthen(
+            accumulator.top.not(),
+            ReturnStatement(),
+        )
+
+        C -> Statements.ifthen(
+            accumulator.top,
+            ReturnStatement(),
+        )
+
+        else -> ReturnStatement()
     }
 
     fun load(operand: IlOperand, N: Boolean = false) {
@@ -186,12 +211,14 @@ class IlStatementFactory(val accumulator: Accumulator) {
     fun store(operand: IlOperand, N: Boolean = false, test: Boolean = false): Statement {
         val variable = operand as IlOperand.Variable
         return if (N) {
-            Statements.ifthen(accumulator.top,
-                    AssignmentStatement(variable.ref, BooleanLit.LTRUE)
-                            .also { it.isAssignmentAttempt = test })
+            Statements.ifthen(
+                accumulator.top,
+                AssignmentStatement(variable.ref, BooleanLit.LTRUE)
+                    .also { it.isAssignmentAttempt = test },
+            )
         } else {
             AssignmentStatement(variable.ref, accumulator.top)
-                    .also { it.isAssignmentAttempt = test }
+                .also { it.isAssignmentAttempt = test }
         }
     }
 

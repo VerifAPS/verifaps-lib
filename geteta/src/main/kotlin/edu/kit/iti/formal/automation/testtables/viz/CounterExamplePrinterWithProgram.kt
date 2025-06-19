@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.viz
 
 import edu.kit.iti.formal.automation.VisualizeTrace
@@ -15,11 +33,11 @@ class CounterExamplePrinterWithProgram(
     val cex: CounterExample,
     lineMap: LineMap,
     val program: PouExecutable,
-    val stream: CodeWriter = CodeWriter()
+    val stream: CodeWriter = CodeWriter(),
 ) {
 
     val vt = VisualizeTrace(cex, lineMap, program, stream).also { vt ->
-        vt.programVariableToSVar = { "code$.${it}" }
+        vt.programVariableToSVar = { "code$.$it" }
     }
 
     fun getAll() {
@@ -27,7 +45,6 @@ class CounterExamplePrinterWithProgram(
             get(k)
         }
     }
-
 
     fun get(k: Int) {
         vt.get(k, k + 1)
@@ -53,8 +70,8 @@ class CounterExamplePrinterWithProgram(
 
                 stream.print(
                     " *     $rowActive Row ${row.id} " +
-                            "${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
-                            " ${boolForHuman(k, fwd)} (Time: $times)"
+                        "${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
+                        " ${boolForHuman(k, fwd)} (Time: $times)",
                 ).nl()
             }
     }
@@ -69,12 +86,10 @@ class CounterExamplePrinterWithProgram(
         return m
     }
 
-    private fun isRowActive(k: Int, it: TableRow): List<Int> {
-        return automaton.getStates(it)
-            ?.filter { rs ->
-                cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
-            }
-            ?.map { it.time }
-            ?: listOf()
-    }
+    private fun isRowActive(k: Int, it: TableRow): List<Int> = automaton.getStates(it)
+        ?.filter { rs ->
+            cex[k, "_${testTable.name}.${rs.name}"] == "TRUE"
+        }
+        ?.map { it.time }
+        ?: listOf()
 }

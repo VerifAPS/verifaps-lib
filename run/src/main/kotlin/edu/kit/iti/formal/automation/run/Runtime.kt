@@ -1,16 +1,29 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.run
 
-import edu.kit.iti.formal.automation.datatypes.FunctionBlockDataType
-import edu.kit.iti.formal.automation.datatypes.RecordType
-import edu.kit.iti.formal.automation.datatypes.UINT
-import edu.kit.iti.formal.automation.datatypes.values.RecordValue
-import edu.kit.iti.formal.automation.datatypes.values.VAnyInt
-import edu.kit.iti.formal.automation.datatypes.values.Value
-import edu.kit.iti.formal.automation.run.stexceptions.TypeMissmatchException
-import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.datatypes.*
+import edu.kit.iti.formal.automation.datatypes.values.*
+import edu.kit.iti.formal.automation.run.stexceptions.*
+import edu.kit.iti.formal.automation.scope.*
 import edu.kit.iti.formal.automation.st.ast.*
-import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
-import edu.kit.iti.formal.automation.visitors.Visitable
+import edu.kit.iti.formal.automation.visitors.*
 import edu.kit.iti.formal.util.debug
 import java.math.BigInteger
 import java.util.*
@@ -62,20 +75,13 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
                 state[it.name!!] =
                     ExecutionFacade.evaluateExpression(innerState, fb.scope, it.expression)
             }
-
-
     }
 
-    private fun evaluateExpression(it: InvocationParameter) =
-        evaluateExpression(it.expression)
+    private fun evaluateExpression(it: InvocationParameter) = evaluateExpression(it.expression)
 
-    private fun evaluateExpression(it: Expression) =
-        it.accept(ExpressionVisitor(state, peekScope()))
+    private fun evaluateExpression(it: Expression) = it.accept(ExpressionVisitor(state, peekScope()))
 
-
-    fun createCondition(expr: Expression): () -> Boolean =
-        { expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean }
-
+    fun createCondition(expr: Expression): () -> Boolean = { expr.accept(ExpressionVisitor(state, peekScope())).value as Boolean }
 
     override fun visit(whileStatement: WhileStatement) {
         val condition = createCondition(whileStatement.condition)
@@ -120,11 +126,12 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         for (statement in ifStatement.conditionalBranches) {
             val returnValue: EValue = (statement.condition as Visitable)
                 .accept(ExpressionVisitor(state, peekScope()))
-            if (returnValue.value is Boolean) {
-                if (returnValue.value == true) {
+            val value = returnValue.value
+            if (value is Boolean) {
+                if (value) {
                     return statement
                 }
-                //if returnValue isType false -> continue to search with the next guarded statement
+                // if returnValue isType false -> continue to search with the next guarded statement
             } else {
                 throw TypeMissmatchException("condition for if statement must be a boolean")
             }
@@ -158,7 +165,7 @@ class Runtime(val state: State, private val definitionScopeStack: Stack<Scope> =
         val expressionValue = assignmentStatement.expression.accept(expressionVisitor)
         val location = assignmentStatement.location
         val path = location.asPath()
-        //var current = state[identifier]
+        // var current = state[identifier]
         state[path] = expressionValue
     }
 

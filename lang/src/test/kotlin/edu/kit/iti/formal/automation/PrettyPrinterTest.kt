@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 /*-
@@ -42,18 +60,15 @@ object PrettyPrinterTest {
     fun testPrettyPrintByString(astNode: Top, file: Path) {
         val content = Files.newBufferedReader(file).readText()
         val printed = StructuredTextPrinter.print(astNode)
-        Assertions.assertEquals(
-                clean(content), clean(printed))
+        Assertions.assertEquals(clean(content), clean(printed))
     }
 
-    private fun clean(printed: String): String {
-        return printed.split("\n".toRegex())
-                .dropLastWhile { it.isEmpty() }
-                .map { s -> s.replace("//.*$".toRegex(), "") }
-                .map { it.trim(' ', '\n') }
-                .joinToString(("\n"))
-                .replace("\\s+".toRegex(), " ")
-    }
+    private fun clean(printed: String): String = printed.split("\n".toRegex())
+        .dropLastWhile { it.isEmpty() }
+        .map { s -> s.replace("//.*$".toRegex(), "") }
+        .map { it.trim(' ', '\n') }
+        .joinToString(("\n"))
+        .replace("\\s+".toRegex(), " ")
 
     @Throws(IOException::class)
     fun testPrettyPrintByEquals(tle: PouElements) {
@@ -64,19 +79,18 @@ object PrettyPrinterTest {
             IEC61131Facade.resolveDataTypes(newTle)
             for (i in 0 until min(tle.size, newTle.size)) {
                 Assertions.assertEquals(tle[i], newTle[i])
-                //Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
+                // Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
             }
             Assertions.assertEquals(tle, newTle)
         } catch (e: SyntaxErrorReporter.ParserException) {
             System.err.println(
-                    e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n")
+                e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n"),
             )
             Assertions.fail("Re-parsing the printed output results into an error\n-----\n$printed")
         } finally {
-           //System.err.println(printed)
+            // System.err.println(printed)
         }
     }
-
 
     /*public static Stream<Object[]> files() {
         Collection<File> files = FileUtils.listFiles(new File("src/test/resources"),
@@ -87,6 +101,5 @@ object PrettyPrinterTest {
 
     @Parameterized.Parameter
     public File toRead;
-    */
-
+     */
 }

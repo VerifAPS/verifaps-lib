@@ -1,40 +1,57 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.builder
 
-import edu.kit.iti.formal.automation.testtables.algorithms.StateReachability
+import edu.kit.iti.formal.automation.testtables.algorithms.*
 import edu.kit.iti.formal.automation.testtables.model.*
-import edu.kit.iti.formal.automation.testtables.model.automata.RowState
-import edu.kit.iti.formal.automation.testtables.model.automata.SpecialState
-import edu.kit.iti.formal.automation.testtables.model.automata.TestTableAutomaton
-import edu.kit.iti.formal.automation.testtables.model.automata.TransitionType
-import edu.kit.iti.formal.automation.testtables.model.options.Mode
-import edu.kit.iti.formal.util.info
-import kotlin.collections.set
+import edu.kit.iti.formal.automation.testtables.model.automata.*
+import edu.kit.iti.formal.automation.testtables.model.options.*
 
 class AutomatonBuilderPipeline(
-        val table: GeneralizedTestTable,
-        var steps: List<AutomatonConstructionTransformer> = listOf()) {
+    val table: GeneralizedTestTable,
+    var steps: List<AutomatonConstructionTransformer> = listOf(),
+) {
     init {
         steps = listOf(
-                RowGroupExpander(),
-                GotoRewriter(),
-                InitialAutomataCreator(),
-                if (table.options.mode == Mode.CONCRETE_TABLE)
-                    AutomatonConcretizerTransformation()
-                else
-                    RowStateCreator(),
-                TransitionCreator(),
-                InitialReachability()
-        )//AddMutualExclusionForStates())
+            RowGroupExpander(),
+            GotoRewriter(),
+            InitialAutomataCreator(),
+            if (table.options.mode == Mode.CONCRETE_TABLE) {
+                AutomatonConcretizerTransformation()
+            } else {
+                RowStateCreator()
+            },
+            TransitionCreator(),
+            InitialReachability(),
+        ) // AddMutualExclusionForStates())
     }
 
     fun transform(): AutomataTransformerState {
         val automaton = TestTableAutomaton()
         val init = AutomataTransformerState(table, automaton)
-        steps.fold(init) { acc, transformer -> transformer.transform(acc);acc }
+        steps.fold(init) { acc, transformer ->
+            transformer.transform(acc)
+            acc
+        }
         return init
     }
 }
-
 
 val Duration.minimum: Int
     get() = when (this) {
@@ -50,7 +67,6 @@ val Duration.maximum: Int
         is Duration.Omega -> 1
     }
 
-
 val stateNameError = "__ERROR__"
 val stateNameSentinel = "__SENTINEL__"
 
@@ -64,9 +80,7 @@ class GotoRewriter : AbstractTransformer<AutomataTransformerState>() {
     }
 
     fun rewriteGotos(region: Region) {
-
     }
-
 }
 
 /**
@@ -88,11 +102,11 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
          */
         fun rewrite(region: Region): Region {
             val m = region.duration.minimum
-            //expand this region if necessary
+            // expand this region if necessary
             val r = if (m == 0) region else expand(region)
 
             val children = ArrayList<TableNode>(r.children.size)
-            //expand this region if necessary
+            // expand this region if necessary
             for (child in r.children) {
                 when (child) {
                     is TableRow -> children.add(child)
@@ -110,25 +124,27 @@ open class RowGroupExpander : AbstractTransformer<AutomataTransformerState>() {
             val duration = r.duration
             val dmodifier = duration.modifier
 
-            if (duration == Duration.Omega || !duration.isRepeatable
-                    || duration.minimum == 0/*TODO check if maximum==1 maybe required*/) {
+            /*TODO check if maximum==1 maybe required*/
+            if (duration == Duration.Omega || !duration.isRepeatable || duration.minimum == 0) {
                 return r
             }
             val seq = ArrayList<TableNode>(r.children.size)
             val m = duration.maximum
             for (iter in 1..m) {
-                val t = Region("${r.id}_${iter}")
+                val t = Region("${r.id}_$iter")
 
                 t.duration = when {
                     (iter == m && duration is Duration.OpenInterval) ->
                         Duration.OpenInterval(0, dmodifier)
+
                     (duration is Duration.ClosedInterval && duration.minimum < iter && iter <= duration.maximum) ->
                         Duration.ClosedInterval(0, 1, dmodifier)
+
                     else ->
                         Duration.ClosedInterval(1, 1, dmodifier)
                 }
 
-                //TODO decide whether to copy/disable the goto commands
+                // TODO decide whether to copy/disable the goto commands
 
                 t.children = r.children.map {
                     val clone = it.clone()
@@ -193,28 +209,35 @@ open class RowStateCreator : AbstractTransformer<AutomataTransformerState>() {
                 a.strongRepetition = true
                 listOf(a)
             }
+
             is Duration.OpenInterval ->
                 if (duration.lower == 0) {
-                    listOf(RowState(s, 1).also { a ->
-                        a.optional = true
-                        a.weakRepeat = true
-                        a.progressFlag = duration.pflag
-                    })
-                } else
+                    listOf(
+                        RowState(s, 1).also { a ->
+                            a.optional = true
+                            a.weakRepeat = true
+                            a.progressFlag = duration.pflag
+                        },
+                    )
+                } else {
                     (1..duration.lower).map {
                         RowState(s, it).also { a ->
                             a.optional = it == duration.lower
                             a.weakRepeat = a.optional
-                            if (a.optional)
+                            if (a.optional) {
                                 a.progressFlag = duration.pflag
+                            }
                         }
                     }
+                }
+
             is Duration.ClosedInterval ->
                 (1..duration.upper).map {
                     RowState(s, it).also { a ->
                         a.optional = it >= duration.lower
-                        if (a.optional)
+                        if (a.optional) {
                             a.progressFlag = duration.pflag
+                        }
                     }
                 }
         }
@@ -225,7 +248,6 @@ open class RowStateCreator : AbstractTransformer<AutomataTransformerState>() {
         model.automaton.rowStates[s] = states
     }
 }
-
 
 /**
  * Creates an mutual exclusion for states, based on the progress flag.
@@ -247,11 +269,11 @@ it.outgoing
 class InitialReachability : AbstractTransformer<AutomataTransformerState>() {
     override fun transform() {
         model.flatRegion
-                .filter { it.isInitialReachable }
-                .forEach { it ->
-                    val astate = model.automaton.getState(it, 0)
-                    astate?.let { model.automaton.initialStates += it }
-                }
+            .filter { it.isInitialReachable }
+            .forEach { it ->
+                val astate = model.automaton.getState(it, 0)
+                astate?.let { model.automaton.initialStates += it }
+            }
     }
 }
 
@@ -270,23 +292,29 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
 
         sentinel.incoming.forEach { it ->
             model.automaton.getStates(it)
-                    ?.filter { it.optional }
-                    ?.forEach { oFrom ->
-                        model.automaton.addTransition(oFrom, sentinelState, TransitionType.ACCEPT)
-                    }
+                ?.filter { it.optional }
+                ?.forEach { oFrom ->
+                    model.automaton.addTransition(oFrom, sentinelState, TransitionType.ACCEPT)
+                }
         }
     }
 
     private fun selfLoops() {
         model.automaton.rowStates.values.flatMap { it }
-                .filter { it.weakRepeat || it.strongRepetition }
-                .forEach {
-                    model.automaton.addTransition(it, it,
-                            transitionTypeAccept(it.row.duration))
-                }
+            .filter { it.weakRepeat || it.strongRepetition }
+            .forEach {
+                model.automaton.addTransition(
+                    it,
+                    it,
+                    transitionTypeAccept(it.row.duration),
+                )
+            }
 
-        model.automaton.addTransition(model.automaton.stateSentinel,
-                model.automaton.stateSentinel, TransitionType.TRUE)
+        model.automaton.addTransition(
+            model.automaton.stateSentinel,
+            model.automaton.stateSentinel,
+            TransitionType.TRUE,
+        )
     }
 
     private fun errorTransitions() {
@@ -294,7 +322,10 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
         model.flatRegion.forEach {
             model.automaton.getStates(it)?.forEach { state ->
                 model.automaton.addTransition(
-                        state, errorState, TransitionType.FAIL)
+                    state,
+                    errorState,
+                    TransitionType.FAIL,
+                )
             }
         }
     }
@@ -303,8 +334,11 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
         model.automaton.getStates(s)?.let { states ->
             states.zipWithNext { a, b ->
                 val pflag = s.duration.pflag && s.duration.isOptional(a.time)
-                model.automaton.addTransition(a, b,
-                        if (pflag) TransitionType.ACCEPT_PROGRESS else TransitionType.ACCEPT)
+                model.automaton.addTransition(
+                    a,
+                    b,
+                    if (pflag) TransitionType.ACCEPT_PROGRESS else TransitionType.ACCEPT,
+                )
             }
         }
     }
@@ -312,14 +346,17 @@ class TransitionCreator : AbstractTransformer<AutomataTransformerState>() {
     private fun externalTransitions(s: TableRow) {
         val jumpOut = model.automaton.getStates(s)?.filter { it.optional } ?: listOf()
         s.outgoing.filter { it != model.stateReachability.endSentinel }
-                .forEach { to ->
-                    model.automaton.getFirstState(to)?.let { toState ->
-                        jumpOut.forEach { out ->
-                            model.automaton.addTransition(out, toState,
-                                    transitionTypeAccept(s.duration))
-                        }
+            .forEach { to ->
+                model.automaton.getFirstState(to)?.let { toState ->
+                    jumpOut.forEach { out ->
+                        model.automaton.addTransition(
+                            out,
+                            toState,
+                            transitionTypeAccept(s.duration),
+                        )
                     }
                 }
+            }
     }
 }
 
@@ -334,7 +371,6 @@ class AutomatonConcretizerTransformation : RowStateCreator() {
         return super.createRowStates(s)
     }
 }
-
 
 /*
  *
@@ -407,7 +443,8 @@ else -> false
 }
  */
 
-
-private fun transitionTypeAccept(duration: Duration) =
-        if (duration.pflag) TransitionType.ACCEPT_PROGRESS
-        else TransitionType.ACCEPT
+private fun transitionTypeAccept(duration: Duration) = if (duration.pflag) {
+    TransitionType.ACCEPT_PROGRESS
+} else {
+    TransitionType.ACCEPT
+}

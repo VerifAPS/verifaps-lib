@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import com.github.ajalt.clikt.core.CliktCommand
@@ -15,7 +33,6 @@ import edu.kit.iti.formal.automation.visitors.findFirstProgram
 import org.antlr.v4.runtime.CharStreams
 import java.io.OutputStreamWriter
 
-
 object Xml2TxtApp {
     @JvmStatic
     fun main(args: Array<String>) = Xml2Txt().main(args)
@@ -23,7 +40,6 @@ object Xml2TxtApp {
 
 class Xml2Txt : CliktCommand() {
     val ppu by option("--ppu").flag()
-
 
     val input by argument(name = "XML", help = "Files to read").file()
 
@@ -40,7 +56,7 @@ class Xml2Txt : CliktCommand() {
     override fun run() {
         IEC61131Facade.useOldSfcTranslator = true
 
-        //val base = if (includeBuiltIn) BuiltinLoader.loadDefault() else PouElements()
+        // val base = if (includeBuiltIn) BuiltinLoader.loadDefault() else PouElements()
         val text = IECXMLFacade.extractPLCOpenXml(input)
         val out = output?.bufferedWriter() ?: OutputStreamWriter(System.out)
 
@@ -58,10 +74,12 @@ class Xml2Txt : CliktCommand() {
         if (ppu) {
             pous.findFirstProgram()?.let {
                 it.scope.variables.forEach { vd ->
-                    if (vd.name.startsWith("Sensor_"))
+                    if (vd.name.startsWith("Sensor_")) {
                         vd.type = vd.type or VariableDeclaration.INPUT
-                    if (vd.name.startsWith("Actuator_"))
+                    }
+                    if (vd.name.startsWith("Actuator_")) {
                         vd.type = VariableDeclaration.OUTPUT
+                    }
                 }
             }
         }
@@ -75,17 +93,20 @@ class Xml2Txt : CliktCommand() {
             if (ppu) {
                 p.findFirstProgram()?.let {
                     it.scope.variables.forEach { vd ->
-                        if (vd.name.startsWith("SENSOR_"))
+                        if (vd.name.startsWith("SENSOR_")) {
                             vd.type = VariableDeclaration.INPUT
-                        if (vd.name.startsWith("ACTUATOR_"))
+                        }
+                        if (vd.name.startsWith("ACTUATOR_")) {
                             vd.type = VariableDeclaration.OUTPUT
+                        }
                     }
                 }
             }
 
             p.forEach {
-                if (it is ProgramDeclaration)
+                if (it is ProgramDeclaration) {
                     IEC61131Facade.printTo(out, it, true)
+                }
             }
 
             pous.forEach {
@@ -93,7 +114,6 @@ class Xml2Txt : CliktCommand() {
                     IEC61131Facade.printTo(out, it, true)
                 }
             }
-
         } else {
             IEC61131Facade.printTo(out, pous, true)
         }

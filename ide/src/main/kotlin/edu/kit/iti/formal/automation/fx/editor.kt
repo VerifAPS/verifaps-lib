@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.fx
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -33,22 +51,18 @@ import java.io.File
 import java.time.Duration
 import java.util.*
 
-
 object NewIssues : FXEvent(ApplicationThread)
-
 
 object Editors {
     fun getLanguageForFilename(file: File) = getEditorForSuffix(file.extension)
-    fun getEditorForSuffix(suffix: String): Language? =
-        when (suffix) {
-            "tt", "gtt" -> TTLanguage
-            "st", "iec" -> StLanguage
-            "smv" -> SmvLanguage
-            "smt" -> SmtLanguage
-            else -> null
-        }
+    fun getEditorForSuffix(suffix: String): Language? = when (suffix) {
+        "tt", "gtt" -> TTLanguage
+        "st", "iec" -> StLanguage
+        "smv" -> SmvLanguage
+        "smt" -> SmtLanguage
+        else -> null
+    }
 }
-
 
 open class Editor : View() {
     final override val root = CodeArea("")
@@ -62,11 +76,10 @@ open class Editor : View() {
     val issues by issuesProperty
 
     val editorTitle = Bindings.createStringBinding(
-        { -> (filenameProperty.value?.name ?: "unknown") + (if (dirtyProperty.value) "*" else "") },
+        { (filenameProperty.value?.name ?: "unknown") + (if (dirtyProperty.value) "*" else "") },
         dirtyProperty,
-        filenameProperty
+        filenameProperty,
     )
-
 
     init {
         root.paragraphGraphicFactory = LineNumberFactory.get(root)
@@ -129,21 +142,23 @@ open class Editor : View() {
         language?.let {
             try {
                 root.setStyleSpans(0, computeHighlighting(it))
-            } catch (e: Exception) {/*ignore*/
+            } catch (e: Exception) {
+                /*ignore*/
             }
 
             try {
                 issues.forEach {
                     root.setStyle(
-                        it.startOffset, it.endOffset + 1,
-                        Collections.singleton("error")
+                        it.startOffset,
+                        it.endOffset + 1,
+                        Collections.singleton("error"),
                     )
                 }
-            } catch (e: Exception) {/*ignore*/
+            } catch (e: Exception) {
+                /*ignore*/
             }
         }
     }
-
 
     fun computeHighlighting(language: Language): StyleSpans<Collection<String>>? {
         val text = root.text
@@ -152,7 +167,7 @@ open class Editor : View() {
         do {
             val tok = lexer.nextToken()
             if (tok.type == -1) break
-            val typ = language.getStyleClass(tok.type)// lexer.vocabulary.getSymbolicName(tok.type)
+            val typ = language.getStyleClass(tok.type) // lexer.vocabulary.getSymbolicName(tok.type)
             spansBuilder.add(Collections.singleton(typ), tok.text.length)
         } while (tok.type != -1)
         return spansBuilder.create()
@@ -174,22 +189,21 @@ abstract class Language {
     protected var operators: Set<Int> = setOf()
     protected var errorChar: Int = -2
 
-    fun getStyleClass(tokenType: Int) =
-        when (tokenType) {
-            in separators -> "separator"
-            in structural -> "structural"
-            in literals -> "literal"
-            in identifiers -> "identifier"
-            in specialIds -> "fancy-identifier"
-            in comments -> "comment"
-            in datatype -> "datatype"
-            in control -> "control"
-            in operators -> "operators"
-            else -> {
-                System.err.println("token type $tokenType (${javaClass.name}) is not registered for syntax highlightning.")
-                ""
-            }
+    fun getStyleClass(tokenType: Int) = when (tokenType) {
+        in separators -> "separator"
+        in structural -> "structural"
+        in literals -> "literal"
+        in identifiers -> "identifier"
+        in specialIds -> "fancy-identifier"
+        in comments -> "comment"
+        in datatype -> "datatype"
+        in control -> "control"
+        in operators -> "operators"
+        else -> {
+            System.err.println("token type $tokenType (${javaClass.name}) is not registered for syntax highlightning.")
+            ""
         }
+    }
 
     abstract fun parseFile(fromString: CharStream): List<Problem>?
 }
@@ -238,7 +252,7 @@ object StLanguage : Language() {
             END_TYPE,
             STRUCT, END_STRUCT,
             CONFIGURATION, END_CONFIGURATION,
-            ACTION, END_ACTION
+            ACTION, END_ACTION,
         )
 
         setOf(
@@ -266,7 +280,7 @@ object StLanguage : Language() {
             WORD,
             LWORD,
             DWORD,
-            BOOL
+            BOOL,
         )
 
         literals = setOf(
@@ -279,14 +293,14 @@ object StLanguage : Language() {
             STRING_LITERAL,
             TOD_LITERAL,
             TIME_LITERAL,
-            WSTRING_LITERAL
+            WSTRING_LITERAL,
         )
 
         control = setOf(
             IF, ELSE, ELSEIF, FOR, END_FOR,
             WHILE, END_WHILE, REPEAT, END_REPEAT,
             END_IF, DO, THEN, UNTIL, TO,
-            WITH, CASE, END_CASE, OF
+            WITH, CASE, END_CASE, OF,
         )
 
         operators = setOf(
@@ -295,7 +309,7 @@ object StLanguage : Language() {
             IL_ADD, IL_ANDN, IL_CAL, IL_CALC, IL_CALCN, IL_CD, IL_CLK,
             IL_CU, IL_DIV, IL_EQ, IL_GE, IL_GT, IL_IN, IL_JMP, IL_JMPC, IL_JMPCN, IL_LD, IL_LDN, IL_LE, IL_LT,
             IL_MOD, IL_MUL, IL_NE, IL_NOT, IL_ORN, IL_PT, IL_PV, IL_R1, IL_R, IL_RET, IL_RETC, IL_RETCN,
-            IL_S1, IL_S, IL_ST, IL_STN, IL_STQ, IL_SUB, IL_XORN, IL_OR
+            IL_S1, IL_S, IL_ST, IL_STN, IL_STQ, IL_SUB, IL_XORN, IL_OR,
         )
 
         identifiers = setOf(IDENTIFIER)
@@ -322,7 +336,6 @@ object TTLanguage : Language() {
                 ReportLevel.ERROR,
             )
         }
-
     }
 
     init {
@@ -346,7 +359,7 @@ object TTLanguage : Language() {
             TestTableLanguageLexer.PLAY,
             TestTableLanguageLexer.PAUSE,
             TestTableLanguageLexer.STATE,
-            TestTableLanguageLexer.RELATIONAL
+            TestTableLanguageLexer.RELATIONAL,
         )
         separators = setOf(
             TestTableLanguageLexer.RBRACE,
@@ -356,10 +369,10 @@ object TTLanguage : Language() {
             TestTableLanguageLexer.RBRACKET,
             TestTableLanguageLexer.LBRACKET,
             TestTableLanguageLexer.COLON,
-            TestTableLanguageLexer.COMMA
+            TestTableLanguageLexer.COMMA,
         )
         literals = setOf(
-            TestTableLanguageLexer.INTEGER
+            TestTableLanguageLexer.INTEGER,
         )
         identifiers = setOf(TestTableLanguageLexer.FQ_VARIABLE, TestTableLanguageLexer.IDENTIFIER)
         comments = setOf(TestTableLanguageLexer.COMMENT, TestTableLanguageLexer.LINE_COMMENT)
@@ -371,7 +384,6 @@ object SmvLanguage : Language() {
 
     override fun lexerFactory(input: CharStream): Lexer = SMVLexer(input)
     override fun parseFile(fromString: CharStream): List<Problem>? = null
-
 }
 
 object SmtLanguage : Language() {

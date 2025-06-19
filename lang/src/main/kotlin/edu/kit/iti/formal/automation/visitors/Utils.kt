@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.visitors
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,9 +15,8 @@ package edu.kit.iti.formal.automation.visitors
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
-
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.visitors
 
 import edu.kit.iti.formal.automation.parser.IEC61131Lexer
 import edu.kit.iti.formal.automation.st.ast.PouElements
@@ -29,7 +24,6 @@ import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.ProgramDeclaration
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
-
 
 fun findProgram(tles: PouElements): ProgramDeclaration? = tles.findFirstProgram()
 fun PouElements.findFirstProgram(): ProgramDeclaration? = asSequence().filterIsInstance<ProgramDeclaration>().firstOrNull()
@@ -47,8 +41,7 @@ object Utils {
                 val tokName = IEC61131Lexer.tokenNames[tok.type]
 
                 if (!expected[i].contentEquals(tokName)) {
-                    throw AssertionError(
-                            String.format("Token mismatch! Expected: %s but got %s", expected[i], tokName))
+                    throw AssertionError(String.format("Token mismatch! Expected: %s but got %s", expected[i], tokName))
                 }
             }
         } catch (e: IndexOutOfBoundsException) {

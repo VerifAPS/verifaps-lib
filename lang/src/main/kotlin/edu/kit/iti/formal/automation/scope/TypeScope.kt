@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.scope
-
-/*-
- * #%L
- * iec61131lang
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.scope
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.scope
 
 import edu.kit.iti.formal.automation.datatypes.*
 import edu.kit.iti.formal.automation.datatypes.AnyBit.*
@@ -34,12 +30,14 @@ import java.util.*
  * @author weigl
  * @version $Id: $Id
  */
-class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap(String.CASE_INSENSITIVE_ORDER))
-    : MutableMap<String, AnyDt> by impl, Cloneable {
+class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = TreeMap(String.CASE_INSENSITIVE_ORDER)) :
+    MutableMap<String, AnyDt> by impl,
+    Cloneable {
 
     fun register(vararg any: AnyDt) {
-        for (a in any)
+        for (a in any) {
             put(a.name, a)
+        }
     }
 
     fun register(name: String, type: AnyDt) = put(name, type)
@@ -51,9 +49,7 @@ class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = T
     }
 
     companion object {
-        fun empty(): TypeScope {
-            return TypeScope()
-        }
+        fun empty(): TypeScope = TypeScope()
 
         fun builtin(): TypeScope {
             val e = empty()
@@ -61,8 +57,12 @@ class TypeScope private constructor(private val impl: TreeMap<String, AnyDt> = T
             e.register(USINT, UINT, ULINT, UDINT)
             e.register(BOOL, BYTE, LWORD, WORD, DWORD)
             e.register(IECString.WSTRING, IECString.STRING)
-            e.register(AnyDate.TIME_OF_DAY, AnyDate.DATE_AND_TIME, AnyDate.DATE,
-                    TimeType.TIME_TYPE)
+            e.register(
+                AnyDate.TIME_OF_DAY,
+                AnyDate.DATE_AND_TIME,
+                AnyDate.DATE,
+                TimeType.TIME_TYPE,
+            )
             e.register(AnyReal.REAL, AnyReal.LREAL)
             e.register(VOID)
             return e

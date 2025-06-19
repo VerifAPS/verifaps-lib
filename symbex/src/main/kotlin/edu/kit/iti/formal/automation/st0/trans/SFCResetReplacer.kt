@@ -1,11 +1,7 @@
-package edu.kit.iti.formal.automation.st0.trans
-
-/*-
- * #%L
- * iec-symbex
- * %%
- * Copyright (C) 2016 Alexander Weigl
- * %%
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
  * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -19,8 +15,8 @@ package edu.kit.iti.formal.automation.st0.trans
  * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
- * #L%
- */
+ * *****************************************************************/
+package edu.kit.iti.formal.automation.st0.trans
 
 import edu.kit.iti.formal.automation.st.Statements
 import edu.kit.iti.formal.automation.st.ast.*
@@ -37,7 +33,6 @@ class SFCResetReplacer : CodeTransformation {
     }
 }
 
-
 class SFCResetReplacerImpl : AstMutableVisitor() {
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
         try {
@@ -46,11 +41,12 @@ class SFCResetReplacerImpl : AstMutableVisitor() {
 
             if (identifier.endsWith("\$SFCReset")) {
                 return Statements.ifthen(
-                        expression,
-                        AssignmentStatement(
-                                SymbolicReference(identifier.replace("SFCReset", "_state")),
-                                EnumLit(null, "Init")
-                        ))
+                    expression,
+                    AssignmentStatement(
+                        SymbolicReference(identifier.replace("SFCReset", "_state")),
+                        EnumLit(null, "Init"),
+                    ),
+                )
             }
         } catch (e: ClassCastException) {
         }

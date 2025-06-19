@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.datatypes
 
 import edu.kit.iti.formal.automation.analysis.Reporter
@@ -12,43 +30,40 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
     override fun defaultVisit(obj: Any): Boolean = false
 
     override fun visit(enumerateType: EnumerateType): Boolean {
-        if(enumerateType.name == expected.name) {
+        if (enumerateType.name == expected.name) {
             return true
         }
         return false
     }
 
-    override fun visit(anyBit: AnyBit): Boolean =
-            when (expected) {
-                is AnyBit -> expected.bitLength >= AnyBit.BOOL.bitLength
-                else -> false
-            }
+    override fun visit(anyBit: AnyBit): Boolean = when (expected) {
+        is AnyBit -> expected.bitLength >= AnyBit.BOOL.bitLength
+        else -> false
+    }
 
-    override fun visit(dateAndTime: AnyDate.DATE_AND_TIME): Boolean =
-            when (expected) {
-                is AnyDate.DATE -> true
-                is AnyDate.DATE_AND_TIME -> true
-                else -> false
-            }
+    override fun visit(dateAndTime: AnyDate.DATE_AND_TIME): Boolean = when (expected) {
+        is AnyDate.DATE -> true
+        is AnyDate.DATE_AND_TIME -> true
+        else -> false
+    }
 
     override fun visit(timeOfDay: AnyDate.TIME_OF_DAY): Boolean = expected == timeOfDay
     override fun visit(date: AnyDate.DATE): Boolean = expected == date
 
-    override fun visit(arrayType: ArrayType): Boolean =
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun visit(arrayType: ArrayType): Boolean = TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
 
     override fun visit(anyInt: AnyInt): Boolean = when (expected) {
-        //TODO There should be a conformance check somewhere else!
-        is AnyInt -> (anyInt.isSigned == expected.isSigned && anyInt.bitLength <= expected.bitLength)
-                || (anyInt.bitLength < expected.bitLength)
-        //TODO automatic conversion for bits?
+        // TODO There should be a conformance check somewhere else!
+        is AnyInt -> (anyInt.isSigned == expected.isSigned && anyInt.bitLength <= expected.bitLength) ||
+            (anyInt.bitLength < expected.bitLength)
+        // TODO automatic conversion for bits?
         else -> false
     }
 
     override fun visit(timeType: TimeType): Boolean = expected is TimeType
 
     override fun visit(reference: ReferenceDt): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun visit(recordType: RecordType): Boolean {
@@ -57,9 +72,10 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
                 expected.fields.forEach { required ->
                     val f = recordType.fields.get(required.name) ?: return false
                     required.dataType?.let {
-                        //TODO: recursion on this visitor
-                        if (f.dataType?.isAssignableTo(it) == false)
+                        // TODO: recursion on this visitor
+                        if (f.dataType?.isAssignableTo(it) == false) {
                             return false
+                        }
                     }
                 }
             }
@@ -68,27 +84,24 @@ class DataTypeAssignability(val expected: AnyDt) : DataTypeVisitorNN<Boolean> {
         return false
     }
 
-    override fun visit(classDataType: ClassDataType): Boolean =
-            when (classDataType) {
-                is ClassDataType.ClassDt -> {
-                    val types = classDataType.clazz.getAllSuperTypes()
-                    expected in types
-                }
-                is ClassDataType.InterfaceDt -> {
-                    val types = classDataType.clazz.getAllSuperTypes()
-                    expected in types
-                }
-                is ClassDataType.AnyClassDt -> {
-                    false
-                }
-            }
-
-    override fun visit(functionBlockDataType: FunctionBlockDataType): Boolean {
-        return super.visit(functionBlockDataType)
+    override fun visit(classDataType: ClassDataType): Boolean = when (classDataType) {
+        is ClassDataType.ClassDt -> {
+            val types = classDataType.clazz.getAllSuperTypes()
+            expected in types
+        }
+        is ClassDataType.InterfaceDt -> {
+            val types = classDataType.clazz.getAllSuperTypes()
+            expected in types
+        }
+        is ClassDataType.AnyClassDt -> {
+            false
+        }
     }
+
+    override fun visit(functionBlockDataType: FunctionBlockDataType): Boolean = super.visit(functionBlockDataType)
 }
 
-class FindAllSuperTypes() : Callable<List<ClassDataType>> {
+class FindAllSuperTypes : Callable<List<ClassDataType>> {
     val clazzesToSearch = Stack<ClassDeclaration>()
     val interfazestoSearch = Stack<InterfaceDeclaration>()
     val found: MutableList<ClassDataType> = arrayListOf()

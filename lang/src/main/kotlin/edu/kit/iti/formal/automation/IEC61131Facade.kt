@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.analysis.*
@@ -44,9 +62,7 @@ object IEC61131Facade {
         return expr
     }
 
-    fun expr(input: String): Expression {
-        return expr(CharStreams.fromString(input))
-    }
+    fun expr(input: String): Expression = expr(CharStreams.fromString(input))
 
     fun getParser(input: CharStream): IEC61131Parser {
         val lexer = IEC61131Lexer(input)
@@ -72,82 +88,76 @@ object IEC61131Facade {
         return tle
     }
 
-
-    fun file(path: Path, tee: File? = null): PouElements {
-        return if (path.endsWith("xml")) {
-            val out = IECXMLFacade.extractPLCOpenXml(path)
-            if (tee != null) {
-                tee.bufferedWriter().use {
-                    it.write(out)
-                }
-                file(tee)
-            } else {
-                file(CharStreams.fromString(out, path.toString()))
+    fun file(path: Path, tee: File? = null): PouElements = if (path.endsWith("xml")) {
+        val out = IECXMLFacade.extractPLCOpenXml(path)
+        if (tee != null) {
+            tee.bufferedWriter().use {
+                it.write(out)
             }
-        } else
-            file(CharStreams.fromPath(path))
+            file(tee)
+        } else {
+            file(CharStreams.fromString(out, path.toString()))
+        }
+    } else {
+        file(CharStreams.fromPath(path))
     }
 
-
     @Throws(IOException::class)
-    fun file(f: File, teeXmlParser: Boolean = true): PouElements {
-        return if (f.extension == "xml") {
-            val out = IECXMLFacade.extractPLCOpenXml(f.absolutePath)
-            if (teeXmlParser) {
-                val stfile = File(f.parentFile, f.nameWithoutExtension + ".st")
-                stfile.bufferedWriter().use {
-                    it.write(out)
-                }
-                file(CharStreams.fromFileName(stfile.absolutePath))
-            } else {
-                file(CharStreams.fromString(out, f.absolutePath))
+    fun file(f: File, teeXmlParser: Boolean = true): PouElements = if (f.extension == "xml") {
+        val out = IECXMLFacade.extractPLCOpenXml(f.absolutePath)
+        if (teeXmlParser) {
+            val stfile = File(f.parentFile, f.nameWithoutExtension + ".st")
+            stfile.bufferedWriter().use {
+                it.write(out)
             }
-        } else
-            file(CharStreams.fromFileName(f.absolutePath))
-
+            file(CharStreams.fromFileName(stfile.absolutePath))
+        } else {
+            file(CharStreams.fromString(out, f.absolutePath))
+        }
+    } else {
+        file(CharStreams.fromFileName(f.absolutePath))
     }
 
     fun file(resource: InputStream) = file(CharStreams.fromStream(resource, Charset.defaultCharset()))
 
-    fun getParser(s: String): IEC61131Parser {
-        return getParser(CharStreams.fromString(s))
-    }
+    fun getParser(s: String): IEC61131Parser = getParser(CharStreams.fromString(s))
 
     fun resolveDataTypes(elements: PouElements, scope: Scope = Scope.defaultScope()): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
-        //val oo = ResolveOO(scope)
-        //val rr = ResolveReferences(scope)
+        // val oo = ResolveOO(scope)
+        // val rr = ResolveReferences(scope)
         elements.accept(EnsureFunctionReturnValue)
         elements.accept(fdt)
         elements.accept(rdt)
         elements.accept(RewriteEnums)
         elements.accept(MaintainInitialValues())
-        //elements.accept(oo)
-        //elements.accept(rr)
+        // elements.accept(oo)
+        // elements.accept(rr)
         return scope
     }
 
     fun resolveDataTypes(scope: Scope = Scope.defaultScope(), vararg elements: Visitable): Scope {
         val fdt = RegisterDataTypes(scope)
         val rdt = ResolveDataTypes(scope)
-        //val rr = ResolveReferences(scope)
+        // val rr = ResolveReferences(scope)
         elements.forEach { it.accept(fdt) }
         elements.forEach { it.accept(rdt) }
         elements.forEach { it.accept(RewriteEnums) }
         elements.forEach { it.accept(MaintainInitialValues()) }
-        //elements.accept(rr)
+        // elements.accept(rr)
         return scope
     }
 
     fun fileResolve(input: List<CharStream>, builtins: Boolean = false): Pair<PouElements, List<ReporterMessage>> {
         val seq = input.parallelStream()
-                .map { file(it) }
-                .flatMap { it.stream() }
-                .collect(Collectors.toList())
+            .map { file(it) }
+            .flatMap { it.stream() }
+            .collect(Collectors.toList())
         val p = PouElements(seq)
-        if (builtins)
+        if (builtins) {
             p.addAll(BuiltinLoader.loadDefault())
+        }
         resolveDataTypes(p)
         return p to check(p)
     }
@@ -156,15 +166,12 @@ object IEC61131Facade {
 
     fun fileResolve(input: File, builtins: Boolean = false) = fileResolve(CharStreams.fromFileName(input.absolutePath), builtins)
 
-    fun filefr(inputs: List<File>, builtins: Boolean = false) =
-            fileResolve(inputs.map { CharStreams.fromFileName(it.absolutePath) }, builtins)
-
+    fun filefr(inputs: List<File>, builtins: Boolean = false) = fileResolve(inputs.map { CharStreams.fromFileName(it.absolutePath) }, builtins)
 
     /**
      *
      */
-    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>, builtins: Boolean=false)
-            : List<PouExecutable?> {
+    fun readProgramsWLN(libraryElements: List<File>, programs: List<File>, names: List<String>, builtins: Boolean = false): List<PouExecutable?> {
         val selectors = names.map { name ->
             { elements: PouElements -> elements.find { it.name == name } as PouExecutable? }
         }
@@ -174,8 +181,7 @@ object IEC61131Facade {
     /**
      * Read programs with support for common libraries and a selection either by name or PROGRAM_DECLARATION
      */
-    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>, builtins: Boolean=false)
-            : List<PouExecutable?> {
+    fun readProgramsWLPN(libraryElements: List<File>, programs: List<String>, builtins: Boolean = false): List<PouExecutable?> {
         val p = programs.map {
             if ('@' in it) {
                 val a = it.split('@', limit = 2)
@@ -187,15 +193,19 @@ object IEC61131Facade {
         val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
         val pfiles = p.map { (_, a) -> File(a) }
         val selectors = p.map { (name, _) ->
-            if (name == null) selectorByType
-            else selectByName(name)
+            if (name == null) {
+                selectorByType
+            } else {
+                selectByName(name)
+            }
         }
         return readProgramsWLS(libraryElements, pfiles, selectors, builtins)
     }
 
-    fun readProgramWLNP(libraryElements: List<File>,
-                        it: String)
-            : Pair<PouElements, PouExecutable?> {
+    fun readProgramWLNP(
+        libraryElements: List<File>,
+        it: String,
+    ): Pair<PouElements, PouExecutable?> {
         val (name, path) = if ('@' in it) {
             val a = it.split('@', limit = 2)
             a[0] to a[1]
@@ -204,21 +214,23 @@ object IEC61131Facade {
         }
         val selectorByType = { elements: PouElements -> elements.findFirstProgram() }
         val selector =
-                if (name == null) selectorByType
-                else selectByName(name)
+            if (name == null) {
+                selectorByType
+            } else {
+                selectByName(name)
+            }
         return readProgramWLS(libraryElements, File(path), selector)
     }
 
-
-    fun readProgramWLS(libraryElements: List<File>,
-                       programs: File,
-                       selectors: (PouElements) -> PouExecutable?)
-            : Pair<PouElements, PouExecutable?> {
+    fun readProgramWLS(
+        libraryElements: List<File>,
+        programs: File,
+        selectors: (PouElements) -> PouExecutable?,
+    ): Pair<PouElements, PouExecutable?> {
         val (elements, error) = filefr(libraryElements + programs)
         error.forEach { warn(it.toHuman()) }
         return elements to selectors(elements)
     }
-
 
     /**
      *
@@ -227,24 +239,21 @@ object IEC61131Facade {
         libraryElements: List<File>,
         programs: List<File>,
         selectors: List<(PouElements) -> PouExecutable?>,
-        builtins: Boolean=false
-    )
-            : List<PouExecutable?> {
-        return programs.zip(selectors).map { (it, selector) ->
-            val (elements, error) = filefr(libraryElements + it, builtins)
-            error.forEach { warn(it.toHuman()) }
-            selector(elements)
-        }
+        builtins: Boolean = false,
+    ): List<PouExecutable?> = programs.zip(selectors).map { (it, selector) ->
+        val (elements, error) = filefr(libraryElements + it, builtins)
+        error.forEach { warn(it.toHuman()) }
+        selector(elements)
     }
-
 
     /**
      *
      */
-    fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> =
-            readProgramsWLS(
-                libraryElements, programs,
-                programs.map { _ -> ::findProgram })
+    fun readProgramsWLP(libraryElements: List<File>, programs: List<File>): List<PouExecutable?> = readProgramsWLS(
+        libraryElements,
+        programs,
+        programs.map { _ -> ::findProgram },
+    )
 
     /**
      *
@@ -276,13 +285,20 @@ object IEC61131Facade {
     var useOldSfcTranslator = true
 
     //region translations
-    fun translateSfcToSt(scope: Scope, sfc: SFCImplementation,
-                         name: String, old: Boolean = useOldSfcTranslator): Pair<TypeDeclarations, StatementList> {
+    fun translateSfcToSt(
+        scope: Scope,
+        sfc: SFCImplementation,
+        name: String,
+        old: Boolean = useOldSfcTranslator,
+    ): Pair<TypeDeclarations, StatementList> {
         val st = StatementList()
         val td = TypeDeclarations()
         sfc.networks.forEachIndexed { index, network ->
-            val element = if (old) TranslationSfcToStOld(network, name, index, scope)
-            else TranslationSfcToStPipeline(network, name, index, scope)
+            val element = if (old) {
+                TranslationSfcToStOld(network, name, index, scope)
+            } else {
+                TranslationSfcToStPipeline(network, name, index, scope)
+            }
             td.add(element.pipelineData.stateEnumTypeDeclaration)
             st.add(element.call())
         }
@@ -324,8 +340,7 @@ object IEC61131Facade {
             val ctx = getParser(token).ilBody()
             return ctx.accept(IlTransformToAst()) as IlBody
         }
-        */
-
+         */
 
         fun parseBody(token: String): IlBody {
             val lexer = IEC61131Lexer(CharStreams.fromString(token))
@@ -335,9 +350,11 @@ object IEC61131Facade {
             return ctx.accept(IECParseTreeToAST()) as IlBody
         }
 
-        private class ShiftedTokenFactory(val offset: Int = 0,
-                                          val offsetLine: Int = 0,
-                                          val offsetChar: Int = 0) : CommonTokenFactory() {
+        private class ShiftedTokenFactory(
+            val offset: Int = 0,
+            val offsetLine: Int = 0,
+            val offsetChar: Int = 0,
+        ) : CommonTokenFactory() {
             constructor(position: Position) : this(position.offset, position.lineNumber, position.charInLine)
             constructor(token: Token) : this(token.startIndex, token.line, token.charPositionInLine)
 

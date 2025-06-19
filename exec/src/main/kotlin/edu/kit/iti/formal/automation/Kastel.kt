@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation
 
 import edu.kit.iti.formal.automation.datatypes.*
@@ -10,13 +28,11 @@ import edu.kit.iti.formal.automation.st0.TransformationState
 import edu.kit.iti.formal.automation.st0.trans.CodeTransformation
 import edu.kit.iti.formal.automation.st0.trans.RealToInt
 import edu.kit.iti.formal.automation.st0.trans.STCodeTransformation
-import edu.kit.iti.formal.automation.visitors.Utils
 import edu.kit.iti.formal.automation.visitors.findProgram
 import edu.kit.iti.formal.smv.*
 import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
-
 import java.io.File
 import java.math.BigInteger
 
@@ -32,10 +48,16 @@ object KastelDemonstrator {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        SINT.bitLength = 10; INT.bitLength = 10; DINT.bitLength = 10;LINT.bitLength = 10
-        USINT.bitLength = 10; UINT.bitLength = 10;UDINT.bitLength = 10; ULINT.bitLength = 10
-        runInfoPipeline(INPUT_FILE, prefix="if_%d.smv")
-        runInfoPipeline(INPUT_FIX_FILE, prefix="fix_%d.smv")
+        SINT.bitLength = 10
+        INT.bitLength = 10
+        DINT.bitLength = 10
+        LINT.bitLength = 10
+        USINT.bitLength = 10
+        UINT.bitLength = 10
+        UDINT.bitLength = 10
+        ULINT.bitLength = 10
+        runInfoPipeline(INPUT_FILE, prefix = "if_%d.smv")
+        runInfoPipeline(INPUT_FIX_FILE, prefix = "fix_%d.smv")
     }
 
     fun runInfoPipeline(input: File, prefix: String) {
@@ -46,32 +68,34 @@ object KastelDemonstrator {
 
         val program = findProgram(pous)!!
 
-        //Custom program transformation
+        // Custom program transformation
         AssignmentDScratch.transform(
-                SeqParamsActiveStep.transform(TransformationState(program))
+            SeqParamsActiveStep.transform(TransformationState(program)),
         )
 
         val simplified = SymbExFacade.simplify(program)
 
         UsageFinder.markVariablesByUsage(simplified)
 
-        //Custom program transformation
+        // Custom program transformation
         val t = MultiCodeTransformation(
-                RealToInt(),
-                RemoveVSObj,
-                RemoveConversionFunction,
-                IntLit1000To1
+            RealToInt(),
+            RemoveVSObj,
+            RemoveConversionFunction,
+            IntLit1000To1,
         )
         t.transform(TransformationState(simplified))
 
-        markVariableAs(simplified.scope,
-                "stHmiInt\$rStartVel",
-                "stHmiInt\$stMCStatus\$bMC_Error",
-                "stHmiInt\$stReq\$stMan\$bDecrVel",
-                "stHmiInt\$stReq\$stMan\$bDisable",
-                "stHmiInt\$stReq\$stMan\$bIncrVel",
-                "stHmiInt\$stReq\$stMan\$bStartVel",
-                flag = VariableDeclaration.INPUT)
+        markVariableAs(
+            simplified.scope,
+            "stHmiInt\$rStartVel",
+            "stHmiInt\$stMCStatus\$bMC_Error",
+            "stHmiInt\$stReq\$stMan\$bDecrVel",
+            "stHmiInt\$stReq\$stMan\$bDisable",
+            "stHmiInt\$stReq\$stMan\$bIncrVel",
+            "stHmiInt\$stReq\$stMan\$bStartVel",
+            flag = VariableDeclaration.INPUT,
+        )
 
         val simpFile = File(FOLDER, "Simplified.st")
         simpFile.bufferedWriter().use {
@@ -82,18 +106,18 @@ object KastelDemonstrator {
         val module = SymbExFacade.evaluateProgram(simplified, true)
         val isHigh = { v: String ->
             val b = v in listOf(
-                    //unused: "ReadStatusAxis1\$ConstantVelocity"
-                    //ReadActVelAxis1.Velocity
-                    "ActStep\$rVelocity"
-                    //,"MoveVelAxis1\$InVelocity"
-                    //,"ReadActVelAxis1\$Velocity"
-            )// v.endsWith("Velocity")
+                // unused: "ReadStatusAxis1\$ConstantVelocity"
+                // ReadActVelAxis1.Velocity
+                "ActStep\$rVelocity",
+                // ,"MoveVelAxis1\$InVelocity"
+                // ,"ReadActVelAxis1\$Velocity"
+            ) // v.endsWith("Velocity")
             info(String.format("%35s %s", v, (if (b) "high" else "low")))
             b
         }
 
         for (historyLength in listOf(2, 3, 5, 7, 10)) {
-            //val imb = IFModelBuilder(module, isHigh)
+            // val imb = IFModelBuilder(module, isHigh)
             val imb = PrivacyModelBuilder(module, isHigh, historyLength)
             imb.run()
 
@@ -106,8 +130,6 @@ object KastelDemonstrator {
     }
 }
 
-
-
 object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
     override fun transform(stBody: StatementList): StatementList = stBody.accept(this) as StatementList
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
@@ -118,21 +140,24 @@ object AssignmentDScratch : STCodeTransformation, AstMutableVisitor() {
     }
 }
 
-
 /**
  * * Self composition
  * * start from two equal states
  * * inserting information
  * * forgetting information in [historyLength] cycles.
  */
-class PrivacyModelBuilder(private val code: SMVModule,
-                          val isHigh: (String) -> Boolean,
-                          val historyLength: Int = 10) : Runnable {
+class PrivacyModelBuilder(
+    private val code: SMVModule,
+    val isHigh: (String) -> Boolean,
+    val historyLength: Int = 10,
+) : Runnable {
     val strongEqualInVar = SVariable("strongEqualIn", SMVTypes.BOOLEAN)
     val softEqualInVar = SVariable("softEqualIn", SMVTypes.BOOLEAN)
-    val hmb = HistoryModuleBuilder("HisStrongEqual",
-            listOf(strongEqualInVar),
-            historyLength)
+    val hmb = HistoryModuleBuilder(
+        "HisStrongEqual",
+        listOf(strongEqualInVar),
+        historyLength,
+    )
 
     val main = SMVModule("main")
     val product = arrayListOf(main, code, hmb.module)
@@ -150,13 +175,14 @@ class PrivacyModelBuilder(private val code: SMVModule,
         instantiateCode(FIRST_RUN)
         instantiateCode(SECOND_RUN)
 
-        //info("State: ${code.stateVars.map { it.name }}")
+        // info("State: ${code.stateVars.map { it.name }}")
 
-        //equal starting state
+        // equal starting state
         main.initExpr.add(
-                code.stateVars
-                        .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
-                        .conjunction())
+            code.stateVars
+                .map { it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN) }
+                .conjunction(),
+        )
 
         // low variables
         val lowVar = code.inputVars.filter { !isHigh(it.name) }
@@ -164,9 +190,8 @@ class PrivacyModelBuilder(private val code: SMVModule,
         // high variables
         val highVar = code.inputVars.filter { isHigh(it.name) }
 
-        //info("lowVar: ${lowVar.map { it.name }}")
-        //info("highVar: ${highVar.map { it.name }}")
-
+        // info("lowVar: ${lowVar.map { it.name }}")
+        // info("highVar: ${highVar.map { it.name }}")
 
         fun conjunction(v: List<SVariable>): SMVExpr {
             if (v.isEmpty()) return SLiteral.TRUE
@@ -178,7 +203,7 @@ class PrivacyModelBuilder(private val code: SMVModule,
         val lowEqual = conjunction(lowVar)
         val highEqual = conjunction(highVar)
 
-        //first phase, insert information
+        // first phase, insert information
         val inputLow = lowEqual
         main.definitions.add(softEqualInVar assignTo inputLow)
 
@@ -197,20 +222,21 @@ class PrivacyModelBuilder(private val code: SMVModule,
         val historyLowEq = SVariable("hInputStrongEq", hmb.moduleType)
         main.stateVars.add(historyLowEq)
 
-
-        //TODO too many output variables.
-        val lowOutput = /*code.definitions.map { it.target } +*/ code.stateVars
+        // TODO too many output variables.
+        val lowOutput = code.stateVars
         val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
         val premise = (history + strongEqualInVar + alwaysLowEqual)
-                .reduce { acc: SMVExpr, sVariable: SMVExpr ->
-                    acc.and(sVariable)
-                }
+            .reduce { acc: SMVExpr, sVariable: SMVExpr ->
+                acc.and(sVariable)
+            }
 
-        main.invariantSpecs.add(premise implies
-                conjunction(lowOutput))
+        main.invariantSpecs.add(
+            premise implies
+                conjunction(lowOutput),
+        )
 
         //    val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
-        //main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
+        // main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
     }
 
     private fun instantiateCode(nameOfRun: String) {
@@ -224,9 +250,11 @@ class PrivacyModelBuilder(private val code: SMVModule,
     }
 }
 
-
-class IFModelBuilder(private val code: SMVModule,
-                     val isHigh: (String) -> Boolean, private val historyLength: Int = 10) : Runnable {
+class IFModelBuilder(
+    private val code: SMVModule,
+    val isHigh: (String) -> Boolean,
+    private val historyLength: Int = 10,
+) : Runnable {
     val loweq = SVariable("lowEq", SMVTypes.BOOLEAN)
     val hmb = HistoryModuleBuilder("HistoryLowEq", listOf(loweq), historyLength)
     val main = SMVModule("main")
@@ -243,17 +271,16 @@ class IFModelBuilder(private val code: SMVModule,
 
         val inV = code.inputVars
         val inputLow = inV.filter { !isHigh(it.name) }
-                .map {
-                    it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
-                }
-                .reduce { a, b -> a and b }
+            .map {
+                it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
+            }
+            .reduce { a, b -> a and b }
 
         // History of low inputs.
         hmb.run()
         val historyLowEq = SVariable("hLowEq", hmb.moduleType)
         main.definitions.add(loweq assignTo inputLow)
         main.stateVars.add(historyLowEq)
-
 
         val outV = code.definitions.map { it.target } + code.stateVars
         val lowOutput = outV.filter { !isHigh(it.name) }
@@ -262,7 +289,7 @@ class IFModelBuilder(private val code: SMVModule,
                     it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
                 }
                 .reduce { a, b -> a and b }
-        */
+         */
 
         val history = hmb.module.stateVars.map { it.inModule(historyLowEq.name) }
         val premise = (history + loweq).reduce { acc: SMVExpr, sVariable: SMVExpr ->
@@ -273,7 +300,7 @@ class IFModelBuilder(private val code: SMVModule,
             val eq = it.inModule(FIRST_RUN) equal it.inModule(SECOND_RUN)
             main.invariantSpecs.add(premise implies eq)
         }
-        //main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
+        // main.invariantSpecs.add( softEqualInVar implies  softEqualInVar)
     }
 
     private fun instantiateCode(nameOfRun: String) {
@@ -287,17 +314,16 @@ class IFModelBuilder(private val code: SMVModule,
     }
 }
 
-
 /**
  * Find and tag the variables with the given [flag]
  */
 fun markVariableAs(scope: Scope, vararg vars: String, flag: Int) {
     for (variable in scope.variables) {
-        if (variable.name in vars)
+        if (variable.name in vars) {
             variable.type = flag
+        }
     }
 }
-
 
 /**
  * Handles access to `aSeqParams[Sequence.iActStep]`
@@ -306,9 +332,11 @@ object SeqParamsActiveStep : CodeTransformation, AstMutableVisitor() {
     override fun transform(state: TransformationState): TransformationState {
         val dt = state.scope.resolveDataType("stSeqParams")
 
-        val vd = VariableDeclaration("ActStep",
-                0,
-                SimpleTypeDeclaration(dt = dt, init = null))
+        val vd = VariableDeclaration(
+            "ActStep",
+            0,
+            SimpleTypeDeclaration(dt = dt, init = null),
+        )
         vd.dataType = dt
         state.scope.variables += vd
         state.stBody = state.stBody.accept(this) as StatementList
@@ -323,7 +351,6 @@ object SeqParamsActiveStep : CodeTransformation, AstMutableVisitor() {
                     return SymbolicReference("ActStep", symbolicReference.sub)
                 }
             } catch (_: ClassCastException) {
-
             }
         }
         return super.visit(symbolicReference)
@@ -336,13 +363,13 @@ object SeqParamsActiveStep : CodeTransformation, AstMutableVisitor() {
  * (i/1000)*1000.
  */
 object IntLit1000To1 : STCodeTransformation, AstMutableVisitor() {
-    val _1000 = BigInteger.valueOf(1000)
+    val one000 = BigInteger.valueOf(1000)
     override fun transform(stBody: StatementList): StatementList = stBody.accept(this) as StatementList
-    override fun visit(literal: Literal): Expression =
-            if (literal is IntegerLit && literal.value == _1000)
-                IntegerLit(INT, BigInteger.ONE)
-            else
-                literal
+    override fun visit(literal: Literal): Expression = if (literal is IntegerLit && literal.value == one000) {
+        IntegerLit(INT, BigInteger.ONE)
+    } else {
+        literal
+    }
 }
 
 object RemoveConversionFunction : STCodeTransformation, AstMutableVisitor() {
@@ -362,8 +389,10 @@ object RemoveVSObj : STCodeTransformation, AstMutableVisitor() {
 
     override fun visit(assignmentStatement: AssignmentStatement): Statement {
         val ident = assignmentStatement.location.identifier
-        return if (ident == "VSObj_McFaultDescription")
+        return if (ident == "VSObj_McFaultDescription") {
             return StatementList()
-        else assignmentStatement
+        } else {
+            assignmentStatement
+        }
     }
 }

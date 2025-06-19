@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.rvt.modularization
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -15,7 +33,6 @@ import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.info
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
@@ -35,9 +52,11 @@ interface ReveContext {
     val inRelation: MutableList<RelatedVariables>
     val outRelation: MutableList<RelatedVariables>
 
-    fun completeRelation(oldVars: MutableList<SymbolicReference>,
-                         newVars: MutableList<SymbolicReference>,
-                         specification: MutableList<RelatedVariables>): MutableList<RelatedVariables> {
+    fun completeRelation(
+        oldVars: MutableList<SymbolicReference>,
+        newVars: MutableList<SymbolicReference>,
+        specification: MutableList<RelatedVariables>,
+    ): MutableList<RelatedVariables> {
         val seq = mutableListOf<RelatedVariables>()
         if (specification.isNotEmpty()) {
             seq.addAll(specification)
@@ -57,29 +76,29 @@ interface ReveContext {
 
     fun completeOutRel(old: BlockStatement, new: BlockStatement) = completeRelation(old.output, new.output, outRelation)
 
-    //fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
-    fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
-            createRelation(old.input, new.input, oldModule, newModule, inRelation)
+    // fun relationBetween(oldVar: String, newVar: String): SBinaryOperator
+    fun createInRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr = createRelation(old.input, new.input, oldModule, newModule, inRelation)
 
-    fun createOutRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr =
-            createRelation(old.output, new.output, oldModule, newModule, outRelation)
+    fun createOutRelation(old: BlockStatement, new: BlockStatement, oldModule: String, newModule: String): SMVExpr = createRelation(old.output, new.output, oldModule, newModule, outRelation)
 
-    fun createRelation(oldVars: MutableList<SymbolicReference>,
-                       newVars: MutableList<SymbolicReference>,
-                       oldModule: String,
-                       newModule: String,
-                       specification: MutableList<RelatedVariables>): SMVExpr {
-        //TODO find a nice way to reduce specification effort for perfect equivalence
+    fun createRelation(
+        oldVars: MutableList<SymbolicReference>,
+        newVars: MutableList<SymbolicReference>,
+        oldModule: String,
+        newModule: String,
+        specification: MutableList<RelatedVariables>,
+    ): SMVExpr {
+        // TODO find a nice way to reduce specification effort for perfect equivalence
         val ov = oldVars.map { it.identifier }.toMutableSet()
         val nv = newVars.map { it.identifier }.toMutableSet()
         val seq = mutableListOf<SMVExpr>()
         if (specification.isNotEmpty()) {
             for ((o, op, n) in specification) {
-                //if (o.name in ov && n.name in nv) {
+                // if (o.name in ov && n.name in nv) {
                 seq.add(SBinaryExpression(o.inModule(oldModule), op, n.inModule(newModule)))
-                //ov.remove(o.name)
-                //nv.remove(n.name)
-                //}
+                // ov.remove(o.name)
+                // nv.remove(n.name)
+                // }
             }
         } else {
             val common = ov.intersect(nv)
@@ -108,14 +127,15 @@ operator fun ReveContext.compareTo(c: ReveContext): Int {
     return 1
 }
 
-
-data class TopReveContext(override var inRelation: MutableList<RelatedVariables> = arrayListOf(),
-                          override var outRelation: MutableList<RelatedVariables> = arrayListOf(),
-                          override var condition: SMVExpr = SLiteral.TRUE) : ReveContext {
+data class TopReveContext(
+    override var inRelation: MutableList<RelatedVariables> = arrayListOf(),
+    override var outRelation: MutableList<RelatedVariables> = arrayListOf(),
+    override var condition: SMVExpr = SLiteral.TRUE,
+) : ReveContext {
 
     override fun clone() = copy()
 
-    //override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator =
+    // override fun relationBetween(oldVar: String, newVar: String): SBinaryOperator =
     //        relation.find { it.oldVar.name == oldVar && it.newVar.name == newVar }?.operator ?: SBinaryOperator.EQUAL
 
     override val isPerfect: Boolean
@@ -151,9 +171,10 @@ data class TopReveContext(override var inRelation: MutableList<RelatedVariables>
 }*/
 
 data class RelatedVariables(
-        val oldVar: SMVExpr,
-        val operator: SBinaryOperator,
-        val newVar: SMVExpr) {
+    val oldVar: SMVExpr,
+    val operator: SBinaryOperator,
+    val newVar: SMVExpr,
+) {
     val expr
         get() = SBinaryExpression(oldVar, operator, newVar)
 }
@@ -169,7 +190,7 @@ class ReveContextManager {
 
     fun get(old: BlockStatement, new: BlockStatement) = map[old to new]
     fun get(old: Frame, new: Frame) = get(old.block, new.block)
-            ?: error("Could not found a context for ${old.name} and ${new.name}")
+        ?: error("Could not found a context for ${old.name} and ${new.name}")
 
     fun addAll(manager: ReveContextManager) {
         map.putAll(manager.map)
@@ -182,11 +203,11 @@ class ReveContextManager {
  * @version 1 (14.07.18)
  */
 class ModularProver(
-        val oldProgram: ModularProgram,
-        val newProgram: ModularProgram,
-        var context: ReveContext,
-        var callSitePairs: CallSiteMapping = arrayListOf(),
-        var outputFolder: File = File(".")
+    val oldProgram: ModularProgram,
+    val newProgram: ModularProgram,
+    var context: ReveContext,
+    var callSitePairs: CallSiteMapping = arrayListOf(),
+    var outputFolder: File = File("."),
 ) {
     val ctxManager = ReveContextManager()
     val proveStrategy = DefaultEqualityStrategy(this)
@@ -208,27 +229,25 @@ class ModularProver(
             info("\tContext: ${ctx.condition.repr()}")
             info("\tInput-Relation: ${ctx.createInRelation(bold, bnew, "old", "new").repr()}")
             info("\tOutput-Relation: ${ctx.createOutRelation(bold, bnew, "old", "new").repr()}")
-
         }
     }
 
     fun proof() {
         outputFolder.mkdirs()
-        //runBlocking(ModApp.processContext) {
-            val equal = proveStrategy.proofEquivalenceTopLevel()
-            info("Proof result: $equal")
-        //}
+        // runBlocking(ModApp.processContext) {
+        val equal = proveStrategy.proofEquivalenceTopLevel()
+        info("Proof result: $equal")
+        // }
     }
 
     fun inferReveContexts() {
         callSitePairs.forEach { (bold, bnew) ->
             val oldCtx = oldProgram.frameContext[bold]!!
             val newCtx = newProgram.frameContext[bnew]!!
-            //ctxManager.add(bold, bnew, ReveSubContext(context, oldCtx, newCtx))
+            // ctxManager.add(bold, bnew, ReveSubContext(context, oldCtx, newCtx))
         }
     }
 }
-
 
 /** Get the name of the callee */
 val Invoked?.name: String?
@@ -244,10 +263,11 @@ val Invoked?.name: String?
 typealias CallSiteMapping = List<Pair<BlockStatement, BlockStatement>>
 
 object ModFacade {
-    fun createModularProgram(entry: PouExecutable,
-                             outputFolder: File,
-                             prefix: String = ""): ModularProgram {
-
+    fun createModularProgram(
+        entry: PouExecutable,
+        outputFolder: File,
+        prefix: String = "",
+    ): ModularProgram {
         val complete = SymbExFacade.simplify(entry)
         val simplifiedFile = File(outputFolder, "${prefix}_${entry.name}_simplified.st")
         info("Write simplified version of '$prefix' to $simplifiedFile")
@@ -280,13 +300,16 @@ object ModFacade {
         return moduleBuilder.module to se.catch
     }
 
-    fun findCallSitePair(old: String, new: String,
-                         oldProgram: ModularProgram, newProgram: ModularProgram)
-            : Pair<BlockStatement, BlockStatement> {
+    fun findCallSitePair(
+        old: String,
+        new: String,
+        oldProgram: ModularProgram,
+        newProgram: ModularProgram,
+    ): Pair<BlockStatement, BlockStatement> {
         val x = oldProgram.findCallSite(old)
-                ?: error("Could not find $old")
+            ?: error("Could not find $old")
         val y = newProgram.findCallSite(new)
-                ?: error("Could not find $new")
+            ?: error("Could not find $new")
         return x to y
     }
 
@@ -296,8 +319,12 @@ object ModFacade {
         return cm
     }
 
-    fun createReveContextsBySpecification(it: String, oldProgram: ModularProgram, newProgram: ModularProgram,
-                                          ctxManager: ReveContextManager) {
+    fun createReveContextsBySpecification(
+        it: String,
+        oldProgram: ModularProgram,
+        newProgram: ModularProgram,
+        ctxManager: ReveContextManager,
+    ) {
         // it == "A.f=A.f#cond#input#output"
         val sharp = it.count { it == '#' }
         val (sitemap, cond, inrel, outrel) = when (sharp) {
@@ -324,10 +351,7 @@ object ModFacade {
         return RelatedVariables(left, b.operator, right)
     }
 
-
-    fun createFrame(cNew: BlockStatement, scope: Scope): Frame {
-        return Frame(cNew, scope)
-    }
+    fun createFrame(cNew: BlockStatement, scope: Scope): Frame = Frame(cNew, scope)
 
     fun inferBlockAssignable(scope: Scope, block: BlockStatement) {
         val a = UsageFinder.investigate(block)
@@ -343,7 +367,6 @@ object ModFacade {
                 w -> block.output.add(it)
             }
         }
-
     }
 
     fun updateBlockStatements(p: PouExecutable) = MaintainBlocks(p).run()
@@ -358,22 +381,21 @@ object ModFacade {
 
         // TODOx check assignable
         scope.variables.addAll(inputs + state + outputs)
-        val fbd = FunctionBlockDeclaration(
-                block.originalInvoked?.name ?: block.name, scope, block.statements)
+        val fbd = FunctionBlockDeclaration(block.originalInvoked?.name ?: block.name, scope, block.statements)
 
         return fbd
     }
 }
 
-class ModularProgram(val entry: PouExecutable,
-                     val complete: PouExecutable,
-                     val symbex: SMVModule,
-                     val callSites: List<BlockStatement>,
-                     val frameContext: HashMap<BlockStatement, SymbolicState>) {
+class ModularProgram(
+    val entry: PouExecutable,
+    val complete: PouExecutable,
+    val symbex: SMVModule,
+    val callSites: List<BlockStatement>,
+    val frameContext: HashMap<BlockStatement, SymbolicState>,
+) {
 
-    fun findCallSite(aa: String): BlockStatement? {
-        return callSites.find { it.repr() == aa }
-    }
+    fun findCallSite(aa: String): BlockStatement? = callSites.find { it.repr() == aa }
 
     val frame: Frame
         get() {
@@ -390,13 +412,11 @@ data class CallSiteSpec(val contextPath: List<String>, val number: Int = 0) {
     var specifiedContext: SMVExpr? = null
 
     fun repr(): String = contextPath.joinToString(".") + ".$number"
-    fun correspond(other: CallSiteSpec) =
-            contextPath.subList(1, contextPath.lastIndex) == other.contextPath.subList(1, other.contextPath.lastIndex)
-                    && other.number == number
+    fun correspond(other: CallSiteSpec) = contextPath.subList(1, contextPath.lastIndex) == other.contextPath.subList(1, other.contextPath.lastIndex) &&
+        other.number == number
 
     fun isPrefix(ids: List<String>) = ids.size <= contextPath.size && ids.zip(contextPath).all { (a, b) -> a == b }
 }
-
 
 class MaintainBlocks(val entry: PouExecutable) {
     val blocks: MutableList<BlockStatement> = arrayListOf()
@@ -446,5 +466,4 @@ class MaintainBlocks(val entry: PouExecutable) {
     }
 }
 
-private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) =
-        vars.map { reference -> this.getVariable(reference).clone().also { it.type = newType } }
+private fun Scope.getAll(vars: MutableList<SymbolicReference>, newType: Int = 0) = vars.map { reference -> this.getVariable(reference).clone().also { it.type = newType } }

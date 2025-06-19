@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.run
 
 import edu.kit.iti.formal.automation.operators.Operators
@@ -6,18 +24,18 @@ import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.visitors.DefaultVisitorNN
 
-class ExpressionVisitor(private val state: State,
-                        private val scope: Scope) : DefaultVisitorNN<EValue>() {
+class ExpressionVisitor(
+    private val state: State,
+    private val scope: Scope,
+) : DefaultVisitorNN<EValue>() {
 
-    override fun defaultVisit(obj: Any) =
-            TODO("missing visitor for visitable ${obj.toString()}")
+    override fun defaultVisit(obj: Any) = TODO("missing visitor for visitable $obj")
 
     override fun visit(parameter: InvocationParameter): EValue = parameter.expression.accept(this)
 
-
     override fun visit(functionCall: Invocation): EValue {
         val functionDeclaration = scope.resolveFunction(functionCall.calleeName)
-                ?: TODO("Could not find function ${functionCall.calleeName}")
+            ?: TODO("Could not find function ${functionCall.calleeName}")
         val evaluatedParams = functionCall.parameters.map { it.accept(this)!! }
         val returnValue = ExecutionFacade.evaluateFunction(functionDeclaration, evaluatedParams)
         return returnValue
@@ -29,7 +47,7 @@ class ExpressionVisitor(private val state: State,
     }
 
     override fun visit(unaryExpression: UnaryExpression): EValue {
-        //"as EValue" should not be necessary, but the compiler complains otherwise
+        // "as EValue" should not be necessary, but the compiler complains otherwise
         // I see no way, where the result of .accept() will not be a EValue
         val expressionValue = unaryExpression.expression.accept(this)
         return when (unaryExpression.operator) {
@@ -40,13 +58,12 @@ class ExpressionVisitor(private val state: State,
     }
 
     override fun visit(literal: Literal): EValue = literal.asValue()
-            ?: throw IllegalStateException("No value from literal $literal")
-
+        ?: throw IllegalStateException("No value from literal $literal")
 
     override fun visit(symbolicReference: SymbolicReference): EValue {
         val variableName = symbolicReference.asPath()
         val variableState = state[variableName]
-                ?: throw ExecutionException("Variable $variableName not found")
+            ?: throw ExecutionException("Variable $variableName not found")
         return variableState
         /*
         var dataType = symbolicReference.dataType(scope)
@@ -72,8 +89,8 @@ class ExpressionVisitor(private val state: State,
         val leftValue = binaryExpression.leftExpr.accept<EValue>(this) as EValue
         val rightValue = binaryExpression.rightExpr.accept<EValue>(this) as EValue
 
-        //TODO resolve function by using dataType
-        //binaryExpression.dataType(scope)
+        // TODO resolve function by using dataType
+        // binaryExpression.dataType(scope)
 
         return when (binaryExpression.operator) {
             Operators.ADD -> OperationEvaluator.add(leftValue, rightValue)
@@ -88,7 +105,7 @@ class ExpressionVisitor(private val state: State,
             Operators.OR -> OperationEvaluator.or(leftValue, rightValue)
             Operators.SUB -> OperationEvaluator.subtract(leftValue, rightValue)
             Operators.MOD -> OperationEvaluator.modulo(leftValue, rightValue)
-            else -> TODO("operator ${binaryExpression.operator.symbol} isType not implemented (${binaryExpression.operator.toString()})")
+            else -> TODO("operator ${binaryExpression.operator.symbol} isType not implemented (${binaryExpression.operator})")
         }
     }
 }

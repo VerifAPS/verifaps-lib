@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.monitor
 
 import edu.kit.iti.formal.automation.IEC61131Facade
@@ -13,8 +31,6 @@ import edu.kit.iti.formal.automation.st.Statements
 import edu.kit.iti.formal.automation.st.ast.*
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
 import edu.kit.iti.formal.automation.testtables.apps.bindsConstraintVariable
-import edu.kit.iti.formal.automation.testtables.grammar.TestTableLanguageParser
-import edu.kit.iti.formal.automation.testtables.model.ConstraintVariable
 import edu.kit.iti.formal.automation.testtables.model.GeneralizedTestTable
 import edu.kit.iti.formal.automation.testtables.model.TableRow
 import edu.kit.iti.formal.automation.testtables.model.Variable
@@ -42,8 +58,10 @@ object MonitorGenerationST : MonitorGeneration {
      * @author Alexander Weigl
      * @version 1 (23.03.17)
      */
-    class MonitorGenerationSTImpl(private val gtt: GeneralizedTestTable,
-                                  private val automaton: TestTableAutomaton) {
+    class MonitorGenerationSTImpl(
+        private val gtt: GeneralizedTestTable,
+        private val automaton: TestTableAutomaton,
+    ) {
         private val fb = FunctionBlockDeclaration()
         private val stBody = StatementList()
 
@@ -56,16 +74,16 @@ object MonitorGenerationST : MonitorGeneration {
             fb.name = "${gtt.name}Monitor"
             fb.stBody = stBody
             gtt.programVariables
-                    .map { VariableDeclaration(it.name, VariableDeclaration.INPUT, it.dataType) }
-                    .forEach { fb.scope.variables.add(it) }
+                .map { VariableDeclaration(it.name, VariableDeclaration.INPUT, it.dataType) }
+                .forEach { fb.scope.variables.add(it) }
 
             gtt.constraintVariables
-                    .map { VariableDeclaration(it.name, VariableDeclaration.LOCAL, it.dataType) }
-                    .forEach { fb.scope.variables.add(it) }
+                .map { VariableDeclaration(it.name, VariableDeclaration.LOCAL, it.dataType) }
+                .forEach { fb.scope.variables.add(it) }
 
             gtt.constraintVariables
-                    .map { VariableDeclaration("${it.name}_bound", VariableDeclaration.LOCAL, AnyBit.BOOL) }
-                    .forEach { fb.scope.variables.add(it) }
+                .map { VariableDeclaration("${it.name}_bound", VariableDeclaration.LOCAL, AnyBit.BOOL) }
+                .forEach { fb.scope.variables.add(it) }
 
             fb.scope.add(lostSync)
             fb.scope.add(errorOutput)
@@ -92,8 +110,7 @@ object MonitorGenerationST : MonitorGeneration {
 
             fb.comment = "\n" + GetetaFacade.print(gtt) + "\n"
 
-            return PouElements(mutableListOf(
-                    fb))
+            return PouElements(mutableListOf(fb))
         }
 
         private fun bindFreeVariables() {
@@ -101,14 +118,18 @@ object MonitorGenerationST : MonitorGeneration {
                 val boundFlag = SymbolicReference("${fvar.name}_bound")
                 automaton.rowStates.forEach { row, states ->
                     val oneOfRowStates = states.map { SymbolicReference(it.name) }
-                            .disjunction()
+                        .disjunction()
                     row.rawFields.forEach { pvar, ctx ->
                         val bind = bindsConstraintVariable(ctx, fvar)
                         if (bind) {
-                            stBody.add(0, Statements.ifthen(boundFlag.not() and oneOfRowStates,
+                            stBody.add(
+                                0,
+                                Statements.ifthen(
+                                    boundFlag.not() and oneOfRowStates,
                                     SymbolicReference(fvar.name) assignTo SymbolicReference(pvar.name),
-                                    boundFlag assignTo BooleanLit.LTRUE
-                            ))
+                                    boundFlag assignTo BooleanLit.LTRUE,
+                                ),
+                            )
                         }
                     }
                 }
@@ -120,9 +141,9 @@ object MonitorGenerationST : MonitorGeneration {
             val synclost = SymbolicReference(lostSync.name)
 
             val noStateOccupied = automaton.rowStates.values.flatMap { it }
-                    .map { SymbolicReference(it.name) }
-                    .reduce { a: Expression, b: Expression -> a or b }
-                    .not()
+                .map { SymbolicReference(it.name) }
+                .reduce { a: Expression, b: Expression -> a or b }
+                .not()
 
             stBody.add(synclost assignTo noStateOccupied)
             stBody.add(error assignTo (synclost and SymbolicReference(automaton.stateError.name)))
@@ -130,8 +151,8 @@ object MonitorGenerationST : MonitorGeneration {
 
         private fun resets() {
             val inputs = automaton.initialStates
-                    .map { SymbolicReference((it as RowState).row.defInput.name) }
-                    .reduce { a: Expression, b: Expression -> a or b }
+                .map { SymbolicReference((it as RowState).row.defInput.name) }
+                .reduce { a: Expression, b: Expression -> a or b }
             val rst = resets.ref()
 
             val s = IfStatement()
@@ -143,13 +164,13 @@ object MonitorGenerationST : MonitorGeneration {
 
             statements.add(rst assignTo (rst plus IntegerLit(INT, 1.toBigInteger())))
             automaton.rowStates.values.flatMap { it }
-                    .map {
-                        SymbolicReference(it.name) assignTo
-                                (if (it in automaton.initialStates) BooleanLit.LTRUE else BooleanLit.LFALSE)
-                    }
-                    .forEach {
-                        statements.add(it)
-                    }
+                .map {
+                    SymbolicReference(it.name) assignTo
+                        (if (it in automaton.initialStates) BooleanLit.LTRUE else BooleanLit.LFALSE)
+                }
+                .forEach {
+                    statements.add(it)
+                }
             gtt.constraintVariables.forEach {
                 statements.add(SymbolicReference("${it.name}_bound") assignTo BooleanLit.LFALSE)
             }
@@ -167,22 +188,22 @@ object MonitorGenerationST : MonitorGeneration {
         private fun createNext(transitions: Map<AutomatonState, List<Transition>>, it: AutomatonState) {
             val to = SymbolicReference(it.name)
             val expr =
-                    transitions[it]?.map { t ->
-                        val from = t.from as? RowState
-                        val fromName = SymbolicReference(t.from.name)
-                        when (t.type) {
-                            TransitionType.ACCEPT ->
-                                SymbolicReference(from!!.row.defForward.name) and fromName
-                            TransitionType.ACCEPT_PROGRESS ->
-                                SymbolicReference(from!!.row.defProgress.name) and fromName
-                            TransitionType.FAIL ->
-                                SymbolicReference(from!!.row.defFailed.name) and fromName
-                            TransitionType.TRUE ->
-                                fromName
-                            TransitionType.MISS -> SymbolicReference(from!!.row.defInput.name).not() and fromName
-                        }
-                    }?.reduce { a, b -> a or b }
-                            ?: BooleanLit.LFALSE
+                transitions[it]?.map { t ->
+                    val from = t.from as? RowState
+                    val fromName = SymbolicReference(t.from.name)
+                    when (t.type) {
+                        TransitionType.ACCEPT ->
+                            SymbolicReference(from!!.row.defForward.name) and fromName
+                        TransitionType.ACCEPT_PROGRESS ->
+                            SymbolicReference(from!!.row.defProgress.name) and fromName
+                        TransitionType.FAIL ->
+                            SymbolicReference(from!!.row.defFailed.name) and fromName
+                        TransitionType.TRUE ->
+                            fromName
+                        TransitionType.MISS -> SymbolicReference(from!!.row.defInput.name).not() and fromName
+                    }
+                }?.reduce { a, b -> a or b }
+                    ?: BooleanLit.LFALSE
 
             stBody.add(to assignTo expr)
         }
@@ -195,48 +216,47 @@ object MonitorGenerationST : MonitorGeneration {
             val defProgress = SymbolicReference(tr.defProgress.name)
 
             val progress = tr.outgoing.map { SymbolicReference(it.defInput.name) }
-                    .reduce { acc: Expression, v: Expression -> acc or v }
+                .reduce { acc: Expression, v: Expression -> acc or v }
 
             val s = arrayListOf(
-                    defInput assignTo tr.inputExpr.values.conjunction().toStExpression(),
-                    defOutput assignTo tr.outputExpr.values.conjunction().toStExpression(),
-                    defFailed assignTo (defInput and defOutput.not()),
-                    defForward assignTo (defInput and defOutput))
+                defInput assignTo tr.inputExpr.values.conjunction().toStExpression(),
+                defOutput assignTo tr.outputExpr.values.conjunction().toStExpression(),
+                defFailed assignTo (defInput and defOutput.not()),
+                defForward assignTo (defInput and defOutput),
+            )
             stBody.addAll(0, s)
-            stBody.add(stBody.lastIndex,
-                    defProgress assignTo ((defInput and defOutput) and progress.not()))
+            stBody.add(
+                stBody.lastIndex,
+                defProgress assignTo ((defInput and defOutput) and progress.not()),
+            )
         }
     }
 }
 
-private fun TableRow.containsVariable(fvar: Variable) =
-        (inputExpr.values + outputExpr.values).find { fvar in it }
+private fun TableRow.containsVariable(fvar: Variable) = (inputExpr.values + outputExpr.values).find { fvar in it }
 
-operator fun SMVExpr.contains(fvar: Variable): Boolean =
-        accept(object : SMVAstDefaultVisitorNN<Boolean>() {
-            override fun defaultVisit(top: SMVAst) = false
-            override fun visit(v: SVariable) =
-                    v.name == fvar.name
+operator fun SMVExpr.contains(fvar: Variable): Boolean = accept(object : SMVAstDefaultVisitorNN<Boolean>() {
+    override fun defaultVisit(top: SMVAst) = false
+    override fun visit(v: SVariable) = v.name == fvar.name
 
-            override fun visit(be: SBinaryExpression) =
-                    be.left.accept(this) || be.right.accept(this)
+    override fun visit(be: SBinaryExpression) = be.left.accept(this) || be.right.accept(this)
 
-            override fun visit(ue: SUnaryExpression) = ue.expr.accept(this)
+    override fun visit(ue: SUnaryExpression) = ue.expr.accept(this)
 
-            override fun visit(ce: SCaseExpression): Boolean {
-                for (case in ce.cases) {
-                    if (case.condition.accept(this)) return true
-                    if (case.then.accept(this)) return true
-                }
-                return false
-            }
+    override fun visit(ce: SCaseExpression): Boolean {
+        for (case in ce.cases) {
+            if (case.condition.accept(this)) return true
+            if (case.then.accept(this)) return true
+        }
+        return false
+    }
 
-            override fun visit(func: SFunction): Boolean = func.arguments.any { it.accept(this) }
-        })
+    override fun visit(func: SFunction): Boolean = func.arguments.any { it.accept(this) }
+})
 
 private fun VariableDeclaration.ref() = SymbolicReference(name)
 
-//TODO should be externalize into Symbex!
+// TODO should be externalize into Symbex!
 private fun SMVExpr.toStExpression(): Expression = this.accept(SMVToStVisitor)
 
 object SMVToStVisitor : SMVAstVisitor<Expression> {
@@ -247,39 +267,35 @@ object SMVToStVisitor : SMVAstVisitor<Expression> {
     override fun visit(v: SVariable): Expression = SymbolicReference(v.name.removePrefix("code\$"))
     override fun visit(be: SBinaryExpression): Expression = BinaryExpression(be.left.accept(this), operator(be.operator), be.right.accept(this))
 
-    fun operator(operator: SBinaryOperator): BinaryOperator =
-            when (operator) {
-                SBinaryOperator.PLUS -> Operators.ADD
-                SBinaryOperator.MINUS -> Operators.SUB
-                SBinaryOperator.DIV -> Operators.DIV
-                SBinaryOperator.MUL -> Operators.MULT
-                SBinaryOperator.AND -> Operators.AND
-                SBinaryOperator.OR -> Operators.OR
-                SBinaryOperator.LESS_THAN -> Operators.LESS_THAN
-                SBinaryOperator.LESS_EQUAL -> Operators.LESS_EQUALS
-                SBinaryOperator.GREATER_THAN -> Operators.GREATER_THAN
-                SBinaryOperator.GREATER_EQUAL -> Operators.GREATER_EQUALS
-                SBinaryOperator.XOR -> Operators.XOR
-                SBinaryOperator.XNOR -> TODO()
-                SBinaryOperator.EQUAL -> Operators.EQUALS
-                SBinaryOperator.IMPL -> TODO()
-                SBinaryOperator.EQUIV -> TODO()
-                SBinaryOperator.NOT_EQUAL -> Operators.NOT_EQUALS
-                SBinaryOperator.MOD -> Operators.MOD
-                SBinaryOperator.SHL -> TODO()
-                SBinaryOperator.SHR -> TODO()
-                SBinaryOperator.WORD_CONCAT -> TODO()
-            }
-
-    override fun visit(ue: SUnaryExpression): Expression {
-        return UnaryExpression(operator(ue.operator), ue.expr.accept(this))
+    fun operator(operator: SBinaryOperator): BinaryOperator = when (operator) {
+        SBinaryOperator.PLUS -> Operators.ADD
+        SBinaryOperator.MINUS -> Operators.SUB
+        SBinaryOperator.DIV -> Operators.DIV
+        SBinaryOperator.MUL -> Operators.MULT
+        SBinaryOperator.AND -> Operators.AND
+        SBinaryOperator.OR -> Operators.OR
+        SBinaryOperator.LESS_THAN -> Operators.LESS_THAN
+        SBinaryOperator.LESS_EQUAL -> Operators.LESS_EQUALS
+        SBinaryOperator.GREATER_THAN -> Operators.GREATER_THAN
+        SBinaryOperator.GREATER_EQUAL -> Operators.GREATER_EQUALS
+        SBinaryOperator.XOR -> Operators.XOR
+        SBinaryOperator.XNOR -> TODO()
+        SBinaryOperator.EQUAL -> Operators.EQUALS
+        SBinaryOperator.IMPL -> TODO()
+        SBinaryOperator.EQUIV -> TODO()
+        SBinaryOperator.NOT_EQUAL -> Operators.NOT_EQUALS
+        SBinaryOperator.MOD -> Operators.MOD
+        SBinaryOperator.SHL -> TODO()
+        SBinaryOperator.SHR -> TODO()
+        SBinaryOperator.WORD_CONCAT -> TODO()
     }
 
-    fun operator(operator: SUnaryOperator): UnaryOperator =
-            when (operator) {
-                SUnaryOperator.NEGATE -> Operators.NOT
-                SUnaryOperator.MINUS -> Operators.MINUS
-            }
+    override fun visit(ue: SUnaryExpression): Expression = UnaryExpression(operator(ue.operator), ue.expr.accept(this))
+
+    fun operator(operator: SUnaryOperator): UnaryOperator = when (operator) {
+        SUnaryOperator.NEGATE -> Operators.NOT
+        SUnaryOperator.MINUS -> Operators.MINUS
+    }
 
     override fun visit(l: SLiteral): Expression {
         val v = l.value
@@ -307,11 +323,10 @@ object SMVToStVisitor : SMVAstVisitor<Expression> {
         TODO("not implemented")
     }
 
-    override fun visit(func: SFunction): Expression {
-        return Invocation(func.name,
-                func.arguments.map { it.accept(this) }
-        )
-    }
+    override fun visit(func: SFunction): Expression = Invocation(
+        func.name,
+        func.arguments.map { it.accept(this) },
+    )
 
     override fun visit(quantified: SQuantified): Expression {
         TODO("not implemented")

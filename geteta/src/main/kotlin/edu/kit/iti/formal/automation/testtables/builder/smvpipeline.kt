@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.builder
-
 
 import edu.kit.iti.formal.automation.datatypes.EnumerateType
 import edu.kit.iti.formal.automation.testtables.GetetaFacade
@@ -23,10 +40,10 @@ import edu.kit.iti.formal.smv.disjunction
 import edu.kit.iti.formal.util.warn
 import kotlin.math.abs
 
-
 class SmvConstructionPipeline(
-        state: AutomataTransformerState,
-        superEnumType: SMVType) {
+    state: AutomataTransformerState,
+    superEnumType: SMVType,
+) {
 
     val model = SMVConstructionModel(superEnumType, state)
     val transformers = arrayListOf<SmvConstructionTransformer>()
@@ -71,13 +88,13 @@ class SmvConstructionPipeline(
 object DefineProjectionVariables : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.testTable.programVariables
-                .filterIsInstance<ProjectionVariable>()
-                .forEach {
-                    val zip = it.argumentDefinitions.zip(it.constraint)
-                    for ((v, expr) in zip) {
-                        translate(model, v, expr)
-                    }
+            .filterIsInstance<ProjectionVariable>()
+            .forEach {
+                val zip = it.argumentDefinitions.zip(it.constraint)
+                for ((v, expr) in zip) {
+                    translate(model, v, expr)
                 }
+            }
     }
 
     private fun translate(model: SMVConstructionModel, variable: SVariable, expr: TestTableLanguageParser.ExprContext) {
@@ -98,21 +115,21 @@ object DefineStateVariables : SmvConstructionTransformer {
     }
 }
 
-
 object InitialStates : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.rowStates.forEach {
             val v = model.getStateVariable(it)
-            model.tableModule.initExpr.add(
-                    if (it in model.automaton.initialStates) v else v.not())
+            model.tableModule.initExpr.add(if (it in model.automaton.initialStates) v else v.not())
         }
 
         model.tableModule.initExpr.addAll(
-                listOf(model.stateError.not(),
-                        model.stateSentinel.not()))
+            listOf(
+                model.stateError.not(),
+                model.stateSentinel.not(),
+            ),
+        )
     }
 }
-
 
 object DefineTransitions : AbstractTransformer<SMVConstructionModel>() {
     private lateinit var transitions: Map<AutomatonState, List<Transition>>
@@ -125,23 +142,20 @@ object DefineTransitions : AbstractTransformer<SMVConstructionModel>() {
         createNext(model.automaton.stateSentinel)
     }
 
-
     private fun createNext(it: AutomatonState) {
         val expr =
-                transitions[it]?.map { t ->
-                    when (t.type) {
-                        TransitionType.ACCEPT -> model.getAccept(t.from as RowState)
-                        TransitionType.ACCEPT_PROGRESS -> model.getAcceptProgress(t.from as RowState)
-                        TransitionType.FAIL -> model.getFail(t.from as RowState)
-                        TransitionType.TRUE -> model.getVariable(it)
-                        TransitionType.MISS -> model.getMiss(t.from as RowState)
-                    }
-                }?.disjunction() ?: SLiteral.FALSE
-        model.tableModule.nextAssignments.add(
-                SAssignment(model.getVariable(it), expr))
+            transitions[it]?.map { t ->
+                when (t.type) {
+                    TransitionType.ACCEPT -> model.getAccept(t.from as RowState)
+                    TransitionType.ACCEPT_PROGRESS -> model.getAcceptProgress(t.from as RowState)
+                    TransitionType.FAIL -> model.getFail(t.from as RowState)
+                    TransitionType.TRUE -> model.getVariable(it)
+                    TransitionType.MISS -> model.getMiss(t.from as RowState)
+                }
+            }?.disjunction() ?: SLiteral.FALSE
+        model.tableModule.nextAssignments.add(SAssignment(model.getVariable(it), expr))
     }
 }
-
 
 object RegisterDefines : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
@@ -156,14 +170,15 @@ object RegisterDefines : SmvConstructionTransformer {
         // define input predicate
         model.define(s.defInput, s.inputExpr)
 
-
         // progress indicator
         val progress = if (s.duration.pflag) {
             s.outgoing
-                    //TODO filter the sentinel out: .filter { it != model.sentinelState }
-                    .map { it.defInput }
-                    .disjunction()
-        } else SLiteral.FALSE
+                // TODO filter the sentinel out: .filter { it != model.sentinelState }
+                .map { it.defInput }
+                .disjunction()
+        } else {
+            SLiteral.FALSE
+        }
 
         model.define(s.defProgress, s.defForward and progress.not())
 
@@ -183,8 +198,10 @@ object RegisterDefines : SmvConstructionTransformer {
         val stateVar = model.getStateVariable(ss)
         model.define(model.getAccept(ss), stateVar and ss.row.defForward)
         model.define(model.getFail(ss), stateVar and ss.row.defFailed)
-        model.define(model.getAcceptProgress(ss),
-                model.getAccept(ss) and ss.row.defProgress.not())
+        model.define(
+            model.getAcceptProgress(ss),
+            model.getAccept(ss) and ss.row.defProgress.not(),
+        )
     }
 }
 
@@ -217,7 +234,6 @@ class NameSetterTransformer : SmvConstructionTransformer {
     }
 }
 
-
 /**
  * Every "pure" input variable (challenger) becomes a module parameter.
  *
@@ -227,20 +243,21 @@ class NameSetterTransformer : SmvConstructionTransformer {
 class ModuleParameterTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         model.testTable.programVariables.forEach {
-            model.tableModule.moduleParameters.add(
-                    it.internalVariable(model.variableContext.programRuns))
+            model.tableModule.moduleParameters.add(it.internalVariable(model.variableContext.programRuns))
         }
 
-        model.ttType = ModuleType(model.tableModule.name,
-                model.testTable.programVariables.map {
-                    val a = it.externalVariable(model.variableContext.programRuns,
-                            "_${model.testTable.name}")
-                    if (it.isAssertion) a.inNext() else a
-                }
+        model.ttType = ModuleType(
+            model.tableModule.name,
+            model.testTable.programVariables.map {
+                val a = it.externalVariable(
+                    model.variableContext.programRuns,
+                    "_${model.testTable.name}",
+                )
+                if (it.isAssertion) a.inNext() else a
+            },
         )
     }
 }
-
 
 /**
  * Add global variables to the module.
@@ -260,14 +277,18 @@ class ManagingGlobalVariables : SmvConstructionTransformer {
 
             if (cv.constraint != null) {
                 mt.initExpr.add(
-                        GetetaFacade.exprToSMV(cv.constraint!!,
-                                svar, 0, model.variableContext))
+                    GetetaFacade.exprToSMV(
+                        cv.constraint!!,
+                        svar,
+                        0,
+                        model.variableContext,
+                    ),
+                )
             }
             //            mt.invariants.add(svar equal svar.inNext())
         }
     }
 }
-
 
 class BackwardsReferencesTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
@@ -280,11 +301,11 @@ class BackwardsReferencesTransformer : SmvConstructionTransformer {
         val b = HistoryModuleBuilder("History_${history}_of_${variable.name}", listOf(variable), history)
         b.run()
 
-        //Add Variable
+        // Add Variable
         val svar = SVariable(GetetaFacade.getHistoryName(variable), b.moduleType)
         model.tableModule.stateVars.add(svar)
 
-        //add helper module
+        // add helper module
         model.helperModules.add(b.module)
     }
 }
@@ -295,14 +316,13 @@ class BackwardsReferencesTransformer : SmvConstructionTransformer {
 class WeakConformance : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         val invar =
-                model.stateError implies
-                        model.rowStates.map { s -> model.getVariable(s) }
-                                .disjunction(SLiteral.FALSE)
-                                .or(model.stateSentinel)
+            model.stateError implies
+                model.rowStates.map { s -> model.getVariable(s) }
+                    .disjunction(SLiteral.FALSE)
+                    .or(model.stateSentinel)
         model.tableModule.invariantSpecs.add(invar)
     }
 }
-
 
 /**
  * Construction of the LTL specification for strict conformance.
@@ -341,10 +361,9 @@ class LtlStrictConformance : SmvConstructionTransformer {
                 .implies(noStateSelected.or(lastStateForward).eventually())
 
         tt.tableModule.ltlSpec.add(ltlspec)
-        */
+         */
     }
 }
-
 
 /**
  *
@@ -355,8 +374,8 @@ class InputSequenceInvariantTransformer : SmvConstructionTransformer {
     override fun transform(model: SMVConstructionModel) {
         /*
             exists an input and state pair in every turn
-        */
-        //TODO
+         */
+        // TODO
         /*
         // one of the rows is always active
         val states = tt.testTable.region!!.flat()
@@ -365,10 +384,9 @@ class InputSequenceInvariantTransformer : SmvConstructionTransformer {
                 .reduce { a, b -> a.or(b) }
 
         tt.tableModule.invariantSpecs.add(states)
-        */
+         */
     }
 }
-
 
 /**
  * This transformer modifies the state in two ways
@@ -387,7 +405,4 @@ class ConcreteTableInvariantTransformer : SmvConstructionTransformer {
     }
 }
 
-
-private operator fun Iterable<SAssignment>.get(svar: SVariable): SAssignment? {
-    return find { it.target == svar }
-}
+private operator fun Iterable<SAssignment>.get(svar: SVariable): SAssignment? = find { it.target == svar }

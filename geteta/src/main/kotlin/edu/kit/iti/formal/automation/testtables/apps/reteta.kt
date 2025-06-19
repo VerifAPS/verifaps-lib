@@ -1,7 +1,26 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -26,7 +45,6 @@ import edu.kit.iti.formal.util.warn
 import java.io.File
 import java.util.*
 import kotlin.system.exitProcess
-import com.github.ajalt.clikt.core.main
 
 object RetetaApp {
     @JvmStatic
@@ -60,11 +78,11 @@ class Reteta : CliktCommand(name = "reteta") {
             fail("No code or table file given.")
         }
 
-        //read program
+        // read program
         val programs = readPrograms()
         val superEnumType = GetetaFacade.createSuperEnum(programs.map { it.scope })
 
-        //read table
+        // read table
         val gtts = tableOptions.table.flatMap { GetetaFacade.readTables(it) }.map {
             it.simplify()
         }
@@ -78,7 +96,7 @@ class Reteta : CliktCommand(name = "reteta") {
 
                 if (printAugmentedPrograms) {
                     File(outputFolder).mkdirs()
-                    val out = File(outputFolder, "${exec.name}_${idx}.st")
+                    val out = File(outputFolder, "${exec.name}_$idx.st")
                     out.bufferedWriter().use {
                         IEC61131Facade.printTo(it, p)
                     }
@@ -86,7 +104,7 @@ class Reteta : CliktCommand(name = "reteta") {
                 }
 
                 SymbExFacade.evaluateProgram(p, true).also {
-                    it.name = "${it.name}_${idx}" // rename module, otherwise clash on self-compositions
+                    it.name = "${it.name}_$idx" // rename module, otherwise clash on self-compositions
                 }
             }
 
@@ -94,14 +112,14 @@ class Reteta : CliktCommand(name = "reteta") {
                 throw IllegalStateException()
             }
 
-
             val tt = GetetaFacade.constructSMV(table, superEnumType)
 
             if (automatonOptions.drawAutomaton) {
                 info("Automaton drawing requested. This may took a while.")
                 val ad = AutomatonDrawer(
                     File(outputFolder, "${table.name}.dot"),
-                    listOf(table.region), tt.automaton
+                    listOf(table.region),
+                    tt.automaton,
                 )
                 ad.runDot = true
                 ad.show = automatonOptions.showAutomaton
@@ -130,8 +148,10 @@ class Reteta : CliktCommand(name = "reteta") {
             modules.addAll(augmentedPrograms)
             modules.addAll(tt.helperModules)
             val pNuxmv = GetetaFacade.createNuXMVProcess(
-                outputFolder, modules, nuxmv ?: "nuxmv",
-                table.options.verificationTechnique
+                outputFolder,
+                modules,
+                nuxmv ?: "nuxmv",
+                table.options.verificationTechnique,
             )
             if (dryRun) {
                 val b = pNuxmv.call()
@@ -148,7 +168,7 @@ class Reteta : CliktCommand(name = "reteta") {
                         /*else info("Use `--cexout' to print a cex analysation.")
                             if (runAnalyzer) runCexAnalysation(b, tt)
                             else info("Use `--row-map' to print possible row mappings.")
-                             */
+                         */
                         exitProcess(67)
                     }
 

@@ -1,22 +1,21 @@
-/**
- * geteta
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
  *
- * Copyright (C) 2016-2018 -- Alexander Weigl <weigl></weigl>@kit.edu>
- *
- * This program is free software: you can redistribute it and/or modify
+ * This program isType free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This program isType distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public
+ * You should have received a clone of the GNU General Public
  * License along with this program.  If not, see
- * <http:></http:>//www.gnu.org/licenses/gpl-3.0.html>.
- */
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.io
 
 import com.github.ajalt.clikt.core.main
@@ -38,7 +37,7 @@ import java.util.*
  * @version 1 (02.02.18)
  */
 object FullStackTest {
-    private var NUXMV = (System.getenv() as Map<String, String>).getOrDefault("NUXMV", "nuXmv")
+    private var nuxmv = (System.getenv() as Map<String, String>).getOrDefault("NUXMV", "nuXmv")
 
     /*var workingDir: String,
     var args: Array<String>,
@@ -55,19 +54,18 @@ object FullStackTest {
     fun testExtern(workingDir: String, args: Array<String>, status: String) {
         val javaHome = System.getProperty("java.home")
         val javaBin = javaHome +
-                File.separator + "bin" +
-                File.separator + "java"
+            File.separator + "bin" +
+            File.separator + "java"
         val classpath = System.getProperty("java.class.path")
         val className = Geteta::class.java.canonicalName
 
-
         val commands = arrayListOf(javaBin, "-cp", classpath, className)
         commands.addAll(Arrays.asList(*args))
-        //println(commands.stream().reduce { a, b -> "$a $b" }.get())
+        // println(commands.stream().reduce { a, b -> "$a $b" }.get())
 
         val builder = ProcessBuilder(commands)
-                .directory(File(workingDir).absoluteFile)
-        val nuxmv = findProgram(NUXMV)
+            .directory(File(workingDir).absoluteFile)
+        val nuxmv = findProgram(nuxmv)
 
         Assumptions.assumeTrue(nuxmv != null)
 
@@ -85,7 +83,6 @@ object FullStackTest {
         Assertions.assertTrue(output.endsWith("STATUS: $status"))
     }
 
-
     data class TestArgument(var wd: String, var status: String, var args: List<String>) : Arguments {
         override fun get(): Array<Any> = arrayOf(wd, args, status)
     }
@@ -94,27 +91,57 @@ object FullStackTest {
         private val CASES = ArrayList<TestArgument>()
 
         init {
-            addCase("examples/constantprogram", "verified",
-                    "-t", "constantprogram.xml", "-c", "constantprogram.st")
+            addCase(
+                "examples/constantprogram",
+                "verified",
+                "-t",
+                "constantprogram.xml",
+                "-c",
+                "constantprogram.st",
+            )
 
-            addCase("examples/constantprogram", "not-verified",
-                    "-t", "constantprogram_broken.xml", "-c", "constantprogram.st")
+            addCase(
+                "examples/constantprogram",
+                "not-verified",
+                "-t",
+                "constantprogram_broken.xml",
+                "-c",
+                "constantprogram.st",
+            )
 
-            addCase("examples/constantprogram", "not-verified",
-                    "-t", "constantprogram_concrete.xml", "-c", "constantprogram.st")
+            addCase(
+                "examples/constantprogram",
+                "not-verified",
+                "-t",
+                "constantprogram_concrete.xml",
+                "-c",
+                "constantprogram.st",
+            )
 
-            addCase("examples/cycles", "verified",
-                    "-t", "cycles.xml", "-c", "cycles.st")
+            addCase(
+                "examples/cycles",
+                "verified",
+                "-t",
+                "cycles.xml",
+                "-c",
+                "cycles.st",
+            )
 
-            addCase("examples/cycles", "not-verified",
-                    "-t", "cycles_wrong.xml", "-c", "cycles.st")
+            addCase(
+                "examples/cycles",
+                "not-verified",
+                "-t",
+                "cycles_wrong.xml",
+                "-c",
+                "cycles.st",
+            )
         }
 
         private fun addCase(wd: String, status: String, vararg args: String) {
             CASES += TestArgument(wd, status, args.toList())
         }
 
+        @Deprecated("Deprecated in Java")
         override fun provideArguments(context: ExtensionContext?) = CASES.stream()
     }
 }
-

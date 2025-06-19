@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.builder
 
 import edu.kit.iti.formal.automation.IEC61131Facade.fileResolve
@@ -37,11 +55,12 @@ import kotlin.collections.HashMap
 import kotlin.math.abs
 
 data class ReactiveProgram(
-        val name: String,
-        val scope: Scope = Scope(),
-        val init: StatementList = StatementList(),
-        val body: StatementList = StatementList(),
-        val functions: MutableList<FunctionDeclaration> = ArrayList())
+    val name: String,
+    val scope: Scope = Scope(),
+    val init: StatementList = StatementList(),
+    val body: StatementList = StatementList(),
+    val functions: MutableList<FunctionDeclaration> = ArrayList(),
+)
 
 /**
  * Maps the value of a enum to its type.
@@ -53,7 +72,6 @@ private fun createNext(t: Transition): SMVExpr {
     return if (t.type == TransitionType.TRUE) {
         stateVar
     } else {
-
         val inputExpr = (t.from as RowState).row.inputExpr.values.conjunction(SLiteral.TRUE)
         val outputExpr = t.from.row.outputExpr.values.conjunction(SLiteral.TRUE)
 
@@ -70,9 +88,11 @@ private fun createNext(t: Transition): SMVExpr {
     }
 }
 
-class GttMiterConstruction(val gtt: GeneralizedTestTable,
-                           val automaton: TestTableAutomaton,
-                           val enumValues: EnumValueTable) {
+class GttMiterConstruction(
+    val gtt: GeneralizedTestTable,
+    val automaton: TestTableAutomaton,
+    val enumValues: EnumValueTable,
+) {
     private var transitions = automaton.transitions.groupBy { it.to }
     private val sentinel = VariableDeclaration(automaton.stateSentinel.name, VariableDeclaration.LOCAL, AnyBit.BOOL)
     private val inv = VariableDeclaration("__INV__", VariableDeclaration.OUTPUT, AnyBit.BOOL)
@@ -91,7 +111,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
         target.scope.variables.add(sentinel)
         err.initValue = getInit(AnyBit.BOOL)
         target.scope.variables.add(err)
-        //inv.initValue = getInit(AnyBit.BOOL)
+        // inv.initValue = getInit(AnyBit.BOOL)
         target.scope.variables.add(inv)
         //endregion
 
@@ -102,7 +122,7 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
         shiftHistory()
         //endregion
 
-        //Init
+        // Init
         initialiseConstraintVariables()
 
         target.functions.addAll(gtt.functions)
@@ -111,17 +131,18 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
     }
 
     private fun initialiseConstraintVariables() {
-        if (gtt.constraintVariables.isEmpty())
+        if (gtt.constraintVariables.isEmpty()) {
             return
+        }
 
-        //havoc
+        // havoc
         target.init += CommentStatement("havocing the contraint variables")
         gtt.constraintVariables.forEach { it ->
             val hc = SpecialCommentFactory.createHavoc(it.name, it.dataType)
             target.init.add(hc)
         }
 
-        //assume
+        // assume
         val constraints = gtt.constraintVariables.map {
             GetetaFacade.exprToSMV(it.constraint!!, SVariable(it.name), 0, gtt.parseContext)
         }
@@ -148,14 +169,14 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
 
     private fun addInvariant() {
         val invAssign: SMVExpr = automaton.getRowStates()
-                .map { SVariable(it.name, SMVTypes.BOOLEAN) }
-                .asIterable()
-                .disjunction()
-                .or(SVariable(sentinel.name, SMVTypes.BOOLEAN))
-                .or(SVariable(err.name, SMVTypes.BOOLEAN).not())
+            .map { SVariable(it.name, SMVTypes.BOOLEAN) }
+            .asIterable()
+            .disjunction()
+            .or(SVariable(sentinel.name, SMVTypes.BOOLEAN))
+            .or(SVariable(err.name, SMVTypes.BOOLEAN).not())
         target.body.add("__INV__" assignTo invAssign.translateToSt())
         val assert = SpecialCommentFactory
-                .createAssert(SymbolicReference("__INV__"))
+            .createAssert(SymbolicReference("__INV__"))
         target.body.add(assert)
     }
 
@@ -192,9 +213,12 @@ class GttMiterConstruction(val gtt: GeneralizedTestTable,
         gtt.parseContext.refs.forEach { (svar, maxhis) ->
             for (n in (1..abs(maxhis))) {
                 val dt = gtt.programVariables.find { it.name == svar.name }?.dataType
-                        ?: error("Could not find datatype for SVariable: `${svar.name}")
-                val vd = VariableDeclaration(historyName(svar.name, n), VariableDeclaration.LOCAL,
-                        if (dt is EnumerateType) INT else dt)
+                    ?: error("Could not find datatype for SVariable: `${svar.name}")
+                val vd = VariableDeclaration(
+                    historyName(svar.name, n),
+                    VariableDeclaration.LOCAL,
+                    if (dt is EnumerateType) INT else dt,
+                )
                 vd.initValue = getInit(vd.dataType!!)
                 target.scope.variables.add(vd)
             }
@@ -259,14 +283,16 @@ class ProgMiterConstruction(val exec: PouExecutable) {
                     td.allowedValues.forEachIndexed { i, value ->
                         val vd = VariableDeclaration(
                             "${td.name}__${value.text.uppercase()}",
-                                VariableDeclaration.CONSTANT,
-                                SimpleTypeDeclaration(INT, IntegerLit(i)))
+                            VariableDeclaration.CONSTANT,
+                            SimpleTypeDeclaration(INT, IntegerLit(i)),
+                        )
                         target.scope.topLevel.add(vd)
                     }
 
                     val fdecl = FunctionDeclaration(
                         "nondet_${td.name.lowercase()}",
-                            returnType = RefTo(INT))
+                        returnType = RefTo(INT),
+                    )
                     fdecl.scope.add(VariableDeclaration("x", VariableDeclaration.LOCAL, INT))
                     fdecl.stBody = StatementList().also {
                         val x = SymbolicReference("x")
@@ -293,7 +319,7 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
     val variableReplacement: HashMap<String, String> = HashMap()
 
     override fun visit(top: SMVAst): Expression {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun visit(v: SVariable): Expression {
@@ -301,26 +327,27 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
         return SymbolicReference(n)
     }
 
-    override fun visit(be: SBinaryExpression): Expression = BinaryExpression(be.left.accept(this),
-            SMVToStVisitor.operator(be.operator), be.right.accept(this))
+    override fun visit(be: SBinaryExpression): Expression = BinaryExpression(
+        be.left.accept(this),
+        SMVToStVisitor.operator(be.operator),
+        be.right.accept(this),
+    )
 
     override fun visit(ue: SUnaryExpression): Expression = UnaryExpression(SMVToStVisitor.operator(ue.operator), ue.expr.accept(this))
 
-    override fun visit(l: SLiteral): Expression {
-        return when (l.dataType) {
-            is SMVTypes.BOOLEAN -> BooleanLit(l.value == true)
-            is SMVWordType -> IntegerLit(INT, l.value.toString().toBigInteger())
-            is EnumType -> {
-                val et = enumValues[l.value.toString().uppercase(Locale.getDefault())]
-                    ?: error("No enum defined which contains ${l.value}. Defined values: ${enumValues.keys}")
-                EnumLit(et, l.value.toString())
-            }
-            else -> error("Literals of type '${l.javaClass} are not supported")
+    override fun visit(l: SLiteral): Expression = when (l.dataType) {
+        is SMVTypes.BOOLEAN -> BooleanLit(l.value == true)
+        is SMVWordType -> IntegerLit(INT, l.value.toString().toBigInteger())
+        is EnumType -> {
+            val et = enumValues[l.value.toString().uppercase(Locale.getDefault())]
+                ?: error("No enum defined which contains ${l.value}. Defined values: ${enumValues.keys}")
+            EnumLit(et, l.value.toString())
         }
+        else -> error("Literals of type '${l.javaClass} are not supported")
     }
 
     override fun visit(a: SAssignment): Expression {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun visit(ce: SCaseExpression): Expression {
@@ -329,32 +356,33 @@ class ExpressionConversion(val enumValues: EnumValueTable) : SMVAstVisitor<Expre
                 throw IllegalArgumentException()
             }
 
-            if (n == cases.size - 1) {//last element
+            if (n == cases.size - 1) { // last element
                 // ignoring the last condition for well-definedness
                 return cases[n].then.accept(this)
             }
 
-            val ite = Invocation("SEL",
-                    cases[n].condition.accept(this),
-                    cases[n].then.accept(this),
-                    ifThenElse(cases, n + 1))
+            val ite = Invocation(
+                "SEL",
+                cases[n].condition.accept(this),
+                cases[n].then.accept(this),
+                ifThenElse(cases, n + 1),
+            )
             return ite
         }
         return ifThenElse(ce.cases, 0)
     }
 
     override fun visit(smvModule: SMVModule): Expression {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun visit(func: SFunction): Expression {
-        return Invocation(func.name,
-                func.arguments.map { it.accept(this) }
-        )
-    }
+    override fun visit(func: SFunction): Expression = Invocation(
+        func.name,
+        func.arguments.map { it.accept(this) },
+    )
 
     override fun visit(quantified: SQuantified): Expression {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 }
 
@@ -398,18 +426,15 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         val vd = VariableDeclaration(
             p.name.lowercase(Locale.getDefault()),
             VariableDeclaration.LOCAL,
-            FunctionBlockDataType(fbd)
+            FunctionBlockDataType(fbd),
         )
         target.scope.add(vd)
         return vd
-
     }
 
-    private fun createParameters(p: ReactiveProgram): MutableList<InvocationParameter> {
-        return p.scope.variables.filter { it.isInput }.map {
-            InvocationParameter(it.name, false, findOrCreateInput(it))
-        }.toMutableList()
-    }
+    private fun createParameters(p: ReactiveProgram): MutableList<InvocationParameter> = p.scope.variables.filter { it.isInput }.map {
+        InvocationParameter(it.name, false, findOrCreateInput(it))
+    }.toMutableList()
 
     // looks up a given variable, if it is already declared as an output of a previous program
     // returns a ref to it, else an input variable is declared
@@ -431,7 +456,7 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
         val renamed = VariableRenamerSC(program.scope::isGlobalVariable, program.init.clone()) { instance.name + SCOPE_SEPARATOR + it }
         target.init.addAll(renamed.rename())
 
-        //will be rewritten by simplify
+        // will be rewritten by simplify
         target.body.add(invocation)
 
         target.functions.addAll(program.functions)
@@ -445,39 +470,41 @@ class InvocationBasedProductProgramBuilder(name: String = "main") {
 
     private fun announceOutputs(instance: VariableDeclaration, program: ReactiveProgram) {
         program.scope.variables.filter { it.isOutput }
-                .forEach {
-                    definedVariables[it.name] = SymbolicReference(instance.name, SymbolicReference(it.name))
-                }
+            .forEach {
+                definedVariables[it.name] = SymbolicReference(instance.name, SymbolicReference(it.name))
+            }
     }
 
     fun build(b: Boolean): PouExecutable {
         val target = target.toProgram()
-        if (b)
+        if (b) {
             return SymbExFacade.simplify(target)
-        else
+        } else {
             return target
+        }
     }
 }
 
 /**
  * Renames everything
  */
-class VariableRenamerSC(isGlobal: (SymbolicReference) -> Boolean,
-                        statements: StatementList,
-                        newName: (String) -> String)
-    : VariableRenamer(isGlobal, statements, newName) {
+class VariableRenamerSC(
+    isGlobal: (SymbolicReference) -> Boolean,
+    statements: StatementList,
+    newName: (String) -> String,
+) : VariableRenamer(isGlobal, statements, newName) {
     val commentsRenamer = SpecialCommentRenamer(isGlobal, newName, this)
-    override fun visit(commentStatement: CommentStatement): CommentStatement {
-        return commentStatement.accept(commentsRenamer) as CommentStatement
-    }
+    override fun visit(commentStatement: CommentStatement): CommentStatement = commentStatement.accept(commentsRenamer) as CommentStatement
 }
 
 /**
  * Renames only SpecialComments and below
  */
-class SpecialCommentRenamer(val isGlobal: (SymbolicReference) -> Boolean,
-                            val newName: (String) -> String,
-                            val renamer: AstMutableVisitor) : AstMutableVisitor() {
+class SpecialCommentRenamer(
+    val isGlobal: (SymbolicReference) -> Boolean,
+    val newName: (String) -> String,
+    val renamer: AstMutableVisitor,
+) : AstMutableVisitor() {
     override fun visit(commentStatement: CommentStatement): CommentStatement {
         when (val meta = commentStatement.meta<SpecialCommentMeta>()) {
             is SpecialCommentMeta.AssertComment -> {
@@ -504,15 +531,15 @@ private fun ReactiveProgram.toProgram(): ProgramDeclaration {
     return ProgramDeclaration(name, scope, stmts)
 }
 
-private fun ReactiveProgram.asFunctionBlock(): FunctionBlockDeclaration {
-    return FunctionBlockDeclaration(name, scope, body)
-}
+private fun ReactiveProgram.asFunctionBlock(): FunctionBlockDeclaration = FunctionBlockDeclaration(name, scope, body)
 
 fun main() = run {
     SCOPE_SEPARATOR = "__"
-    //choose gtt
-    run("geteta/examples/LinRe/lr.st",
-            "geteta/examples/LinRe/lr.gtt")
+    // choose gtt
+    run(
+        "geteta/examples/LinRe/lr.st",
+        "geteta/examples/LinRe/lr.gtt",
+    )
 }
 
 fun run(programFile: String, table: String) {
@@ -525,7 +552,7 @@ fun run(programFile: String, table: String) {
 
     //region read program
     val progs = fileResolve(File(programFile)).first
-    //endprogram
+    // endprogram
 
     val enum = progs.findFirstProgram()?.scope?.enumValuesToType() ?: mapOf()
     val miter = GttMiterConstruction(gtt, gttAsAutomaton, enum).constructMiter()

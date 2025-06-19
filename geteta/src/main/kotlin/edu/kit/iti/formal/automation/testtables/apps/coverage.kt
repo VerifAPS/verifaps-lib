@@ -1,7 +1,26 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.apps
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.Context
+import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.groups.provideDelegate
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
@@ -17,7 +36,6 @@ import edu.kit.iti.formal.smv.ast.*
 import edu.kit.iti.formal.smv.conjunction
 import edu.kit.iti.formal.util.info
 import java.io.File
-import com.github.ajalt.clikt.core.main
 
 /**
  *
@@ -56,7 +74,7 @@ class CoverageApp : CliktCommand(name = "ttcov") {
         info("Super enum built")
 
         val definitions = modCode.definitions.map { it.target.name to it.expr }.toMap()
-        //val r = ExpressionReplacer(definitions)
+        // val r = ExpressionReplacer(definitions)
         modCode.unfold()
 
         val dtTranslator: S2SDataTypeTranslator = DefaultS2STranslator()
@@ -64,7 +82,6 @@ class CoverageApp : CliktCommand(name = "ttcov") {
         val toSmt = Smv2SmtVisitor(fnTranslator, dtTranslator, "")
         val toSmtState = Smv2SmtVisitor(fnTranslator, dtTranslator, "old")
         val program = SmvSmtFacade.translate(modCode)
-
 
         gtts.forEach { gtt ->
             val varRename = hashMapOf<SMVExpr, SMVExpr>()
@@ -83,7 +100,7 @@ class CoverageApp : CliktCommand(name = "ttcov") {
                 out.newLine()
                 out.write(SList("assert", program.nextBody).toString())
                 out.newLine()
-                //println(program.getAssertNext("_cur", "_new"))
+                // println(program.getAssertNext("_cur", "_new"))
                 gtt.region.flat().forEach {
                     val assume = it.inputExpr.values.conjunction(SLiteral.TRUE).accept(renamer).accept(toSmt)
                     val assert = it.outputExpr.values.conjunction(SLiteral.TRUE).accept(renamer).accept(toSmt)
@@ -92,11 +109,11 @@ class CoverageApp : CliktCommand(name = "ttcov") {
                         (push)  ;; Table row ${it.id}
                         (assert $assume) ;; pre-condition
                         (assert $assert) ;; post-condition
-                    """.trimIndent()
+                        """.trimIndent(),
                     )
                     lineMap.branchMap.forEach { (t, _) ->
                         val e = definitions[t]?.accept(toSmtState)
-                        out.write("\t(push) (assert ${e}) (check-sat) (pop);; check for $t")
+                        out.write("\t(push) (assert $e) (check-sat) (pop);; check for $t")
                         out.newLine()
                     }
                     out.write("(pop)\n")

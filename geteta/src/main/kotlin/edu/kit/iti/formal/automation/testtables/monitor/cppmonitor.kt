@@ -1,5 +1,22 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.testtables.monitor
-
 
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade
 import edu.kit.iti.formal.automation.cpp.TranslateToCppFacade.dataType
@@ -27,7 +44,6 @@ val CPP_HEADER by lazy { readResource("header.cpp").second }
 val CPP_FOOTER by lazy { readResource("footer.cpp").second }
 val CPP_RESOURCES by lazy { listOf(readResource("monitor.h")) }
 
-
 /**
  * TODO double the state variable of the system (prev, next value).
  * @author Alexander Weigl
@@ -35,8 +51,11 @@ val CPP_RESOURCES by lazy { listOf(readResource("monitor.h")) }
  */
 object CppMonitorGenerator : MonitorGeneration {
     override val key: String = "cpp"
-    override fun generate(gtt: GeneralizedTestTable, automaton: TestTableAutomaton,
-                          options: MonitorGenerationOptions): Monitor {
+    override fun generate(
+        gtt: GeneralizedTestTable,
+        automaton: TestTableAutomaton,
+        options: MonitorGenerationOptions,
+    ): Monitor {
         val impl = CppMonitorGeneratorImpl(gtt, automaton)
         impl.includes = options.includes
         return impl.call()
@@ -44,13 +63,10 @@ object CppMonitorGenerator : MonitorGeneration {
 }
 
 object CppCombinedMonitorGeneration : CombinedMonitorGeneration {
-    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor {
-        return CppCombinedMonitorGenerationImpl(name, input).call()
-    }
+    override fun generate(name: String, input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>): Monitor = CppCombinedMonitorGenerationImpl(name, input).call()
 
     override val key = "cpp"
 }
-
 
 class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: TestTableAutomaton) {
     var includes = listOf<String>()
@@ -61,24 +77,24 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     val structNameGv = "${gtt.name}_gv_t"
     val enumStates = "${gtt.name.replaceFirstChar { it.uppercase() }}States"
     val cppRewriter =
-            SmvToCTranslator().also {
-                //val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
-                for ((a, b) in gtt.parseContext.refs) {
-                    val ref = gtt.parseContext.getReference(a, b)
-                    it.variableReplacement[ref.name] = "_h_${a.name.replace("code\$", "")}[$b]"
-                }
-
-                gtt.programVariables.forEach { pv ->
-                    val name = pv.externalVariable(gtt.programRuns, gtt.name).name
-                    it.variableReplacement[name] = "input.${pv.name}"
-                }
-                gtt.constraintVariables.forEach { cv ->
-                    val name = cv.internalVariable(gtt.programRuns).name
-                    it.variableReplacement[name] = "token.globalVars.${cv.name}"
-                }
-                println(it.variableReplacement)
-                it.rewritingFunction = { it -> it.replace("code$", "input.") }
+        SmvToCTranslator().also {
+            // val re = "(.+)\\.\\_\\$(\\d+)".toRegex()
+            for ((a, b) in gtt.parseContext.refs) {
+                val ref = gtt.parseContext.getReference(a, b)
+                it.variableReplacement[ref.name] = "_h_${a.name.replace("code\$", "")}[$b]"
             }
+
+            gtt.programVariables.forEach { pv ->
+                val name = pv.externalVariable(gtt.programRuns, gtt.name).name
+                it.variableReplacement[name] = "input.${pv.name}"
+            }
+            gtt.constraintVariables.forEach { cv ->
+                val name = cv.internalVariable(gtt.programRuns).name
+                it.variableReplacement[name] = "token.globalVars.${cv.name}"
+            }
+            println(it.variableReplacement)
+            it.rewritingFunction = { it -> it.replace("code$", "input.") }
+        }
 
     private val resetTrigger = gtt.options.monitor.resetTrigger?.let {
         val e = GetetaFacade.exprToSMV(it.trim('"'), EMPTY_COLUMN, 0, gtt.parseContext)
@@ -90,23 +106,22 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         e.accept(cppRewriter)
     }
 
-    private fun defineGlobalVarStruct() =
-            CodeWriter.with {
-                cblock("struct $structNameGv {", "};") {
-                    gtt.constraintVariables.forEach { pv ->
-                        println("${dataType(pv.dataType)}  ${pv.name};")
-                    }
-                    gtt.constraintVariables.forEach { pv ->
-                        println("bool is_bound_${pv.name};")
-                    }
-                }.nl()
-                println("const struct $structNameGv ${structNameGv}_default = {};").nl().nl()
+    private fun defineGlobalVarStruct() = CodeWriter.with {
+        cblock("struct $structNameGv {", "};") {
+            gtt.constraintVariables.forEach { pv ->
+                println("${dataType(pv.dataType)}  ${pv.name};")
             }
+            gtt.constraintVariables.forEach { pv ->
+                println("bool is_bound_${pv.name};")
+            }
+        }.nl()
+        println("const struct $structNameGv ${structNameGv}_default = {};").nl().nl()
+    }
 
     private fun defineStateEnum() = CodeWriter.with {
         cblock("enum class $enumStates {", "};") {
             val states = automaton.getRowStates() +
-                    automaton.stateError + automaton.stateSentinel
+                automaton.stateError + automaton.stateSentinel
             val rows = states.joinToString(", ") { it.name }
             append(rows)
         }
@@ -119,32 +134,37 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
         monitor.types += defineStateEnum()
 
         cw.println("template <typename io_t>")
-                .cblock("class ${gtt.name.replaceFirstChar { it.uppercase() }}Monitor " +
-                        ": public IMonitor<io_t> {", "};") {
-                    +("struct Token {int state; $structNameGv globalVars;};")
-                    +("vector<Token> tokens;")
-                    +("int numErrors;")
-                    this.historyValuesDeclaration(gtt)
-                    +"public:"
+            .cblock(
+                "class ${gtt.name.replaceFirstChar { it.uppercase() }}Monitor " +
+                    ": public IMonitor<io_t> {",
+                "};",
+            ) {
+                +("struct Token {int state; $structNameGv globalVars;};")
+                +("vector<Token> tokens;")
+                +("int numErrors;")
+                this.historyValuesDeclaration(gtt)
+                +"public:"
 
-                    constructor("${gtt.name.capitalize()}Monitor") { +"reset();" }
+                constructor("${gtt.name.capitalize()}Monitor") { +"reset();" }
 
-                    method("void", "reset", "override") {
-                        print("""
+                method("void", "reset", "override") {
+                    print(
+                        """
                             this->state(MonitorState::FINE);
                             numErrors = 0;
                             tokens.clear();
-                        """.trimIndent())
-                        automaton.getStartStates().forEach {
-                            val state = "${enumStates}::${it.name}".also {
-                                createNewToken("tokens  ", it, "${structNameGv}_default")
-                            }
+                        """.trimIndent(),
+                    )
+                    automaton.getStartStates().forEach {
+                        val state = "$enumStates::${it.name}".also {
+                            createNewToken("tokens  ", it, "${structNameGv}_default")
                         }
                     }
+                }
 
-                    nl().method("void", "next", "const io_t &input", "override") {
-                        resetCode(this)
-                        +"""
+                nl().method("void", "next", "const io_t &input", "override") {
+                    resetCode(this)
+                    +"""
                                 vector<Token> newTokens;
                                 for (auto &&tok : tokens) evaluate(newTokens, tok, input);
                                 tokens.clear();
@@ -165,30 +185,35 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                                 }  
                                 this->state(hitError ? MonitorState::ERROR
                                                : hitState ? MonitorState::FINE : MonitorState::UNKNOWN);
-                        """.trimIndent()
-                        historyValuesUpdate(gtt)
-                    }
+                    """.trimIndent()
+                    historyValuesUpdate(gtt)
+                }
 
-                    nl().method("void", "evaluate",
-                            "vector<Token> &newTokens", "Token &token", "const io_t &input") {
-                        +"bool __assumption = false, __assertion = false;"
-                        bindGlobalVariables()
-                        switch("token.state") {
-                            automaton.rowStates.forEach { (tr, rs) ->
-                                rs.forEach { +"case ${enumStates}::${it.name}:" }
-                                increaseIndent()
-                                assertVariableBound(gtt, tr)
-                                nl().print("__assumption = ${expr(tr.inputExpr)};")
-                                nl().print("__assertion  = ${expr(tr.outputExpr)};")
-                                nl().switch("token.state") {
-                                    rs.forEach { generateCase(it) }
-                                }
-                                +"break;"
-                                decreaseIndent()
+                nl().method(
+                    "void",
+                    "evaluate",
+                    "vector<Token> &newTokens",
+                    "Token &token",
+                    "const io_t &input",
+                ) {
+                    +"bool __assumption = false, __assertion = false;"
+                    bindGlobalVariables()
+                    switch("token.state") {
+                        automaton.rowStates.forEach { (tr, rs) ->
+                            rs.forEach { +"case $enumStates::${it.name}:" }
+                            increaseIndent()
+                            assertVariableBound(gtt, tr)
+                            nl().print("__assumption = ${expr(tr.inputExpr)};")
+                            nl().print("__assertion  = ${expr(tr.outputExpr)};")
+                            nl().switch("token.state") {
+                                rs.forEach { generateCase(it) }
                             }
+                            +"break;"
+                            decreaseIndent()
                         }
                     }
                 }
+            }
 
         monitor.postamble = CPP_FOOTER
         monitor.preamble = CPP_HEADER
@@ -208,12 +233,12 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
                 switch("token.state") {
                     automaton.rowStates.forEach { (tr, rs) ->
                         (tr.inputExpr.values + tr.outputExpr.values).findAssignment(gvsvar)
-                                ?.let { equality ->
-                                    rs.forEach { +"case ${enumStates}::${it.name}:" }
-                                    +"token.globalVars.${gv.name}_bound = true;"
-                                    +"token.globalVars.${gv.name} = ${equality.accept(cppRewriter)};"
-                                    +"break;"
-                                }
+                            ?.let { equality ->
+                                rs.forEach { +"case $enumStates::${it.name}:" }
+                                +"token.globalVars.${gv.name}_bound = true;"
+                                +"token.globalVars.${gv.name} = ${equality.accept(cppRewriter)};"
+                                +"break;"
+                            }
                     }
                 }
             }
@@ -229,14 +254,16 @@ class CppMonitorGeneratorImpl(val gtt: GeneralizedTestTable, val automaton: Test
     }
 
     private fun createNewToken(vec: String, state: String, globalvars: String) {
-        cw.println("$vec.push_back((struct Token) " +
-                "{ .state = $state, .globalVars = $globalvars });")
+        cw.println(
+            "$vec.push_back((struct Token) " +
+                "{ .state = $state, .globalVars = $globalvars });",
+        )
     }
 
     private fun generateCase(it: RowState) {
-        cw.cblock("case ${enumStates}::${it.name}:", "break;") {
-            //println("boolean tokenUsed = false;")
-            //println("/* */")
+        cw.cblock("case $enumStates::${it.name}:", "break;") {
+            // println("boolean tokenUsed = false;")
+            // println("/* */")
             for (t in automaton.getOutgoingTransition(it)) {
                 handleTransition(t)
             }
@@ -278,10 +305,7 @@ fun CodeWriter.assertVariableBound(gtt: GeneralizedTestTable, tableRow: TableRow
     }
 }
 
-
-private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SVariable> =
-        filter { gv -> seq.any { expr -> expr.find { it == gv } != null } }
-
+private fun Iterable<SVariable>.filterUsedVariables(seq: List<SMVExpr>): List<SVariable> = filter { gv -> seq.any { expr -> expr.find { it == gv } != null } }
 
 /** Searches for equality of gv with other terms. TODO look only for top level formulas */
 fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
@@ -302,8 +326,8 @@ fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
     }
     val pred = { eq: SMVExpr -> getExpr(eq) != null }
     val assignments = map { it.find(pred) }
-            .filterNotNull().mapNotNull(getExpr)
-            .toHashSet()
+        .filterNotNull().mapNotNull(getExpr)
+        .toHashSet()
 
     if (assignments.size > 1) {
         warn("There are possible conflicting assignments for global variable $gv in one row. $assignments")
@@ -312,23 +336,23 @@ fun List<SMVExpr>.findAssignment(gv: SVariable): SMVExpr? {
     return assignments.firstOrNull()
 }
 
-
 class CppCombinedMonitorGenerationImpl(
-        val name: String,
-        val input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
-        val aggregation: String = "CombinedAndMonitor") {
+    val name: String,
+    val input: List<Pair<GeneralizedTestTable, TestTableAutomaton>>,
+    val aggregation: String = "CombinedAndMonitor",
+) {
 
     private val containsDynamic =
-            input.any { (a, b) -> !a.options.monitor.dynamicTrigger.isNullOrBlank() }
+        input.any { (a, b) -> !a.options.monitor.dynamicTrigger.isNullOrBlank() }
 
     private val subGenerators = input.map { (a, b) -> CppMonitorGeneratorImpl(a, b) }
     private val subMonitors = subGenerators.map { g -> g.call() }
 
     private val staticMonitors
-        get() = subMonitors.asSequence().filter { it.static }//.map { it.name }
+        get() = subMonitors.asSequence().filter { it.static } // .map { it.name }
 
     private val dynamicMonitors
-        get() = subMonitors.asSequence().filter { !it.static }//.map { it.name }
+        get() = subMonitors.asSequence().filter { !it.static } // .map { it.name }
 
     private val monitor = Monitor()
 
@@ -347,36 +371,37 @@ class CppCombinedMonitorGenerationImpl(
 
     private fun inputStruct() {
         val combinedVariables =
-                input.map { (gtt, _) -> gtt.programVariables }
-                        .reduce { acc, list ->
-                            list.forEach { pv ->
-                                val collision = acc.find { it.name == pv.name }
-                                if (collision != null && collision.dataType != pv.dataType)
-                                    throw IllegalStateException("Datatype clash for variable: ${pv.name}")
-                                if (collision == null) acc.add(pv)
-                            }
-                            acc
+            input.map { (gtt, _) -> gtt.programVariables }
+                .reduce { acc, list ->
+                    list.forEach { pv ->
+                        val collision = acc.find { it.name == pv.name }
+                        if (collision != null && collision.dataType != pv.dataType) {
+                            throw IllegalStateException("Datatype clash for variable: ${pv.name}")
                         }
+                        if (collision == null) acc.add(pv)
+                    }
+                    acc
+                }
         monitor.types += subMonitors.joinToString("\n") { it.types }
         monitor.types += defineIOStruct("${name}_io_t", combinedVariables)
     }
 
-    private fun getOwnBody(): String =
-            CodeWriter.with {
-                cblock("class $name : public $aggregation<io_t> {", "};") {
-                    if (containsDynamic)
-                        +"vector<IMonitor<io_t> *> monitors;"
-
-                    staticMonitors.forEach { +"${it.name} ${it.instanceName};" }
-
-                    +"public:"
-                    genConsructor()
-                    genReset()
-                    genEval()
-                    genBefore()
-                    genAfter()
-                }
+    private fun getOwnBody(): String = CodeWriter.with {
+        cblock("class $name : public $aggregation<io_t> {", "};") {
+            if (containsDynamic) {
+                +"vector<IMonitor<io_t> *> monitors;"
             }
+
+            staticMonitors.forEach { +"${it.name} ${it.instanceName};" }
+
+            +"public:"
+            genConsructor()
+            genReset()
+            genEval()
+            genBefore()
+            genAfter()
+        }
+    }
 
     private fun CodeWriter.genAfter() {
         method("void", "cleanup", "override") {
@@ -412,10 +437,11 @@ class CppCombinedMonitorGenerationImpl(
         method("void", "eval", "const io_t &input", "override") {
             staticMonitors.forEach {
                 val n = it.instanceName
-                +"$n.next(input); combine(${n}.state());"
+                +"$n.next(input); combine($n.state());"
             }
-            if (containsDynamic)
+            if (containsDynamic) {
                 println("for(auto& m: monitors) {m->next(input); combine(m->state());}")
+            }
         }
     }
 
@@ -427,8 +453,9 @@ class CppCombinedMonitorGenerationImpl(
 
     private fun CodeWriter.genReset() {
         method("virtual void", "reset", "override") {
-            if (containsDynamic)
+            if (containsDynamic) {
                 +"for (auto m : monitors) m->reset();"
+            }
             subMonitors.forEach {
                 +"${it.instanceName}.reset();"
             }
@@ -456,7 +483,6 @@ private fun CodeWriter.historyValuesUpdate(gtt: GeneralizedTestTable) {
     }
 }
 
-
 private fun CodeWriter.constructor(name: String, inits: Iterable<String> = listOf(), fn: CodeWriter.() -> Unit): CodeWriter {
     val a = inits.joinToString(", ")
     val b = if (a.isBlank()) "" else ": $a"
@@ -464,15 +490,23 @@ private fun CodeWriter.constructor(name: String, inits: Iterable<String> = listO
     return this
 }
 
-private fun CodeWriter.method(ret: String = "", name: String,
-                              args: Iterable<String>, fn: CodeWriter.() -> Unit) {
+private fun CodeWriter.method(
+    ret: String = "",
+    name: String,
+    args: Iterable<String>,
+    fn: CodeWriter.() -> Unit,
+) {
     val params = args.filter { ' ' in it }.joinToString(", ")
     val mods = args.filter { ' ' !in it }.joinToString(" ")
     cblock("$ret $name($params) $mods {", "}", fn)
 }
 
-private fun CodeWriter.method(ret: String = "", name: String,
-                              vararg args: String, fn: CodeWriter.() -> Unit) = method(ret, name, args.toList(), fn)
+private fun CodeWriter.method(
+    ret: String = "",
+    name: String,
+    vararg args: String,
+    fn: CodeWriter.() -> Unit,
+) = method(ret, name, args.toList(), fn)
 
 private fun CodeWriter.ift(cond: String = "", fn: CodeWriter.() -> Unit): CodeWriter {
     cblock("if($cond) {", "}", fn)
@@ -493,24 +527,22 @@ private fun CodeWriter.case(cond: String, fn: CodeWriter.() -> Unit): CodeWriter
     return this
 }
 
-
 private fun readResource(name: String): Pair<String, String> {
     val content = CppMonitorGenerator.javaClass.getResourceAsStream("/monitor/$name")
-            ?.use { it.bufferedReader().readText() }
+        ?.use { it.bufferedReader().readText() }
     if (content == null) {
         error("Could not read resource: $name")
     }
     return name to (content ?: "")
 }
 
-private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String =
-        CodeWriter.with {
-            cblock("struct $typeName {", "};") {
-                variables.filterIsInstance<ProgramVariable>()
-                        .forEach { pv ->
-                            print("${dataType(pv.dataType)}  ${pv.name};")
-                                    .println("// ${pv.category}")
-                        }
+private fun defineIOStruct(typeName: String, variables: MutableList<ColumnVariable>): String = CodeWriter.with {
+    cblock("struct $typeName {", "};") {
+        variables.filterIsInstance<ProgramVariable>()
+            .forEach { pv ->
+                print("${dataType(pv.dataType)}  ${pv.name};")
+                    .println("// ${pv.category}")
             }
-            nl().nl()
-        }
+    }
+    nl().nl()
+}

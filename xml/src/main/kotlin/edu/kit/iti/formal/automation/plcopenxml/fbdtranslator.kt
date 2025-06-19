@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.plcopenxml
 
 import edu.kit.iti.formal.automation.fbd.*
@@ -11,27 +29,25 @@ import java.util.*
 
 private val xpathFactory = XPathFactory.instance()
 
-
 internal fun getVariables(block: Element, child: String) =
     block.getChild(child)?.children?.map { BlockVariable(it) } ?: listOf()
 
-internal fun operatorSymbol(name: String) =
-    when (name.lowercase(Locale.getDefault())) {
-        "eq" -> " = "
-        "sub" -> " - "
-        "add" -> " + "
-        "div" -> " / "
-        "mult" -> " * "
-        "and" -> " AND "
-        "or" -> " OR "
-        "xor" -> " ^ "
-        else -> "/*!! UNKNOWN OP: $name !!*/"
-    }
+internal fun operatorSymbol(name: String) = when (name.lowercase(Locale.getDefault())) {
+    "eq" -> " = "
+    "sub" -> " - "
+    "add" -> " + "
+    "div" -> " / "
+    "mult" -> " * "
+    "and" -> " AND "
+    "or" -> " OR "
+    "xor" -> " ^ "
+    else -> "/*!! UNKNOWN OP: $name !!*/"
+}
 
-//TODO: Edges could be negated
-//TODO: Storage modifier (S=, R=)
-//TODO: Edge modifier
-//TODO: Jumps and Marks
+// TODO: Edges could be negated
+// TODO: Storage modifier (S=, R=)
+// TODO: Edge modifier
+// TODO: Jumps and Marks
 /*
 class FBDTranslator(val fbd: Element, val writer: CodeWriter) {
     val nodes: List<FbdNode>
@@ -164,10 +180,12 @@ sealed class FbdNode(val block: Element, val network: FBDTranslator) {
     val id: String by lazy { block.getAttributeValue("localId") }
     val networkId by lazy {
         if (id.length > 5) {
-            //This is a codesys assumption!
+            // This is a codesys assumption!
             if (id[1] != '0') throw IllegalStateException("I am not tested for more than 9 FBD networks!")
             id[0].code - 49
-        } else 0
+        } else {
+            0
+        }
     }
 
     val outputVariables by lazy { getVariables(block, "outputVariables") }
@@ -197,7 +215,6 @@ sealed class FbdNode(val block: Element, val network: FBDTranslator) {
                 dia.edges.add(FbdEdge(out.gid, v.asInput.gid))
             }
         }
-
     }
 
     open fun getSlot(formalParameterName: String?): FbdOutput? = null
@@ -227,15 +244,16 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
 
     val executeBody: String? by lazy {
         val key = "http://www.3s-software.com/plcopenxml/stcode"
-        //val query = xpathFactory.compile(".//data[@name=\"$key\"]/STCode/text()", Filters.textOnly())
+        // val query = xpathFactory.compile(".//data[@name=\"$key\"]/STCode/text()", Filters.textOnly())
         val query = xpathFactory.compile(".//STCode", Filters.element())
         val a = query.evaluateFirst(block)
         a?.textTrim
     }
 
     override fun getSlot(formalParameterName: String?): FbdOutput? {
-        if (outputVariables.size == 1)
+        if (outputVariables.size == 1) {
             return outputVariables.first().asOutput
+        }
 
         return outputVariables.find { it.formalParameter.equals(formalParameterName, true) }?.asOutput
 
@@ -272,7 +290,7 @@ class FbdBlock(e: Element, network: FBDTranslator) : FbdNode(e, network) {
                 if (callType == FBDCallType.FUNCTION) e
                 else "${it.formalParameter} := $e"
             }
-    */
+     */
 
     override val fbdNode by lazy {
         when (callType) {
@@ -312,7 +330,9 @@ class FbdReturn(e: Element, network: FBDTranslator) : FbdNode(e, network) {
 
 class FbdLabel(e: Element, network: FBDTranslator) : FbdNode(e, network) {
     val label by lazy { e.getAttributeValue("label") }
-    override val fbdNode by lazy { Jump(label) /* nobody cares for this value */ }
+    override val fbdNode by lazy {
+        Jump(label) /* nobody cares for this value */
+    }
     override fun write(dia: FbDiagram) {
         dia.label = label
     }
@@ -341,7 +361,7 @@ class OutVariable(e: Element, network: FBDTranslator) : FbdNode(e, network) {
         get() = listOf(variable)
 
     override val fbdNode by lazy { Variable(expression, store = true) }
-    //.also { it.inputSlots.add(variable.asInput) } }
+    // .also { it.inputSlots.add(variable.asInput) } }
 
     override val predessorIds by lazy {
         val v = variable.connectionInId

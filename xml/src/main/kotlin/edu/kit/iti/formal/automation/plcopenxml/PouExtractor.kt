@@ -1,18 +1,38 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.plcopenxml
 
 import edu.kit.iti.formal.util.CodeWriter
 import org.jdom2.Element
 import org.jdom2.filter.Filters
 
-class PouExtractor(val pous: List<Element>, val writer: CodeWriter,
-                   val translators: List<XMLTranslator> = listOf<XMLTranslator>(
-                           FunctionTranslator, FunctionBlockTranslator, ProgramTranslator)) {
+class PouExtractor(
+    val pous: List<Element>,
+    val writer: CodeWriter,
+    val translators: List<XMLTranslator> = listOf<XMLTranslator>(FunctionTranslator, FunctionBlockTranslator, ProgramTranslator),
+) {
     fun run() {
         val p = pous.sortedWith(compareBy({ it.getAttributeValue("pouType") }, { it.getAttributeValue("name") }))
         p.forEach { pou -> run(pou) }
     }
 
-    fun run(pou: Element): Unit {
+    fun run(pou: Element) {
         translators.forEach { t ->
             if (t.isCapableOf(pou)) {
                 t.translate(pou, writer)
@@ -43,8 +63,7 @@ object Action : XMLTranslator {
 }
 
 abstract class POUTranslator(val type: String) : XMLTranslator {
-    override fun isCapableOf(e: Element): Boolean =
-            e.getAttributeValue("pouType") == type
+    override fun isCapableOf(e: Element): Boolean = e.getAttributeValue("pouType") == type
 }
 
 object FunctionTranslator : POUTranslator("function") {
@@ -52,7 +71,7 @@ object FunctionTranslator : POUTranslator("function") {
         val name = e.getAttributeValue("name")
         val returnType = VariableDeclXML.getDatatype(e.getChild("interface").getChild("returnType"))
         writer.printf("FUNCTION $name : $returnType")
-                .increaseIndent().nl()
+            .increaseIndent().nl()
         InterfaceBuilder.translate(e, writer)
         STBody.translate(e, writer)
         FBDBody.translate(e, writer)
@@ -90,7 +109,6 @@ object ProgramTranslator : POUTranslator("program") {
     }
 }
 
-
 object SFCBody : XMLTranslatorXPath("./body/SFC") {
     override fun translate(e: Element, writer: CodeWriter) {
         val getSTBody = xpathFactory.compile("./body/SFC", Filters.element())
@@ -115,7 +133,8 @@ object STBody : XMLTranslatorXPath("./body/ST/xhtml") {
 object FBDBody : XMLTranslatorXPath("./body/FBD") {
     override fun translate(e: Element, writer: CodeWriter) {
         val fbd = query.evaluateFirst(e)
-        if (fbd != null)
+        if (fbd != null) {
             FBDTranslator(fbd, writer).run()
+        }
     }
 }

@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ * 
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.st.ast
 
 import edu.kit.iti.formal.automation.VariableScope
@@ -32,8 +50,12 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.reflect.full.memberProperties
 
-sealed class Top : Visitable, Cloneable, HasMetadata,
-        HasRuleContext, Serializable {
+sealed class Top :
+    Visitable,
+    Cloneable,
+    HasMetadata,
+    HasRuleContext,
+    Serializable {
     override var ruleContext: ParserRuleContext? = null
 
     val nodeName: String
@@ -42,16 +64,18 @@ sealed class Top : Visitable, Cloneable, HasMetadata,
     val children: List<Top>
         get() =
             this::class.memberProperties
-                    .map {
-                        it.getter.call(this)
-                    }
-                    .filterIsInstance<Top>()
-                    .map { it as Top }
+                .map {
+                    it.getter.call(this)
+                }
+                .filterIsInstance<Top>()
+                .map { it as Top }
 
+    @Suppress("ktlint:standard:backing-property-naming")
     private var _metadata: Metadata? = null
     override fun metadata(create: Boolean): Metadata? {
-        if (create && _metadata == null)
+        if (create && _metadata == null) {
             _metadata = Metadata()
+        }
         return _metadata
     }
 }
@@ -67,19 +91,22 @@ interface HasPragma {
 
 inline fun <reified T> HasPragma.findPragma() = pragmas.filterIsInstance<T>()
 
-
 //region Declaration and Toplevel
-abstract class PouElement : Top(), Identifiable, HasPragma, Comparable<PouElement> {
+abstract class PouElement :
+    Top(),
+    Identifiable,
+    HasPragma,
+    Comparable<PouElement> {
     var comment: String = ""
-    override fun compareTo(other: PouElement): Int {
-        return name.compareTo(other.name)
-    }
+    override fun compareTo(other: PouElement): Int = name.compareTo(other.name)
 
     override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
-data class PouElements(val elements: MutableList<PouElement> = arrayListOf())
-    : Top(), MutableList<PouElement> by elements, Visitable {
+data class PouElements(val elements: MutableList<PouElement> = arrayListOf()) :
+    Top(),
+    MutableList<PouElement> by elements,
+    Visitable {
     override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this)
     override fun clone() = copy()
 
@@ -100,37 +127,42 @@ data class Namespace(var fqName: String) {
         get() = fqName.splitToSequence('.')
 
     infix fun isSubSpaceOf(n: Namespace): Boolean {
-        if (this == n || fqName == n.fqName)
+        if (this == n || fqName == n.fqName) {
             return false
+        }
         return n.fqName.startsWith(fqName)
     }
-
 }
 
 val GLOBAL_NAMESPACE = Namespace("")
 
 data class NamespaceDeclaration(
-        var fqName: Namespace = GLOBAL_NAMESPACE,
-        val pous: PouElements = PouElements(),
-        override var scope: Scope = Scope()) : HasScope, Top() {
+    var fqName: Namespace = GLOBAL_NAMESPACE,
+    val pous: PouElements = PouElements(),
+    override var scope: Scope = Scope(),
+) : Top(),
+    HasScope {
     override fun clone(): NamespaceDeclaration {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-data class ConfigurationDeclaration(override var scope: Scope) : HasScope, PouElement() {
+data class ConfigurationDeclaration(override var scope: Scope) :
+    PouElement(),
+    HasScope {
     override fun clone(): Top {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override val name: String = "<configuration>"
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-data class RefList<T : Identifiable>(private var impl: ArrayList<RefTo<T>> = arrayListOf()) : MutableList<RefTo<T>> by impl,
-        Cloneable {
+data class RefList<T : Identifiable>(private val impl: ArrayList<RefTo<T>> = arrayListOf()) :
+    MutableList<RefTo<T>> by impl,
+    Cloneable {
     fun add(element: String) = add(RefTo(element))
 
     override fun clone(): RefList<T> {
@@ -145,16 +177,18 @@ data class RefList<T : Identifiable>(private var impl: ArrayList<RefTo<T>> = arr
 val ANONYM = "ANONYM"
 
 data class FunctionBlockDeclaration(
-        override var name: String = ANONYM,
-        override var scope: Scope = Scope(),
-        override var stBody: StatementList? = null,
-        override var sfcBody: SFCImplementation? = null,
-        override var ilBody: IlBody? = null,
-        override var fbBody: FbdBody? = null,
-        var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
-        override val interfaces: RefList<InterfaceDeclaration> = RefList(),
-        override val methods: MutableList<MethodDeclaration> = arrayListOf()
-) : PouExecutable(), HasMethods, Classifier {
+    override var name: String = ANONYM,
+    override var scope: Scope = Scope(),
+    override var stBody: StatementList? = null,
+    override var sfcBody: SFCImplementation? = null,
+    override var ilBody: IlBody? = null,
+    override var fbBody: FbdBody? = null,
+    var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
+    override val interfaces: RefList<InterfaceDeclaration> = RefList(),
+    override val methods: MutableList<MethodDeclaration> = arrayListOf(),
+) : PouExecutable(),
+    HasMethods,
+    Classifier {
 
     var parent: RefTo<FunctionBlockDeclaration> = RefTo()
     var isFinal: Boolean = false
@@ -172,7 +206,9 @@ data class FunctionBlockDeclaration(
     }
 }
 
-data class ResourceDeclaration(override var scope: Scope) : HasScope, PouElement() {
+data class ResourceDeclaration(override var scope: Scope) :
+    PouElement(),
+    HasScope {
     override val name: String
         get() = "<resource>"
 
@@ -181,15 +217,18 @@ data class ResourceDeclaration(override var scope: Scope) : HasScope, PouElement
 }
 
 data class ClassDeclaration(
-        override var name: String = ANONYM,
-        override var scope: Scope = Scope(),
-        var isFinal: Boolean = false,
-        var isAbstract: Boolean = false,
-        override val interfaces: RefList<InterfaceDeclaration> = RefList(),
-        override val methods: MutableList<MethodDeclaration> = arrayListOf(),
-        val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>()) :
-        HasInterfaces, HasScope, HasMethods, PouElement(), Classifier {
-
+    override var name: String = ANONYM,
+    override var scope: Scope = Scope(),
+    var isFinal: Boolean = false,
+    var isAbstract: Boolean = false,
+    override val interfaces: RefList<InterfaceDeclaration> = RefList(),
+    override val methods: MutableList<MethodDeclaration> = arrayListOf(),
+    val parent: RefTo<ClassDeclaration> = RefTo<ClassDeclaration>(),
+) : PouElement(),
+    HasInterfaces,
+    HasScope,
+    HasMethods,
+    Classifier {
 
     override fun clone() = copy()
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -199,8 +238,9 @@ interface HasInterfaces : Identifiable {
     val interfaces: RefList<InterfaceDeclaration>
 }
 
-data class TypeDeclarations(private val declarations: MutableList<TypeDeclaration> = arrayListOf())
-    : PouElement(), MutableList<TypeDeclaration> by declarations {
+data class TypeDeclarations(private val declarations: MutableList<TypeDeclaration> = arrayListOf()) :
+    PouElement(),
+    MutableList<TypeDeclaration> by declarations {
 
     override val name: String get() = "types"
 
@@ -218,13 +258,13 @@ data class TypeDeclarations(private val declarations: MutableList<TypeDeclaratio
 
     fun declares(typeName: String): Boolean {
         for (td in this) {
-            if (td.name == typeName)
+            if (td.name == typeName) {
                 return true
+            }
         }
         return false
     }
 }
-
 
 interface HasStBody {
     var stBody: StatementList?
@@ -242,26 +282,34 @@ interface HasFbBody {
     var fbBody: FbdBody?
 }
 
-interface HasBody : HasSfcBody, HasStBody, HasIlBody, HasFbBody
+interface HasBody :
+    HasSfcBody,
+    HasStBody,
+    HasIlBody,
+    HasFbBody
 
 interface HasMethods : Identifiable {
     val methods: MutableList<MethodDeclaration>
 }
 
-abstract class PouExecutable : PouElement(), HasScope, HasBody, Visitable {
+abstract class PouExecutable :
+    PouElement(),
+    HasScope,
+    HasBody,
+    Visitable {
     abstract override fun clone(): PouExecutable
 }
 
-
 data class ProgramDeclaration(
-        override var name: String = ANONYM,
-        override var scope: Scope = Scope(),
-        override var stBody: StatementList? = null,
-        override var sfcBody: SFCImplementation? = null,
-        override var ilBody: IlBody? = null,
-        override var fbBody: FbdBody? = null,
-        var actions: LookupList<ActionDeclaration> = ArrayLookupList()
-) : PouExecutable(), Identifiable {
+    override var name: String = ANONYM,
+    override var scope: Scope = Scope(),
+    override var stBody: StatementList? = null,
+    override var sfcBody: SFCImplementation? = null,
+    override var ilBody: IlBody? = null,
+    override var fbBody: FbdBody? = null,
+    var actions: LookupList<ActionDeclaration> = ArrayLookupList(),
+) : PouExecutable(),
+    Identifiable {
     override fun clone() = copy()
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -271,11 +319,14 @@ data class ProgramDeclaration(
 }
 
 class InterfaceDeclaration(
-        override var name: String = "",
-        override var interfaces: RefList<InterfaceDeclaration> = RefList(),
-        override var methods: MutableList<MethodDeclaration> = arrayListOf()
-) : HasInterfaces, HasMethods, PouElement(), Identifiable, Classifier {
-
+    override var name: String = "",
+    override var interfaces: RefList<InterfaceDeclaration> = RefList(),
+    override var methods: MutableList<MethodDeclaration> = arrayListOf(),
+) : PouElement(),
+    HasInterfaces,
+    HasMethods,
+    Identifiable,
+    Classifier {
 
     override fun clone(): InterfaceDeclaration {
         val i = InterfaceDeclaration()
@@ -307,13 +358,13 @@ class InterfaceDeclaration(
 }
 
 data class FunctionDeclaration(
-        override var name: String = ANONYM,
-        override var scope: Scope = Scope(),
-        var returnType: RefTo<AnyDt> = RefTo(),
-        override var stBody: StatementList? = StatementList(),
-        override var ilBody: IlBody? = null,
-        override var fbBody: FbdBody? = null)
-    : PouExecutable() {
+    override var name: String = ANONYM,
+    override var scope: Scope = Scope(),
+    var returnType: RefTo<AnyDt> = RefTo(),
+    override var stBody: StatementList? = StatementList(),
+    override var ilBody: IlBody? = null,
+    override var fbBody: FbdBody? = null,
+) : PouExecutable() {
 
     override var sfcBody: SFCImplementation?
         get() = null
@@ -332,9 +383,9 @@ data class FunctionDeclaration(
     }
 }
 
-data class GlobalVariableListDeclaration(
-        override var scope: Scope = Scope())
-    : HasScope, PouElement() {
+data class GlobalVariableListDeclaration(override var scope: Scope = Scope()) :
+    PouElement(),
+    HasScope {
 
     override val name: String = "VAR_GLOBAL"
     override fun clone() = copy()
@@ -342,10 +393,12 @@ data class GlobalVariableListDeclaration(
 }
 
 data class MethodDeclaration(
-        override var name: String = ANONYM,
-        var returnType: RefTo<AnyDt> = RefTo(),
-        var stBody: StatementList = StatementList()
-) : HasScope, Top(), Identifiable {
+    override var name: String = ANONYM,
+    var returnType: RefTo<AnyDt> = RefTo(),
+    var stBody: StatementList = StatementList(),
+) : Top(),
+    HasScope,
+    Identifiable {
 
     var accessSpecifier: AccessSpecifier = AccessSpecifier.PROTECTED
     var isFinal: Boolean = false
@@ -382,16 +435,20 @@ data class MethodDeclaration(
 object EMPTY_EXPRESSION : Expression() {
     override fun dataType(localScope: Scope): AnyDt = throw IllegalStateException()
     override fun clone(): Expression = EMPTY_EXPRESSION
-    override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this);
+    override fun <T> accept(visitor: Visitor<T>) = visitor.visit(this)
 }
 
-abstract class Statement : Top(), HasPragma {
+abstract class Statement :
+    Top(),
+    HasPragma {
     abstract override fun clone(): Statement
     override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 }
 
-
-data class RepeatStatement(var condition: Expression = EMPTY_EXPRESSION, var statements: StatementList = StatementList()) : Statement() {
+data class RepeatStatement(
+    var condition: Expression = EMPTY_EXPRESSION,
+    var statements: StatementList = StatementList(),
+) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): RepeatStatement {
         val rs = RepeatStatement()
@@ -402,7 +459,10 @@ data class RepeatStatement(var condition: Expression = EMPTY_EXPRESSION, var sta
     }
 }
 
-data class WhileStatement(var condition: Expression = EMPTY_EXPRESSION, var statements: StatementList = StatementList()) : Statement() {
+data class WhileStatement(
+    var condition: Expression = EMPTY_EXPRESSION,
+    var statements: StatementList = StatementList(),
+) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): WhileStatement {
         val ws = WhileStatement()
@@ -413,18 +473,22 @@ data class WhileStatement(var condition: Expression = EMPTY_EXPRESSION, var stat
     }
 }
 
-data class AssignmentStatement(var location: SymbolicReference,
-                               var expression: Expression = EMPTY_EXPRESSION,
-                               var reference: Boolean = false) : Statement() {
+data class AssignmentStatement(
+    var location: SymbolicReference,
+    var expression: Expression = EMPTY_EXPRESSION,
+    var reference: Boolean = false,
+) : Statement() {
 
     var isAssignmentAttempt: Boolean = false
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): AssignmentStatement {
-        val a = AssignmentStatement(location.clone(), expression.clone()
-                //Utils.copyNull<Reference>(location),
-                //Utils.copyNull<Expression>(expression)
+        val a = AssignmentStatement(
+            location.clone(),
+            expression.clone(),
+            // Utils.copyNull<Reference>(location),
+            // Utils.copyNull<Expression>(expression)
         )
         a.reference = reference
         a.isAssignmentAttempt = isAssignmentAttempt
@@ -434,15 +498,14 @@ data class AssignmentStatement(var location: SymbolicReference,
 }
 
 data class CaseStatement(
-        var expression: Expression = EMPTY_EXPRESSION,
-        var cases: MutableList<Case> = arrayListOf(),
-        var elseCase: StatementList = StatementList())
-    : Statement() {
+    var expression: Expression = EMPTY_EXPRESSION,
+    var cases: MutableList<Case> = arrayListOf(),
+    var elseCase: StatementList = StatementList(),
+) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     fun addCase(cs: Case) {
         cases.add(cs)
     }
-
 
     override fun clone(): CaseStatement {
         val c = CaseStatement()
@@ -455,8 +518,8 @@ data class CaseStatement(
 }
 
 data class Case(
-        var conditions: MutableList<CaseCondition> = arrayListOf(),
-        var statements: StatementList = StatementList()
+    var conditions: MutableList<CaseCondition> = arrayListOf(),
+    var statements: StatementList = StatementList(),
 ) : Top() {
 
     fun addCondition(condition: CaseCondition) = conditions.add(condition)
@@ -486,10 +549,7 @@ class ExitStatement : Statement() {
         return true
     }
 
-    override fun hashCode(): Int {
-        return 23423532
-    }
-
+    override fun hashCode(): Int = 23423532
 
     companion object {
         var EXIT_STATMENT = ExitStatement()
@@ -506,7 +566,6 @@ data class LabelStatement(var label: String) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-
 class ReturnStatement : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun clone(): ReturnStatement {
@@ -521,18 +580,16 @@ class ReturnStatement : Statement() {
         return true
     }
 
-    override fun hashCode(): Int {
-        return 696996
-    }
-
+    override fun hashCode(): Int = 696996
 }
 
 data class ForStatement(
-        var variable: String = ANONYM,
-        var start: Expression = EMPTY_EXPRESSION,
-        var stop: Expression = EMPTY_EXPRESSION,
-        var step: Expression? = null,
-        var statements: StatementList = StatementList()) : Statement() {
+    var variable: String = ANONYM,
+    var start: Expression = EMPTY_EXPRESSION,
+    var stop: Expression = EMPTY_EXPRESSION,
+    var step: Expression? = null,
+    var statements: StatementList = StatementList(),
+) : Statement() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -552,22 +609,17 @@ data class CommentStatement(var comment: String) : Statement() {
     constructor(format: String, vararg args: Any) : this(String.format(format, *args)) {}
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-    override fun clone(): CommentStatement {
-        return CommentStatement(comment).also { it.copyMetaFrom(this) }
-    }
+    override fun clone(): CommentStatement = CommentStatement(comment).also { it.copyMetaFrom(this) }
 
     companion object {
         fun box(s: String, vararg args: Any): Statement {
             val q = String.format(s, *args)
             val rest = "*" * (79 - 2 - q.length)
             val line = "*" * 79
-            return CommentStatement(
-                    "$line\n * $q $rest\n $line")
+            return CommentStatement("$line\n * $q $rest\n $line")
         }
 
-        fun single(fmt: String, vararg args: Any): Statement {
-            return CommentStatement(fmt, *args)
-        }
+        fun single(fmt: String, vararg args: Any): Statement = CommentStatement(fmt, *args)
     }
 }
 
@@ -580,26 +632,20 @@ data class CommentStatement(var comment: String) : Statement() {
 sealed class SpecialStatement : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    data class Assert(var exprs: MutableList<Expression>,
-                      val name: String? = null) : SpecialStatement() {
+    data class Assert(var exprs: MutableList<Expression>, val name: String? = null) : SpecialStatement() {
         override fun clone() = Assert(exprs.clone())
     }
 
-    data class Assume(var exprs: MutableList<Expression>,
-                      val name: String? = null) : SpecialStatement() {
+    data class Assume(var exprs: MutableList<Expression>, val name: String? = null) : SpecialStatement() {
         override fun clone() = Assume(exprs.clone())
     }
 
-    data class Havoc(var variables: MutableList<SymbolicReference>,
-                     val name: String? = null) : SpecialStatement() {
+    data class Havoc(var variables: MutableList<SymbolicReference>, val name: String? = null) : SpecialStatement() {
         override fun clone() = Havoc(variables.clone())
     }
 }
 
-
-data class GuardedStatement(
-        var condition: Expression,
-        var statements: StatementList = StatementList()) : Statement() {
+data class GuardedStatement(var condition: Expression, var statements: StatementList = StatementList()) : Statement() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): GuardedStatement {
@@ -610,12 +656,13 @@ data class GuardedStatement(
 }
 
 data class IfStatement(
-        val conditionalBranches: MutableList<GuardedStatement> = arrayListOf(),
-        var elseBranch: StatementList = StatementList()
+    val conditionalBranches: MutableList<GuardedStatement> = arrayListOf(),
+    var elseBranch: StatementList = StatementList(),
 ) : Statement() {
     fun addGuardedCommand(expr: Expression?, statements: StatementList): GuardedStatement {
-        if (expr == null)
+        if (expr == null) {
             throw IllegalArgumentException()
+        }
         val e = GuardedStatement(expr, statements)
         conditionalBranches.add(e)
         return e
@@ -636,10 +683,11 @@ data class IfStatement(
 }
 
 data class InvocationStatement(
-        var callee: SymbolicReference = SymbolicReference(),
-        var parameters: MutableList<InvocationParameter> = arrayListOf()) : Statement(), HasPragma {
+    var callee: SymbolicReference = SymbolicReference(),
+    var parameters: MutableList<InvocationParameter> = arrayListOf(),
+) : Statement(),
+    HasPragma {
     var invoked: Invoked? = null
-
 
     val inputParameters: List<InvocationParameter>
         get() = parameters.filter { !it.isOutput }
@@ -649,8 +697,8 @@ data class InvocationStatement(
 
     override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
 
-    constructor(fnName: String, vararg expr: Expression)
-            : this(SymbolicReference(fnName), expr.map { InvocationParameter(it) }.toMutableList())
+    constructor(fnName: String, vararg expr: Expression) :
+        this(SymbolicReference(fnName), expr.map { InvocationParameter(it) }.toMutableList())
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -663,7 +711,6 @@ data class InvocationStatement(
     }
 }
 // endregion
-
 
 //region Expressions
 abstract class Expression : Top() {
@@ -688,14 +735,10 @@ abstract class Expression : Top() {
 
     operator fun not() = UnaryExpression(Operators.NOT, this)
     fun unaryMinus() = UnaryExpression(Operators.MINUS, this)
-
 }
 
-data class BinaryExpression(
-        var leftExpr: Expression,
-        var operator: BinaryOperator,
-        var rightExpr: Expression
-) : Expression() {
+data class BinaryExpression(var leftExpr: Expression, var operator: BinaryOperator, var rightExpr: Expression) :
+    Expression() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -704,22 +747,26 @@ data class BinaryExpression(
         val a = leftExpr.dataType(localScope)
         val b = rightExpr.dataType(localScope)
         val c = operator.getDataType(a, b) ?: throw TypeConformityException(
-                this, operator.expectedDataTypes, a, b
+            this,
+            operator.expectedDataTypes,
+            a,
+            b,
         )
         return c
     }
 
     override fun clone(): Expression {
-        val be = BinaryExpression(leftExpr.clone(),
-                operator, rightExpr.clone())
+        val be = BinaryExpression(
+            leftExpr.clone(),
+            operator,
+            rightExpr.clone(),
+        )
         be.ruleContext = ruleContext
         return be
     }
 }
 
-data class UnaryExpression(
-        var operator: UnaryOperator,
-        var expression: Expression) : Expression() {
+data class UnaryExpression(var operator: UnaryOperator, var expression: Expression) : Expression() {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -740,9 +787,9 @@ data class UnaryExpression(
 }
 
 data class SymbolicReference @JvmOverloads constructor(
-        var identifier: String = ANONYM,
-        var subscripts: ExpressionList? = null,
-        var sub: SymbolicReference? = null
+    var identifier: String = ANONYM,
+    var subscripts: ExpressionList? = null,
+    var sub: SymbolicReference? = null,
 //        var dataType: AnyDt? = null
 ) : Reference() {
 
@@ -752,37 +799,34 @@ data class SymbolicReference @JvmOverloads constructor(
         get() = subscripts != null
 
     constructor(s: String?, sub: SymbolicReference? = null) : this() {
-        if (s == null)
+        if (s == null) {
             throw IllegalArgumentException()
+        }
         this.sub = sub
         identifier = s
     }
 
     fun addSubscript(ast: Expression) {
-        if (subscripts == null)
+        if (subscripts == null) {
             subscripts = ExpressionList()
+        }
         subscripts!!.add(ast)
     }
 
-    fun hasSub(): Boolean {
-        return sub != null
-    }
+    fun hasSub(): Boolean = sub != null
 
-    fun hasSubscripts(): Boolean {
-        return subscripts != null
-    }
-
+    fun hasSubscripts(): Boolean = subscripts != null
 
     fun asList(): List<SymbolicReference> {
         val list = ArrayList<SymbolicReference>()
-        if (sub != null)
+        if (sub != null) {
             list.addAll(sub!!.asList())
+        }
         list.add(0, this)
         return list
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-
 
     @Throws(VariableNotDefinedException::class)
     override fun dataType(scope: Scope): AnyDt {
@@ -793,7 +837,6 @@ data class SymbolicReference @JvmOverloads constructor(
         }
     }
 
-
     override fun clone(): SymbolicReference {
         val sr = SymbolicReference()
         sr.ruleContext = ruleContext
@@ -801,7 +844,7 @@ data class SymbolicReference @JvmOverloads constructor(
         sr.subscripts = subscripts?.clone()
         sr.sub = sub?.clone()
         sr.derefCount = derefCount
-        //sr.dataType = dataType
+        // sr.dataType = dataType
         return sr
     }
 
@@ -810,8 +853,11 @@ data class SymbolicReference @JvmOverloads constructor(
         var cur: SymbolicReference = this
         while (true) {
             l.add(cur.identifier)
-            if (cur.hasSub()) cur = cur.sub!!
-            else break
+            if (cur.hasSub()) {
+                cur = cur.sub!!
+            } else {
+                break
+            }
         }
         return l
     }
@@ -825,10 +871,9 @@ data class SymbolicReference @JvmOverloads constructor(
     }*/
 }
 
-
 data class Invocation(
-        var callee: SymbolicReference = SymbolicReference(),
-        val parameters: MutableList<InvocationParameter> = arrayListOf()
+    var callee: SymbolicReference = SymbolicReference(),
+    val parameters: MutableList<InvocationParameter> = arrayListOf(),
 ) : Expression() {
     var invoked: Invoked? = null
 
@@ -874,19 +919,18 @@ data class Invocation(
 
     fun addParameter(parameter: InvocationParameter) {
         parameters.add(parameter)
-        //parameters.sortWith { a,b -> obj.compareTo(o) }
+        // parameters.sortWith { a,b -> obj.compareTo(o) }
     }
 
     fun addParameters(parameterList: List<InvocationParameter>) {
         parameters.addAll(parameterList)
-        //parameters.sort(Comparator<InvocationParameter> { obj, o -> obj.compareTo(o) })
+        // parameters.sort(Comparator<InvocationParameter> { obj, o -> obj.compareTo(o) })
     }
 
     fun addExpressionParameters(expressionList: List<Expression>) {
         expressionList.forEach { e -> parameters.add(InvocationParameter(e)) }
-        //parameters.sort(Comparator<InvocationParameter> { obj, o -> obj.compareTo(o) })
+        // parameters.sort(Comparator<InvocationParameter> { obj, o -> obj.compareTo(o) })
     }
-
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -895,12 +939,22 @@ data class Invocation(
         val invoked = invoked
         return if (invoked != null) {
             when (invoked) {
-                is Invoked.Program -> throw DataTypeNotResolvedException("Invocation calls to a program. Programs have no return types")
-                is Invoked.FunctionBlock -> throw DataTypeNotResolvedException("Invocation calls to a FB. FB have no return types")
-                is Invoked.Action -> throw DataTypeNotResolvedException("Invocation calls to an action. Action have no return types")
-                is Invoked.Function -> invoked.function.returnType.obj
-                        ?: throw DataTypeNotResolvedException("Return type of function ${invoked.function} is not resolved")
-                is Invoked.Method -> invoked.method.returnType.obj
+                is Invoked.Program -> throw DataTypeNotResolvedException(
+                    "Invocation calls to a program. Programs have no return types",
+                )
+                is Invoked.FunctionBlock -> throw DataTypeNotResolvedException(
+                    "Invocation calls to a FB. FB have no return types",
+                )
+                is Invoked.Action -> throw DataTypeNotResolvedException(
+                    "Invocation calls to an action. Action have no return types",
+                )
+                is Invoked.Function ->
+                    invoked.function.returnType.obj
+                        ?: throw DataTypeNotResolvedException(
+                            "Return type of function ${invoked.function} is not resolved",
+                        )
+                is Invoked.Method ->
+                    invoked.method.returnType.obj
                         ?: throw DataTypeNotResolvedException("Return type of method ${invoked.method} is not resolved")
             }
         } else {
@@ -915,14 +969,14 @@ data class Invocation(
         cloneList(fc.parameters, parameters)
         return fc
     }
-
 }
 
 data class InvocationParameter(
-        var name: String? = null,
-        var isOutput: Boolean = false,
-        var expression: Expression = EMPTY_EXPRESSION
-) : Top(), Comparable<InvocationParameter> {
+    var name: String? = null,
+    var isOutput: Boolean = false,
+    var expression: Expression = EMPTY_EXPRESSION,
+) : Top(),
+    Comparable<InvocationParameter> {
     val isInput: Boolean
         get() = !isOutput
 
@@ -930,31 +984,31 @@ data class InvocationParameter(
 
     override fun clone() = InvocationParameter(this.name, isOutput, this.expression.clone())
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    override operator fun compareTo(o: InvocationParameter): Int {
-        return if (o.name != null)
-            this.name!!.compareTo(o.name!!)
-        else
-            0
+    override operator fun compareTo(o: InvocationParameter): Int = if (o.name != null) {
+        this.name!!.compareTo(o.name!!)
+    } else {
+        0
     }
 }
 
 //region Type
-interface TypeDeclaration : HasRuleContext, Identifiable, Visitable, Cloneable {
+interface TypeDeclaration :
+    HasRuleContext,
+    Identifiable,
+    Visitable,
+    Cloneable {
     override var name: String
 
-    //var dataType: AnyDt
+    // var dataType: AnyDt
     @property:Deprecated("should be an type DECLARATION")
     var baseType: RefTo<AnyDt>
     val initialization: Initialization?
     override fun clone(): TypeDeclaration
 
     @Throws(IECException::class)
-    fun getDataType(scope: Scope): AnyDt? =
-            this.accept(TypeDeclarationToDataType(scope))
+    fun getDataType(scope: Scope): AnyDt? = this.accept(TypeDeclarationToDataType(scope))
 
     fun setInit(initialization: Initialization?)
 }
@@ -966,8 +1020,9 @@ data class SimpleTypeDeclaration(
     override var name: String = ANONYM,
     @Deprecated("should be an type DECLARATION")
     override var baseType: RefTo<AnyDt> = RefTo(),
-    override var initialization: Initialization? = null
-) : TypeDeclaration, Top() {
+    override var initialization: Initialization? = null,
+) : Top(),
+    TypeDeclaration {
     constructor(dt: AnyDt, init: Initialization?) : this(baseType = RefTo(dt), initialization = init)
 
     override fun setInit(init: Initialization?) {
@@ -990,8 +1045,9 @@ data class StructureTypeDeclaration(
     @Deprecated("should be an type DECLARATION")
     override var baseType: RefTo<AnyDt> = RefTo(),
     override var initialization: StructureInitialization? = null,
-    var fields: VariableScope = VariableScope()
-) : TypeDeclaration, Top() {
+    var fields: VariableScope = VariableScope(),
+) : Top(),
+    TypeDeclaration {
     override fun setInit(init: Initialization?) {
         initialization = init as StructureInitialization?
     }
@@ -1012,7 +1068,6 @@ data class StructureTypeDeclaration(
         return t
     }
 
-
     fun addField(text: String, accept: TypeDeclaration): VariableDeclaration {
         val vd = VariableDeclaration(text, 0, accept)
         fields.add(vd)
@@ -1023,10 +1078,11 @@ data class StructureTypeDeclaration(
 data class SubRangeTypeDeclaration(
     override var name: String = ANONYM,
     @Deprecated("should be an type DECLARATION")
-    override var baseType: RefTo<AnyDt> = RefTo(),//TODO false, should be type DECLARATION
+    override var baseType: RefTo<AnyDt> = RefTo(), // TODO false, should be type DECLARATION
     override var initialization: IntegerLit? = null,
-    var range: Range? = null)
-    : TypeDeclaration, Top() {
+    var range: Range? = null,
+) : Top(),
+    TypeDeclaration {
 
     override fun setInit(init: Initialization?) {
         initialization = init as? IntegerLit
@@ -1056,10 +1112,11 @@ data class EnumerationTypeDeclaration(
     override var name: String = ANONYM,
     @Deprecated("should be an type DECLARATION")
     override var baseType: RefTo<AnyDt> = RefTo(),
-    override var initialization: IdentifierInitializer? = null
-) : TypeDeclaration, Top() {
+    override var initialization: IdentifierInitializer? = null,
+) : Top(),
+    TypeDeclaration {
     override fun clone(): EnumerationTypeDeclaration {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     var allowedValues: MutableList<Token> = LinkedList()
@@ -1070,11 +1127,9 @@ data class EnumerationTypeDeclaration(
         initialization = init as IdentifierInitializer?
     }
 
-
     init {
         baseType.identifier = "ENUM"
     }
-
 
     override fun <S> accept(visitor: Visitor<S>): S = visitor.visit(this)
 
@@ -1123,11 +1178,12 @@ override fun clone(): EnumerationTypeDeclaration {
 }
 
 data class ArrayTypeDeclaration(
-        override var name: String = ANONYM,
-        var type: TypeDeclaration,
-        override var initialization: ArrayInitialization? = null,
-        val ranges: MutableList<Range> = arrayListOf())
-    : TypeDeclaration, Top() {
+    override var name: String = ANONYM,
+    var type: TypeDeclaration,
+    override var initialization: ArrayInitialization? = null,
+    val ranges: MutableList<Range> = arrayListOf(),
+) : Top(),
+    TypeDeclaration {
     @Deprecated("should be an type DECLARATION")
     override var baseType = RefTo<AnyDt>()
 
@@ -1135,12 +1191,13 @@ data class ArrayTypeDeclaration(
         initialization = init as ArrayInitialization?
     }
 
-
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): ArrayTypeDeclaration {
         val atd = ArrayTypeDeclaration(
-                name, type.clone(), initialization?.clone()
+            name,
+            type.clone(),
+            initialization?.clone(),
         )
         atd.ruleContext = ruleContext
         cloneList(atd.ranges, ranges)
@@ -1160,7 +1217,7 @@ data class ArrayTypeDeclaration(
         type = ArrayType(getTypeName(), baseType, ranges)
         return type
     }
-    */
+     */
 }
 
 class StringTypeDeclaration(
@@ -1168,13 +1225,13 @@ class StringTypeDeclaration(
     @Deprecated("should be an type DECLARATION")
     override var baseType: RefTo<AnyDt> = RefTo(),
     var size: Literal? = null,
-    override var initialization: Literal? = null)
-    : TypeDeclaration, Top() {
+    override var initialization: Literal? = null,
+) : Top(),
+    TypeDeclaration {
 
     override fun setInit(init: Initialization?) {
         initialization = init as Literal?
     }
-
 
     override fun clone(): StringTypeDeclaration {
         val t = StringTypeDeclaration()
@@ -1191,8 +1248,9 @@ class PointerTypeDeclaration(
     override var name: String = ANONYM,
     @Deprecated("should be an type DECLARATION")
     override var baseType: RefTo<AnyDt> = RefTo(),
-    override var initialization: Literal? = null)
-    : TypeDeclaration, Top() {
+    override var initialization: Literal? = null,
+) : Top(),
+    TypeDeclaration {
 
     override fun setInit(init: Initialization?) {
         initialization = init as Literal?
@@ -1206,14 +1264,14 @@ data class ReferenceTypeDeclaration(
     override var name: String = ANONYM,
     var refTo: SimpleTypeDeclaration = SimpleTypeDeclaration(),
     @Deprecated("should be an type DECLARATION")
-    override var baseType: RefTo<AnyDt> = refTo.baseType)
-    : TypeDeclaration, Top() {
+    override var baseType: RefTo<AnyDt> = refTo.baseType,
+) : Top(),
+    TypeDeclaration {
     override var initialization: Literal? = null
 
     override fun setInit(init: Initialization?) {
         initialization = init as Literal?
     }
-
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -1226,19 +1284,16 @@ data class ReferenceTypeDeclaration(
 }
 //endregion
 
-
 //region Initialization
 abstract class Initialization : Expression() {
     abstract override fun clone(): Initialization
     fun getValue(): Value<*, *> = accept(EvaluateInitialization)
 }
 
-data class ArrayInitialization(
-        val initValues: MutableList<Initialization> = arrayListOf())
-    : Initialization() {
+data class ArrayInitialization(val initValues: MutableList<Initialization> = arrayListOf()) : Initialization() {
 
     override fun dataType(localScope: Scope): AnyDt {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
@@ -1252,9 +1307,9 @@ data class ArrayInitialization(
 }
 
 data class StructureInitialization(
-        //var structureName: String? = null
-        var initValues: MutableMap<String, Initialization> = HashMap())
-    : Initialization() {
+    // var structureName: String? = null
+    var initValues: MutableMap<String, Initialization> = HashMap(),
+) : Initialization() {
 
     constructor(initEntries: List<Map.Entry<String, Initialization>>) : this() {
         initEntries.forEach { entry -> addField(entry.key, entry.value) }
@@ -1278,13 +1333,10 @@ data class StructureInitialization(
     }
 }
 
-class IdentifierInitializer(var enumType: EnumerateType? = null,
-                            var value: String? = null) : Initialization() {
+class IdentifierInitializer(var enumType: EnumerateType? = null, var value: String? = null) : Initialization() {
 
     @Throws(VariableNotDefinedException::class, TypeConformityException::class)
-    override fun dataType(localScope: Scope): AnyDt {
-        return enumType!!
-    }
+    override fun dataType(localScope: Scope): AnyDt = enumType!!
 
     override fun clone() = rctxHelper(IdentifierInitializer(enumType, value), this)
 
@@ -1292,15 +1344,12 @@ class IdentifierInitializer(var enumType: EnumerateType? = null,
 }
 //endregion
 
-
-abstract class CaseCondition() : Top() {
+abstract class CaseCondition : Top() {
     data class Range(var range: edu.kit.iti.formal.automation.st.ast.Range) : CaseCondition() {
         var start: Literal? = null
         var stop: Literal? = null
 
-        override fun <T> accept(visitor: Visitor<T>): T {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
         override fun clone(): Range {
             val r = Range(range.copy())
@@ -1312,21 +1361,15 @@ abstract class CaseCondition() : Top() {
     }
 
     data class IntegerCondition(var value: IntegerLit) : CaseCondition() {
-        override fun <T> accept(visitor: Visitor<T>): T {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-        override fun clone(): IntegerCondition {
-            return IntegerCondition(this.value.clone())
-        }
+        override fun clone(): IntegerCondition = IntegerCondition(this.value.clone())
     }
 
     data class Enumeration(var start: EnumLit, var stop: EnumLit? = null) : CaseCondition() {
         constructor(start: EnumLit) : this(start, start)
 
-        override fun <T> accept(visitor: Visitor<T>): T {
-            return visitor.visit(this)
-        }
+        override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
         override fun clone(): Enumeration {
             val e = Enumeration(start.clone(), stop?.clone())
@@ -1339,41 +1382,28 @@ abstract class CaseCondition() : Top() {
 class Deref(val reference: Reference) : Reference() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     override fun dataType(localScope: Scope): AnyDt {
-        return reference.dataType(localScope)//TODO
+        return reference.dataType(localScope) // TODO
     }
 
-    override fun clone(): Deref {
-        return Deref(reference.clone())
-    }
+    override fun clone(): Deref = Deref(reference.clone())
 }
 
 class DirectVariable(s: String) : Reference() {
 
+    override fun <T> accept(visitor: Visitor<T>): T = throw IllegalStateException("not implemented")
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        throw IllegalStateException("not implemented")
-    }
+    override fun dataType(localScope: Scope): AnyDt = throw IllegalStateException("not implemented")
 
-
-    override fun dataType(localScope: Scope): AnyDt {
-        throw IllegalStateException("not implemented")
-    }
-
-    override fun clone(): Reference {
-        return DirectVariable("todo")
-    }
-
+    override fun clone(): Reference = DirectVariable("todo")
 }
 
 sealed class Invoked {
-    fun getCalleeScope(): Scope? {
-        return when (this) {
-            is Program -> program.scope
-            is FunctionBlock -> fb.scope
-            is Function -> function.scope
-            is Method -> method.scope
-            is Action -> scope
-        }
+    fun getCalleeScope(): Scope? = when (this) {
+        is Program -> program.scope
+        is FunctionBlock -> fb.scope
+        is Function -> function.scope
+        is Method -> method.scope
+        is Action -> scope
     }
 
     class Program(val program: ProgramDeclaration) : Invoked()
@@ -1383,14 +1413,13 @@ sealed class Invoked {
     class Action(val action: ActionDeclaration, val scope: Scope) : Invoked()
 }
 
-sealed class Literal() : Initialization() {
+sealed class Literal : Initialization() {
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
     abstract fun asValue(scope: Scope = Scope.defaultScope()): Value<*, *>?
     abstract override fun clone(): Literal
 }
 
-data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
-                      var value: BigInteger) : Literal() {
+data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT), var value: BigInteger) : Literal() {
     constructor(dt: String?, v: BigInteger) : this(RefTo(dt), v)
     constructor(dt: AnyInt, v: BigInteger) : this(RefTo(dt), v)
     constructor(intVal: VAnyInt) : this(intVal.dataType, intVal.value)
@@ -1401,7 +1430,6 @@ data class IntegerLit(var dataType: RefTo<AnyInt> = RefTo<AnyInt>(INT),
     override fun asValue(scope: Scope) = VAnyInt(dataType(scope), value)
     override fun clone() = copy()
 }
-
 
 data class StringLit(var dataType: RefTo<IECString> = RefTo(), var value: String) : Literal() {
     constructor(dt: IECString, v: String) : this(RefTo(dt.name, dt), v)
@@ -1424,8 +1452,11 @@ data class RealLit(var dataType: RefTo<AnyReal> = RefTo(), var value: BigDecimal
 private fun <T : AnyDt> RefTo<T>.checkAndresolveDt(localScope: Scope, default: T? = null): T {
     obj?.let { return it }
     resolve { localScope.resolveDataType0(it) }
-    if (obj == null) return default ?: throw DataTypeNotResolvedException("Datatype of ${identifier} is not defined")
-    else return obj!!
+    if (obj == null) {
+        return default ?: throw DataTypeNotResolvedException("Datatype of $identifier is not defined")
+    } else {
+        return obj!!
+    }
 }
 
 data class EnumLit(var dataType: RefTo<EnumerateType> = RefTo(), var value: String) : Literal() {
@@ -1437,7 +1468,7 @@ data class EnumLit(var dataType: RefTo<EnumerateType> = RefTo(), var value: Stri
     override fun clone() = copy()
 }
 
-class NullLit() : Literal() {
+class NullLit : Literal() {
     override fun clone() = rctxHelper(NullLit(), this)
     override fun dataType(localScope: Scope) = ClassDataType.AnyClassDt
     override fun asValue(scope: Scope) = VNULL
@@ -1447,10 +1478,7 @@ class NullLit() : Literal() {
         return true
     }
 
-    override fun hashCode(): Int {
-        return javaClass.hashCode()
-    }
-
+    override fun hashCode(): Int = javaClass.hashCode()
 }
 
 data class ToDLit(var value: TimeofDayData) : Literal() {
@@ -1499,7 +1527,8 @@ data class BitLit(var dataType: RefTo<AnyBit> = RefTo(), var value: Long) : Lite
 
 data class UnindentifiedLit(var value: String) : Literal() {
     override fun asValue(localScope: Scope) = null
-    override fun dataType(scope: Scope) = throw DataTypeNotResolvedException("Datatype of UnindentifiedLit is not defined")
+    override fun dataType(scope: Scope) =
+        throw DataTypeNotResolvedException("Datatype of UnindentifiedLit is not defined")
     override fun clone() = copy()
 }
 
@@ -1523,11 +1552,7 @@ class Location : Expression {
         path.add(deref)
     }
 
-
-    fun asIdentifier(): String {
-        return path.stream().map { a -> a.toString() }.reduce("") { a, b -> "$a.$b" }
-    }
-
+    fun asIdentifier(): String = path.stream().map { a -> a.toString() }.reduce("") { a, b -> "$a.$b" }
 
     override fun dataType(localScope: Scope): AnyDt {
         TODO("Not implemented")
@@ -1541,10 +1566,10 @@ class Location : Expression {
     }
 }
 
-
 //region Helpers
-open class StatementList(private val list: MutableList<Statement> = arrayListOf())
-    : Statement(), MutableList<Statement> by list {
+open class StatementList(private val list: MutableList<Statement> = arrayListOf()) :
+    Statement(),
+    MutableList<Statement> by list {
 
     constructor(vararg then: Statement) : this(list = ArrayList(Arrays.asList(*then)))
 
@@ -1563,8 +1588,7 @@ open class StatementList(private val list: MutableList<Statement> = arrayListOf(
 
     override fun toString() = list.toString()
 
-
-    //override fun clone(): StatementList = StatementList(map { it.clone() })
+    // override fun clone(): StatementList = StatementList(map { it.clone() })
 
     override fun clone(): StatementList {
         val s = StatementList()
@@ -1579,13 +1603,12 @@ open class StatementList(private val list: MutableList<Statement> = arrayListOf(
         return true
     }
 
-    override fun hashCode(): Int {
-        return list.hashCode()
-    }
+    override fun hashCode(): Int = list.hashCode()
 }
 
-data class ExpressionList(private val expressions: MutableList<Expression> = arrayListOf())
-    : Top(), MutableList<Expression> by expressions {
+data class ExpressionList(private val expressions: MutableList<Expression> = arrayListOf()) :
+    Top(),
+    MutableList<Expression> by expressions {
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
@@ -1596,28 +1619,28 @@ data class ExpressionList(private val expressions: MutableList<Expression> = arr
     }
 }
 
-data class Position(
-        val lineNumber: Int = -1,
-        val charInLine: Int = -1,
-        val offset: Int = -1,
-        val file: String = "") : Cloneable {
+data class Position(val lineNumber: Int = -1, val charInLine: Int = -1, val offset: Int = -1, val file: String = "") :
+    Cloneable {
 
     companion object {
-        fun start(token: Token?) =
-                Position(token?.line ?: -1,
-                        token?.charPositionInLine ?: -1,
-                        token?.startIndex ?: -1,
-                        token?.tokenSource?.sourceName ?: "")
+        fun start(token: Token?) = Position(
+            token?.line ?: -1,
+            token?.charPositionInLine ?: -1,
+            token?.startIndex ?: -1,
+            token?.tokenSource?.sourceName ?: "",
+        )
 
-        fun end(token: Token?): Position {
-            return if (token == null) Position()
-            else {
-                val text = token.text ?: ""
-                val newlines = text.count { it == '\n' }
-                Position(token.line + newlines,
-                        text.length - Math.max(0, text.lastIndexOf('\n')),
-                        token.stopIndex, token?.tokenSource?.sourceName ?: "")
-            }
+        fun end(token: Token?): Position = if (token == null) {
+            Position()
+        } else {
+            val text = token.text ?: ""
+            val newlines = text.count { it == '\n' }
+            Position(
+                token.line + newlines,
+                text.length - Math.max(0, text.lastIndexOf('\n')),
+                token.stopIndex,
+                token?.tokenSource?.sourceName ?: "",
+            )
         }
     }
 
@@ -1625,13 +1648,15 @@ data class Position(
 
     override fun toString(): String = "@$lineNumber:$charInLine"
 }
-//endregion 
+//endregion
 
-data class BlockStatement(var name: String = "empty",
-                          var statements: StatementList = StatementList(),
-                          var state: MutableList<SymbolicReference> = arrayListOf(),
-                          var input: MutableList<SymbolicReference> = arrayListOf(),
-                          var output: MutableList<SymbolicReference> = arrayListOf()) : Statement() {
+data class BlockStatement(
+    var name: String = "empty",
+    var statements: StatementList = StatementList(),
+    var state: MutableList<SymbolicReference> = arrayListOf(),
+    var input: MutableList<SymbolicReference> = arrayListOf(),
+    var output: MutableList<SymbolicReference> = arrayListOf(),
+) : Statement() {
     /** Fully qualified call stack, seperated with dots */
     var fqName: String = name
 
@@ -1676,7 +1701,6 @@ class VariableBuilder(val scope: VariableScope) {
     private var identifiers: MutableList<Token> = arrayListOf()
     private var type: TypeDeclaration? = null
 
-
     //region Handling of special flags (like constant, input or global)
     fun popPragma() = pragmaStack.pop()
     fun pushPragma(p: List<Pragma>): VariableBuilder {
@@ -1700,7 +1724,6 @@ class VariableBuilder(val scope: VariableScope) {
         } catch (e: EmptyStackException) {
             return 0
         }
-
     }
 
     fun push(input: Int): VariableBuilder {
@@ -1720,24 +1743,17 @@ class VariableBuilder(val scope: VariableScope) {
     }
     //endregion
 
-    fun boolType(): VariableBuilder {
-        return type("BOOL")
-    }
+    fun boolType(): VariableBuilder = type("BOOL")
 
-    fun pointerType(pointsTo: String): VariableBuilder {
-        return type(PointerTypeDeclaration(pointsTo))
-    }
+    fun pointerType(pointsTo: String): VariableBuilder = type(PointerTypeDeclaration(pointsTo))
 
-    fun stringType(base: String,
-                   length: Literal,
-                   def: Literal): VariableBuilder {
+    fun stringType(base: String, length: Literal, def: Literal): VariableBuilder {
         val std = StringTypeDeclaration()
         std.baseType.identifier = base
         std.size = length
         std.initialization = def
         return type(std)
     }
-
 
     fun baseType(baseType: String) = type(baseType)
 
@@ -1746,7 +1762,6 @@ class VariableBuilder(val scope: VariableScope) {
         td.baseType.identifier = baseType
         return type(td)
     }
-
 
     fun type(type: TypeDeclaration): VariableBuilder {
         this.type = type
@@ -1773,11 +1788,7 @@ class VariableBuilder(val scope: VariableScope) {
         return this
     }
 
-
-    fun close(): VariableBuilder {
-        return create().clear()
-    }
-
+    fun close(): VariableBuilder = create().clear()
 
     fun identifiers(ast: List<Token>): VariableBuilder {
         identifiers.clear()
@@ -1792,13 +1803,13 @@ class VariableBuilder(val scope: VariableScope) {
     }
 }
 
-data class VariableDeclaration(
-        override var name: String = ANONYM,
-        var type: Int = 0
-) : Top(), Comparable<VariableDeclaration>, Identifiable, HasPragma {
+data class VariableDeclaration(override var name: String = ANONYM, var type: Int = 0) :
+    Top(),
+    Comparable<VariableDeclaration>,
+    Identifiable,
+    HasPragma {
 
     override val pragmas: MutableList<Pragma> by lazy { arrayListOf<Pragma>() }
-
 
     var typeDeclaration: TypeDeclaration? = null
 
@@ -1816,30 +1827,23 @@ data class VariableDeclaration(
     val isRetain: Boolean
         get() = isType(RETAIN)
 
-
     val isConstant: Boolean
         get() = isType(CONSTANT)
-
 
     val isExternal: Boolean
         get() = isType(EXTERNAL)
 
-
     val isTemp: Boolean
         get() = isType(TEMP)
-
 
     val isLocated: Boolean
         get() = isType(LOCATED)
 
-
     val isLocal: Boolean
         get() = isType(LOCAL)
 
-
     val isOutput: Boolean
         get() = isType(OUTPUT)
-
 
     val isInput: Boolean
         get() = isType(INPUT)
@@ -1902,15 +1906,10 @@ data class VariableDeclaration(
         initValue = DefaultInitValue.getInit(dt)
     }
 
-    fun isType(i: Int): Boolean {
-        return type and i != 0
-    }
-
+    fun isType(i: Int): Boolean = type and i != 0
 
     override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
-    override fun compareTo(o: VariableDeclaration): Int {
-        return name.compareTo(o.name)
-    }
+    override fun compareTo(o: VariableDeclaration): Int = name.compareTo(o.name)
 
     /*
     override fun toString(): String {
@@ -1924,18 +1923,16 @@ data class VariableDeclaration(
         return vd
     }
 
-
     class FlagCounter {
         private var internal = 1
-        fun peek(): Int {
-            return internal
-        }
+        fun peek(): Int = internal
 
         fun get(): Int {
             val p = peek()
             internal = internal shl 1
-            if (internal <= 0)
+            if (internal <= 0) {
                 throw IllegalStateException("Not enough flag bits left for variable declaration.")
+            }
             return p
         }
     }
@@ -1944,7 +1941,7 @@ data class VariableDeclaration(
         val FLAG_COUNTER = FlagCounter()
         val INPUT = FLAG_COUNTER.get()
         val OUTPUT = FLAG_COUNTER.get()
-        val INOUT = FLAG_COUNTER.get() //INPUT | OUTPUT;
+        val INOUT = FLAG_COUNTER.get() // INPUT | OUTPUT;
         val LOCAL = FLAG_COUNTER.get()
         val GLOBAL = FLAG_COUNTER.get()
         val CONSTANT = FLAG_COUNTER.get()
@@ -1986,28 +1983,33 @@ data class Range(val start: IntegerLit, val stop: IntegerLit) : Cloneable {
     fun toIntRange(): IntRange = startValue..stopValue
 }
 
-
 private fun <T : Top> rctxHelper(target: T, source: T): T {
     target.ruleContext = source.ruleContext
     return target
 }
 
 enum class AccessSpecifier(val flag: Int) {
-    PUBLIC(VariableDeclaration.PUBLIC), INTERNAL(VariableDeclaration.INTERNAL),
-    PROTECTED(VariableDeclaration.PRIVATE), PRIVATE(VariableDeclaration.PUBLIC);
+    PUBLIC(VariableDeclaration.PUBLIC),
+    INTERNAL(VariableDeclaration.INTERNAL),
+    PROTECTED(VariableDeclaration.PRIVATE),
+    PRIVATE(VariableDeclaration.PUBLIC),
 }
 
-interface Classifier : HasMethods, HasInterfaces, Identifiable
-
+interface Classifier :
+    HasMethods,
+    HasInterfaces,
+    Identifiable
 
 //region SFC
 data class ActionDeclaration(
-        override var name: String = ANONYM,
-        override var stBody: StatementList? = null,
-        override var sfcBody: SFCImplementation? = null,
-        override var ilBody: IlBody? = null,
-        override var fbBody: FbdBody? = null)
-    : Identifiable, HasBody, Top() {
+    override var name: String = ANONYM,
+    override var stBody: StatementList? = null,
+    override var sfcBody: SFCImplementation? = null,
+    override var ilBody: IlBody? = null,
+    override var fbBody: FbdBody? = null,
+) : Top(),
+    Identifiable,
+    HasBody {
     override fun clone(): ActionDeclaration {
         val a = ActionDeclaration()
         a.name = this.name
@@ -2016,18 +2018,11 @@ data class ActionDeclaration(
         return rctxHelper(a, this)
     }
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 }
 
-data class SFCActionQualifier(
-        var qualifier: Qualifier = Qualifier.SET,
-        var time: Expression = EMPTY_EXPRESSION
-) {
-    fun hasTime(): Boolean {
-        return qualifier.hasTime
-    }
+data class SFCActionQualifier(var qualifier: Qualifier = Qualifier.SET, var time: Expression = EMPTY_EXPRESSION) {
+    fun hasTime(): Boolean = qualifier.hasTime
 
     /*fun copy(): SFCActionQualifier {
         val q = SFCActionQualifier()
@@ -2043,21 +2038,24 @@ data class SFCActionQualifier(
         TIME_LIMITED("L", true),
         STORE_AND_DELAY("SD", true),
         STORE_AND_LIMITED("SL", true),
-        STORE_DELAYED("D", true),           //could be renamed to TIME_DELAYED
+        STORE_DELAYED("D", true), // could be renamed to TIME_DELAYED
         DELAYED_AND_STORED("DS", true),
-        RAISING("P1", false),               //could be renamed to RISING
+        RAISING("P1", false), // could be renamed to RISING
         FALLING("P0", false),
         PULSE("P", false),
 
         /** special case for code sys */
-        WHILE("A", false)
+        WHILE("A", false),
     }
 
     companion object {
         fun fromName(qName: String): SFCActionQualifier? {
             val qualifier = Qualifier.entries.find { it.symbol == qName }
-            if (qualifier != null) return SFCActionQualifier(qualifier)
-            else return null
+            if (qualifier != null) {
+                return SFCActionQualifier(qualifier)
+            } else {
+                return null
+            }
         }
 
         var RAISING = SFCActionQualifier(Qualifier.RAISING)
@@ -2069,17 +2067,15 @@ data class SFCActionQualifier(
 }
 
 data class SFCImplementation(
-        val networks: MutableList<SFCNetwork> = ArrayList<SFCNetwork>()
-        //weigl: actions now in PouExecutable
-        // var actions: MutableList<ActionDeclaration> = ArrayList()
+    val networks: MutableList<SFCNetwork> = ArrayList<SFCNetwork>(),
+    // weigl: actions now in PouExecutable
+    // var actions: MutableList<ActionDeclaration> = ArrayList()
 ) : Top() {
 
     /**
      * {@inheritDoc}
      */
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     override fun clone(): SFCImplementation {
         val sfc = SFCImplementation()
@@ -2087,7 +2083,6 @@ data class SFCImplementation(
         return rctxHelper(sfc, this)
     }
 }
-
 
 data class SFCStep(var name: String = ANONYM) : Top() {
     var isInitial: Boolean = false
@@ -2113,13 +2108,10 @@ data class SFCStep(var name: String = ANONYM) : Top() {
         return s
     }
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    data class AssociatedAction(
-            var qualifier: SFCActionQualifier? = null,
-            var actionName: String = ANONYM) : Cloneable {
+    data class AssociatedAction(var qualifier: SFCActionQualifier? = null, var actionName: String = ANONYM) :
+        Cloneable {
         override fun clone(): AssociatedAction {
             val aa = AssociatedAction()
             aa.actionName = this.actionName
@@ -2128,7 +2120,6 @@ data class SFCStep(var name: String = ANONYM) : Top() {
         }
     }
 }
-
 
 private fun <T : Cloneable> cloneList(target: MutableCollection<in T>, source: Collection<out T>) {
     source.forEach { target += it.clone() as T }
@@ -2163,14 +2154,10 @@ class SFCTransition : Top() {
         return t
     }
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
     class PriorityComparison : Comparator<SFCTransition> {
-        override fun compare(o1: SFCTransition, o2: SFCTransition): Int {
-            return Integer.compare(o1.priority, o2.priority)
-        }
+        override fun compare(o1: SFCTransition, o2: SFCTransition): Int = Integer.compare(o1.priority, o2.priority)
     }
 }
 
@@ -2184,14 +2171,11 @@ class SFCNetwork(var steps: MutableList<SFCStep> = ArrayList()) : Top() {
         return sfcNetwork
     }
 
-    override fun <T> accept(visitor: Visitor<T>): T {
-        return visitor.visit(this)
-    }
+    override fun <T> accept(visitor: Visitor<T>): T = visitor.visit(this)
 
-    fun getStep(text: String): Optional<SFCStep> {
-        return steps.stream().filter { s -> s.name.equals(text, ignoreCase = true) }.findAny()
-    }
+    fun getStep(text: String): Optional<SFCStep> = steps.stream().filter { s ->
+        s.name.equals(text, ignoreCase = true)
+    }.findAny()
 }
 
 //endregion
-

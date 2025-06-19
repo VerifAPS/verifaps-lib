@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.rvt
 
 /*-
@@ -31,10 +49,8 @@ import edu.kit.iti.formal.automation.rvt.translators.TypeTranslator
 import edu.kit.iti.formal.automation.scope.Scope
 import edu.kit.iti.formal.automation.st.DefaultInitValue
 import edu.kit.iti.formal.automation.st.InitValueTranslator
-import edu.kit.iti.formal.automation.st.ast.Literal
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.VariableDeclaration
-import edu.kit.iti.formal.smv.ExpressionReplacer
 import edu.kit.iti.formal.smv.ExpressionReplacerRecur
 import edu.kit.iti.formal.smv.ast.SAssignment
 import edu.kit.iti.formal.smv.ast.SMVExpr
@@ -43,7 +59,6 @@ import edu.kit.iti.formal.smv.ast.SVariable
 import edu.kit.iti.formal.util.meta
 import java.util.*
 import kotlin.collections.HashMap
-
 
 public val SVariable.info: SmvVariableInfo
     get() {
@@ -67,7 +82,7 @@ data class SmvVariableInfo(var isInput: Boolean = false, var isOutput: Boolean =
 class DefinitionReducer(private val module: SMVModule) {
     private val definitionsForSurvival = ArrayList<SAssignment>(module.definitions.size)
     private val substitutions = HashMap<SVariable, SVariable>()
-    fun identifiedTrivialDefinitions(): Unit {
+    fun identifiedTrivialDefinitions() {
         module.definitions.forEach { assign ->
             val (k, v) = assign
             if (v is SVariable) {
@@ -110,17 +125,22 @@ class DefinitionReducer(private val module: SMVModule) {
  * @version 1 (12.12.16)
  */
 class ModuleBuilder(
-        name: String,
-        val scope: Scope,
+    name: String,
+    val scope: Scope,
+    finalState: SymbolicState,
+    val reduceDefinitions: Boolean = true,
+    val supportSpecialStatements: Boolean = false,
+) : Runnable {
+
+    constructor(
+        program: PouExecutable,
         finalState: SymbolicState,
-        val reduceDefinitions: Boolean = true,
-        val supportSpecialStatements: Boolean = false) : Runnable {
+        reduceDefinitions: Boolean = true,
+        supportSpecialStatements: Boolean = false,
+    ) :
+        this(program.name, program.scope, finalState, reduceDefinitions, supportSpecialStatements)
 
-    constructor(program: PouExecutable, finalState: SymbolicState, reduceDefinitions: Boolean = true,
-                supportSpecialStatements: Boolean = false)
-            : this(program.name, program.scope, finalState, reduceDefinitions, supportSpecialStatements)
-
-    val state = finalState//.unfolded()
+    val state = finalState // .unfolded()
     val module = SMVModule(name)
     var typeTranslator: TypeTranslator = DefaultTypeTranslator.INSTANCE
     var valueTranslator = DefaultValueTranslator.INSTANCE
@@ -132,9 +152,9 @@ class ModuleBuilder(
 
         // Using this workaround instead
         val stateVariables = state.keys
-                .filter { (name) ->
-                    inputVars.stream().noneMatch { v2 -> v2.name == name }
-                }
+            .filter { (name) ->
+                inputVars.stream().noneMatch { v2 -> v2.name == name }
+            }
 
         val outputVarNames = outputVars.map(VariableDeclaration::name)
         for (`var` in stateVariables) {
@@ -154,37 +174,35 @@ class ModuleBuilder(
 
         if (supportSpecialStatements) {
             module.definitions
-                    .filter { (a, _) -> a.name.startsWith(ASSERTION_PREFIX) }
-                    .forEach { (a, _) ->
-                        module.invariantSpecs.add(a)
-                    }
+                .filter { (a, _) -> a.name.startsWith(ASSERTION_PREFIX) }
+                .forEach { (a, _) ->
+                    module.invariantSpecs.add(a)
+                }
             module.definitions
-                    .filter { (a, _) -> a.name.startsWith(ASSUMPTION_PREFIX) }
-                    .forEach { (a, _) ->
-                        module.invariants.add(a)
-                    }
+                .filter { (a, _) -> a.name.startsWith(ASSUMPTION_PREFIX) }
+                .forEach { (a, _) ->
+                    module.invariants.add(a)
+                }
 
             val havoc = module.definitions
-                    .filter { (a, _) -> a.name.startsWith(HAVOC_PREFIX) }
+                .filter { (a, _) -> a.name.startsWith(HAVOC_PREFIX) }
             module.definitions.removeAll(havoc)
             havoc.forEach { (a, _) -> module.moduleParameters.add(a) }
         }
-
     }
 
     private fun insertDefinitions(definitions: Map<SVariable, SMVExpr>) {
         definitions.forEach { (k, v) -> addDefinition(k, v) }
     }
 
-    private fun addDefinition(k: SVariable, v: SMVExpr) =
-            module.definitions.add(SAssignment(k, v))
+    private fun addDefinition(k: SVariable, v: SMVExpr) = module.definitions.add(SAssignment(k, v))
 
     private fun insertInputVariables(decls: List<VariableDeclaration>) {
         decls.map { this.typeTranslator.translate(it) }
-                .forEach { v ->
-                    v.isInput = true
-                    module.moduleParameters.add(v)
-                }
+            .forEach { v ->
+                v.isInput = true
+                module.moduleParameters.add(v)
+            }
     }
 
     private fun insertVariables(variables: Collection<SVariable>) {

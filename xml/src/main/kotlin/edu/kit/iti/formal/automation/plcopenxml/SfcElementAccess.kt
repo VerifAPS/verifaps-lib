@@ -1,3 +1,21 @@
+/* *****************************************************************
+ * This file belongs to verifaps-lib (https://verifaps.github.io).
+ * SPDX-License-Header: GPL-3.0-or-later
+ *
+ * This program isType free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program isType distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a clone of the GNU General Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/gpl-3.0.html>.
+ * *****************************************************************/
 package edu.kit.iti.formal.automation.plcopenxml
 
 import org.jdom2.Element
@@ -9,9 +27,8 @@ data class Trans(
     val from: Set<String> = setOf(),
     val to: Set<String> = setOf(),
     val condition: Set<String> = setOf(),
-    val usedNodes: Set<String> = setOf()
+    val usedNodes: Set<String> = setOf(),
 )
-
 
 class SfcElementAccess(val sfcElement: Element) {
     val CODESYS_ON_ENTRY = "a6b08bd8-b696-47e3-9cbf-7408b61c9ff8"
@@ -27,9 +44,8 @@ class SfcElementAccess(val sfcElement: Element) {
     private val xpathFindActionsInActionBlock =
         createXPathWithId("./actionBlock[connectionPointIn/connection/@refLocalId=\$id]/action")
 
-
     val initialStep: Element by lazy { xpathFindRootStep.evaluateFirst(sfcElement) }
-    val nodes by lazy { sfcElement.children.map { it.getAttributeValue("localId") to it }.toMap() }
+    val nodes by lazy { sfcElement.children.associate { it.getAttributeValue("localId") to it } }
     val access = HashMap<String, NodeAccess>()
 
     val steps: List<Step> by lazy { getElements("step") { Step(it) } }
@@ -54,15 +70,15 @@ class SfcElementAccess(val sfcElement: Element) {
         return element?.textTrim
     }
 
-
     open inner class NodeAccess(val entry: Element, expectedTag: String? = null) {
         val localId: String by lazy { entry.getAttributeValue("localId") }
         open val transitions: Collection<Trans>
             get() = arrayListOf()
 
         init {
-            if (expectedTag != null && entry.name != expectedTag)
+            if (expectedTag != null && entry.name != expectedTag) {
                 throw IllegalArgumentException("Tag $expectedTag expected, but got ${entry.name}")
+            }
         }
 
         open fun transitionIncoming(): Collection<Trans> = arrayListOf()
@@ -72,13 +88,11 @@ class SfcElementAccess(val sfcElement: Element) {
     inner class JumpStep(e: Element) : NodeAccess(e, "jumpStep") {
         val jumpTo: String by lazy { entry.getAttributeValue("targetName") }
 
-        override fun transitionIncoming(): Collection<Trans> {
-            return listOf(Trans(from = setOf(jumpTo), usedNodes = setOf(localId)))
-        }
+        override fun transitionIncoming(): Collection<Trans> =
+            listOf(Trans(from = setOf(jumpTo), usedNodes = setOf(localId)))
 
-        override fun transitionOutgoing(): Collection<Trans> {
-            return listOf(Trans(to = setOf(jumpTo), usedNodes = setOf(localId)))
-        }
+        override fun transitionOutgoing(): Collection<Trans> =
+            listOf(Trans(to = setOf(jumpTo), usedNodes = setOf(localId)))
     }
 
     inner class Step(e: Element) : NodeAccess(e, "step") {
@@ -92,12 +106,9 @@ class SfcElementAccess(val sfcElement: Element) {
         val onWhile: String? by lazy { getVendorSpecificAttribute(e, CODESYS_ON_STEP) }
         val actionBlock: ActionBlock? by lazy { null }
 
+        override fun transitionIncoming() = listOf(Trans(from = setOf(name), usedNodes = setOf(localId)))
 
-        override fun transitionIncoming() =
-            listOf(Trans(from = setOf(name), usedNodes = setOf(localId)))
-
-        override fun transitionOutgoing() =
-            listOf(Trans(to = setOf(name), usedNodes = setOf(localId)))
+        override fun transitionOutgoing() = listOf(Trans(to = setOf(name), usedNodes = setOf(localId)))
     }
 
     inner class ActionBlock(entry: Element) : NodeAccess(entry) {
@@ -107,14 +118,14 @@ class SfcElementAccess(val sfcElement: Element) {
                 val qName = action.getAttributeValue("qualifier")
                 val duration: String? = action.getAttributeValue("duration")
                 val name = action.getChild("reference").getAttributeValue("name")
-                if (duration != null)
+                if (duration != null) {
                     "$name($qName)"
-                else
+                } else {
                     "$name($qName,$duration)"
+                }
             }
         }
     }
-
 
     inner class ParallelFork(entry: Element) : NodeAccess(entry, "simultaneousDivergence") {
         override val transitions: Collection<Trans>
@@ -128,7 +139,7 @@ class SfcElementAccess(val sfcElement: Element) {
         }
 
         override fun transitionOutgoing(): List<Trans> {
-            //combine
+            // combine
             val a = pointOut(localId).flatMap { it.transitionOutgoing() }
             val usedNodes = a.flatMap { it.usedNodes } + localId
             val from = a.flatMap { it.from }
@@ -137,7 +148,6 @@ class SfcElementAccess(val sfcElement: Element) {
             return listOf(Trans(from.toSet(), to.toSet(), condition.toSet(), usedNodes.toSet()))
         }
     }
-
 
     inner class ParallelJoin(entry: Element) : NodeAccess(entry, "simultaneousConvergence") {
         override val transitions: Collection<Trans>
@@ -151,7 +161,7 @@ class SfcElementAccess(val sfcElement: Element) {
         }
 
         override fun transitionIncoming(): List<Trans> {
-            //combine
+            // combine
             val a = pointIn(entry).flatMap { it.transitionIncoming() }
             val usedNodes = a.flatMap { it.usedNodes } + localId
             val from = a.flatMap { it.from }
@@ -165,25 +175,23 @@ class SfcElementAccess(val sfcElement: Element) {
         override val transitions: Collection<Trans>
             get() = times(transitionIncoming(), transitionOutgoing())
 
-        override fun transitionOutgoing() =
-            pointOut(localId)
-                .flatMap { it.transitionOutgoing() }
-                .map { it.copy(usedNodes = it.usedNodes + localId) }
+        override fun transitionOutgoing() = pointOut(localId)
+            .flatMap { it.transitionOutgoing() }
+            .map { it.copy(usedNodes = it.usedNodes + localId) }
 
-        override fun transitionIncoming(): List<Trans> =
-            pointIn(entry)
-                .flatMap { it.transitionIncoming() }
-                .map { it.copy(usedNodes = it.usedNodes + localId) }
+        override fun transitionIncoming(): List<Trans> = pointIn(entry)
+            .flatMap { it.transitionIncoming() }
+            .map { it.copy(usedNodes = it.usedNodes + localId) }
     }
 
-    private fun times(from: Collection<Trans>, to: Collection<Trans>): Collection<Trans> {
-        return from.flatMap { f ->
-            to.map { t ->
-                Trans(
-                    f.from + t.from, f.to + t.to, f.condition + t.condition,
-                    t.usedNodes + f.usedNodes
-                )
-            }
+    private fun times(from: Collection<Trans>, to: Collection<Trans>): Collection<Trans> = from.flatMap { f ->
+        to.map { t ->
+            Trans(
+                f.from + t.from,
+                f.to + t.to,
+                f.condition + t.condition,
+                t.usedNodes + f.usedNodes,
+            )
         }
     }
 
@@ -193,9 +201,10 @@ class SfcElementAccess(val sfcElement: Element) {
         return listOf(
             Trans(
                 x.from + y.from,
-                x.to + y.to, x.condition + y.condition,
-                x.usedNodes + y.usedNodes
-            )
+                x.to + y.to,
+                x.condition + y.condition,
+                x.usedNodes + y.usedNodes,
+            ),
         )
     }
 
@@ -203,15 +212,13 @@ class SfcElementAccess(val sfcElement: Element) {
         override val transitions: Collection<Trans>
             get() = times(transitionIncoming(), transitionOutgoing())
 
-        override fun transitionOutgoing() =
-            pointOut(localId)
-                .flatMap { it.transitionOutgoing() }
-                .map { it.copy(usedNodes = it.usedNodes + localId) }
+        override fun transitionOutgoing() = pointOut(localId)
+            .flatMap { it.transitionOutgoing() }
+            .map { it.copy(usedNodes = it.usedNodes + localId) }
 
-        override fun transitionIncoming(): List<Trans> =
-            pointIn(entry)
-                .flatMap { it.transitionIncoming() }
-                .map { it.copy(usedNodes = it.usedNodes + localId) }
+        override fun transitionIncoming(): List<Trans> = pointIn(entry)
+            .flatMap { it.transitionIncoming() }
+            .map { it.copy(usedNodes = it.usedNodes + localId) }
     }
 
     /**
@@ -230,30 +237,27 @@ class SfcElementAccess(val sfcElement: Element) {
         val condition: String by lazy {
             val q = xpf.compile(qExpression, Filters.text(), hashMapOf("id" to "id") as Map<String, Any>?)
             q.setVariable("id", conditionId)
-            q.evaluateFirst(sfcElement).textTrim.trim(';') ?: "no condition found for $conditionId"
+            q.evaluateFirst(sfcElement)?.textTrim?.trim(';') ?: "no condition found for $conditionId"
         }
 
         override val transitions: Collection<Trans>
             get() = times(transitionIncoming(), transitionOutgoing())
 
-        override fun transitionIncoming(): Collection<Trans> =
-            pointIn(entry).flatMap { it.transitionIncoming() }
-                .map {
-                    it.copy(
-                        condition = it.condition + condition,
-                        usedNodes = it.usedNodes + localId + conditionId
-                    )
-                }
+        override fun transitionIncoming(): Collection<Trans> = pointIn(entry).flatMap { it.transitionIncoming() }
+            .map {
+                it.copy(
+                    condition = it.condition + condition,
+                    usedNodes = it.usedNodes + localId + conditionId,
+                )
+            }
 
-        override fun transitionOutgoing() =
-            pointOut(localId).flatMap { it.transitionOutgoing() }
-                .map {
-                    it.copy(
-                        condition = it.condition + condition,
-                        usedNodes = it.usedNodes + localId + conditionId
-                    )
-                }
-
+        override fun transitionOutgoing() = pointOut(localId).flatMap { it.transitionOutgoing() }
+            .map {
+                it.copy(
+                    condition = it.condition + condition,
+                    usedNodes = it.usedNodes + localId + conditionId,
+                )
+            }
     }
 
     fun pointOut(localId: String): List<NodeAccess> {
@@ -265,11 +269,11 @@ class SfcElementAccess(val sfcElement: Element) {
 
     fun pointIn(element: Element): List<NodeAccess> {
         val xpath = xpf.compile(
-            "./connectionPointIn/connection/@refLocalId", Filters.attribute()
+            "./connectionPointIn/connection/@refLocalId",
+            Filters.attribute(),
         )
         return xpath.evaluate(element).map { nodes[it.value]!! }.map { get<NodeAccess>(it) }
     }
-
 
     @Suppress("UNCHECKED_CAST")
     private fun <T : NodeAccess> get(e: Element): T =
@@ -279,16 +283,14 @@ class SfcElementAccess(val sfcElement: Element) {
     private fun <T : NodeAccess> get(e: String): T = access.computeIfAbsent(e) { factory(nodes[it]!!) as T } as T
 
     @Suppress("UNCHECKED_CAST")
-    private fun <T : NodeAccess> factory(e: Element): T {
-        return when (e.name) {
-            "step" -> Step(e)
-            "transition" -> Transition(e)
-            "selectionDivergence" -> SelectiveFork(e)
-            "selectionConvergence" -> SelectiveJoin(e)
-            "simultaneousDivergence" -> ParallelFork(e)
-            "simultaneousConvergence" -> ParallelJoin(e)
-            "jumpStep" -> JumpStep(e)
-            else -> throw IllegalStateException(e.name)
-        } as T
-    }
+    private fun <T : NodeAccess> factory(e: Element): T = when (e.name) {
+        "step" -> Step(e)
+        "transition" -> Transition(e)
+        "selectionDivergence" -> SelectiveFork(e)
+        "selectionConvergence" -> SelectiveJoin(e)
+        "simultaneousDivergence" -> ParallelFork(e)
+        "simultaneousConvergence" -> ParallelJoin(e)
+        "jumpStep" -> JumpStep(e)
+        else -> throw IllegalStateException(e.name)
+    } as T
 }
