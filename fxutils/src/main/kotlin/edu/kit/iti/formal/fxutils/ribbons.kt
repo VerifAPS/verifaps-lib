@@ -11,7 +11,6 @@ import javafx.scene.control.Button
 import javafx.scene.input.KeyCombination
 import org.kordamp.ikonli.Ikon
 import org.kordamp.ikonli.javafx.FontIcon
-import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.attachTo
 
 
@@ -56,11 +55,10 @@ fun Column.item(
     return item
 }
 
-private val resolver = IkonResolver.getInstance()
 
 private fun buildItem(ikon: String?, ikof: Ikon?, graphic: Node?=null, key: String?, name: String, event: () -> Unit): Button {
     val icon = ikon?.let { ref ->
-        resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }
+        FontIcon(ref)
     } ?: ikof?.let { FontIcon(ikof) } ?: graphic
 
     val k = key?.let { KeyCombination.keyCombination(it) }

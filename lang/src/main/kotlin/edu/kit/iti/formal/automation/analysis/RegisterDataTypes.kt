@@ -8,6 +8,7 @@ import edu.kit.iti.formal.automation.st.util.AstVisitorWithScope
  * @author Alexander Weigl, Augusto Modanese
  * @version 1 (25.06.17)
  */
+@Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 class RegisterDataTypes(val globalScope: Scope) : AstVisitorWithScope<Unit>() {
     init {
         scope = globalScope

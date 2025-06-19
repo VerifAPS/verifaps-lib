@@ -10,12 +10,13 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(23)
 }
 
 dependencies {
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.0.0")
     implementation("org.jetbrains.dokka:dokka-base:2.0.0")
+    implementation("com.diffplug.spotless:com.diffplug.spotless.gradle.plugin:7.0.4")
     implementation(libs.kotlinGradlePlugin)
 }
 

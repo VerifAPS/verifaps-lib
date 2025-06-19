@@ -11,15 +11,11 @@ import javafx.scene.control.cell.TextFieldTreeCell
 import javafx.scene.input.KeyCombination
 import javafx.scene.paint.Color.*
 import javafx.util.StringConverter
-import org.kordamp.ikonli.Ikon
-import org.kordamp.ikonli.Ikonli
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid
 import org.kordamp.ikonli.javafx.FontIcon
-import org.kordamp.ikonli.javafx.IkonResolver
 import tornadofx.View
 import tornadofx.contextmenu
 import tornadofx.separator
-import java.awt.Color
 import java.awt.Desktop
 import java.io.IOException
 import java.nio.file.Files
@@ -178,17 +174,14 @@ class FileNavigator(main: IdeView) : View("Navigator") {
 }
 
 fun ContextMenu.item(name: String, key: String? = null, ikon: String? = null, event: (ActionEvent) -> Unit) {
-    val icon = ikon?.let { ref ->
-        val resolver = IkonResolver.getInstance()
-        resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }
-    }
+    val icon = ikon?.let { ref -> FontIcon(ref) }
     titem(name, key?.let { KeyCombination.keyCombination(it) }, icon) {
         onAction = EventHandler(event)
     }
 }
 
 class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
-    private val pathComparator: Comparator<TreeItem<Path>> = java.util.Comparator.comparingInt<TreeItem<Path>?> {
+    private val pathComparator: Comparator<TreeItem<Path>> = java.util.Comparator.comparingInt<TreeItem<Path>> {
         if (Files.isDirectory(it.value)) 0 else 1
     }.thenComparing { it -> it.value.name }
 
@@ -231,13 +224,12 @@ class SimpleFileTreeItem(f: Path) : TreeItem<Path>(f) {
 }
 
 object NavigationIconFinder {
-    private val resolver = IkonResolver.getInstance()
     private val DIRECTORY = FontAwesomeSolid.FOLDER
     private val FILE = FontAwesomeSolid.FILE
     private val FILE_CODE = FontAwesomeSolid.FILE_CODE
 
     private fun get(ref: String): FontIcon? {
-        return resolver.resolve(ref).resolve(ref)?.let { FontIcon(it) }!!
+        return FontIcon(ref)
     }
 
     fun find(p: Path): Node? {

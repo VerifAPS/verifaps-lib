@@ -7,7 +7,25 @@ plugins {
     jacoco
     kotlin("jvm")
     id("dokka-convention")
+    id("com.diffplug.spotless")
 }
+
+// version and style are optional
+spotless {
+    kotlin {
+        licenseHeader("""
+            |/* *****************************************************************
+            | * This file belongs to verifaps-lib (https://verifaps.github.io).
+            | * SPDX-License-Header: GPL-3.0-or-later
+            | * *****************************************************************/
+        """.trimMargin())
+        // or licenseHeaderFile
+        //ktfmt("0.55").kotlinlangStyle()
+        ktlint()
+
+    }
+}
+
 
 repositories {
     mavenCentral()
@@ -28,13 +46,13 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.0")
     testImplementation(project(":utils-test"))
 
-    testRuntimeOnly ("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 
 kotlin {
     // Use a specific Java version to make it easier to work in different environments.
-    jvmToolchain(21)
+    jvmToolchain(23)
 }
 
 tasks.withType<Test>().configureEach {
