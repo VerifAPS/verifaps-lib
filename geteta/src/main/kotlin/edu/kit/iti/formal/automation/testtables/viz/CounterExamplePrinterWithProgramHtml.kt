@@ -33,9 +33,9 @@ import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
 import java.io.Writer
 
-const val OKMARK = "✔" // ✔
-const val ERRMARK = "✘"
-const val QMARK = "❓"
+const val OKMARK = '✔' // ✔
+const val ERRMARK = '✘'
+const val QMARK = '❓'
 
 class CounterExamplePrinterWithProgramHtml(
     val automaton: TestTableAutomaton,
@@ -150,7 +150,10 @@ class CounterExamplePrinterWithProgramHtml(
                 li {
                     unsafe {
                         +(
-                            "$rowActive Row ${row.id} ${boolForHuman(k, assumption)} --> ${boolForHuman(k, assertion)}:" +
+                            "$rowActive Row ${row.id} ${boolForHuman(
+                                k,
+                                assumption,
+                            )} --> ${boolForHuman(k, assertion)}:" +
                                 " ${boolForHuman(k, fwd)} (Time: $times)"
                             )
                     }
@@ -187,7 +190,7 @@ class CounterExamplePrinterWithProgramHtml(
         }
     }
 
-    private fun boolForHuman(k: Int, n: String): String {
+    private fun boolForHuman(k: Int, n: String): Char {
         val v = cex[k, n]
         val m = when (v) {
             "TRUE" -> OKMARK
