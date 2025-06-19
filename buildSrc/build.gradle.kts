@@ -10,7 +10,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
 }
 
 dependencies {
@@ -19,4 +19,3 @@ dependencies {
     implementation("com.diffplug.spotless:com.diffplug.spotless.gradle.plugin:7.0.4")
     implementation(libs.kotlinGradlePlugin)
 }
-
