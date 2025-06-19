@@ -1,84 +1,83 @@
 name: Nightly Deployer of Weekly Builds
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron:  '0 5 * * 1' # every monday morning
+    workflow_dispatch:
+    schedule:
+        -   cron: '0 5 * * 1' # every monday morning
 
 permissions:
-  contents: write
-  id-token: write
-  pages: write
+    contents: write
+    id-token: write
+    pages: write
 
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
+    group: "pages"
+    cancel-in-progress: false
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: 21
-          distribution: 'temurin'
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Set up JDK 21
+                uses: actions/setup-java@v4
+                with:
+                    java-version: 21
+                    distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle
-        run: ./gradlew --parallel assemble :exec:assembleDist
+            -   name: Build with Gradle
+                run: ./gradlew --parallel assemble :exec:assembleDist
 
-      - name: Delete previous nightly release
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release delete nightly --yes --cleanup-tag 
+            -   name: Delete previous nightly release
+                continue-on-error: true
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    gh release delete nightly --yes --cleanup-tag 
 
-      - name: Create nightly release
-        id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create --generate-notes --title "Nightly Release" \
-             --prerelease nightly \
-             exec/build/distributions/exec.zip
+            -   name: Create nightly release
+                id: create_release
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    gh release create --generate-notes --title "Nightly Release" \
+                       --prerelease nightly \
+                       exec/build/distributions/exec.zip
 
     pages:
-      environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Setup Pages
-          uses: actions/configure-pages@v5
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Setup Pages
+                uses: actions/configure-pages@v5
 
-        - name: Set up JDK 21
-          uses: actions/setup-java@v4
-          with:
-            java-version: 21
-            distribution: 'temurin'
+            -   name: Set up JDK 21
+                uses: actions/setup-java@v4
+                with:
+                    java-version: 21
+                    distribution: 'temurin'
 
-        - name: Setup Gradle
-          uses: gradle/actions/setup-gradle@v4
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v4
 
-        - name: Build with Gradle
-          run: ./gradlew --parallel dokkaHtmlMultiModule
+            -   name: Build with Gradle
+                run: ./gradlew --parallel dokkaHtmlMultiModule
 
-        - name: Upload artifact
-          uses: actions/upload-pages-artifact@v3
-          with:
-            # Upload entire repository
-            path: 'build/dokka/htmlMultiModule'
-        - name: Deploy to GitHub Pages
-          id: deployment
-          uses: actions/deploy-pages@v4
+            -   name: Upload artifact
+                uses: actions/upload-pages-artifact@v3
+                with:
+                    path: 'build/dokka/htmlMultiModule'
+
+            -   name: Deploy to GitHub Pages
+                id: deployment
+                uses: actions/deploy-pages@v4
