@@ -69,7 +69,7 @@ dependencies {
 
 kotlin {
     // Use a specific Java version to make it easier to work in different environments.
-    jvmToolchain(21)
+    jvmToolchain(24)
 }
 
 tasks.withType<Test>().configureEach {
