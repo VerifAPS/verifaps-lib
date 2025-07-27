@@ -19,6 +19,7 @@
 package edu.kit.iti.formal.automation.st0
 
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st0.trans.Sfc2StPipelineStep
 import edu.kit.iti.formal.automation.st.ast.PouExecutable
 import edu.kit.iti.formal.automation.st.ast.SFCImplementation
 import edu.kit.iti.formal.automation.st.ast.StatementList
@@ -43,6 +44,7 @@ class SimplifierPipelineST0 : CodeTransformation {
     fun add(ct: CodeTransformation) = also { pipeline.transformations += ct }
     fun addGlobalVariableListEmbedding() = add(GlobalVariableListEmbedding())
 
+    fun addSFCReduction() = add(Sfc2StPipelineStep())
     fun addCallEmbedding() = add(CallEmbedding())
     fun addLoopUnwinding() = add(LoopUnwinding())
     fun addTimerToCounter() = add(TimerSimplifier())

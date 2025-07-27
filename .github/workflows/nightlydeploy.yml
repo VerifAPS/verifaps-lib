@@ -32,7 +32,13 @@ jobs:
                 uses: gradle/actions/setup-gradle@v4
 
             -   name: Build with Gradle
-                run: ./gradlew --parallel assemble :exec:assembleDist
+                run: ./gradlew --parallel assemble :exec:installDist :exec:installLinuxDist :exec:installWindowsDist
+
+            -   name: Compress Distributions
+                run: |
+                    tar cvf varifaps-windows.tar.xz exec/build/install/verifaps-windows
+                    tar cvf varifaps-linux.tar.xz exec/build/install/verifaps-linux
+                    tar cvf varifaps-without-tools.tar.xz exec/build/install/verifaps-universal
 
             -   name: Delete previous nightly release
                 continue-on-error: true
@@ -48,7 +54,10 @@ jobs:
                 run: |
                     gh release create --generate-notes --title "Nightly Release" \
                        --prerelease nightly \
-                       exec/build/distributions/exec.zip
+                       varifaps-windows.tar.xz \
+                       varifaps-linux.tar.xz \
+                       varifaps-without-tools.tar.xz 
+                    
 
     pages:
         environment:

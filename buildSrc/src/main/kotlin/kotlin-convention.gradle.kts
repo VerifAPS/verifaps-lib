@@ -39,8 +39,8 @@ spotless {
         // or licenseHeaderFile
         // ktfmt("0.55").kotlinlangStyle()
         var editorConfig = File(rootDir, ".editorconfig")
-        println(editorConfig)
-        println(editorConfig.exists())
+        //println(editorConfig)
+        //println(editorConfig.exists())
         ktlint("1.6.0").setEditorConfigPath(editorConfig.absolutePath)
     }
 }
@@ -69,7 +69,7 @@ dependencies {
 
 kotlin {
     // Use a specific Java version to make it easier to work in different environments.
-    jvmToolchain(24)
+    jvmToolchain(21)
 }
 
 tasks.withType<Test>().configureEach {

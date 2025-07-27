@@ -83,8 +83,9 @@ object IEC61131Facade {
 
     fun file(input: CharStream): PouElements {
         val parser = getParser(input)
-        val tle = parser.start().accept(IECParseTreeToAST()) as PouElements
+        val ctx = parser.start()
         parser.errorReporter.throwException()
+        val tle = ctx.accept(IECParseTreeToAST()) as PouElements
         return tle
     }
 

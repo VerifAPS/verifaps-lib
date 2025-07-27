@@ -658,7 +658,7 @@ SUPER : S U P E R;
 THIS : T H I S;
 EXTENDS : (E X T E N D S);
 REF_TO : R E F UNDERSCORE T O;
-ON : 	O N ;
+// ON : 	O N ;
 STEP : 	S T E P ;
 END_STEP : 	E N D '_' S T E P;
 INITIAL_STEP: I N I T I A  L '_' S T E P;

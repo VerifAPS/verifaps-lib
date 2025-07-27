@@ -77,6 +77,7 @@ object SymbExFacade {
     }
 
     fun getDefaultSimplifier(): SimplifierPipelineST0 = SimplifierPipelineST0()
+        .addSFCReduction()
         .addGlobalVariableListEmbedding()
         .addCallEmbedding()
         .addLoopUnwinding()

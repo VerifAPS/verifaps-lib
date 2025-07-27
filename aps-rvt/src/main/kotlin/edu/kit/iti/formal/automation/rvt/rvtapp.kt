@@ -152,8 +152,8 @@ class RvtApsApp : CliktCommand(name = "rvt-aps.sh") {
     val untilMiterEndTrigger by option("--until-miter-cond", metavar = "FILE").file()
 
     override fun run() {
-        val newModule = loadPouExecutable(library, newVersion, newName)
         val oldModule = loadPouExecutable(library, oldVersion, oldName)
+        val newModule = loadPouExecutable(library, newVersion, newName)
         val factory = when (miter) {
             Miter.NONE -> { a: SMVModule, b: SMVModule -> RegressionVerification(a, b) }
             Miter.UNTIL -> {
@@ -170,7 +170,7 @@ class RvtApsApp : CliktCommand(name = "rvt-aps.sh") {
             nuxmvOutput = nuxmvOutput, debugMode = debugMode, disableST0Pipeline = disableST0Pipeline,
             outputSMVOutputName = outputSMVOutputName,
             outputDirectory = outputDirectory,
-            nuxmvExecutable = nuxmvExecutable ?: "nuXmv not supplied",
+            nuxmvExecutable = nuxmvExecutable ?: error("nuXmv not supplied"),
             nuxmvMethod = nuxmvMethod,
             reveFactory = factory,
         )

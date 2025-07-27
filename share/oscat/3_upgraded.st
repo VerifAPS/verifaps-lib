@@ -13,14 +13,16 @@ PROGRAM upgraded
 
 
   ACTION act_Init
-    output := 0; last := 0; toggle_count := 0;
+    output := 0; last := 0;
+    toggle_count := 0;
   END_ACTION
 
   ACTION act_Check
   END_ACTION
 
   ACTION act_Toggle
-    output := 1 - output; toggle_count := toggle_count + 1;
+    output := 1 - output;
+    toggle_count := toggle_count + 1;
   END_ACTION
 
   ACTION act_End
