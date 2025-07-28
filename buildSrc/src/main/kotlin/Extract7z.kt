@@ -3,7 +3,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.internal.impldep.org.apache.commons.compress.archivers.sevenz.SevenZFile
+import org.jetbrains.kotlin.org.apache.commons.compress.archivers.sevenz.SevenZFile
 import java.nio.channels.FileChannel
 import kotlin.io.path.createDirectories
 import kotlin.io.path.outputStream

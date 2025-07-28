@@ -80,6 +80,7 @@ test.dependsOn(tasks.installDist)
 
 val tmpTools = project.layout.buildDirectory.dir("tmp/tools").get().asFile.toPath()
 
+//region Download Linux Tools
 val downloadNuxmvLinux by tasks.registering(Download::class) {
     source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-linux64.tar.xz"))
     outputFile.set(tmpTools.resolve("nuxmv-linux-64.tar.xz").toFile())
@@ -96,15 +97,17 @@ val downloadZ3Linux by tasks.registering(Download::class) {
     source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-glibc-2.39.zip"))
     outputFile.set(tmpTools.resolve("z3-linux.zip").toFile())
 }
+//endregion
 
+//region Download Windows Tools
 val downloadZ3Win by tasks.registering(Download::class) {
     source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-win.zip"))
-    outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
+    outputFile.set(tmpTools.resolve("z3-windows.zip").toFile())
 }
 
 val downloadNuxmvWin by tasks.registering(Download::class) {
     source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-win64.7z"))
-    outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
+    outputFile.set(tmpTools.resolve("nuxmv-windows.7z").toFile())
 }
 
 val nuxmvWinUnzip by tasks.registering(Extract7z::class) {
@@ -113,17 +116,17 @@ val nuxmvWinUnzip by tasks.registering(Extract7z::class) {
     input.set(downloadNuxmvWin.get().outputFile.get())
     output.set(tmpTools.resolve("nuxmv-windows").toFile())
 }
+//endregion
 
 //region MacOS downloads
 val downloadZ3Macos by tasks.registering(Download::class) {
-    // TODO CHANGE URL 
-    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-win.zip"))
-    outputFile.set(tmpTools.resolve("tmp/z3-macos.zip").toFile())
+    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-osx-13.7.6.zip"))
+    outputFile.set(tmpTools.resolve("z3-macos.zip").toFile())
 }
 
 val downloadNuxmvMac by tasks.registering(Download::class) {
     source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-macos-universal.tar.xz"))
-    outputFile.set(tmpTools.resolve("tmp/nuxmv-macos.tar.xz").toFile())
+    outputFile.set(tmpTools.resolve("nuxmv-macos.tar.xz").toFile())
 }
 
 val nuxmvMacosTar by tasks.registering(ExtractXz::class) {
