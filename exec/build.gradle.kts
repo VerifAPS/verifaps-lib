@@ -102,18 +102,8 @@ val downloadZ3Win by tasks.registering(Download::class) {
     outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
 }
 
-val downloadZ3Macos by tasks.registering(Download::class) {
-    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-win.zip"))
-    outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
-}
-
 val downloadNuxmvWin by tasks.registering(Download::class) {
     source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-win64.7z"))
-    outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
-}
-
-val downloadNuxmvMac by tasks.registering(Download::class) {
-    source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-macos-universal.tar.xz"))
     outputFile.set(tmpTools.resolve("tmp/z3-windows.zip").toFile())
 }
 
@@ -124,12 +114,25 @@ val nuxmvWinUnzip by tasks.registering(Extract7z::class) {
     output.set(tmpTools.resolve("nuxmv-windows").toFile())
 }
 
+//region MacOS downloads
+val downloadZ3Macos by tasks.registering(Download::class) {
+    // TODO CHANGE URL 
+    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-win.zip"))
+    outputFile.set(tmpTools.resolve("tmp/z3-macos.zip").toFile())
+}
+
+val downloadNuxmvMac by tasks.registering(Download::class) {
+    source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-macos-universal.tar.xz"))
+    outputFile.set(tmpTools.resolve("tmp/nuxmv-macos.tar.xz").toFile())
+}
+
 val nuxmvMacosTar by tasks.registering(ExtractXz::class) {
     dependsOn(downloadNuxmvMac)
     inputs.files(downloadNuxmvMac.get())
     input.set(downloadNuxmvMac.get().outputFile.get())
     output.set(tmpTools.resolve("nuxmv-macos.tar").toFile())
 }
+//endregion MAC
 
 val mainDist = distributions.getByName(DistributionPlugin.MAIN_DISTRIBUTION_NAME)
 
@@ -172,9 +175,6 @@ afterEvaluate {
                     from(zipTree(downloadZ3Win.get().outputFile))
                     from(fileTree(nuxmvWinUnzip.get().output))
                 }
-                into("examples") {
-                    from("$rootDir/share")
-                }
                 exclude {
                     it.name.endsWith("-linux.jar") || it.name.endsWith("-macos.jar")
                 }
@@ -190,12 +190,9 @@ afterEvaluate {
                     from(zipTree(downloadZ3Macos.get().outputFile))
                     from(tarTree(nuxmvMacosTar.get().output))
                 }
-                into("examples") {
-                    from("$rootDir/share")
-                }
                 exclude {
                     it.name.endsWith("-windows.jar") ||
-                        it.name.endsWith("-macos.jar")
+                        it.name.endsWith("-linux.jar")
                 }
             }
         }
