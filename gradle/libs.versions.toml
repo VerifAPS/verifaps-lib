@@ -4,10 +4,10 @@
 
 [versions]
 kotlin = "2.2.0"
-kotlinxDatetime = "0.7.0-0.6.x-compat"
+kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxSerializationJSON = "1.9.0"
 kotlinxCoroutines = "1.10.2"
-junit = "5.13.2"
+junit = "5.13.4"
 antlr = "4.13.2"
 
 [libraries]
