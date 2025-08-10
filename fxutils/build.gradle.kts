@@ -16,7 +16,9 @@ dependencies {
     }
 
     api("com.pixelduke:fxribbon:1.2.2")
-    api("no.tornado:tornadofx:1.7.20")
+    api("no.tornado:tornadofx:1.7.20") {
+        exclude("org.jetbrains.kotlin:kotlin-stdlib")
+    }
     api("com.miglayout:miglayout-javafx:11.4.2")
     api("org.fxmisc.richtext:richtextfx:0.11.5")
     api("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.4.0")
