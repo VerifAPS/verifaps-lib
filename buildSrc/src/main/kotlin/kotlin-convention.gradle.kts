@@ -39,8 +39,8 @@ spotless {
         // or licenseHeaderFile
         // ktfmt("0.55").kotlinlangStyle()
         var editorConfig = File(rootDir, ".editorconfig")
-        //println(editorConfig)
-        //println(editorConfig.exists())
+        // println(editorConfig)
+        // println(editorConfig.exists())
         ktlint("1.6.0").setEditorConfigPath(editorConfig.absolutePath)
     }
 }
@@ -115,11 +115,12 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.getByName<Jar>("jar") {
     manifest {
-        attributes(
+        var a = arrayOf(
             "Implementation-Title" to project.name,
             "Implementation-Version" to version,
-            "Description" to description,
+            "Description" to description!!
         )
+        attributes(*a)
     }
 }
 

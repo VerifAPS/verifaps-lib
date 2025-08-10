@@ -19,7 +19,7 @@ abstract class Download : DefaultTask() {
 
     @get:Input
     @get:Optional
-    abstract val checksumSha256Url: Property<URI?>
+    abstract val checksumSha256Url: Property<URI>
 
     @get:OutputFile
     abstract val outputFile: Property<File>
