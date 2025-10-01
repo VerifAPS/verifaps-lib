@@ -3,11 +3,11 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.20"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
 kotlinxSerializationJSON = "1.9.0"
 kotlinxCoroutines = "1.10.2"
-junit = "5.13.4"
+junit = "6.0.0"
 antlr = "4.13.2"
 
 [libraries]
@@ -20,7 +20,7 @@ slf4jSimple = { module = "org.slf4j:slf4j-simple", version = "2.0.17" }
 junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 junitParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-truth = { module = "com.google.truth:truth", version = "1.4.4" }
+truth = { module = "com.google.truth:truth", version = "1.4.5" }
 antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
 jdom = { module = "org.jdom:jdom2", version = "2.0.6.1" }
