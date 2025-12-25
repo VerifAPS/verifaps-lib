@@ -18,4 +18,5 @@ tasks.named<AntlrTask>("generateGrammarSource") {
     arguments.addAll(listOf("-package", "edu.kit.iti.formal.smt", "-visitor"))
 }
 
-tasks["dokkaHtmlPartial"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGenerateModuleHtml"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGeneratePublicationHtml"].dependsOn(tasks["generateGrammarSource"])

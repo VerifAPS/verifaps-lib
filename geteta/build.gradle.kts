@@ -64,4 +64,5 @@ tasks.named<Test>("test") {
     )
 }
 
-tasks["dokkaHtmlPartial"].dependsOn(generateGrammarSource)
+tasks["dokkaGenerateModuleHtml"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGeneratePublicationHtml"].dependsOn(tasks["generateGrammarSource"])

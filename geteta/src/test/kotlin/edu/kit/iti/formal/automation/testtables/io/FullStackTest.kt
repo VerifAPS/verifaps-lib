@@ -19,8 +19,7 @@
 package edu.kit.iti.formal.automation.testtables.io
 
 import com.github.ajalt.clikt.core.main
-import edu.kit.iti.formal.automation.testtables.apps.Geteta
-import edu.kit.iti.formal.automation.testtables.apps.GetetaApp
+import edu.kit.iti.formal.automation.testtables.apps.*
 import edu.kit.iti.formal.util.findProgram
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assumptions
@@ -29,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
+import org.junit.jupiter.params.support.ParameterDeclarations
 import java.io.File
 import java.util.*
 
@@ -141,7 +141,6 @@ object FullStackTest {
             CASES += TestArgument(wd, status, args.toList())
         }
 
-        @Deprecated("Deprecated in Java")
-        override fun provideArguments(context: ExtensionContext?) = CASES.stream()
+        override fun provideArguments(parameters: ParameterDeclarations, context: ExtensionContext) = CASES.stream()
     }
 }

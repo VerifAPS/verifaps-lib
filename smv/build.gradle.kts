@@ -21,6 +21,5 @@ tasks.named<AntlrTask>("generateGrammarSource") {
     )
 }
 
-//compileKotlin.dependsOn(generateGrammarSource)
-//compileTestKotlin.dependsOn(generateTestGrammarSource)
-tasks["dokkaHtmlPartial"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGenerateModuleHtml"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGeneratePublicationHtml"].dependsOn(tasks["generateGrammarSource"])

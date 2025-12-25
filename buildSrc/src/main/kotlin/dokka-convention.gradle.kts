@@ -1,7 +1,4 @@
-import org.jetbrains.dokka.gradle.DokkaTaskPartial
-import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import gradle.kotlin.dsl.accessors._ae0e2e0f59d526dd61b4865f6e032691.dokkaPublications
 import java.net.URI
 
 plugins {
@@ -13,33 +10,31 @@ dependencies {
     dokkaPlugin("com.glureau:html-mermaid-dokka-plugin:0.6.0")
 }
 
-tasks.withType<DokkaTask>().configureEach {
-    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-        customAssets = listOf(rootDir.resolve("gradle/dokkaAssets"), rootDir.resolve("gradle/dokkaAssets/screenshot.png"))
-        // customStyleSheets = listOf(file("my-styles.css"))
-        footerMessage = "(c) 2014-2025 Alexander Weigl"
-        // separateInheritedMembers = false
-        // templatesDir = file("dokka/templates")
-        // mergeImplicitExpectActualDeclarations = false
+dokka {
+    moduleName.set("verifaps/${project.name}")
+    dokkaPublications.html {
+        suppressInheritedMembers.set(true)
+        failOnWarning.set(false)
     }
-}
 
-// configure all format tasks at once
-tasks.withType<DokkaTaskPartial>().configureEach {
+    dokkaPublications.html {
+        // outputDirectory.set(rootDir.resolve("docs/api/0.x"))
+    }
+
     dokkaSourceSets {
-        named("main") {
-            // used as project name in the header
-            // moduleName.set("Dokka Gradle Example")
-
-            // contains descriptions for the module and the packages
-            includes.from(rootDir.resolve("MODULES.md"))
-            // projectDir.resolve("README.md"))
-
+        configureEach {
+            // Or source set name, for single-platform the default source sets are `main` and `test`
+            // includes.from("$rootDir/MODULES.md")
             sourceLink {
                 localDirectory.set(file("src/main/kotlin"))
-                remoteUrl.set(URI("https://github.com/verifaps/verifaps-lib/blob/").toURL())
+                remoteUrl.set(URI("https://github.com/verifaps/verifaps-lib/blob/"))
                 remoteLineSuffix.set("#L")
             }
         }
+    }
+    pluginsConfiguration.html {
+        customAssets.from(rootDir.resolve("gradle/dokkaAssets/screenshot.png"))
+        customAssets.from(rootDir.resolve("gradle/dokkaAssets"))
+        footerMessage = "(c) 2014-2026 Alexander Weigl"
     }
 }

@@ -5,7 +5,6 @@ plugins {
 
 description = "iec61131lang"
 
-
 dependencies {
     api(project(":util"))
     api(project(":xml"))
@@ -19,11 +18,12 @@ dependencies {
 tasks.named<AntlrTask>("generateGrammarSource") {
     maxHeapSize = "64m"
     arguments.addAll(listOf("-visitor", "-long-messages", "-package", "edu.kit.iti.formal.automation.parser"))
-    //outputDirectory.set(file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser"))
+    // outputDirectory.set(file("${project.buildDir}/generated-src/antlr/main/edu/kit/iti/formal/automation/parser"))
 }
 
 tasks.withType<Test>().configureEach {
     exclude("**/SFCLangParserTest.class")
 }
 
-tasks["dokkaHtmlPartial"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGenerateModuleHtml"].dependsOn(tasks["generateGrammarSource"])
+tasks["dokkaGeneratePublicationHtml"].dependsOn(tasks["generateGrammarSource"])

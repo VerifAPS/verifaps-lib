@@ -6,7 +6,8 @@ plugins {
 
 repositories { mavenCentral() }
 
-// configuration for subproject-A only.
-tasks.dokkaHtmlMultiModule {
-    // moduleName.set("verifaps")
+dependencies {
+    subprojects.forEach {
+        dokka(it)
+    }
 }
