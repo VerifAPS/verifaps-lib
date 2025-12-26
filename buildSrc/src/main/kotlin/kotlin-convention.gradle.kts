@@ -82,15 +82,29 @@ tasks.withType<Test>().configureEach {
     // Log information about all test results, not only the failed ones.
     testLogging {
         showStandardStreams = false
-        exceptionFormat = TestExceptionFormat.SHORT
-
-        events(
-            TestLogEvent.FAILED,
-            // TestLogEvent.PASSED,
-            // TestLogEvent.SKIPPED
-        )
-
         error.showStandardStreams = true
+        exceptionFormat = TestExceptionFormat.SHORT
+        events(TestLogEvent.FAILED)
+    }
+
+    if ("true" == System.getenv("CI")) {
+        addTestListener(object : TestListener {
+            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+                if (result.resultType == TestResult.ResultType.FAILURE) {
+                    val message = "${testDescriptor.className}#${testDescriptor.name}; Error: `${result.exception}`"
+                    println("::error title=${testDescriptor.displayName}::$message")
+                }
+            }
+
+            override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+                println("::endgroup::")
+            }
+            override fun beforeSuite(suite: TestDescriptor) {
+                println("::group::${suite.displayName}")
+            }
+
+            override fun beforeTest(testDescriptor: TestDescriptor) {}
+        })
     }
 }
 
@@ -140,14 +154,14 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/verifaps/verifaps-lib")
             credentials {
-                // username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                // password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+// username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+// password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
             }
         }
     }
     publications {
         create<MavenPublication>("gpr") {
-            // TODO from(components.java)
+// TODO from(components.java)
             artifact(sourcesJar)
             artifact(javadocJar)
             pom {
