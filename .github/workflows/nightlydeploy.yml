@@ -80,7 +80,7 @@ jobs:
                 uses: gradle/actions/setup-gradle@v5
 
             -   name: Build with Gradle
-                run: ./gradlew --parallel dokkaHtmlMultiModule
+                run: ./gradlew --parallel dokkaGenerateHtml
 
             -   name: Upload artifact
                 uses: actions/upload-pages-artifact@v4

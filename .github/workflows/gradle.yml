@@ -46,9 +46,9 @@ jobs:
             -   name: Run integration tests
                 run: ./gradlew :exec:test         --no-problems-report
 
-            -   name: Summarize tests results
-                uses: jeantessier/test-summary-action@v1
-                if: ${{ always() }}
+#            -   name: Summarize tests results
+#                uses: jeantessier/test-summary-action@v1
+#                if: ${{ always() }}
 
     dokka:
         runs-on: ubuntu-latest
