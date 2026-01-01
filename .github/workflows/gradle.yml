@@ -34,7 +34,7 @@ jobs:
                 run: echo "quit" | nuXmv -int | head -n 1
 
             -   name: setup-smt
-                uses: keyproject/setup-smt@v0.2.0
+                uses: keyproject/setup-smt@v0.3.0
 
             -   name: Test z3
                 run: z3 -version
@@ -101,7 +101,7 @@ jobs:
 #        run: echo "quit" | nuXmv -int | head -n 1
 #
 #      - name: setup-smt
-#        uses: keyproject/setup-smt@v0.2.0
+#        uses: keyproject/setup-smt@v0.3.0
 #
 #      - name: Test z3
 #        run: z3 -version
