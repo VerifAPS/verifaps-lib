@@ -26,5 +26,5 @@ dependencies {
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("com.pixelduke:fxribbon:1.2.2")
     api("org.jfxtras:jmetro:11.6.16")
-    api("org.controlsfx:controlsfx:11.2.2")
+    api("org.controlsfx:controlsfx:11.2.3")
 }
