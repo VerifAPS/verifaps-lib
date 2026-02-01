@@ -5,9 +5,9 @@
 [versions]
 kotlin = "2.3.0"
 kotlinxDatetime = "0.7.1-0.6.x-compat"
-kotlinxSerializationJSON = "1.9.0"
+kotlinxSerializationJSON = "1.10.0"
 kotlinxCoroutines = "1.10.2"
-junit = "6.0.1"
+junit = "6.0.2"
 antlr = "4.13.2"
 
 [libraries]
@@ -24,7 +24,7 @@ truth = { module = "com.google.truth:truth", version = "1.4.5" }
 antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
 jdom = { module = "org.jdom:jdom2", version = "2.0.6.1" }
-clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.0.3" }
+clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.1.0" }
 
 # Libraries can be bundled together for easier import
 [bundles]
