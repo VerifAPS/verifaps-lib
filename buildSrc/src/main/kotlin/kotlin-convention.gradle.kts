@@ -62,7 +62,7 @@ dependencies {
     testImplementation("com.google.truth:truth:1.4.4")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.0")
-    testImplementation(project(":utils-test"))
+    testImplementation(testFixtures(project(":util")))
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
