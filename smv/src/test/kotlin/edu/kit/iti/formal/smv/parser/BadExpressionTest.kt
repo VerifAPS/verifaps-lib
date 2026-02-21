@@ -46,7 +46,7 @@ import org.junit.jupiter.api.TestFactory
 
 object BadExpressionTest {
     fun test(testExpression: String) {
-        val slp = TestHelper.getParser(testExpression!!)
+        val slp = TestHelper.getParser(testExpression)
         val e = slp.expr()
         Assertions.assertNotEquals(0, slp.numberOfSyntaxErrors.toLong())
     }
