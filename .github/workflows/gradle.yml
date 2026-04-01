@@ -23,7 +23,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Set up Gradle
-                uses: gradle/actions/setup-gradle@v5
+                uses: gradle/actions/setup-gradle@v6
 
             -   run: ./gradlew testClasses
 
@@ -62,7 +62,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Setup Gradle
-                uses: gradle/actions/setup-gradle@v5
+                uses: gradle/actions/setup-gradle@v6
 
             -   name: Build with Gradle
                 run: ./gradlew --parallel dokkaGenerate
@@ -78,7 +78,7 @@ jobs:
                     distribution: 'temurin'
 
             -   name: Set up Gradle
-                uses: gradle/actions/setup-gradle@v5
+                uses: gradle/actions/setup-gradle@v6
 
             -   run: ./gradlew spotlessCheck
 
