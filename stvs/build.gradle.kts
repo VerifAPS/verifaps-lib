@@ -50,7 +50,7 @@ dependencies {
 
 
     implementation(libs.jdom)
-    implementation("jaxen:jaxen:2.0.1")
+    implementation("jaxen:jaxen:2.0.4")
 
     implementation("com.google.code.gson:gson:2.14.0")
 
