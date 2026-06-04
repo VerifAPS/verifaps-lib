@@ -1,4 +1,3 @@
-import gradle.kotlin.dsl.accessors._ae0e2e0f59d526dd61b4865f6e032691.dokkaPublications
 import java.net.URI
 
 plugins {
