@@ -26,6 +26,7 @@ import edu.kit.iti.formal.automation.parser.IEC61131Parser
 import edu.kit.iti.formal.automation.parser.IECParseTreeToAST
 import edu.kit.iti.formal.automation.plcopenxml.IECXMLFacade
 import edu.kit.iti.formal.automation.scope.Scope
+import edu.kit.iti.formal.automation.st.PPStructuredTextPrinter
 import edu.kit.iti.formal.automation.st.StructuredTextPrinter
 import edu.kit.iti.formal.automation.st.TranslationSfcToStOld
 import edu.kit.iti.formal.automation.st.TranslationSfcToStPipeline
@@ -36,6 +37,10 @@ import edu.kit.iti.formal.automation.visitors.findProgram
 import edu.kit.iti.formal.automation.visitors.selectByName
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
+import io.github.wadoon.pp.Engine
+import io.github.wadoon.pp.Engine.KNil
+import io.github.wadoon.pp.Engine.pretty
+import io.github.wadoon.pp.State
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
@@ -294,6 +299,26 @@ object IEC61131Facade {
         val stp = StructuredTextPrinter(CodeWriter(stream))
         stp.isPrintComments = comments
         ast.accept(stp)
+    }
+
+    /**
+     * Return the textual representation of the given AST.
+     *
+     * @param ast a [Top] object.
+     * @return a [java.lang.String] object.
+     */
+    fun pprint(ast: Top, width: Int = 120, comments: Boolean = true): String {
+        val sw = StringWriter()
+        pprintTo(PrintWriter(sw), ast, width, comments)
+        return sw.toString()
+    }
+
+    fun pprintTo(stream: PrintWriter, ast: Top, width: Int = 80, comments: Boolean = false) {
+        val stp = PPStructuredTextPrinter()
+        stp.isPrintComments = comments
+        val doc = ast.accept(stp)
+        val state = State(width = width, .9)
+        Engine.pretty(stream, state, 0, false, doc)
     }
 
     var useOldSfcTranslator = true

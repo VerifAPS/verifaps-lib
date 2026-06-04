@@ -40,10 +40,9 @@ package edu.kit.iti.formal.automation
  * #L%
  */
 
-import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.PouElements
-import edu.kit.iti.formal.automation.st.ast.Top
+import edu.kit.iti.formal.automation.parser.*
+import edu.kit.iti.formal.automation.st.*
+import edu.kit.iti.formal.automation.st.ast.*
 import org.antlr.v4.runtime.CharStreams
 import org.junit.jupiter.api.Assertions
 import java.io.IOException
@@ -66,9 +65,29 @@ object PrettyPrinterTest {
     private fun clean(printed: String): String = printed.split("\n".toRegex())
         .dropLastWhile { it.isEmpty() }
         .map { s -> s.replace("//.*$".toRegex(), "") }
-        .map { it.trim(' ', '\n') }
-        .joinToString(("\n"))
+        .joinToString(("\n")) { it.trim(' ', '\n') }
         .replace("\\s+".toRegex(), " ")
+
+    fun testPrettyPrettyPrintByEquals(tle: PouElements) {
+        val printed = IEC61131Facade.pprint(tle)
+        IEC61131Facade.resolveDataTypes(tle)
+        try {
+            val newTle = IEC61131Facade.file(CharStreams.fromString(printed))
+            IEC61131Facade.resolveDataTypes(newTle)
+            for (i in 0 until min(tle.size, newTle.size)) {
+                Assertions.assertEquals(tle[i], newTle[i])
+                // Assertions.assertEquals(tle[i].toString(), newTle[i].toString())
+            }
+            Assertions.assertEquals(tle, newTle)
+        } catch (e: SyntaxErrorReporter.ParserException) {
+            System.err.println(
+                e.print(printed.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(), "\n---\n"),
+            )
+            Assertions.fail("Re-parsing the printed output results into an error\n-----\n$printed")
+        } finally {
+            // System.err.println(printed)
+        }
+    }
 
     @Throws(IOException::class)
     fun testPrettyPrintByEquals(tle: PouElements) {
@@ -90,16 +109,6 @@ object PrettyPrinterTest {
         } finally {
             // System.err.println(printed)
         }
+        testPrettyPrettyPrintByEquals(tle)
     }
-
-    /*public static Stream<Object[]> files() {
-        Collection<File> files = FileUtils.listFiles(new File("src/test/resources"),
-                new String[]{"sfc", "st"}, true
-        );
-        return files.stream().map(f->new Object[]{f});
-    }
-
-    @Parameterized.Parameter
-    public File toRead;
-     */
 }

@@ -18,10 +18,12 @@
  * *****************************************************************/
 package edu.kit.iti.formal.automation.il
 
-import edu.kit.iti.formal.automation.st.StructuredTextPrinter
-import edu.kit.iti.formal.automation.st.ast.ANONYM
+import edu.kit.iti.formal.automation.st.*
+import edu.kit.iti.formal.automation.st.ast.*
+import edu.kit.iti.formal.util.Builder
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.joinInto
+import io.github.wadoon.pp.*
 
 /**
  *
@@ -108,4 +110,89 @@ class IlPrinter(val writer: CodeWriter) : IlTraversalVisitor() {
             param.right.accept(this)
         }
     }
+}
+
+class PPIlPrinter : IlBaseVisitor<Document>() {
+    val stPrinter = PPStructuredTextPrinter()
+
+    private fun build(f: Builder.() -> Unit): Document {
+        val builder = Builder()
+        f(builder)
+        return builder.doc
+    }
+
+    override fun defaultVisit(top: IlAst) = string("// Could not print out: $top")
+
+    override fun visit(variable: IlOperand.Variable) =
+        variable.ref.accept(stPrinter)
+
+    override fun visit(constant: IlOperand.Constant) =
+        constant.literal.accept(stPrinter)
+
+    override fun visit(jump: JumpInstr) =
+        string("${jump.type} ${jump.target}") + hardline
+
+    override fun visit(simple: SimpleInstr) =
+        string("${simple.type}") + space + (simple.operand?.accept(this) ?: empty) + hardline
+
+    override fun visit(funCall: FunctionCallInstr) = build {
+        +funCall.function.accept(stPrinter)
+        space()
+        +funCall.operands.flowMap(commaSpace) { it.accept(this@PPIlPrinter) }
+        nl()
+    }
+
+    override fun visit(expr: ExprInstr) = build {
+        +("${expr.operand}")
+        space()
+
+        if (expr.operandi != null && expr.instr == null) {
+            expr.operandi?.also {
+                +it.accept(this@PPIlPrinter)
+            }
+        } else if (expr.operandi != null || expr.instr != null) {
+            +lparen
+            indent {
+                expr.operandi?.also {
+                    +it.accept(this@PPIlPrinter)
+                }
+                expr.instr?.let {
+                    nl()
+                    it.accept(this@PPIlPrinter)
+                }
+            }
+            +rparen
+        }
+        nl()
+    }
+
+    override fun visit(call: CallInstr) = build {
+        if (call.type != CallOperand.IMPLICIT_CALLED) {
+            +("${call.type} ")
+        }
+        call.ref.accept(stPrinter)
+        +lparen
+        indent {
+            call.parameters.flowMap(hardline) {
+                it.accept(this@PPIlPrinter)
+            }
+        }
+        +rparen
+        nl()
+    }
+
+    override fun visit(param: IlParameter) =
+        if (param.left == ANONYM) {
+            param.right.accept(this)
+        } else {
+            build {
+                if (param.negated) {
+                    +"NOT"
+                    space()
+                }
+                +param.left
+                if (param.input) +" := " else +" => "
+                +param.right.accept(this@PPIlPrinter)
+            }
+        }
 }

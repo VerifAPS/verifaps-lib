@@ -11,3 +11,13 @@ dependencies {
         dokka(it)
     }
 }
+
+tasks.register<JUnitMarkdownReporter>("githubReporter") {
+    group = "verification"
+    val i = fileTree(rootDir) {
+        include("*/build/test-results/test/TEST-*.xml")
+    }
+    testReports.set(i)
+
+    outputFile.set(layout.buildDirectory.file("reports/junit.md"))
+}
