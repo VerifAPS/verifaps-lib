@@ -1,6 +1,6 @@
 plugins {
     id("dokka-convention")
-    id("org.sonarqube") version "7.3.0.8198"
+    id("org.sonarqube") version "7.3.1.8318"
     id("com.github.ben-manes.versions") version "0.54.0"
 }
 
