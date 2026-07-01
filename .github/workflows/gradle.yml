@@ -14,7 +14,7 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
 
             -   name: Set up JDK 23
                 uses: actions/setup-java@v5
@@ -54,7 +54,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@v7
             -   name: Set up JDK 21
                 uses: actions/setup-java@v5
                 with:
@@ -70,7 +70,7 @@ jobs:
     spotless:
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v6
+            -   uses: actions/checkout@v7
             -   name: Set up JDK 21
                 uses: actions/setup-java@v5
                 with:
@@ -89,7 +89,7 @@ jobs:
 #    needs: [ "build" ]
 #    steps:
 #
-#      - uses: actions/checkout@v6
+#      - uses: actions/checkout@v7
 #
 #      - name: Download build artifacts
 #        uses: actions/download-artifact@v4
