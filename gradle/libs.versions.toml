@@ -3,11 +3,11 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.4.0"
+kotlin = "2.4.10"
 kotlinxDatetime = "0.8.0-0.6.x-compat"
 kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.11.0"
-junit = "6.1.1"
+junit = "6.1.2"
 antlr = "4.13.2"
 
 [libraries]
