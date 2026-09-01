@@ -11,7 +11,7 @@ dependencies {
 
     api("com.github.ajalt.clikt:clikt:5.1.0")
 
-    implementation("io.github.wadoon:kotlin-prettyprinting:1.0")
+    implementation("io.github.wadoon:kotlin-prettyprinting:1.1.0")
 
     testImplementation("org.mdkt.compiler:InMemoryJavaCompiler:1.3.0")
     implementation("com.squareup:javapoet:1.13.0")
