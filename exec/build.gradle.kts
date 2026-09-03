@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":run"))
     implementation(project(":ide"))
     implementation(project(":stvs"))
+    implementation(project(":lsp"))
     implementation(libs.clickt)
 }
 
@@ -69,6 +70,7 @@ entrypoint("ide", "edu.kit.iti.formal.automation.fx.Main")
 entrypoint("stvs", "edu.kit.iti.formal.stvs.Main")
 entrypoint("smteta", "edu.kit.iti.formal.automation.testtables.apps.SMTeta")
 entrypoint("xml2st", "edu.kit.iti.formal.automation.Xml2TxtApp")
+entrypoint("verifaps-lsp", "edu.kit.iti.formal.lsp.Main")
 
 application {
     applicationDistribution.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -83,23 +85,23 @@ val tmpTools = project.layout.buildDirectory.dir("tmp/tools").get().asFile.toPat
 //region Download Linux Tools
 val downloadNuxmvLinux by tasks.registering(Download::class) {
     source.set(uri("https://nuxmv.fbk.eu/theme/download.php?file=nuXmv-2.1.0-linux64.tar.xz"))
-    outputFile.set(tmpTools.resolve("nuxmv-linux-64.tar.xz").toFile())
+    outputFile.set(tmpTools.resolve("nuxmv-linux.tar.xz").toFile())
 }
 
 val nuxmvLinuxTar by tasks.registering(ExtractXz::class) {
-    mustRunAfter(downloadNuxmvLinux.get())
+    dependsOn(downloadNuxmvLinux)
     inputs.files(downloadNuxmvLinux.get())
     input.set(downloadNuxmvLinux.get().outputFile.get())
-    output.set(tmpTools.resolve("nuxmv-linux-64.tar").toFile())
+    output.set(tmpTools.resolve("nuxmv-linux.tar").toFile())
 }
 
 val downloadZ3Linux by tasks.registering(Download::class) {
-    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-glibc-2.39.zip"))
-    outputFile.set(tmpTools.resolve("z3-linux.zip").toFile())
+    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-glibc-2.35.tar.gz"))
+    outputFile.set(tmpTools.resolve("z3-linux.tar.gz").toFile())
 }
 //endregion
 
-//region Download Windows Tools
+//region Windows downloads
 val downloadZ3Win by tasks.registering(Download::class) {
     source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-win.zip"))
     outputFile.set(tmpTools.resolve("z3-windows.zip").toFile())
