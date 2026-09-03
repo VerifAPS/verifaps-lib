@@ -38,8 +38,6 @@ import edu.kit.iti.formal.automation.visitors.selectByName
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
 import io.github.wadoon.pp.Engine
-import io.github.wadoon.pp.Engine.KNil
-import io.github.wadoon.pp.Engine.pretty
 import io.github.wadoon.pp.State
 import org.antlr.v4.runtime.*
 import java.io.*

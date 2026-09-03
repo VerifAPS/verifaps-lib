@@ -9,6 +9,8 @@ kotlinxSerializationJSON = "1.11.0"
 kotlinxCoroutines = "1.10.2"
 junit = "6.0.3"
 antlr = "4.13.2"
+lsp4j = "1.0.0"
+guava = "33.4.8-jre"
 
 [libraries]
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -25,6 +27,9 @@ antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
 jdom = { module = "org.jdom:jdom2", version = "2.0.6.1" }
 clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.1.0" }
+lsp4jJsonrpc = { module = "org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", version.ref = "lsp4j" }
+lsp4j = { module = "org.eclipse.lsp4j:org.eclipse.lsp4j", version.ref = "lsp4j" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Libraries can be bundled together for easier import
 [bundles]
