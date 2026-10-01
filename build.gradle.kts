@@ -1,7 +1,7 @@
 plugins {
     id("dokka-convention")
-    id("org.sonarqube") version "7.4.0.8496"
-    id("com.github.ben-manes.versions") version "0.61.0"
+    id("org.sonarqube") version "7.5.0.8588"
+    id("com.github.ben-manes.versions") version "0.64.0"
 }
 
 repositories { mavenCentral() }
