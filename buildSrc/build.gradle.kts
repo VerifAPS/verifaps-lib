@@ -17,6 +17,6 @@ dependencies {
     // implementation("org.tukaani:xz:1.10")
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:2.2.0")
     implementation("org.jetbrains.dokka:dokka-base:2.2.0")
-    implementation("com.diffplug.spotless:com.diffplug.spotless.gradle.plugin:7.0.4")
+    implementation("com.diffplug.spotless:com.diffplug.spotless.gradle.plugin:8.10.3")
     implementation(libs.kotlinGradlePlugin)
 }
