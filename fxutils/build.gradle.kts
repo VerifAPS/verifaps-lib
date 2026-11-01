@@ -19,12 +19,12 @@ dependencies {
     api("no.tornado:tornadofx:1.7.20") {
         exclude("org.jetbrains.kotlin:kotlin-stdlib")
     }
-    api("com.miglayout:miglayout-javafx:11.4.3")
+    api("com.miglayout:miglayout-javafx:11.5.2")
     api("org.fxmisc.richtext:richtextfx:0.11.7")
     api("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("com.pixelduke:fxribbon:1.2.2")
     api("org.jfxtras:jmetro:11.6.16")
-    api("org.controlsfx:controlsfx:11.2.5")
+    api("org.controlsfx:controlsfx:11.2.6")
 }
