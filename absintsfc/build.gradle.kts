@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation("com.github.ajalt.clikt:clikt:5.1.0")
+    implementation("com.github.ajalt.clikt:clikt:5.2.1")
     // implementation("org.graphstream:gs-core:2.0")
     // implementation("org.graphstream:gs-ui:1.3")
     // implementation("org.graphstream:gs-algo:2.0")
