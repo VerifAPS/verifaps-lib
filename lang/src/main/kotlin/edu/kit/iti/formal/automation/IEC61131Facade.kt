@@ -41,6 +41,7 @@ import io.github.wadoon.pp.Engine
 import io.github.wadoon.pp.Engine.KNil
 import io.github.wadoon.pp.Engine.pretty
 import io.github.wadoon.pp.State
+import io.github.wadoon.pp.StatefulPrintWriter
 import org.antlr.v4.runtime.*
 import java.io.*
 import java.nio.charset.Charset
@@ -318,7 +319,10 @@ object IEC61131Facade {
         stp.isPrintComments = comments
         val doc = ast.accept(stp)
         val state = State(width = width, .9)
-        Engine.pretty(stream, state, 0, false, doc)
+        StatefulPrintWriter(stream,state).use { out ->
+            Engine.pretty(out, 0, false, doc)
+            out.flush()
+        }
     }
 
     var useOldSfcTranslator = true
