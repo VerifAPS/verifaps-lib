@@ -38,8 +38,6 @@ import edu.kit.iti.formal.automation.visitors.selectByName
 import edu.kit.iti.formal.util.CodeWriter
 import edu.kit.iti.formal.util.warn
 import io.github.wadoon.pp.Engine
-import io.github.wadoon.pp.Engine.KNil
-import io.github.wadoon.pp.Engine.pretty
 import io.github.wadoon.pp.State
 import io.github.wadoon.pp.StatefulPrintWriter
 import org.antlr.v4.runtime.*
@@ -319,8 +317,8 @@ object IEC61131Facade {
         stp.isPrintComments = comments
         val doc = ast.accept(stp)
         val state = State(width = width, .9)
-        StatefulPrintWriter(stream,state).use { out ->
-            Engine.pretty(out, 0, false, doc)
+        StatefulPrintWriter(stream, state).use { out ->
+            Engine.prettyQ(doc, out, 0, false)
             out.flush()
         }
     }

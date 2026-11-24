@@ -64,7 +64,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
                 blockParam(blockStatement.output, "(", ")")
             )
         indent {
-            accept(blockStatement.statements)
+            +accept(blockStatement.statements)
         }
         nl()
         +"//! END_REGION"
@@ -83,9 +83,9 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     override fun visit(arrayTypeDeclaration: ArrayTypeDeclaration) = build {
         +"ARRAY["
         arrayTypeDeclaration.ranges.forEachIndexed { i, it ->
-            accept(it.start)
+            +accept(it.start)
             +".."
-            accept(it.stop)
+            +accept(it.stop)
             if (i < arrayTypeDeclaration.ranges.size - 1) {
                 +", "
             }
@@ -107,7 +107,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
     override fun visit(integerCondition: CaseCondition.IntegerCondition) = build {
         indent {
-            accept(integerCondition.value)
+            +accept(integerCondition.value)
         }
     }
 
@@ -120,23 +120,23 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
     override fun visit(binaryExpression: BinaryExpression) = build {
         +'('
-        accept(binaryExpression.leftExpr)
+        +accept(binaryExpression.leftExpr)
         space()
         +literals.operator(binaryExpression.operator)
         space()
-        accept(binaryExpression.rightExpr)
+        +accept(binaryExpression.rightExpr)
         +')'
     }
 
     override fun visit(assignmentStatement: AssignmentStatement) = build {
         nl()
-        accept(assignmentStatement.location)
+        +accept(assignmentStatement.location)
         if (assignmentStatement.isAssignmentAttempt) {
             +literals.assignmentAttempt()
         } else {
             +literals.assign()
         }
-        accept(assignmentStatement.expression)
+        +accept(assignmentStatement.expression)
         +";"
     }
 
@@ -162,22 +162,22 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         +"REPEAT"
         +break1
         indent {
-            accept(repeatStatement.statements)
+            +accept(repeatStatement.statements)
         }
         +break1
         printf("UNTIL")
         +break1
-        accept(repeatStatement.condition)
+        +accept(repeatStatement.condition)
         +"END_REPEAT"
     }
 
     override fun visit(whileStatement: WhileStatement) = build {
         nl()
         +"WHILE "
-        accept(whileStatement.condition)
+        +accept(whileStatement.condition)
         +" DO "
         indent {
-            accept(whileStatement.statements)
+            +accept(whileStatement.statements)
         }
         +"END_WHILE"
     }
@@ -185,7 +185,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     override fun visit(unaryExpression: UnaryExpression) = build {
         +literals.operator(unaryExpression.operator)!!
         space()
-        accept(unaryExpression.expression)
+        +accept(unaryExpression.expression)
     }
 
     override fun visit(typeDeclarations: TypeDeclarations) = build {
@@ -205,19 +205,19 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     override fun visit(caseStatement: CaseStatement) = build {
         nl()
         +"CASE "
-        accept(caseStatement.expression)
+        +accept(caseStatement.expression)
         +" OF "
         indent {
 
             for (c in caseStatement.cases) {
-                accept(c)
+                +accept(c)
                 nl()
             }
 
             if (caseStatement.elseCase.size > 0) {
                 nl()
                 +"ELSE "
-                accept(caseStatement.elseCase)
+                +accept(caseStatement.elseCase)
             }
 
             nl()
@@ -238,7 +238,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
         if (symbolicReference.sub != null) {
             +dot
-            accept(symbolicReference.sub)
+            +accept(symbolicReference.sub)
         }
     }
 
@@ -252,12 +252,12 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
     override fun visit(statements: StatementList) = build {
         for (stmt in statements) {
-            accept(stmt)
+            +accept(stmt)
         }
     }
 
     override fun visit(programDeclaration: ProgramDeclaration) = build {
-        printComment(programDeclaration.comment)
+        +printComment(programDeclaration.comment)
         keyword("PROGRAM").space()
         +programDeclaration.name
         indent {
@@ -266,11 +266,11 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
             nl()
 
             if (!programDeclaration.actions.isEmpty()) {
-                programDeclaration.actions.forEach { v -> accept(v) }
+                programDeclaration.actions.forEach { v -> +accept(v) }
                 nl()
             }
 
-            printBody(programDeclaration)
+            +printBody(programDeclaration)
         }
         nl().keyword("END_PROGRAM").nl()
     }
@@ -296,19 +296,19 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         +"FOR "
         +forStatement.variable
         +" := "
-        accept(forStatement.start)
+        +accept(forStatement.start)
         +" TO "
-        accept(forStatement.stop)
+        +accept(forStatement.stop)
         +" DO "
         indent {
-            accept(forStatement.statements)
+            +accept(forStatement.statements)
         }
         nl()
         +"END_FOR"
     }
 
     override fun visit(functionBlockDeclaration: FunctionBlockDeclaration) = build {
-        printComment(functionBlockDeclaration.comment)
+        +printComment(functionBlockDeclaration.comment)
         keyword("FUNCTION_BLOCK ")
         if (functionBlockDeclaration.isFinal) {
             keyword("FINAL ")
@@ -333,19 +333,19 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         }
         indent {
             nl()
-            visit(functionBlockDeclaration.scope)
+            +visit(functionBlockDeclaration.scope)
             nl()
 
             if (functionBlockDeclaration.methods.isNotEmpty()) {
-                functionBlockDeclaration.methods.forEach { accept(it) }
+                functionBlockDeclaration.methods.forEach { +accept(it) }
                 nl()
             }
 
             if (!functionBlockDeclaration.actions.isEmpty()) {
-                functionBlockDeclaration.actions.forEach { v -> accept(v) }
+                functionBlockDeclaration.actions.forEach { v -> +accept(v) }
             }
 
-            printBody(functionBlockDeclaration)
+            +printBody(functionBlockDeclaration)
         }
         nl()
         +"END_FUNCTION_BLOCK"
@@ -374,14 +374,14 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
             // accept(interfaceDeclaration.scope)
 
-            interfaceDeclaration.methods.forEach { m -> accept(m) }
+            interfaceDeclaration.methods.forEach { m -> +accept(m) }
         }
         nl()
         keyword("END_INTERFACE").nl().nl()
     }
 
     override fun visit(clazz: ClassDeclaration) = build {
-        printComment(clazz.comment)
+        +printComment(clazz.comment)
         keyword("CLASS ")
 
         if (clazz.isFinal) {
@@ -408,7 +408,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         indent {
             nl()
             +visit(clazz.scope)
-            clazz.methods.forEach { m -> accept(m) }
+            clazz.methods.forEach { m -> +accept(m) }
         }
         nl()
         keyword("END_CLASS").nl().nl()
@@ -448,7 +448,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     }
 
     override fun visit(functionDeclaration: FunctionDeclaration) = build {
-        printComment(functionDeclaration.comment)
+        +printComment(functionDeclaration.comment)
         keyword("FUNCTION ")
         +functionDeclaration.name
 
@@ -473,12 +473,12 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
     override fun visit(referenceSpecification: ReferenceTypeDeclaration) = build {
         keyword("REF_TO ")
-        accept(referenceSpecification.refTo)
+        +accept(referenceSpecification.refTo)
     }
 
     override fun visit(referenceValue: ReferenceValue) = build {
         keyword("REF(")
-        accept(referenceValue.referenceTo)
+        +accept(referenceValue.referenceTo)
         +")"
     }
 
@@ -487,46 +487,44 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     }
 
     override fun visit(ifStatement: IfStatement) = build {
-        for (i in 0 until ifStatement.conditionalBranches.size) {
+        ifStatement.conditionalBranches.forEachIndexed { i, branch ->
             nl()
-
             if (i == 0) {
                 keyword("IF")
                 space()
             } else {
-                keyword("ELSIF ")
+                keyword("ELSEIF ")
                 space()
             }
-            accept(ifStatement.conditionalBranches[i].condition)
-
+            +accept(branch.condition)
             space().keyword("THEN")
             indent {
-                accept(ifStatement.conditionalBranches[i].statements)
-            }
-
-            if (ifStatement.elseBranch.size > 0) {
-                nl().keyword("ELSE")
-                indent {
-                    accept(ifStatement.elseBranch)
-                }
-                nl().keyword("END_IF")
+                +accept(branch.statements)
             }
         }
+
+        if (ifStatement.elseBranch.size > 0) {
+            nl().keyword("ELSE")
+            indent {
+                +accept(ifStatement.elseBranch)
+            }
+        }
+        nl().keyword("END_IF")
     }
 
     override fun visit(actionDeclaration: ActionDeclaration) = build {
         nl().keyword("ACTION").space()
         +actionDeclaration.name
         indent {
-            printBody(actionDeclaration)
+            +printBody(actionDeclaration)
         }
         nl().keyword("END_ACTION")
     }
 
     override fun visit(invocation: InvocationStatement) = build {
         nl()
-        accept(invocation.callee)
-        visitInvocationParameter(invocation.parameters)
+        +accept(invocation.callee)
+        +visitInvocationParameter(invocation.parameters)
         +";"
     }
 
@@ -554,7 +552,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         indent {
             structureTypeDeclaration.fields.forEach {
                 nl()
-                accept(it)
+                +accept(it)
             }
         }
         keyword("END_STRUCT").write(";").nl()
@@ -565,9 +563,9 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         +": "
         printf(subRangeTypeDeclaration.baseType.identifier!!)
         +"("
-        accept(subRangeTypeDeclaration.range!!.start)
+        +accept(subRangeTypeDeclaration.range!!.start)
         +" .. "
-        accept(subRangeTypeDeclaration.range!!.stop)
+        +accept(subRangeTypeDeclaration.range!!.stop)
         +")"
         /*if (subRangeTypeDeclaration.initialization != null) {
             +(" := ")
@@ -578,7 +576,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
 
     override fun visit(vd: VariableDeclaration) = build {
         write("${vd.name} :")
-        variableDataType(vd)
+        +variableDataType(vd)
     }
 
     val variableDeclarationUseDataType = false
@@ -683,7 +681,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
                 space()
                 indent {
                     for (vd in vars) {
-                        print(vd)
+                        +print(vd)
                     }
                 }
                 nl().keyword("END_VAR")
@@ -695,18 +693,10 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         nl()
         +vd.name
         +" : "
-        variableDataType(vd)
-        when {
-            vd.initValue != null -> {
-                +" := "
-                val (dt, v) = vd.initValue as Value<*, *>
-                +dt.repr(v)
-            }
-
-            vd.init != null -> {
-                +" := "
-                accept(vd.init)
-            }
+        +variableDataType(vd)
+        vd.init?.let {
+            +" := "
+            +accept(it)
         }
         +";"
     }
@@ -723,7 +713,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         +sfcStep.name
         printf(":")
         indent {
-            sfcStep.events.forEach { aa -> visit(aa) }
+            sfcStep.events.forEach { aa -> +visit(aa) }
         }
         nl()
         +"END_STEP"
@@ -747,15 +737,15 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
     override fun visit(sfcNetwork: SFCNetwork) = build {
         val seq = ArrayList(sfcNetwork.steps)
         seq.sortWith(compareBy(SFCStep::isInitial).thenBy(SFCStep::name))
-        seq.forEach { a -> accept(a) }
+        seq.forEach { a -> +accept(a) }
         sfcNetwork.steps.stream()
             .flatMap { s -> s.incoming.stream() }
-            .forEachOrdered { t -> accept(t) }
+            .forEachOrdered { t -> +accept(t) }
     }
 
     override fun visit(sfc: SFCImplementation) = build {
         // sfc.actions.forEach { a -> accept(a) }
-        sfc.networks.forEach { n -> accept(n) }
+        sfc.networks.forEach { n -> +accept(n) }
     }
 
     override fun visit(transition: SFCTransition) = build {
@@ -781,7 +771,7 @@ open class PPStructuredTextPrinter : AstVisitor<Document>() {
         }
         +" := "
 
-        accept(transition.guard)
+        +accept(transition.guard)
         +";"
         space()
         keyword("END_TRANSITION")
