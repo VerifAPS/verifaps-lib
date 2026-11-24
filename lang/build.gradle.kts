@@ -9,7 +9,7 @@ dependencies {
     api(project(":util"))
     api(project(":xml"))
 
-    api("com.github.ajalt.clikt:clikt:5.1.0")
+    api("com.github.ajalt.clikt:clikt:5.2.1")
 
     implementation("io.github.wadoon:kotlin-prettyprinting:1.1.0")
 
