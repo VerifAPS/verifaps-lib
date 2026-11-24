@@ -82,9 +82,12 @@ internal operator fun Position.compareTo(tok: Token): Int {
 }
 
 internal fun SyntaxErrorReporter.ParserException.toDiagnostics(): List<Diagnostic> = errors.map {
+    val line = it.line.coerceAtLeast(1) - 1
+    val start = Position(line, it.charPositionInLine.coerceAtLeast(0))
+    val end = Position(line, start.character + (it.offendingSymbol?.text?.length ?: 1))
     Diagnostic(
-        it.location.toRange,
-        it.message,
+        Range(start, end),
+        it.msg ?: "",
         DiagnosticSeverity.Error,
         "KeY-Parser"
     )

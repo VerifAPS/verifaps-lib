@@ -21,7 +21,7 @@ package edu.kit.iti.formal.lsp.st
 import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.parser.*
 import edu.kit.iti.formal.lsp.*
-import edu.kit.iti.formal.smv.parser.SMVParser
+import edu.kit.iti.formal.lsp.smv.SmvFoldingRange
 import org.antlr.v4.runtime.CharStream
 import org.eclipse.lsp4j.*
 import org.eclipse.lsp4j.services.LanguageClient
@@ -79,24 +79,6 @@ class StructuredTextTextDocumentService(override val server: StructuredTextLangu
         with(SmvFoldingRange) {
             get(params.textDocument.uri).foldingRange()
         }
-}
-
-object SmvFoldingRange : FoldingRangeHelper() {
-    init {
-        register<SMVParser.ModuleContext> { it.name.text }
-        register<SMVParser.IVariableDeclarationContext> { "IVAR" }
-        register<SMVParser.FrozenVariableDeclarationContext> { "FROZENVAR" }
-        register<SMVParser.VariableDeclarationContext> { "VAR" }
-        register<SMVParser.NextBodyContext> { null }
-        register<SMVParser.TransContext> { "TRANS" }
-        register<SMVParser.CtlSpecificationContext> { "CTLSPEC" }
-        register<SMVParser.LtlSpecificationContext> { "LTLSPEC" }
-        register<SMVParser.PslSpecificationContext> { "PSLSPEC" }
-        register<SMVParser.InvarSpecificationContext> { "INVARSPEC" }
-        register<SMVParser.InitBodyContext> { null }
-        register<SMVParser.VarBodyContext> { null }
-        register<SMVParser.AssignConstraintContext> { "ASSIGN" }
-    }
 }
 
 class StructuredTextWorkspaceService(val server: StructuredTextLanguageServer) : WorkspaceService {

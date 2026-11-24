@@ -56,7 +56,8 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
         if (uri !in fileCache) {
             load(uri)
         }
-        return fileCache[uri] ?: throw fileErrors[uri]!!
+        return fileCache[uri]
+            ?: throw (fileErrors[uri] ?: IllegalStateException("No parse result or error cached for '$uri'"))
     }
 
     fun get(uri: String): CompletableFuture<T> = CompletableFuture.supplyAsync {
