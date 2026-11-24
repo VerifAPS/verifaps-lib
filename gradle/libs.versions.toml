@@ -5,7 +5,7 @@
 [versions]
 kotlin = "2.4.21"
 kotlinxDatetime = "0.8.0-0.6.x-compat"
-kotlinxSerializationJSON = "1.12.0"
+kotlinxSerializationJSON = "1.13.0"
 kotlinxCoroutines = "1.11.0"
 junit = "6.1.3"
 antlr = "4.13.2"
@@ -26,7 +26,7 @@ truth = { module = "com.google.truth:truth", version = "1.4.5" }
 antlrRuntime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
 antlr = { module = "org.antlr:antlr4", version.ref = "antlr" }
 jdom = { module = "org.jdom:jdom2", version = "2.0.6.1" }
-clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.1.0" }
+clickt = { module = "com.github.ajalt.clikt:clikt", version = "5.2.1" }
 lsp4jJsonrpc = { module = "org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", version.ref = "lsp4j" }
 lsp4j = { module = "org.eclipse.lsp4j:org.eclipse.lsp4j", version.ref = "lsp4j" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
