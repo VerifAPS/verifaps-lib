@@ -10,12 +10,12 @@ table MinMaxTbl {
 
     group {
         row   I >=1 { mode: Active; learn: -; I: -; Q: 0; W: true }
-        row Lmin >=1 { mode: Learn; learn: true; I: min;  Q: 0; W: false }
-        row Lmax >=1 { mode: Learn; learn: true; I: max;  Q: 0; W: false }
+        row Lmin >=1 { mode: Learning; learn: true; I: min;  Q: 0; W: false }
+        row Lmax >=1 { mode: Learning; learn: true; I: max;  Q: 0; W: false }
 
         group L >=1 {
-            row >=1 { mode: Learn; learn: false; I: -;  Q: 0; W: false }
-            row >=1 { mode: Learn; learn: true;  I: [min,max]; Q: [min,max]; W: =false }
+            row >=1 { mode: Learning; learn: false; I: -;  Q: 0; W: false }
+            row >=1 { mode: Learning; learn: true;  I: [min,max]; Q: [min,max]; W: =false }
         }
 
         group A omega {

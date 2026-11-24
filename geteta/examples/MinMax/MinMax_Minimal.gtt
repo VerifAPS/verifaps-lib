@@ -11,8 +11,8 @@ table MinMaxTbl {
     group {
         row >=1 { mode: Active; learn: -; I: -; Q: 0; W: true }
         group >=1 {
-            row >=1 { mode: Learn; learn: false; I: -;  Q: 0; W: false }
-            row >=1 { mode: Learn; learn: true;  I: [min,max]; Q: [min,max]; W: false }
+            row >=1 { mode: Learning; learn: false; I: -;  Q: 0; W: false }
+            row >=1 { mode: Learning; learn: true;  I: [min,max]; Q: [min,max]; W: false }
         }
     }
 }

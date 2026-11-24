@@ -1,5 +1,5 @@
 TYPE
-  OperationMode : (Learn , Active);
+  OperationMode : (Learning , Active);
 END_TYPE
 
 FUNCTION SEL : INT
@@ -61,7 +61,7 @@ VAR
 END_VAR
 
 
-IF mode = OperationMode#Learn THEN // go into learning
+IF mode = OperationMode#Learning THEN // go into learning
         IF learn THEN
                 lower := MIN(lower, I);
                 upper := MAX(upper, I);

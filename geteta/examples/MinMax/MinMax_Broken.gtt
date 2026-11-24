@@ -19,14 +19,14 @@ table MinMaxBrokenTbl {
         }
         group 2 >= 1 {
             row 3 >= 1{
-                mode: Learn
+                mode: Learning
                 learn: false
                 I: -
                 Q: 0
                 W: false
             }
             row 4 >= 1{
-                mode: Learn
+                mode: Learning
                 learn: true
                 I: [p,q]
                 Q: [p,q]

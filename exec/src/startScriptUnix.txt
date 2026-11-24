@@ -126,9 +126,11 @@ MAX_FD=maximum
 
 ############################
 ## VERIFAPS EXTERNAL TOOLS
-export PATH=\$PATH:\$APP_HOME/tools/nuXmv-2.1.0-linux64/bin/:\$APP_HOME/tools/z3-4.15.2-x64-glibc-2.39/bin/
-export NUXMV=\$APP_HOME/tools/nuXmv-2.1.0-linux64/bin/
-export Z3=\$APP_HOME/tools/z3-4.15.2-x64-glibc-2.39/bin/z3
+if [ -d "\$APP_HOME/tools" ]; then
+    export PATH=\$PATH:\$APP_HOME/tools/nuXmv-2.1.0-linux64/bin/:\$APP_HOME/tools/z3-4.15.2-x64-glibc-2.39/bin/
+    export NUXMV=\$APP_HOME/tools/nuXmv-2.1.0-linux64/bin/nuXmv
+    export Z3=\$APP_HOME/tools/z3-4.15.2-x64-glibc-2.39/bin/z3
+fi
 #############################
 
 

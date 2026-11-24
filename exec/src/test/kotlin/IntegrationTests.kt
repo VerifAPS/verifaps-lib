@@ -33,13 +33,13 @@ val NUXMV_PATH by lazy {
     }
 }
 
-val GETETA_PATH = Paths.get("build/install/exec/bin/geteta")
+val GETETA_PATH = Paths.get("build/install/verifaps-universal/bin/geteta")
     .absolutePathString()
     .also {
         println("geteta path: $it")
     }
 
-val RETETA_PATH = Paths.get("build/install/exec/bin/reteta")
+val RETETA_PATH = Paths.get("build/install/verifaps-universal/bin/reteta")
     .absolutePathString()
     .also {
         println("reteta path: $it")
