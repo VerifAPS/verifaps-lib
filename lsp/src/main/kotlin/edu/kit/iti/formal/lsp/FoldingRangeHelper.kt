@@ -49,12 +49,12 @@ open class FoldingRangeHelper {
                 if (n.start.line == n.stop.line) continue // one line ParserRuleContext, nothing to gain by folding
                 rulesOfFoldingInterests[n.javaClass]?.let {
                     it(n)?.let { text ->
-                        val range = FoldingRange(n.start.line, n.stop.line)
+                        val range = FoldingRange(n.start.line - 1, n.stop.line - 1)
                         range.collapsedText = text
                         result.add(range)
                     }
                 }
-                queue.addAll(n.children.filterIsInstance<ParserRuleContext>())
+                queue.addAll(n.children?.filterIsInstance<ParserRuleContext>() ?: emptyList())
             }
             result as List<FoldingRange>
         }

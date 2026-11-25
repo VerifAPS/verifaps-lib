@@ -29,7 +29,6 @@ dependencies {
     // ANTLR runtime for accessing generated parser classes
     implementation(libs.antlrRuntime)
     
-    testImplementation(kotlin("test"))
     testImplementation(libs.junitApi)
     testImplementation(libs.junitEngine)
 }

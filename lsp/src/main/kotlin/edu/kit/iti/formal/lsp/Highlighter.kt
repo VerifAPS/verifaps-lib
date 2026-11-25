@@ -65,8 +65,14 @@ abstract class Highlighter {
     fun analyzeText(text: String): SemanticTokens {
         val tb = SemanticTokensBuilder()
         analyzeToken(text).forEach { token ->
-            tokenType(token)?.let { tt ->
-                tb.add(token.line - 1, token.charPositionInLine, token.text.length, tt, tokenModifier(token))
+            val type = tokenType(token) ?: return@forEach
+            val lines = (token.text ?: "").split('\n')
+            lines.forEachIndexed { index, segment ->
+                if (segment.isNotEmpty()) {
+                    val line = token.line - 1 + index
+                    val column = if (index == 0) token.charPositionInLine else 0
+                    tb.add(line, column, segment.length, type, tokenModifier(token))
+                }
             }
         }
         return SemanticTokens(tb.data)

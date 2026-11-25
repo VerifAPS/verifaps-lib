@@ -38,19 +38,18 @@ import kotlin.text.substring
 fun String.toPath(): Path = Paths.get(this.replace("file://", ""))
 
 internal fun String.substring(startIndex: Position, endIndex: Position): String {
-    var start: Int = -1
-    var end: Int = -1
-    var currentLine = 0
-    for ((index, ch) in this.withIndex()) {
-        if (ch == '\n') currentLine++
-        if (startIndex.line == currentLine) {
-            start = index + startIndex.character
-        }
-        if (endIndex.line == currentLine) {
-            end = index + endIndex.character
-        }
-        if (start != -1 && end != -1) break
+    val lineStarts = ArrayList<Int>()
+    lineStarts.add(0)
+    forEachIndexed { index, ch ->
+        if (ch == '\n') lineStarts.add(index + 1)
     }
+
+    fun offset(position: Position): Int =
+        (lineStarts.getOrElse(position.line) { length } + position.character)
+            .coerceIn(0, length)
+
+    val start = offset(startIndex)
+    val end = offset(endIndex)
     return substring(min(start, end), max(start, end))
 }
 
@@ -93,14 +92,24 @@ internal fun SyntaxErrorReporter.ParserException.toDiagnostics(): List<Diagnosti
     )
 }
 
-fun ParseCancellationException.toDiagnostics(): List<Diagnostic> = listOf(
-    Diagnostic(
-        Range(Position(0, 0), Position(0, 0)), // TODO
-        message ?: (" " + this),
-        DiagnosticSeverity.Error,
-        "KeY-Parser"
+fun ParseCancellationException.toDiagnostics(): List<Diagnostic> {
+    val match = Regex("line (\\d+):(\\d+)").find(message ?: "")
+    val start = if (match != null) {
+        Position(match.groupValues[1].toInt() - 1, match.groupValues[2].toInt())
+    } else {
+        Position(0, 0)
+    }
+    val end = Position(start.line, start.character + 1)
+
+    return listOf(
+        Diagnostic(
+            Range(start, end),
+            message ?: (" " + this),
+            DiagnosticSeverity.Error,
+            "KeY-Parser"
+        )
     )
-)
+}
 
 internal fun String.substring(range: Range) = substring(range.start, range.end)
 
