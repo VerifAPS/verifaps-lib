@@ -21,9 +21,9 @@ package edu.kit.iti.formal.lsp.st
 import edu.kit.iti.formal.automation.*
 import edu.kit.iti.formal.automation.parser.*
 import edu.kit.iti.formal.lsp.*
-import edu.kit.iti.formal.lsp.smv.SmvFoldingRange
 import org.antlr.v4.runtime.CharStream
 import org.eclipse.lsp4j.*
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
@@ -34,7 +34,6 @@ import kotlin.io.path.readText
 class StructuredTextLanguageServer : MyLanguageServer() {
     val documentHighlighter = StDocumentHighlighter()
 
-    private lateinit var params: InitializeParams
     override lateinit var client: LanguageClient
 
     private val wsService: WorkspaceService by lazy {
@@ -46,8 +45,19 @@ class StructuredTextLanguageServer : MyLanguageServer() {
     }
 
     override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
-        this.params = params
-        return CompletableFuture.completedFuture(InitializeResult())
+        val capabilities = ServerCapabilities()
+        capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
+
+        capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
+            documentHighlighter.legend, SemanticTokensServerFull(true), false,
+            listOf(DocumentFilter("st", "file", Either.forLeft("**/*.st")))
+        )
+        capabilities.semanticTokensProvider.range = Either.forLeft(true)
+        capabilities.foldingRangeProvider = Either.forLeft(true)
+
+        return CompletableFuture.completedFuture(
+            InitializeResult(capabilities, ServerInfo("verifaps-st", "0.0.1")),
+        )
     }
 
     override fun getTextDocumentService(): TextDocumentService = txtService
@@ -62,9 +72,6 @@ class StructuredTextTextDocumentService(override val server: StructuredTextLangu
         return ctx
     }
 
-    override fun diagnostic(params: DocumentDiagnosticParams): CompletableFuture<DocumentDiagnosticReport> =
-        super.diagnostic(params)
-
     //region Semantic Tokens
     override fun semanticTokensFull(params: SemanticTokensParams): CompletableFuture<SemanticTokens> =
         supplyAsync { params.textDocument.uri.toPath().readText() }
@@ -76,12 +83,17 @@ class StructuredTextTextDocumentService(override val server: StructuredTextLangu
     //endregion
 
     override fun foldingRange(params: FoldingRangeRequestParams): CompletableFuture<List<FoldingRange>> =
-        with(SmvFoldingRange) {
+        with(StructuredTextFoldingRange) {
             get(params.textDocument.uri).foldingRange()
         }
 }
 
 class StructuredTextWorkspaceService(val server: StructuredTextLanguageServer) : WorkspaceService {
-    override fun didChangeConfiguration(params: DidChangeConfigurationParams) {}
-    override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams) {}
+    override fun didChangeConfiguration(params: DidChangeConfigurationParams) {
+        // No configuration is currently supported.
+    }
+
+    override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams) {
+        // Documents are re-read on open, change, and save.
+    }
 }
