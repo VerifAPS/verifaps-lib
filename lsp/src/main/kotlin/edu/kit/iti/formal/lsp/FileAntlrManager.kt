@@ -60,18 +60,29 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
             ?: throw (fileErrors[uri] ?: IllegalStateException("No parse result or error cached for '$uri'"))
     }
 
+    protected open fun publishDiagnostics(params: PublishDiagnosticsParams) {
+        server.client.publishDiagnostics(params)
+    }
+
+    private fun parseAndPublish(uri: String) {
+        try {
+            getSync(uri)
+            publishDiagnostics(PublishDiagnosticsParams(uri, emptyList()))
+        } catch (e: SyntaxErrorReporter.ParserException) {
+            publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
+        } catch (e: ParseCancellationException) {
+            publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
+        }
+    }
+
     fun get(uri: String): CompletableFuture<T> = CompletableFuture.supplyAsync {
         try {
             getSync(uri)
         } catch (e: SyntaxErrorReporter.ParserException) {
-            server.client.publishDiagnostics(
-                PublishDiagnosticsParams(uri, e.toDiagnostics())
-            )
+            publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
             throw e
         } catch (e: ParseCancellationException) {
-            server.client.publishDiagnostics(
-                PublishDiagnosticsParams(uri, e.toDiagnostics())
-            )
+            publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
             throw e
         }
     }
@@ -91,24 +102,26 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
 
     private fun invalidate(uri: String) {
         fileCache.remove(uri)
+        fileErrors.remove(uri)
     }
 
     override fun didOpen(params: DidOpenTextDocumentParams) {
-        // read in, in advance
-        getSync(params.textDocument.uri)
+        invalidate(params.textDocument.uri)
+        parseAndPublish(params.textDocument.uri)
     }
 
     override fun didChange(params: DidChangeTextDocumentParams) {
         invalidate(params.textDocument.uri)
+        parseAndPublish(params.textDocument.uri)
     }
 
     override fun didClose(params: DidCloseTextDocumentParams) {
-        // Nothing to do
+        invalidate(params.textDocument.uri)
     }
 
     override fun didSave(params: DidSaveTextDocumentParams) {
         invalidate(params.textDocument.uri)
-        getSync(params.textDocument.uri)
+        parseAndPublish(params.textDocument.uri)
     }
 
 //endregion
