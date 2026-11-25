@@ -27,6 +27,7 @@ import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.InitializeParams
 import org.eclipse.lsp4j.InitializeResult
 import org.eclipse.lsp4j.PublishDiagnosticsParams
+import org.eclipse.lsp4j.TextDocumentContentChangeEvent
 import org.eclipse.lsp4j.TextDocumentIdentifier
 import org.eclipse.lsp4j.TextDocumentItem
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier
@@ -127,14 +128,18 @@ class FileAntlrManagerTest {
     }
 
     @Test
-    fun `didChange reparses and publishes diagnostics`() {
+    fun `didChange parses the change text, not the disk`() {
         val file = tempFile(VALID_ST)
         val uri = file.toUri().toString()
         val (manager, client) = manager()
         manager.didOpen(DidOpenTextDocumentParams(TextDocumentItem(uri, "st", 1, VALID_ST)))
 
-        Files.writeString(file, "PROGRAM")
-        manager.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(uri, 2), emptyList()))
+        manager.didChange(
+            DidChangeTextDocumentParams(
+                VersionedTextDocumentIdentifier(uri, 2),
+                listOf(TextDocumentContentChangeEvent("PROGRAM")),
+            ),
+        )
 
         assertTrue(client.published.last().diagnostics.isNotEmpty())
     }

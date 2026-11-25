@@ -29,7 +29,6 @@ import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.supplyAsync
-import kotlin.io.path.readText
 
 class StructuredTextLanguageServer : MyLanguageServer() {
     val documentHighlighter = StDocumentHighlighter()
@@ -49,7 +48,7 @@ class StructuredTextLanguageServer : MyLanguageServer() {
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
 
         capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
-            documentHighlighter.legend, SemanticTokensServerFull(true), false,
+            documentHighlighter.legend, SemanticTokensServerFull(false), false,
             listOf(DocumentFilter("st", "file", Either.forLeft("**/*.st")))
         )
         capabilities.semanticTokensProvider.range = Either.forLeft(true)
@@ -74,12 +73,12 @@ class StructuredTextTextDocumentService(override val server: StructuredTextLangu
 
     //region Semantic Tokens
     override fun semanticTokensFull(params: SemanticTokensParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { params.textDocument.uri.toPath().readText() }
+        supplyAsync { text(params.textDocument.uri) }
             .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
 
     override fun semanticTokensRange(params: SemanticTokensRangeParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { (params.textDocument.uri).toPath().readText().substring(params.range.start, params.range.end) }
-            .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
+        supplyAsync { text(params.textDocument.uri) }
+            .thenApplyAsync { server.documentHighlighter.analyzeText(it, params.range) }
     //endregion
 
     override fun foldingRange(params: FoldingRangeRequestParams): CompletableFuture<List<FoldingRange>> =

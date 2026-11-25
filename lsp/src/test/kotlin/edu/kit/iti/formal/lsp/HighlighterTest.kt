@@ -23,7 +23,10 @@ import edu.kit.iti.formal.lsp.st.StDocumentHighlighter
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
+import org.eclipse.lsp4j.Position
+import org.eclipse.lsp4j.Range
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 
@@ -51,5 +54,22 @@ class HighlighterTest {
         assertEquals(1, tokens.data[5].toInt())
         assertEquals(0, tokens.data[6].toInt())
         assertEquals(4, tokens.data[7].toInt())
+    }
+
+    @Test
+    fun `range tokens keep absolute line numbers`() {
+        val text = """
+            PROGRAM P
+            VAR
+                x : INT;
+            END_VAR
+            x := 1;
+            END_PROGRAM
+        """.trimIndent()
+
+        val tokens = StTestHighlighter().analyzeText(text, Range(Position(4, 0), Position(5, 0)))
+
+        assertTrue(tokens.data.isNotEmpty())
+        assertEquals(4, tokens.data[0].toInt())
     }
 }

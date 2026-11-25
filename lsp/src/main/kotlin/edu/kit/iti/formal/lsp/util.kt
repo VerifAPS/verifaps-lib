@@ -29,13 +29,14 @@ import org.eclipse.lsp4j.Diagnostic
 import org.eclipse.lsp4j.DiagnosticSeverity
 import org.eclipse.lsp4j.Position
 import org.eclipse.lsp4j.Range
+import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.text.substring
 
-fun String.toPath(): Path = Paths.get(this.replace("file://", ""))
+fun String.toPath(): Path = runCatching { Paths.get(URI(this)) }.getOrElse { Paths.get(this) }
 
 internal fun String.substring(startIndex: Position, endIndex: Position): String {
     val lineStarts = ArrayList<Int>()

@@ -53,7 +53,7 @@ class GttLanguageServer : MyLanguageServer() {
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
 
         capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
-            documentHighlighter.legend, SemanticTokensServerFull(true), false,
+            documentHighlighter.legend, SemanticTokensServerFull(false), false,
             listOf(DocumentFilter("gtt", "file", Either.forLeft("**/*.gtt")))
         )
         capabilities.semanticTokensProvider.range = Either.forLeft(true)

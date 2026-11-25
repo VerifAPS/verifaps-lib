@@ -29,7 +29,6 @@ import org.eclipse.lsp4j.SemanticTokensParams
 import org.eclipse.lsp4j.SemanticTokensRangeParams
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.supplyAsync
-import kotlin.io.path.readText
 
 class GttTextDocumentService(override val server: GttLanguageServer) : FileAntlrManager<TestTableLanguageParser.FileContext>(server) {
     override fun parse(x: CharStream): TestTableLanguageParser.FileContext {
@@ -41,12 +40,12 @@ class GttTextDocumentService(override val server: GttLanguageServer) : FileAntlr
 
     //region Semantic Tokens
     override fun semanticTokensFull(params: SemanticTokensParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { params.textDocument.uri.toPath().readText() }
+        supplyAsync { text(params.textDocument.uri) }
             .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
 
     override fun semanticTokensRange(params: SemanticTokensRangeParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { params.textDocument.uri.toPath().readText().substring(params.range.start, params.range.end) }
-            .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
+        supplyAsync { text(params.textDocument.uri) }
+            .thenApplyAsync { server.documentHighlighter.analyzeText(it, params.range) }
     //endregion
 
     override fun foldingRange(params: FoldingRangeRequestParams): CompletableFuture<List<FoldingRange>> =

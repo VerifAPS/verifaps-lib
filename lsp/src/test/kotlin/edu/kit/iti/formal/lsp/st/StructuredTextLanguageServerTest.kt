@@ -45,6 +45,7 @@ class StructuredTextLanguageServerTest {
 
         assertEquals(TextDocumentSyncKind.Full, caps.textDocumentSync.left)
         assertNotNull(caps.semanticTokensProvider)
+        assertEquals(false, caps.semanticTokensProvider.full.right.delta)
         assertEquals(true, caps.foldingRangeProvider.left)
         assertEquals("**/*.st", caps.semanticTokensProvider.documentSelector.single().pattern.left)
         assertNull(caps.hoverProvider)

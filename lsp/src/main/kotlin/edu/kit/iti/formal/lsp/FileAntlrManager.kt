@@ -24,14 +24,20 @@ import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.misc.ParseCancellationException
+import org.eclipse.lsp4j.Diagnostic
+import org.eclipse.lsp4j.DiagnosticSeverity
 import org.eclipse.lsp4j.DidChangeTextDocumentParams
 import org.eclipse.lsp4j.DidCloseTextDocumentParams
 import org.eclipse.lsp4j.DidOpenTextDocumentParams
 import org.eclipse.lsp4j.DidSaveTextDocumentParams
+import org.eclipse.lsp4j.Position
 import org.eclipse.lsp4j.PublishDiagnosticsParams
+import org.eclipse.lsp4j.Range
 import org.eclipse.lsp4j.services.TextDocumentService
+import java.io.IOException
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import kotlin.io.path.readText
 
 abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLanguageServer) : TextDocumentService {
     val fileErrors = CacheBuilder.newBuilder()
@@ -50,6 +56,8 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
         .build<String, T>()
         .asMap()
 
+    private val fileText = HashMap<String, String>()
+
     abstract fun parse(x: CharStream): T
 
     fun getSync(uri: String): T {
@@ -59,6 +67,8 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
         return fileCache[uri]
             ?: throw (fileErrors[uri] ?: IllegalStateException("No parse result or error cached for '$uri'"))
     }
+
+    protected fun text(uri: String): String = fileText[uri] ?: uri.toPath().readText()
 
     protected open fun publishDiagnostics(params: PublishDiagnosticsParams) {
         server.client.publishDiagnostics(params)
@@ -72,6 +82,20 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
             publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
         } catch (e: ParseCancellationException) {
             publishDiagnostics(PublishDiagnosticsParams(uri, e.toDiagnostics()))
+        } catch (e: IOException) {
+            publishDiagnostics(
+                PublishDiagnosticsParams(
+                    uri,
+                    listOf(
+                        Diagnostic(
+                            Range(Position(0, 0), Position(0, 0)),
+                            e.message ?: e.toString(),
+                            DiagnosticSeverity.Error,
+                            "verifaps",
+                        ),
+                    ),
+                ),
+            )
         }
     }
 
@@ -88,9 +112,9 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
     }
 
     private fun load(uri: String): T? {
-        val path = uri.toPath()
         try {
-            val ctx = parse(CharStreams.fromPath(path))
+            val stream = fileText[uri]?.let { CharStreams.fromString(it) } ?: CharStreams.fromPath(uri.toPath())
+            val ctx = parse(stream)
             fileErrors.remove(uri)
             fileCache[uri] = ctx
             return ctx
@@ -106,22 +130,30 @@ abstract class FileAntlrManager<T : ParserRuleContext>(open val server: MyLangua
     }
 
     override fun didOpen(params: DidOpenTextDocumentParams) {
-        invalidate(params.textDocument.uri)
-        parseAndPublish(params.textDocument.uri)
+        val uri = params.textDocument.uri
+        fileText[uri] = params.textDocument.text
+        invalidate(uri)
+        parseAndPublish(uri)
     }
 
     override fun didChange(params: DidChangeTextDocumentParams) {
-        invalidate(params.textDocument.uri)
-        parseAndPublish(params.textDocument.uri)
+        val uri = params.textDocument.uri
+        params.contentChanges.lastOrNull()?.text?.let { fileText[uri] = it }
+        invalidate(uri)
+        parseAndPublish(uri)
     }
 
     override fun didClose(params: DidCloseTextDocumentParams) {
-        invalidate(params.textDocument.uri)
+        val uri = params.textDocument.uri
+        fileText.remove(uri)
+        invalidate(uri)
     }
 
     override fun didSave(params: DidSaveTextDocumentParams) {
-        invalidate(params.textDocument.uri)
-        parseAndPublish(params.textDocument.uri)
+        val uri = params.textDocument.uri
+        params.text?.let { fileText[uri] = it }
+        invalidate(uri)
+        parseAndPublish(uri)
     }
 
 //endregion

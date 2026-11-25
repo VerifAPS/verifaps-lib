@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.eclipse.lsp4j.Position
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class UtilTest {
     @Test
@@ -47,6 +48,13 @@ class UtilTest {
         assertEquals(Position(1, 3), diagnostic.range.start)
         assertEquals(Position(1, 6), diagnostic.range.end)
         assertEquals("x", diagnostic.message.left)
+    }
+
+    @Test
+    fun `file uris with spaces decode`() {
+        val file = Files.createTempFile("lsp space", ".st")
+
+        assertEquals(file, file.toUri().toString().toPath())
     }
 
     @Test

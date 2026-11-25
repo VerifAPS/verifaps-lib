@@ -21,6 +21,8 @@ package edu.kit.iti.formal.lsp
 import edu.kit.iti.formal.lsp.gtt.GttLanguageServer
 import edu.kit.iti.formal.lsp.smv.SmvLanguageServer
 import edu.kit.iti.formal.lsp.st.StructuredTextLanguageServer
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -30,5 +32,13 @@ class MainTest {
         assertTrue(createLanguageServer(Language.STRUCTURED_TEXT) is StructuredTextLanguageServer)
         assertTrue(createLanguageServer(Language.SMV) is SmvLanguageServer)
         assertTrue(createLanguageServer(Language.GTT) is GttLanguageServer)
+    }
+
+    @Test
+    fun `parseLanguage accepts the documented values`() {
+        assertEquals(Language.STRUCTURED_TEXT, parseLanguage("st"))
+        assertEquals(Language.GTT, parseLanguage("gtt"))
+        assertEquals(Language.SMV, parseLanguage("smv"))
+        assertThrows(IllegalArgumentException::class.java) { parseLanguage("nope") }
     }
 }

@@ -47,6 +47,7 @@ class GttLanguageServerTest {
         val caps = GttLanguageServer().initialize(InitializeParams()).get().capabilities
 
         assertEquals(TextDocumentSyncKind.Full, caps.textDocumentSync.left)
+        assertEquals(false, caps.semanticTokensProvider.full.right.delta)
         assertEquals("**/*.gtt", caps.semanticTokensProvider.documentSelector.single().pattern.left)
         assertNotNull(caps.foldingRangeProvider)
     }

@@ -18,8 +18,10 @@
  * *****************************************************************/
 package edu.kit.iti.formal.lsp.smv
 
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
 import edu.kit.iti.formal.lsp.*
 import edu.kit.iti.formal.smv.SMVFacade
+import edu.kit.iti.formal.smv.parser.SMVLexer
 import edu.kit.iti.formal.smv.parser.SMVParser
 import org.antlr.v4.runtime.CharStream
 import org.eclipse.lsp4j.*
@@ -29,7 +31,6 @@ import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.supplyAsync
-import kotlin.io.path.readText
 
 class SmvLanguageServer : MyLanguageServer() {
     override lateinit var client: LanguageClient
@@ -52,7 +53,7 @@ class SmvLanguageServer : MyLanguageServer() {
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
 
         capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
-            documentHighlighter.legend, SemanticTokensServerFull(true), false,
+            documentHighlighter.legend, SemanticTokensServerFull(false), false,
             listOf(DocumentFilter("smv", "file", Either.forLeft("**/*.smv")))
         )
         capabilities.semanticTokensProvider.id = "verifaps-smv"
@@ -66,16 +67,27 @@ class SmvLanguageServer : MyLanguageServer() {
 }
 
 class SmvTextTextDocumentService(override val server: SmvLanguageServer) : FileAntlrManager<SMVParser.ModulesContext>(server) {
-    override fun parse(x: CharStream): SMVParser.ModulesContext = SMVFacade.getParser(x).modules()
+    override fun parse(x: CharStream): SMVParser.ModulesContext {
+        val parser = SMVFacade.getParser(x)
+        val reporter = SyntaxErrorReporter()
+        val lexer = parser.tokenStream.tokenSource as SMVLexer
+        lexer.removeErrorListeners()
+        lexer.addErrorListener(reporter)
+        parser.removeErrorListeners()
+        parser.addErrorListener(reporter)
+        val context = parser.modules()
+        reporter.throwException()
+        return context
+    }
 
     //region Semantic Tokens
     override fun semanticTokensFull(params: SemanticTokensParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { params.textDocument.uri.toPath().readText() }
+        supplyAsync { text(params.textDocument.uri) }
             .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
 
     override fun semanticTokensRange(params: SemanticTokensRangeParams): CompletableFuture<SemanticTokens> =
-        supplyAsync { (params.textDocument.uri).toPath().readText().substring(params.range.start, params.range.end) }
-            .thenApplyAsync { server.documentHighlighter.analyzeText(it) }
+        supplyAsync { text(params.textDocument.uri) }
+            .thenApplyAsync { server.documentHighlighter.analyzeText(it, params.range) }
     //endregion
 
     override fun foldingRange(params: FoldingRangeRequestParams): CompletableFuture<List<FoldingRange>> =

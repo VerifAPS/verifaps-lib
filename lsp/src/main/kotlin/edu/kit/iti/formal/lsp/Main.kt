@@ -20,10 +20,10 @@ package edu.kit.iti.formal.lsp
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import edu.kit.iti.formal.lsp.gtt.GttLanguageServer
 import edu.kit.iti.formal.lsp.smv.SmvLanguageServer
@@ -71,6 +71,13 @@ internal fun createLanguageServer(language: Language): MyLanguageServer = when (
     Language.SMV -> SmvLanguageServer()
 }
 
+internal fun parseLanguage(value: String): Language = when (value.lowercase()) {
+    "gtt" -> Language.GTT
+    "st" -> Language.STRUCTURED_TEXT
+    "smv" -> Language.SMV
+    else -> throw IllegalArgumentException("Unknown language '$value' (choose from gtt, st, smv)")
+}
+
 class VerifapsLspCommand : CliktCommand("VerifAPS Language Server") {
     private val traceEnabled by option("--trace", help = "Enable tracing (file path or '-' for stderr)")
     private val stdioMode by option("--stdio", help = "Use standard I/O for communication").flag()
@@ -79,7 +86,7 @@ class VerifapsLspCommand : CliktCommand("VerifAPS Language Server") {
     private val language by option(
         "--language",
         help = "Language to serve: gtt, st, smv (default: st)"
-    ).enum<Language>().default(Language.STRUCTURED_TEXT)
+    ).convert { parseLanguage(it) }.default(Language.STRUCTURED_TEXT)
 
     override fun run() {
         try {

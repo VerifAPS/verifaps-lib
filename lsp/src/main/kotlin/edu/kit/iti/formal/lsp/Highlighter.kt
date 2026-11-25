@@ -20,6 +20,7 @@ package edu.kit.iti.formal.lsp
 
 import org.antlr.v4.runtime.Lexer
 import org.antlr.v4.runtime.Token
+import org.eclipse.lsp4j.Range
 import org.eclipse.lsp4j.SemanticTokenModifiers
 import org.eclipse.lsp4j.SemanticTokenTypes
 import org.eclipse.lsp4j.SemanticTokens
@@ -62,7 +63,7 @@ abstract class Highlighter {
     fun analyzeToken(it: String): Sequence<Token> =
         createLexer(it).asSequence()
 
-    fun analyzeText(text: String): SemanticTokens {
+    fun analyzeText(text: String, range: Range? = null): SemanticTokens {
         val tb = SemanticTokensBuilder()
         analyzeToken(text).forEach { token ->
             val type = tokenType(token) ?: return@forEach
@@ -71,11 +72,21 @@ abstract class Highlighter {
                 if (segment.isNotEmpty()) {
                     val line = token.line - 1 + index
                     val column = if (index == 0) token.charPositionInLine else 0
-                    tb.add(line, column, segment.length, type, tokenModifier(token))
+                    if (range == null || inRange(line, column, segment.length, range)) {
+                        tb.add(line, column, segment.length, type, tokenModifier(token))
+                    }
                 }
             }
         }
         return SemanticTokens(tb.data)
+    }
+
+    private fun inRange(line: Int, column: Int, length: Int, range: Range): Boolean {
+        if (line < range.start.line || line > range.end.line) return false
+        val end = column + length
+        if (line == range.start.line && end <= range.start.character) return false
+        if (line == range.end.line && column >= range.end.character) return false
+        return true
     }
 
     abstract fun tokenModifier(token: Token): Int

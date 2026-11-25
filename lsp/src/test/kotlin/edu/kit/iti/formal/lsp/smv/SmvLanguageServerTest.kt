@@ -18,11 +18,19 @@
  * *****************************************************************/
 package edu.kit.iti.formal.lsp.smv
 
+import edu.kit.iti.formal.automation.parser.SyntaxErrorReporter
+import org.eclipse.lsp4j.FoldingRangeRequestParams
 import org.eclipse.lsp4j.InitializeParams
+import org.eclipse.lsp4j.SemanticTokensParams
+import org.eclipse.lsp4j.TextDocumentIdentifier
 import org.eclipse.lsp4j.TextDocumentSyncKind
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.nio.file.Files
 
 class SmvLanguageServerTest {
     @Test
@@ -30,10 +38,34 @@ class SmvLanguageServerTest {
         val caps = SmvLanguageServer().initialize(InitializeParams()).get().capabilities
 
         assertEquals(TextDocumentSyncKind.Full, caps.textDocumentSync.left)
+        assertEquals(false, caps.semanticTokensProvider.full.right.delta)
         assertEquals("**/*.smv", caps.semanticTokensProvider.documentSelector.single().pattern.left)
         assertEquals(true, caps.foldingRangeProvider.left)
         assertNull(caps.hoverProvider)
         assertNull(caps.codeActionProvider)
         assertNull(caps.executeCommandProvider)
+    }
+
+    @Test
+    fun `a broken smv file is reported as a parse error`() {
+        val file = Files.createTempFile("lsp", ".smv")
+        Files.writeString(file, "MODULE main VAR x : ;")
+        val service = SmvLanguageServer().getTextDocumentService() as SmvTextTextDocumentService
+
+        assertThrows(SyntaxErrorReporter.ParserException::class.java) {
+            service.getSync(file.toUri().toString())
+        }
+    }
+
+    @Test
+    fun `a valid smv file yields tokens and folding ranges`() {
+        val file = Files.createTempFile("lsp", ".smv")
+        Files.writeString(file, "MODULE main\nVAR\n  x : boolean;\nASSIGN\n  init(x) := FALSE;\n")
+        val uri = file.toUri().toString()
+        val service = SmvLanguageServer().getTextDocumentService() as SmvTextTextDocumentService
+
+        assertDoesNotThrow { service.getSync(uri) }
+        assertTrue(service.semanticTokensFull(SemanticTokensParams(TextDocumentIdentifier(uri))).get().data.isNotEmpty())
+        assertTrue(service.foldingRange(FoldingRangeRequestParams(TextDocumentIdentifier(uri))).get().isNotEmpty())
     }
 }
