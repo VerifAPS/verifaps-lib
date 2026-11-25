@@ -96,8 +96,8 @@ val nuxmvLinuxTar by tasks.registering(ExtractXz::class) {
 }
 
 val downloadZ3Linux by tasks.registering(Download::class) {
-    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-glibc-2.35.tar.gz"))
-    outputFile.set(tmpTools.resolve("z3-linux.tar.gz").toFile())
+    source.set(uri("https://github.com/Z3Prover/z3/releases/download/z3-4.15.2/z3-4.15.2-x64-glibc-2.39.zip"))
+    outputFile.set(tmpTools.resolve("z3-linux.zip").toFile())
 }
 //endregion
 
