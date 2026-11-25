@@ -19,10 +19,16 @@
 package edu.kit.iti.formal.lsp.gtt
 
 import edu.kit.iti.formal.lsp.MyLanguageServer
+import org.eclipse.lsp4j.DocumentFilter
 import org.eclipse.lsp4j.InitializeParams
 import org.eclipse.lsp4j.InitializeResult
+import org.eclipse.lsp4j.SemanticTokensServerFull
+import org.eclipse.lsp4j.SemanticTokensWithRegistrationOptions
+import org.eclipse.lsp4j.ServerCapabilities
+import org.eclipse.lsp4j.ServerInfo
+import org.eclipse.lsp4j.TextDocumentSyncKind
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.LanguageClient
-import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
 import java.util.concurrent.CompletableFuture
 
@@ -30,21 +36,35 @@ import java.util.concurrent.CompletableFuture
  * Language Server for Generalized Test Tables (GTT).
  */
 class GttLanguageServer : MyLanguageServer() {
-    private lateinit var clientParams: InitializeParams
     override lateinit var client: LanguageClient
 
+    val documentHighlighter = GttDocumentHighlighter()
+
+    private val wsService: WorkspaceService by lazy {
+        GttTextWorkspaceService(this)
+    }
+
+    private val txtService: GttTextDocumentService by lazy {
+        GttTextDocumentService(this)
+    }
+
     override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
-        this.clientParams = params
-        val result = InitializeResult()
+        val capabilities = ServerCapabilities()
+        capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
 
-        return CompletableFuture.completedFuture(result)
+        capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
+            documentHighlighter.legend, SemanticTokensServerFull(true), false,
+            listOf(DocumentFilter("gtt", "file", Either.forLeft("**/*.gtt")))
+        )
+        capabilities.semanticTokensProvider.range = Either.forLeft(true)
+        capabilities.foldingRangeProvider = Either.forLeft(true)
+
+        return CompletableFuture.completedFuture(
+            InitializeResult(capabilities, ServerInfo("verifaps-gtt", "0.0.1")),
+        )
     }
 
-    override fun getTextDocumentService(): TextDocumentService? {
-        TODO("Not yet implemented")
-    }
+    override fun getTextDocumentService(): GttTextDocumentService = txtService
 
-    override fun getWorkspaceService(): WorkspaceService? {
-        TODO("Not yet implemented")
-    }
+    override fun getWorkspaceService(): WorkspaceService = wsService
 }
