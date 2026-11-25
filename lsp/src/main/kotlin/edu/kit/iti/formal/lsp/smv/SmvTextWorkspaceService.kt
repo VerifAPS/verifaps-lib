@@ -24,8 +24,10 @@ import org.eclipse.lsp4j.services.WorkspaceService
 
 class SmvTextWorkspaceService(server: SmvLanguageServer) : WorkspaceService {
     override fun didChangeConfiguration(params: DidChangeConfigurationParams?) {
+        // No configuration is currently supported.
     }
 
     override fun didChangeWatchedFiles(params: DidChangeWatchedFilesParams?) {
+        // Documents are re-read on open, change, and save.
     }
 }

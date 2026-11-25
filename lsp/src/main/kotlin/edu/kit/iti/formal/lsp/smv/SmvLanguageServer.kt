@@ -27,13 +27,11 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.lsp4j.services.TextDocumentService
 import org.eclipse.lsp4j.services.WorkspaceService
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletableFuture.supplyAsync
 import kotlin.io.path.readText
 
 class SmvLanguageServer : MyLanguageServer() {
-    private lateinit var initParams: InitializeParams
     override lateinit var client: LanguageClient
 
     private val wsService: WorkspaceService by lazy {
@@ -49,77 +47,20 @@ class SmvLanguageServer : MyLanguageServer() {
     override fun getTextDocumentService(): TextDocumentService = txtService
     override fun getWorkspaceService(): WorkspaceService = wsService
 
-    /**
-     * Loads LSP actions via ServiceLoader pattern.
-     *
-     * Extensions can register custom actions by implementing [LspAction] interface
-     * and adding a META-INF/services/org.key_project.key.lsp.actions.LspAction file
-     * with the fully qualified class name.
-     */
-    internal val actions by lazy {
-        ServiceLoader.load(LspAction::class.java).filterNotNull().toList()
-    }
-
     override fun initialize(params: InitializeParams): CompletableFuture<InitializeResult> {
-        this.initParams = params
-        val smvFiles = DocumentFilter("smv", "file", Either.forLeft("**/*.key"))
-
         val capabilities = ServerCapabilities()
-        capabilities.setHoverProvider(true)
-        capabilities.signatureHelpProvider = SignatureHelpOptions(listOf("<", "("), listOf("<", "(", ","))
-        capabilities.foldingRangeProvider = Either.forRight(FoldingRangeProviderOptions("KeY"))
-        capabilities.diagnosticProvider = DiagnosticRegistrationOptions(false, true).also {
-            it.identifier = "smv-lsp"
-            it.documentSelector = listOf(smvFiles)
-        }
-
-        capabilities.setDocumentSymbolProvider(true)
-        capabilities.setDeclarationProvider(DeclarationRegistrationOptions("KeY"))
-
-        capabilities.setCodeActionProvider(CodeActionOptions(listOf("key")))
-        capabilities.executeCommandProvider = ExecuteCommandOptions(actions.map { it.id })
-        capabilities.codeLensProvider = CodeLensOptions(true)
-        capabilities.selectionRangeProvider = Either.forRight(SelectionRangeRegistrationOptions("KeY"))
-
         capabilities.setTextDocumentSync(TextDocumentSyncKind.Full)
-        capabilities.completionProvider = CompletionOptions(true, listOf(",", "(", ")", "<", ">", "\\"))
 
         capabilities.semanticTokensProvider = SemanticTokensWithRegistrationOptions(
             documentHighlighter.legend, SemanticTokensServerFull(true), false,
-            listOf(smvFiles)
+            listOf(DocumentFilter("smv", "file", Either.forLeft("**/*.smv")))
         )
-        capabilities.semanticTokensProvider.id = "smv-lsp"
+        capabilities.semanticTokensProvider.id = "verifaps-smv"
         capabilities.semanticTokensProvider.range = Either.forLeft(true)
-
-        capabilities.documentOnTypeFormattingProvider = null
-
-        capabilities.setDocumentFormattingProvider(true)
-        capabilities.setDocumentRangeFormattingProvider(true)
-        capabilities.documentLinkProvider = DocumentLinkOptions(false)
-
-        // capabilities.setWorkspaceSymbolProvider(true)
-
-        capabilities.textDocument = TextDocumentServerCapabilities()
-        capabilities.textDocument.diagnostic = DiagnosticServerCapabilities().also { it.markupMessageSupport = true }
-
-        // capabilities.workspace = WorkspaceServerCapabilities()
-        // capabilities.workspace.workspaceFolders = WorkspaceFoldersOptions().also {
-        //    it.supported = true
-        //    it.changeNotifications = Either.forRight(true)
-        // }
-
-        // capabilities.workspace.textDocumentContent = TextDocumentContentRegistrationOptions(
-        //    listOf("jar:file")
-        // )
+        capabilities.foldingRangeProvider = Either.forLeft(true)
 
         return CompletableFuture.completedFuture(
-            InitializeResult(
-                capabilities,
-                ServerInfo(
-                    "smv-lsp",
-                    "0.0.1"
-                )
-            )
+            InitializeResult(capabilities, ServerInfo("verifaps-smv", "0.0.1")),
         )
     }
 }

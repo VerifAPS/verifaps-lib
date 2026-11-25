@@ -16,8 +16,24 @@
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/gpl-3.0.html>.
  * *****************************************************************/
-package edu.kit.iti.formal.lsp
+package edu.kit.iti.formal.lsp.smv
 
-interface LspAction {
-    val id: String
+import org.eclipse.lsp4j.InitializeParams
+import org.eclipse.lsp4j.TextDocumentSyncKind
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Test
+
+class SmvLanguageServerTest {
+    @Test
+    fun `initialize advertises smv sync, tokens, folding only`() {
+        val caps = SmvLanguageServer().initialize(InitializeParams()).get().capabilities
+
+        assertEquals(TextDocumentSyncKind.Full, caps.textDocumentSync.left)
+        assertEquals("**/*.smv", caps.semanticTokensProvider.documentSelector.single().pattern.left)
+        assertEquals(true, caps.foldingRangeProvider.left)
+        assertNull(caps.hoverProvider)
+        assertNull(caps.codeActionProvider)
+        assertNull(caps.executeCommandProvider)
+    }
 }
