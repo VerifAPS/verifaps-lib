@@ -6,6 +6,6 @@ description = "PCLOpenXML"
 dependencies {
     api(project(":util"))
     api(libs.jdom)
-    api("jaxen:jaxen:2.0.0")
-    api("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+    api("jaxen:jaxen:2.0.6")
+    api("com.fasterxml.jackson.core:jackson-databind:2.23.0")
 }

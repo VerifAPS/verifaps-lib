@@ -40,8 +40,8 @@ dependencies {
     implementation(project(":lang"))
     implementation(project(":geteta"))
 
-    implementation("org.sosy-lab:java-smt:5.0.1-523-g9001c0ea4")
-    val z3Version = "4.16.0"
+    implementation("org.sosy-lab:java-smt:5.0.1-990-g2a1205c7f")
+    val z3Version = "4.17.0-1009b13"
     //javasmt-solver-z3-4.13.4-libz3-x64.dll
     runtimeOnly("org.sosy-lab:javasmt-solver-z3:$z3Version:libz3-x64@dll")
     runtimeOnly("org.sosy-lab:javasmt-solver-z3:$z3Version:libz3java-x64@dll")
