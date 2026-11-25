@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    dokkaPlugin("org.jetbrains.dokka:mathjax-plugin:2.0.0")
+    dokkaPlugin("org.jetbrains.dokka:mathjax-plugin:2.3.0")
     dokkaPlugin("com.glureau:html-mermaid-dokka-plugin:0.6.0")
 }
 

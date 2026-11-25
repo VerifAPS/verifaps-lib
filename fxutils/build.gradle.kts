@@ -4,14 +4,14 @@ plugins {
 }
 
 javafx {
-    version = "22"
+    version = "22.0.2"
     modules = listOf("javafx.controls")
 }
 
 dependencies {
     for (module in listOf("javafx-controls", "javafx-fxml", "javafx-graphics", "javafx-web")) {
         for (classifier in listOf("win", "linux", "mac")) {
-            api("org.openjfx:$module:22:$classifier")
+            api("org.openjfx:$module:22.0.2:$classifier")
         }
     }
 

@@ -61,7 +61,7 @@ dependencies {
 
     testImplementation("com.google.truth:truth:1.4.4")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.1.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.4.21")
     testImplementation(testFixtures(project(":util")))
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -109,7 +109,7 @@ tasks.withType<Test>().configureEach {
 }
 
 jacoco {
-    toolVersion = "0.8.12"
+    toolVersion = "0.8.16"
 }
 
 tasks.jacocoTestReport {
