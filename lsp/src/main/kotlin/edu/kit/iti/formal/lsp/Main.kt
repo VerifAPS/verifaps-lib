@@ -65,6 +65,12 @@ enum class Language {
     SMV
 }
 
+internal fun createLanguageServer(language: Language): MyLanguageServer = when (language) {
+    Language.GTT -> GttLanguageServer()
+    Language.STRUCTURED_TEXT -> StructuredTextLanguageServer()
+    Language.SMV -> SmvLanguageServer()
+}
+
 class VerifapsLspCommand : CliktCommand("VerifAPS Language Server") {
     private val traceEnabled by option("--trace", help = "Enable tracing (file path or '-' for stderr)")
     private val stdioMode by option("--stdio", help = "Use standard I/O for communication").flag()
@@ -72,7 +78,7 @@ class VerifapsLspCommand : CliktCommand("VerifAPS Language Server") {
     private val clientMode by option("--client", help = "Connect as TCP client to specified port").int()
     private val language by option(
         "--language",
-        help = "Language to serve: gtt, st, smv (default: auto-detect)"
+        help = "Language to serve: gtt, st, smv (default: st)"
     ).enum<Language>().default(Language.STRUCTURED_TEXT)
 
     override fun run() {
@@ -89,11 +95,7 @@ class VerifapsLspCommand : CliktCommand("VerifAPS Language Server") {
     }
 
     private fun launchLanguageServer(input: InputStream, output: OutputStream): Future<*> {
-        val ls = when (language) {
-            Language.GTT -> GttLanguageServer()
-            Language.STRUCTURED_TEXT -> StructuredTextLanguageServer()
-            Language.SMV -> SmvLanguageServer()
-        }
+        val ls = createLanguageServer(language)
 
         val launcher = LSPLauncher.Builder<LanguageClient>()
             .setLocalService(ls)
